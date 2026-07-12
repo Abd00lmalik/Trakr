@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const sampleRequest = {
   user: {
     name: "Amina",
@@ -18,8 +20,19 @@ export default function Home() {
   return (
     <main>
       <section className="hero">
-        <p className="eyebrow">A2MCP Opportunity Companion</p>
-        <h1>Trakr</h1>
+        <div className="brand-lockup">
+          <Image
+            className="brand-logo"
+            src="/trakr-avatar.png"
+            alt="Trakr logo"
+            width="96"
+            height="96"
+          />
+          <div>
+            <p className="eyebrow">A2MCP Opportunity Companion</p>
+            <h1>Trakr</h1>
+          </div>
+        </div>
         <p>
           Trakr accepts a user profile or resume text and returns ranked,
           explainable opportunity recommendations with missing-skill analysis,

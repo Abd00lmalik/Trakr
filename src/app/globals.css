@@ -41,6 +41,21 @@ main {
   border-bottom: 1px solid var(--line);
 }
 
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.brand-logo {
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  object-fit: cover;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--accent-strong);
@@ -110,5 +125,16 @@ p {
 
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .brand-lockup {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .brand-logo {
+    width: 76px;
+    height: 76px;
   }
 }

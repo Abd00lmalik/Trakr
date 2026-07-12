@@ -1,5 +1,7 @@
 # Trakr
 
+![Trakr logo](public/trakr-logo.png)
+
 Trakr is an AI-powered Opportunity Companion exposed as an A2MCP-style API service. It accepts a structured user profile or resume text and returns ranked opportunity recommendations with match scores, reasoning, missing requirements, recommended actions, an action plan, and a learning roadmap.
 
 ## MVP Scope

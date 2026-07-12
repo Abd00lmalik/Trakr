@@ -12,6 +12,9 @@
 - Health: `https://trakr-production-c70e.up.railway.app/api/health`
 - Metadata: `https://trakr-production-c70e.up.railway.app/api/a2mcp`
 - OpenAPI: `https://trakr-production-c70e.up.railway.app/api/a2mcp/openapi`
+- Logo: `https://trakr-production-c70e.up.railway.app/trakr-logo.png`
+- Avatar: `https://trakr-production-c70e.up.railway.app/trakr-avatar.png`
+- OKX avatar: `https://static.okx.com/cdn/web3/wallet/marketplace/headimages/agent/avatar/8281fbc1-189e-4ab4-8efa-ca726d5e273e.png`
 - Protected ingestion: `https://trakr-production-c70e.up.railway.app/api/ingest`
 - Protected DB setup: `https://trakr-production-c70e.up.railway.app/api/admin/database`
 - MCP metadata template: `.mcp.json.example`
@@ -74,6 +77,7 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 
 - Agent ID: `#5198`
 - Registration transaction: `0x01ca3d9585c76bc5a88357d66b09cb62f7f192cb28f3d956582081e6cf93d240`
+- Official avatar update transaction: `0x80a0843597fcdd25b7925bdbf36e47bb3c1134492781bdcfb4986866d093180d`
 - Owner X Layer address: `0xbe116468bb544723141647608fe98c1bc0471291`
 - Service: Opportunity Matching API
 - Service type: A2MCP

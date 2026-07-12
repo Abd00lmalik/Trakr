@@ -14,6 +14,9 @@ Use these values when registering Trakr in OKX.AI / Onchain OS.
 - Health URL: https://trakr-production-c70e.up.railway.app/api/health
 - Metadata URL: https://trakr-production-c70e.up.railway.app/api/a2mcp
 - OpenAPI URL: https://trakr-production-c70e.up.railway.app/api/a2mcp/openapi
+- Logo URL: https://trakr-production-c70e.up.railway.app/trakr-logo.png
+- Avatar URL: https://trakr-production-c70e.up.railway.app/trakr-avatar.png
+- OKX avatar URL: https://static.okx.com/cdn/web3/wallet/marketplace/headimages/agent/avatar/8281fbc1-189e-4ab4-8efa-ca726d5e273e.png
 
 ## Short Description
 
@@ -72,6 +75,7 @@ Latest verification on 2026-07-12:
 - OKX ASP identity: Registered
 - OKX marketplace listing: Under review
 - OKX review note: AI quality review suggested pass
+- OKX avatar: Updated to official Trakr logo
 - Health endpoint: OK
 - Railway deployment: Online
 - PostgreSQL: Connected

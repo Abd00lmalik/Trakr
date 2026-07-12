@@ -6,6 +6,8 @@
   "endpoint": "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
   "metadata": "https://trakr-production-c70e.up.railway.app/api/a2mcp",
   "openapi": "https://trakr-production-c70e.up.railway.app/api/a2mcp/openapi",
+  "logo": "https://trakr-production-c70e.up.railway.app/trakr-logo.png",
+  "avatar": "https://trakr-production-c70e.up.railway.app/trakr-avatar.png",
   "pricing": {
     "mode": "free",
     "x402": false
