@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { getAiProvider } from "@/lib/ai/factory";
-import { staticOpportunitySource } from "@/lib/opportunities/sources/static-source";
+import { opportunitySource } from "@/lib/opportunities/sources";
 import { rankOpportunities, buildProfileText } from "@/lib/recommendation/scoring";
 import {
   buildActionPlan,
@@ -66,7 +66,7 @@ export async function generateRecommendations(
   request: RecommendationRequest,
 ): Promise<RecommendationResponse> {
   const aiProvider = getAiProvider();
-  const source = staticOpportunitySource;
+  const source = opportunitySource;
   const opportunities = await source.fetchOpportunities(request, request.filters);
   const ranked = rankOpportunities(opportunities, request).slice(0, getLimit(request));
 

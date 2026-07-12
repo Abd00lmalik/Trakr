@@ -7,6 +7,9 @@ Trakr is an AI-powered Opportunity Companion exposed as an A2MCP-style API servi
 - Next.js 15 App Router with TypeScript.
 - Public A2MCP metadata endpoint at `GET /api/a2mcp`.
 - Main recommendation endpoint at `POST /api/a2mcp/recommend`.
+- OpenAPI-style contract endpoint at `GET /api/a2mcp/openapi`.
+- Resume parsing endpoint at `POST /api/profile/parse-resume`.
+- Protected structured ingestion endpoint at `POST /api/ingest`.
 - PostgreSQL and pgvector schema for opportunity storage and future semantic matching.
 - Gemini provider abstraction with deterministic local fallback when `GEMINI_API_KEY` is not configured.
 - Structured opportunity source interface with a seeded catalog for Phase 1.
@@ -20,6 +23,7 @@ src/app/api/a2mcp/route.ts
 src/app/api/a2mcp/recommend/route.ts
 src/app/api/health/route.ts
 src/app/page.tsx
+scripts/
 src/lib/ai/
 src/lib/db.ts
 src/lib/opportunities/
@@ -39,7 +43,14 @@ npm run dev
 Optional database setup:
 
 ```bash
-psql "$DATABASE_URL" -f db/schema.sql
+npm run db:migrate
+npm run db:seed
+```
+
+Verification:
+
+```bash
+npm run verify
 ```
 
 ## Example Request
@@ -74,3 +85,7 @@ The API returns:
 ## Extending Sources
 
 Add official APIs or structured feeds by implementing `OpportunitySource` in `src/lib/opportunities/source.ts`, then combine those sources in `src/lib/recommendation/service.ts`. The seeded catalog is intentionally small and should be replaced or supplemented with live provider adapters as the service matures.
+
+## Deployment
+
+Railway deployment instructions are in `DEPLOYMENT.md`. OKX.AI registration details are in `OKX_SUBMISSION.md`.

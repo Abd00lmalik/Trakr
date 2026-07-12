@@ -13,24 +13,40 @@ GEMINI_MODEL=gemini-1.5-flash
 TRAKR_SERVICE_URL=https://your-railway-domain
 DATABASE_URL=postgresql://...
 RECOMMENDATION_LIMIT=7
+RATE_LIMIT_REQUESTS_PER_MINUTE=60
+INGEST_API_KEY=generate_a_long_random_value
 ```
 
 3. Add a PostgreSQL service in Railway, then apply the schema:
 
 ```bash
-psql "$DATABASE_URL" -f db/schema.sql
+npm run db:migrate
+npm run db:seed
 ```
 
-4. Deploy the app. Railway should use `railway.toml`, run `npm ci && npm run build`, and start with `npm run start`.
+4. Deploy the app. Railway should use `railway.toml`; Nixpacks runs `npm ci`, then `npm run build`, and starts with `npm run start`.
 
 5. Verify the public endpoints:
 
 ```bash
 curl -i https://your-railway-domain/api/health
 curl -i https://your-railway-domain/api/a2mcp
+curl -i https://your-railway-domain/api/a2mcp/openapi
 curl -i -X POST https://your-railway-domain/api/a2mcp/recommend \
   -H "Content-Type: application/json" \
   -d '{"user":{"headline":"Frontend developer interested in Web3","skills":["React","TypeScript"],"goals":["win a hackathon"],"interests":["web3"]},"filters":{"remote":true,"limit":3}}'
+```
+
+Or run the automated remote smoke test:
+
+```bash
+SMOKE_BASE_URL=https://your-railway-domain npm run smoke
+```
+
+6. Refresh structured opportunity sources:
+
+```bash
+TRAKR_SERVICE_URL=https://your-railway-domain INGEST_API_KEY=your_ingest_key npm run ingest
 ```
 
 ## OKX.AI A2MCP Registration
@@ -46,3 +62,19 @@ For the first submission, register Trakr as a free A2MCP service:
 - Output: ranked opportunities, match scores, reasoning, missing requirements, recommended actions, action plan, and learning roadmap
 
 After the free endpoint passes review and has stable behavior, add x402 payment middleware around `POST /api/a2mcp/recommend` and resubmit/update the listing as pay-per-call.
+
+## Production Readiness Checks
+
+- `GET /api/health` should return `ok: true`.
+- `ai.configured` should be `true` when `GEMINI_API_KEY` is configured.
+- `database.connected`, `database.pgvector`, and `database.schemaReady` should be `true` once Railway Postgres is configured and migrated.
+- `POST /api/a2mcp/recommend` should return `HTTP 200` for the free OKX submission path.
+- Leave `TRAKR_API_KEY` unset for public free OKX review unless OKX gives a shared secret or gateway header to enforce.
+- Set `INGEST_API_KEY` before enabling scheduled ingestion.
+
+## Scheduled Ingestion
+
+The repository includes `.github/workflows/ingest.yml`, which calls `POST /api/ingest` every six hours. Configure these GitHub repository secrets before enabling it:
+
+- `TRAKR_SERVICE_URL`
+- `INGEST_API_KEY`

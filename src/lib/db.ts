@@ -20,16 +20,40 @@ export function getPool() {
 export async function checkDatabase() {
   const db = getPool();
   if (!db) {
-    return { configured: false, ok: false };
+    return {
+      configured: false,
+      connected: false,
+      pgvector: false,
+      schemaReady: false,
+    };
   }
 
   try {
     await db.query("select 1");
-    return { configured: true, ok: true };
+    const pgvector = await db.query<{ installed: boolean }>(
+      "select exists(select 1 from pg_extension where extname = 'vector') as installed",
+    );
+    const schema = await db.query<{ ready: boolean }>(
+      `select exists(
+        select 1
+        from information_schema.tables
+        where table_schema = 'public'
+          and table_name = 'opportunities'
+      ) as ready`,
+    );
+
+    return {
+      configured: true,
+      connected: true,
+      pgvector: pgvector.rows[0]?.installed ?? false,
+      schemaReady: schema.rows[0]?.ready ?? false,
+    };
   } catch (error) {
     return {
       configured: true,
-      ok: false,
+      connected: false,
+      pgvector: false,
+      schemaReady: false,
       error: error instanceof Error ? error.message : "Unknown database error",
     };
   }

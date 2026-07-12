@@ -1,0 +1,24 @@
+{
+  "name": "trakr",
+  "description": "AI-powered Opportunity Companion for ranked, explainable opportunity recommendations.",
+  "type": "A2MCP",
+  "version": "0.1.0",
+  "endpoint": "https://YOUR-RAILWAY-DOMAIN/api/a2mcp/recommend",
+  "metadata": "https://YOUR-RAILWAY-DOMAIN/api/a2mcp",
+  "openapi": "https://YOUR-RAILWAY-DOMAIN/api/a2mcp/openapi",
+  "pricing": {
+    "mode": "free",
+    "x402": false
+  },
+  "inputModes": ["structured_profile", "resume_text"],
+  "categories": [
+    "hackathon",
+    "grant",
+    "scholarship",
+    "fellowship",
+    "internship",
+    "remote_job",
+    "web3_bounty"
+  ],
+  "actions": ["Apply Now", "Prepare First", "Skip"]
+}

@@ -1,0 +1,33 @@
+# Architecture Decisions
+
+## ADR 001: A2MCP First, Product UI Later
+
+Trakr is optimized first as an OKX.AI A2MCP service. The public API surface is prioritized over a full dashboard because the hackathon submission requires a callable ASP endpoint.
+
+## ADR 002: Free A2MCP Submission Before x402
+
+The first OKX submission should be free and return `HTTP 200` JSON. x402 payment middleware remains the paid upgrade path after the endpoint is stable and accepted.
+
+## ADR 003: Next.js App Router on Railway
+
+Next.js keeps the API and future UI in one codebase. Railway is used because Trakr needs PostgreSQL/pgvector, health checks, logs, and future ingestion workers close to the API service.
+
+## ADR 004: PostgreSQL + pgvector With Seeded Fallback
+
+The production architecture uses PostgreSQL with pgvector for opportunity storage and future semantic matching. The runtime falls back to a seeded structured catalog when the database is not configured or empty so the ASP remains callable during setup.
+
+## ADR 005: Gemini Provider Abstraction
+
+Gemini is the primary AI provider. The implementation wraps it behind an `AiProvider` interface and uses deterministic local reasoning when no key is configured, which keeps development and review endpoints reliable.
+
+## ADR 006: Resume Files Are Parsed, Not Stored
+
+The resume parsing endpoint extracts text from PDF, DOCX, or TXT uploads and returns a draft profile. It does not persist the uploaded file, aligning with the research privacy model.
+
+## ADR 007: Official Sources Before Scraping
+
+The next ingestion milestone should add structured sources such as Devpost and RemoteOK before any scraping. Scraping should be used only when APIs/RSS are unavailable and terms allow it.
+
+## ADR 008: API Guardrails Without Blocking OKX Review
+
+The recommendation endpoint has CORS, structured errors, in-memory rate limiting, and an optional `TRAKR_API_KEY`. The API key should remain unset for free public OKX review unless OKX requires a shared secret.

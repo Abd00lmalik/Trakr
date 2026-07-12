@@ -20,6 +20,19 @@ export async function GET() {
         method: "GET",
         path: "/api/health",
       },
+      openapi: {
+        method: "GET",
+        path: "/api/a2mcp/openapi",
+      },
+      parseResume: {
+        method: "POST",
+        path: "/api/profile/parse-resume",
+      },
+      ingest: {
+        method: "POST",
+        path: "/api/ingest",
+        description: "Protected operator endpoint for refreshing structured opportunity sources.",
+      },
     },
     categories: [
       "hackathon",
@@ -36,5 +49,11 @@ export async function GET() {
       compatibleWith: "x402",
       status: "not_enabled_in_phase_1",
     },
+    submission: {
+      pricing: "free",
+      responseMode: "HTTP 200 JSON for Phase 1",
+      paidUpgradePath: "x402 middleware on /api/a2mcp/recommend",
+    },
+    dataSources: ["seeded catalog", "Devpost API", "RemoteOK API"],
   });
 }

@@ -5,15 +5,22 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const database = await checkDatabase();
+  const aiConfigured = Boolean(process.env.GEMINI_API_KEY);
+  const status = database.configured && !database.connected ? "degraded" : "ok";
 
   return NextResponse.json({
     service: "trakr",
-    ok: true,
+    status,
+    ok: status === "ok",
     timestamp: new Date().toISOString(),
     ai: {
-      provider: process.env.GEMINI_API_KEY ? "gemini" : "deterministic-local",
-      configured: Boolean(process.env.GEMINI_API_KEY),
+      provider: aiConfigured ? "gemini" : "deterministic-local",
+      configured: aiConfigured,
     },
     database,
+    endpoints: {
+      metadata: "/api/a2mcp",
+      recommend: "/api/a2mcp/recommend",
+    },
   });
 }
