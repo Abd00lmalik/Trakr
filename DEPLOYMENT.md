@@ -88,6 +88,13 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - Railway services: `Trakr` application service and `Postgres` database service.
 - Required app variables: `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `NEXT_PUBLIC_APP_URL`, `TRAKR_SERVICE_URL`, `RECOMMENDATION_LIMIT`, `RATE_LIMIT_REQUESTS_PER_MINUTE`, `INGEST_API_KEY`, and `TRAKR_ADMIN_API_KEY`.
 - `DATABASE_URL` should be configured as a Railway reference to the attached Postgres service, not as a localhost placeholder.
+- Latest verified live state on 2026-07-12:
+  - `GET /api/health`: `ok: true`
+  - Gemini provider: `gemini:gemini-3.5-flash`
+  - Database: connected, pgvector installed, schema ready
+  - Baseline seed: 7 opportunities
+  - Structured ingestion: 59 opportunities stored from Devpost and RemoteOK
+  - Remote smoke: passed
 
 ## Scheduled Ingestion
 

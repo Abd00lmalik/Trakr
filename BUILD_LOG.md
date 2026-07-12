@@ -11,6 +11,13 @@
   - Database service: `Postgres`
   - Initial app `DATABASE_URL` was still a localhost placeholder and was staged in Railway as a Postgres service reference.
   - `GEMINI_MODEL` was staged in Railway as `gemini-3.5-flash`.
+- Railway production verification after deployment:
+  - `POST /api/admin/database` completed migration and seeded 7 baseline opportunities.
+  - `GET /api/health` returned `ok: true`.
+  - Database checks returned `connected: true`, `pgvector: true`, and `schemaReady: true`.
+  - Remote smoke test passed against `https://trakr-production-c70e.up.railway.app`.
+  - Live provider returned `gemini:gemini-3.5-flash`.
+  - Protected ingestion fetched and stored 59 opportunities from Devpost and RemoteOK.
 - Initialized Trakr as a Next.js 15 App Router + TypeScript A2MCP service.
 - Added `POST /api/a2mcp/recommend`, `GET /api/a2mcp`, and `GET /api/health`.
 - Added Gemini provider abstraction with deterministic local fallback.
@@ -51,7 +58,7 @@ Smoke coverage:
 
 Known environment-dependent checks:
 
-- `GEMINI_API_KEY` must be configured to verify live Gemini reasoning.
-- `DATABASE_URL` must be configured and migrated to verify Railway Postgres, pgvector, and stored opportunity reads.
-- Railway public URL must be supplied or discovered from the authenticated dashboard before remote smoke testing.
+- `GEMINI_API_KEY` is configured in Railway and was verified through the live smoke test.
+- `DATABASE_URL` is configured in Railway and was verified with Postgres, pgvector, and schema-ready health checks.
+- Railway public URL is `https://trakr-production-c70e.up.railway.app`.
 - `npm audit --audit-level=moderate` currently reports a transitive Next/PostCSS advisory where npm suggests a breaking downgrade. Do not run `npm audit fix --force`; monitor Next/PostCSS updates instead.

@@ -57,15 +57,14 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 
 ## Registration Checklist
 
-1. Deploy Railway service and confirm HTTPS URL.
-2. Configure `TRAKR_SERVICE_URL`, `GEMINI_API_KEY`, and `DATABASE_URL`.
-3. Run `npm run db:migrate` and `npm run db:seed` against Railway Postgres.
-4. If direct CLI database access is unavailable, run protected DB setup through `POST /api/admin/database` with `TRAKR_ADMIN_API_KEY`.
-5. Run `SMOKE_BASE_URL=https://trakr-production-c70e.up.railway.app npm run smoke`.
-6. Configure `INGEST_API_KEY` and run `npm run ingest` with `TRAKR_SERVICE_URL`.
-7. Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
-8. Submit as free for first review.
-9. Add x402 only after free endpoint stability is proven or OKX requires paid calls.
+1. Done: Deploy Railway service and confirm HTTPS URL.
+2. Done: Configure `TRAKR_SERVICE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, and `DATABASE_URL`.
+3. Done: Run protected DB setup through `POST /api/admin/database` with `TRAKR_ADMIN_API_KEY`.
+4. Done: Run `SMOKE_BASE_URL=https://trakr-production-c70e.up.railway.app npm run smoke`.
+5. Done: Configure `INGEST_API_KEY` and run `npm run ingest` with `TRAKR_SERVICE_URL`.
+6. Remaining: Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
+7. Remaining: Submit as free for first review.
+8. Later: Add x402 only after free endpoint stability is proven or OKX requires paid calls.
 
 ## Manual/User-Gated Steps
 
