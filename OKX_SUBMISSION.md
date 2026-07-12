@@ -6,12 +6,13 @@
 - Type: A2MCP
 - Category target: Lifestyle Companion
 - Pricing for first submission: Free
-- Endpoint: `https://YOUR-RAILWAY-DOMAIN/api/a2mcp/recommend`
+- Endpoint: `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`
 - Method: `POST`
-- Health: `https://YOUR-RAILWAY-DOMAIN/api/health`
-- Metadata: `https://YOUR-RAILWAY-DOMAIN/api/a2mcp`
-- OpenAPI: `https://YOUR-RAILWAY-DOMAIN/api/a2mcp/openapi`
-- Protected ingestion: `https://YOUR-RAILWAY-DOMAIN/api/ingest`
+- Health: `https://trakr-production-c70e.up.railway.app/api/health`
+- Metadata: `https://trakr-production-c70e.up.railway.app/api/a2mcp`
+- OpenAPI: `https://trakr-production-c70e.up.railway.app/api/a2mcp/openapi`
+- Protected ingestion: `https://trakr-production-c70e.up.railway.app/api/ingest`
+- Protected DB setup: `https://trakr-production-c70e.up.railway.app/api/admin/database`
 - MCP metadata template: `.mcp.json.example`
 
 ## Description
@@ -59,11 +60,12 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 1. Deploy Railway service and confirm HTTPS URL.
 2. Configure `TRAKR_SERVICE_URL`, `GEMINI_API_KEY`, and `DATABASE_URL`.
 3. Run `npm run db:migrate` and `npm run db:seed` against Railway Postgres.
-4. Run `SMOKE_BASE_URL=https://YOUR-RAILWAY-DOMAIN npm run smoke`.
-5. Configure `INGEST_API_KEY` and run `npm run ingest` with `TRAKR_SERVICE_URL`.
-6. Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
-7. Submit as free for first review.
-8. Add x402 only after free endpoint stability is proven or OKX requires paid calls.
+4. If direct CLI database access is unavailable, run protected DB setup through `POST /api/admin/database` with `TRAKR_ADMIN_API_KEY`.
+5. Run `SMOKE_BASE_URL=https://trakr-production-c70e.up.railway.app npm run smoke`.
+6. Configure `INGEST_API_KEY` and run `npm run ingest` with `TRAKR_SERVICE_URL`.
+7. Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
+8. Submit as free for first review.
+9. Add x402 only after free endpoint stability is proven or OKX requires paid calls.
 
 ## Manual/User-Gated Steps
 
@@ -82,5 +84,5 @@ Verified on 2026-07-12 against official OKX Onchain OS docs:
 
 - A2MCP supports a free response path where the service returns `HTTP 200`.
 - Paid A2MCP uses x402 and returns `HTTP 402 Payment Required` before payment.
-- ASP registration requires service name, description, endpoint, and pricing.
+- ASP registration requires service name, description, price, and endpoint.
 - Trakr should submit as free first, then add x402 after the endpoint is stable or if OKX requires paid calls.

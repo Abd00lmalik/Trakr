@@ -31,3 +31,13 @@ The next ingestion milestone should add structured sources such as Devpost and R
 ## ADR 008: API Guardrails Without Blocking OKX Review
 
 The recommendation endpoint has CORS, structured errors, in-memory rate limiting, and an optional `TRAKR_API_KEY`. The API key should remain unset for free public OKX review unless OKX requires a shared secret.
+
+## ADR 009: Protected Operator Database Setup
+
+Railway does not always provide local CLI access to the deployed environment or a safe way to copy database URLs into local shells. Trakr includes `POST /api/admin/database`, protected by `TRAKR_ADMIN_API_KEY` or `INGEST_API_KEY`, to apply schema migrations and seed baseline opportunities from inside the deployed runtime.
+
+This endpoint is intentionally outside the public A2MCP surface. It exists for deployment operations only and must remain protected in production.
+
+## ADR 010: Gemini Flash Model Pin
+
+Trakr pins Gemini to `gemini-3.5-flash` by default. The provider abstraction still allows switching models or providers through environment variables without changing recommendation logic.

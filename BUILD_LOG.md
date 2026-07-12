@@ -2,6 +2,15 @@
 
 ## 2026-07-12
 
+- Added a protected `POST /api/admin/database` operator endpoint for Railway database migration and seed operations when direct CLI/database shell access is unavailable.
+- Updated Gemini default model from `gemini-1.5-flash` to `gemini-3.5-flash` after checking the official Google AI model docs.
+- Tightened `/api/health` so production only reports `ok: true` when the configured database is connected, pgvector is installed, and the schema is ready.
+- Railway dashboard inspection found:
+  - Public URL: `https://trakr-production-c70e.up.railway.app`
+  - Application service: `Trakr`
+  - Database service: `Postgres`
+  - Initial app `DATABASE_URL` was still a localhost placeholder and was staged in Railway as a Postgres service reference.
+  - `GEMINI_MODEL` was staged in Railway as `gemini-3.5-flash`.
 - Initialized Trakr as a Next.js 15 App Router + TypeScript A2MCP service.
 - Added `POST /api/a2mcp/recommend`, `GET /api/a2mcp`, and `GET /api/health`.
 - Added Gemini provider abstraction with deterministic local fallback.
