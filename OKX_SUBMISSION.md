@@ -3,6 +3,7 @@
 ## Service
 
 - Name: Trakr
+- OKX Agent ID: `#5198`
 - Type: A2MCP
 - Category target: Lifestyle Companion
 - Pricing for first submission: Free
@@ -14,6 +15,8 @@
 - Protected ingestion: `https://trakr-production-c70e.up.railway.app/api/ingest`
 - Protected DB setup: `https://trakr-production-c70e.up.railway.app/api/admin/database`
 - MCP metadata template: `.mcp.json.example`
+- Paste-ready registration form: `OKX_REGISTRATION_FORM.md`
+- Marketplace review status: Listing under review
 
 ## Description
 
@@ -62,9 +65,22 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 3. Done: Run protected DB setup through `POST /api/admin/database` with `TRAKR_ADMIN_API_KEY`.
 4. Done: Run `SMOKE_BASE_URL=https://trakr-production-c70e.up.railway.app npm run smoke`.
 5. Done: Configure `INGEST_API_KEY` and run `npm run ingest` with `TRAKR_SERVICE_URL`.
-6. Remaining: Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
-7. Remaining: Submit as free for first review.
-8. Later: Add x402 only after free endpoint stability is proven or OKX requires paid calls.
+6. Done: Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
+7. Done: Submit as free for first review.
+8. Waiting: OKX marketplace review result by email.
+9. Later: Add x402 only after free endpoint stability is proven or OKX requires paid calls.
+
+## OKX Registration Result
+
+- Agent ID: `#5198`
+- Registration transaction: `0x01ca3d9585c76bc5a88357d66b09cb62f7f192cb28f3d956582081e6cf93d240`
+- Owner X Layer address: `0xbe116468bb544723141647608fe98c1bc0471291`
+- Service: Opportunity Matching API
+- Service type: A2MCP
+- Fee: `0 USDT`
+- Endpoint: `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`
+- Current status: Listing under review
+- Review note: AI quality review suggested pass
 
 ## Manual/User-Gated Steps
 

@@ -18,6 +18,13 @@
   - Remote smoke test passed against `https://trakr-production-c70e.up.railway.app`.
   - Live provider returned `gemini:gemini-3.5-flash`.
   - Protected ingestion fetched and stored 59 opportunities from Devpost and RemoteOK.
+- OKX registration:
+  - Installed verified `onchainos.exe` v4.2.3 from the official OKX release after the PowerShell installer failed to parse.
+  - Logged in to Agentic Wallet by email OTP.
+  - Registered Trakr as ASP Agent ID `#5198`.
+  - Service: `Opportunity Matching API`, A2MCP, `0 USDT`, endpoint `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`.
+  - Activated/submitted the listing for OKX review.
+  - Current OKX status: listing under review; review note says AI quality review suggested pass.
 - Initialized Trakr as a Next.js 15 App Router + TypeScript A2MCP service.
 - Added `POST /api/a2mcp/recommend`, `GET /api/a2mcp`, and `GET /api/health`.
 - Added Gemini provider abstraction with deterministic local fallback.

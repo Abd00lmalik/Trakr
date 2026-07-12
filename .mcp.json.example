@@ -3,9 +3,9 @@
   "description": "AI-powered Opportunity Companion for ranked, explainable opportunity recommendations.",
   "type": "A2MCP",
   "version": "0.1.0",
-  "endpoint": "https://YOUR-RAILWAY-DOMAIN/api/a2mcp/recommend",
-  "metadata": "https://YOUR-RAILWAY-DOMAIN/api/a2mcp",
-  "openapi": "https://YOUR-RAILWAY-DOMAIN/api/a2mcp/openapi",
+  "endpoint": "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+  "metadata": "https://trakr-production-c70e.up.railway.app/api/a2mcp",
+  "openapi": "https://trakr-production-c70e.up.railway.app/api/a2mcp/openapi",
   "pricing": {
     "mode": "free",
     "x402": false
