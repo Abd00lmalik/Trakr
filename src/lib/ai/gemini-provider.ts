@@ -287,8 +287,8 @@ export class GeminiProvider implements AiProvider {
   }
 
   async enhanceRecommendations(input: RecommendationNarrativeInput) {
-    const attempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "3", 10);
-    const timeoutMs = Number.parseInt(process.env.GEMINI_TIMEOUT_MS ?? "45000", 10);
+    const attempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "1", 10);
+    const timeoutMs = Number.parseInt(process.env.GEMINI_TIMEOUT_MS ?? "12000", 10);
     const baseDelayMs = Number.parseInt(process.env.GEMINI_RETRY_BASE_DELAY_MS ?? "900", 10);
     let lastError: unknown;
 
