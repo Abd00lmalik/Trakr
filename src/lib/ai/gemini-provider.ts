@@ -106,17 +106,15 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function timeoutPromise<T>(promise: Promise<T>, timeoutMs: number) {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-  const timeoutResult = new Promise<T>((_, reject) => {
-    timeout = setTimeout(() => reject(new Error("AI provider timed out.")), timeoutMs);
-  });
+function buildAbortSignal(timeoutMs: number) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  timeout.unref?.();
 
-  return Promise.race([promise, timeoutResult]).finally(() => {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-  });
+  return {
+    signal: controller.signal,
+    clear: () => clearTimeout(timeout),
+  };
 }
 
 function isRetryableError(error: unknown) {
@@ -287,26 +285,27 @@ export class GeminiProvider implements AiProvider {
   }
 
   async enhanceRecommendations(input: RecommendationNarrativeInput) {
-    const attempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "1", 10);
-    const timeoutMs = Number.parseInt(process.env.GEMINI_TIMEOUT_MS ?? "12000", 10);
+    const configuredAttempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "1", 10);
+    const configuredTimeoutMs = Number.parseInt(process.env.GEMINI_TIMEOUT_MS ?? "12000", 10);
+    const attempts = Math.min(Math.max(configuredAttempts, 1), 1);
+    const timeoutMs = Math.min(Math.max(configuredTimeoutMs, 1000), 12000);
     const baseDelayMs = Number.parseInt(process.env.GEMINI_RETRY_BASE_DELAY_MS ?? "900", 10);
     let lastError: unknown;
 
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      const abort = buildAbortSignal(timeoutMs);
       try {
-        const result = await timeoutPromise(
-          this.client.models.generateContent({
-            model: this.modelName,
-            contents: buildPrompt(input),
-            config: {
-              responseMimeType: "application/json",
-              responseJsonSchema: enhancementJsonSchema,
-              temperature: 0.35,
-              maxOutputTokens: 6000,
-            },
-          }),
-          timeoutMs,
-        );
+        const result = await this.client.models.generateContent({
+          model: this.modelName,
+          contents: buildPrompt(input),
+          config: {
+            abortSignal: abort.signal,
+            responseMimeType: "application/json",
+            responseJsonSchema: enhancementJsonSchema,
+            temperature: 0.35,
+            maxOutputTokens: 6000,
+          },
+        });
         if (!result.text) {
           throw new Error("Invalid structured output: empty Gemini response.");
         }
@@ -319,6 +318,8 @@ export class GeminiProvider implements AiProvider {
         }
 
         await sleep(baseDelayMs * 2 ** (attempt - 1));
+      } finally {
+        abort.clear();
       }
     }
 
