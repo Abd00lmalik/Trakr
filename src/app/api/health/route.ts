@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { checkDatabase } from "@/lib/db";
+import { getAiMetricsSnapshot } from "@/lib/ai/metrics";
 
 export const runtime = "nodejs";
 
@@ -18,6 +19,7 @@ export async function GET() {
     ai: {
       provider: aiConfigured ? "gemini" : "deterministic-local",
       configured: aiConfigured,
+      metrics: getAiMetricsSnapshot(),
     },
     database,
     endpoints: {

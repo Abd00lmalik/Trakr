@@ -1,5 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
+import { createHash } from "node:crypto";
 import { z } from "zod";
+import { recordAiMetric, type AiErrorCategory } from "@/lib/ai/metrics";
 import { recommendationResponseSchema } from "@/lib/types/opportunities";
 import type { AiProvider, RecommendationNarrativeInput } from "@/lib/ai/provider";
 import type { Recommendation, RecommendationResponse } from "@/lib/types/opportunities";
@@ -20,6 +22,16 @@ const enhancementSchema = z.object({
 });
 
 type Enhancement = z.infer<typeof enhancementSchema>;
+
+type CachedEnhancement = {
+  enhancement: Enhancement;
+  outputChars: number;
+  expiresAt: number;
+};
+
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 100;
+const enhancementCache = new Map<string, CachedEnhancement>();
 
 const enhancementJsonSchema = {
   type: "object",
@@ -140,31 +152,53 @@ function safeJsonParse(text: string) {
   return JSON.parse(extractJson(text)) as unknown;
 }
 
+function errorCategory(error: unknown): AiErrorCategory {
+  const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+  if (message.includes("abort") || message.includes("timeout") || message.includes("timed out")) {
+    return "timeout";
+  }
+  if (message.includes("429") || message.includes("quota") || message.includes("rate")) {
+    return "rate_limit";
+  }
+  if (message.includes("503") || message.includes("500") || message.includes("unavailable") || message.includes("overloaded")) {
+    return "provider_unavailable";
+  }
+  if (error instanceof SyntaxError || error instanceof z.ZodError || message.includes("json")) {
+    return "invalid_output";
+  }
+  if (message.includes("fetch") || message.includes("network")) {
+    return "network";
+  }
+  return "unknown";
+}
+
+function nowMs() {
+  return performance.now();
+}
+
 function candidateForPrompt(candidate: RecommendationNarrativeInput["scoredOpportunities"][number]) {
   return {
     id: candidate.opportunity.id,
     title: candidate.opportunity.title,
     organization: candidate.opportunity.organization,
     category: candidate.opportunity.category,
-    sourceName: candidate.opportunity.sourceName,
-    qualityScore: candidate.qualityScore,
-    relevanceScore: candidate.relevanceScore,
+    score: candidate.score,
     matchScore: candidate.score,
     preliminaryAction: candidate.action,
-    matchedSignals: candidate.matchedSignals.slice(0, 8),
-    missingRequirements: candidate.missingRequirements.slice(0, 8),
-    requiredSkills: candidate.opportunity.requiredSkills,
-    preferredSkills: candidate.opportunity.preferredSkills,
-    eligibility: candidate.opportunity.eligibility,
-    benefits: candidate.opportunity.benefits,
-    tags: candidate.opportunity.tags,
+    matchedSignals: candidate.matchedSignals.slice(0, 5),
+    missingRequirements: candidate.missingRequirements.slice(0, 5),
+    requiredSkills: candidate.opportunity.requiredSkills.slice(0, 6),
+    preferredSkills: candidate.opportunity.preferredSkills.slice(0, 6),
+    eligibility: candidate.opportunity.eligibility.slice(0, 4),
+    benefits: candidate.opportunity.benefits.slice(0, 4),
     deadline: candidate.opportunity.deadline,
-    summary: candidate.opportunity.summary.slice(0, 700),
+    summary: candidate.opportunity.summary.slice(0, 320),
   };
 }
 
 function buildPrompt(input: RecommendationNarrativeInput) {
-  const compactCandidates = input.scoredOpportunities.map(candidateForPrompt);
+  const candidateLimit = Math.min(input.scoredOpportunities.length, 5);
+  const compactCandidates = input.scoredOpportunities.slice(0, candidateLimit).map(candidateForPrompt);
   const compactDraft = {
     requestId: input.draftResponse.requestId,
     recommendations: input.draftResponse.recommendations.map((recommendation) => ({
@@ -184,39 +218,10 @@ function buildPrompt(input: RecommendationNarrativeInput) {
     "Enhance only the narrative fields for the already-ranked real opportunities.",
     "Never invent opportunities, URLs, deadlines, organizations, scores, or eligibility requirements.",
     "If an opportunity is weak, explain the concern and use Prepare First or Skip.",
-    "Every recommendation must answer: why this, why now, what is missing, and what to do next.",
-    "Reason like a knowledgeable mentor. Be specific to the user's goals, experience, skills, eligibility, deadline urgency, expected value, learning potential, and career impact.",
-    "",
-    "Required JSON schema:",
-    JSON.stringify(
-      {
-        recommendations: [
-          {
-            id: "existing opportunity id",
-            reasoning: "specific mentor-style explanation",
-            missingRequirements: ["specific gap"],
-            recommendedAction: "Apply Now | Prepare First | Skip",
-            nextSteps: ["concrete next step"],
-          },
-        ],
-        actionPlan: {
-          immediate: ["action"],
-          sevenDayPlan: ["action"],
-          thirtyDayPlan: ["action"],
-        },
-        learningRoadmap: {
-          focusAreas: ["skill or theme"],
-          resourcesToFind: ["resource type"],
-          practiceProjects: ["project"],
-        },
-        agentNotes: ["short professional grounding note"],
-      },
-      null,
-      2,
-    ),
+    "Keep reasoning specific and concise: why this, main gap, and next move.",
     "",
     "USER_PROFILE:",
-    input.profileText.slice(0, 6000),
+    input.profileText.slice(0, 1800),
     "",
     "RANKED_REAL_CANDIDATES:",
     JSON.stringify(compactCandidates, null, 2),
@@ -224,6 +229,42 @@ function buildPrompt(input: RecommendationNarrativeInput) {
     "CURRENT_RESPONSE_DRAFT:",
     JSON.stringify(compactDraft, null, 2),
   ].join("\n");
+}
+
+function cacheKey(modelName: string, prompt: string) {
+  return createHash("sha256").update(modelName).update("\0").update(prompt).digest("hex");
+}
+
+function getCachedEnhancement(key: string) {
+  const cached = enhancementCache.get(key);
+  if (!cached) {
+    return null;
+  }
+
+  if (cached.expiresAt < Date.now()) {
+    enhancementCache.delete(key);
+    return null;
+  }
+
+  enhancementCache.delete(key);
+  enhancementCache.set(key, cached);
+  return cached;
+}
+
+function setCachedEnhancement(key: string, enhancement: Enhancement, outputChars: number) {
+  enhancementCache.set(key, {
+    enhancement,
+    outputChars,
+    expiresAt: Date.now() + CACHE_TTL_MS,
+  });
+
+  while (enhancementCache.size > MAX_CACHE_ENTRIES) {
+    const oldestKey = enhancementCache.keys().next().value;
+    if (!oldestKey) {
+      break;
+    }
+    enhancementCache.delete(oldestKey);
+  }
 }
 
 function mergeEnhancement(
@@ -285,31 +326,81 @@ export class GeminiProvider implements AiProvider {
   }
 
   async enhanceRecommendations(input: RecommendationNarrativeInput) {
-    const configuredAttempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "1", 10);
-    const configuredTimeoutMs = Number.parseInt(process.env.GEMINI_TIMEOUT_MS ?? "12000", 10);
-    const attempts = Math.min(Math.max(configuredAttempts, 1), 1);
-    const timeoutMs = Math.min(Math.max(configuredTimeoutMs, 1000), 12000);
+    const startedAt = nowMs();
+    const buildStartedAt = nowMs();
+    const prompt = buildPrompt(input);
+    const requestBuildMs = Math.round(nowMs() - buildStartedAt);
+    const key = cacheKey(this.modelName, prompt);
+    const cached = getCachedEnhancement(key);
+
+    if (cached) {
+      const totalMs = Math.round(nowMs() - startedAt);
+      recordAiMetric({
+        status: "cache_hit",
+        provider: this.name,
+        model: this.modelName,
+        attempts: 0,
+        errorCategory: "none",
+        timings: { requestBuildMs, networkMs: 0, parseMs: 0, totalMs },
+        promptChars: prompt.length,
+        outputChars: cached.outputChars,
+      });
+      return mergeEnhancement(input.draftResponse, cached.enhancement, this.name, 1);
+    }
+
+    const configuredAttempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "2", 10);
+    const configuredTimeoutMs = Number.parseInt(process.env.GEMINI_TIMEOUT_MS ?? "8000", 10);
+    const attempts = Math.min(Math.max(configuredAttempts, 1), 3);
+    const timeoutMs = Math.min(Math.max(configuredTimeoutMs, 1000), 15000);
     const baseDelayMs = Number.parseInt(process.env.GEMINI_RETRY_BASE_DELAY_MS ?? "900", 10);
     let lastError: unknown;
+    let networkMs = 0;
+    let parseMs = 0;
+    let outputChars = 0;
 
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       const abort = buildAbortSignal(timeoutMs);
       try {
+        const networkStartedAt = nowMs();
         const result = await this.client.models.generateContent({
           model: this.modelName,
-          contents: buildPrompt(input),
+          contents: prompt,
           config: {
             abortSignal: abort.signal,
             responseMimeType: "application/json",
             responseJsonSchema: enhancementJsonSchema,
             temperature: 0.35,
-            maxOutputTokens: 6000,
+            maxOutputTokens: 2200,
+            thinkingConfig: {
+              thinkingLevel: ThinkingLevel.MINIMAL,
+              includeThoughts: false,
+            },
           },
         });
+        networkMs += Math.round(nowMs() - networkStartedAt);
         if (!result.text) {
           throw new Error("Invalid structured output: empty Gemini response.");
         }
-        const parsed = enhancementSchema.parse(safeJsonParse(result.text ?? ""));
+        outputChars = result.text.length;
+        const parseStartedAt = nowMs();
+        const parsed = enhancementSchema.parse(safeJsonParse(result.text));
+        parseMs += Math.round(nowMs() - parseStartedAt);
+        setCachedEnhancement(key, parsed, outputChars);
+        recordAiMetric({
+          status: "enhanced",
+          provider: this.name,
+          model: this.modelName,
+          attempts: attempt,
+          errorCategory: "none",
+          timings: {
+            requestBuildMs,
+            networkMs,
+            parseMs,
+            totalMs: Math.round(nowMs() - startedAt),
+          },
+          promptChars: prompt.length,
+          outputChars,
+        });
         return mergeEnhancement(input.draftResponse, parsed, this.name, attempt);
       } catch (error) {
         lastError = error;
@@ -323,6 +414,21 @@ export class GeminiProvider implements AiProvider {
       }
     }
 
+    recordAiMetric({
+      status: errorCategory(lastError) === "timeout" ? "timeout" : "error",
+      provider: this.name,
+      model: this.modelName,
+      attempts,
+      errorCategory: errorCategory(lastError),
+      timings: {
+        requestBuildMs,
+        networkMs,
+        parseMs,
+        totalMs: Math.round(nowMs() - startedAt),
+      },
+      promptChars: prompt.length,
+      outputChars,
+    });
     throw lastError instanceof Error ? lastError : new Error("AI enhancement failed.");
   }
 }
