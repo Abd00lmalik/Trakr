@@ -296,22 +296,21 @@ function candidateForPrompt(candidate: RecommendationNarrativeInput["scoredOppor
     score: candidate.score,
     matchScore: candidate.score,
     preliminaryAction: candidate.action,
-    matchedSignals: candidate.matchedSignals.slice(0, 5),
-    missingRequirements: candidate.missingRequirements.slice(0, 5),
-    requiredSkills: candidate.opportunity.requiredSkills.slice(0, 6),
-    preferredSkills: candidate.opportunity.preferredSkills.slice(0, 6),
-    eligibility: candidate.opportunity.eligibility.slice(0, 4),
-    benefits: candidate.opportunity.benefits.slice(0, 4),
+    matchedSignals: candidate.matchedSignals.slice(0, 4),
+    missingRequirements: candidate.missingRequirements.slice(0, 4),
+    requiredSkills: candidate.opportunity.requiredSkills.slice(0, 5),
+    preferredSkills: candidate.opportunity.preferredSkills.slice(0, 5),
+    eligibility: candidate.opportunity.eligibility.slice(0, 3),
+    benefits: candidate.opportunity.benefits.slice(0, 3),
     deadline: candidate.opportunity.deadline,
-    summary: candidate.opportunity.summary.slice(0, 320),
+    summary: candidate.opportunity.summary.slice(0, 240),
   };
 }
 
 function buildPrompt(input: RecommendationNarrativeInput) {
-  const candidateLimit = Math.min(input.scoredOpportunities.length, 5);
+  const candidateLimit = Math.min(input.scoredOpportunities.length, 4);
   const compactCandidates = input.scoredOpportunities.slice(0, candidateLimit).map(candidateForPrompt);
   const compactDraft = {
-    requestId: input.draftResponse.requestId,
     recommendations: input.draftResponse.recommendations.map((recommendation) => ({
       rank: recommendation.rank,
       id: recommendation.opportunity.id,
@@ -332,13 +331,13 @@ function buildPrompt(input: RecommendationNarrativeInput) {
     "Keep reasoning specific and concise: why this, main gap, and next move.",
     "",
     "USER_PROFILE:",
-    input.profileText.slice(0, 1800),
+    input.profileText.slice(0, 1200),
     "",
     "RANKED_REAL_CANDIDATES:",
-    JSON.stringify(compactCandidates, null, 2),
+    JSON.stringify(compactCandidates),
     "",
     "CURRENT_RESPONSE_DRAFT:",
-    JSON.stringify(compactDraft, null, 2),
+    JSON.stringify(compactDraft),
   ].join("\n");
 }
 
@@ -504,7 +503,7 @@ export class GeminiProvider implements AiProvider {
               responseMimeType: "application/json",
               responseJsonSchema: enhancementJsonSchema,
               temperature: 0.35,
-              maxOutputTokens: 2200,
+              maxOutputTokens: 1600,
               thinkingConfig: {
                 thinkingLevel: ThinkingLevel.MINIMAL,
                 includeThoughts: false,
