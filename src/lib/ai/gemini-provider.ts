@@ -295,22 +295,26 @@ export class GeminiProvider implements AiProvider {
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       try {
         const result = await timeoutPromise(
-          this.client.models.generateContent({
+          this.client.interactions.create({
             model: this.modelName,
-            contents: buildPrompt(input),
-            config: {
-              responseMimeType: "application/json",
-              responseJsonSchema: enhancementJsonSchema,
+            input: buildPrompt(input),
+            response_format: {
+              type: "text",
+              mime_type: "application/json",
+              schema: enhancementJsonSchema,
+            },
+            generation_config: {
               temperature: 0.35,
-              maxOutputTokens: 6000,
+              max_output_tokens: 6000,
+              thinking_level: "minimal",
             },
           }),
           timeoutMs,
         );
-        if (!result.text) {
+        if (!result.output_text) {
           throw new Error("Invalid structured output: empty Gemini response.");
         }
-        const parsed = enhancementSchema.parse(safeJsonParse(result.text ?? ""));
+        const parsed = enhancementSchema.parse(safeJsonParse(result.output_text));
         return mergeEnhancement(input.draftResponse, parsed, this.name, attempt);
       } catch (error) {
         lastError = error;
