@@ -9,7 +9,8 @@ This guide covers the first public deployment path for Trakr as a free A2MCP end
 
 ```text
 GEMINI_API_KEY=your_gemini_key
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.1-flash-lite
+GEMINI_FALLBACK_MODELS=gemini-3.5-flash
 TRAKR_SERVICE_URL=https://your-railway-domain
 DATABASE_URL=postgresql://...
 RECOMMENDATION_LIMIT=7
@@ -87,10 +88,11 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - Public URL: `https://trakr-production-c70e.up.railway.app`
 - Railway services: `Trakr` application service and `Postgres` database service.
 - Required app variables: `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `NEXT_PUBLIC_APP_URL`, `TRAKR_SERVICE_URL`, `RECOMMENDATION_LIMIT`, `RATE_LIMIT_REQUESTS_PER_MINUTE`, `INGEST_API_KEY`, and `TRAKR_ADMIN_API_KEY`.
+- Optional AI resilience variable: `GEMINI_FALLBACK_MODELS`, a comma-separated list of Gemini model IDs to try when the primary model returns provider-side quota exhaustion.
 - `DATABASE_URL` should be configured as a Railway reference to the attached Postgres service, not as a localhost placeholder.
 - Latest verified live state on 2026-07-12:
   - `GET /api/health`: `ok: true`
-  - Gemini provider: `gemini:gemini-3.5-flash`
+  - Gemini provider: `gemini:gemini-3.1-flash-lite` or another configured Gemini model
   - Database: connected, pgvector installed, schema ready
   - Baseline seed: 7 opportunities
   - Structured ingestion: 59 opportunities stored from Devpost and RemoteOK
