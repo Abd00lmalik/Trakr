@@ -35,6 +35,8 @@ type CachedEnhancement = {
 
 const CACHE_TTL_MS = 10 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 100;
+const DEFAULT_MODEL = "gemini-3.5-flash";
+const DEFAULT_FALLBACK_MODELS = ["gemini-3.1-flash-lite"];
 const enhancementCache = new Map<string, CachedEnhancement>();
 
 const enhancementJsonSchema = {
@@ -426,12 +428,21 @@ function mergeEnhancement(
 export class GeminiProvider implements AiProvider {
   name: string;
   private modelName: string;
+  private fallbackModelNames: string[];
   private client: GoogleGenAI;
 
-  constructor(apiKey: string, modelName = process.env.GEMINI_MODEL ?? "gemini-3.5-flash") {
+  constructor(apiKey: string, modelName = process.env.GEMINI_MODEL ?? DEFAULT_MODEL) {
     this.client = new GoogleGenAI({ apiKey });
     this.modelName = modelName;
+    this.fallbackModelNames = (
+      process.env.GEMINI_FALLBACK_MODELS?.split(",").map((item) => item.trim()).filter(Boolean) ??
+      DEFAULT_FALLBACK_MODELS
+    ).filter((fallbackModel) => fallbackModel !== modelName);
     this.name = `gemini:${modelName}`;
+  }
+
+  private getModelSequence() {
+    return [this.modelName, ...this.fallbackModelNames];
   }
 
   async enhanceRecommendations(input: RecommendationNarrativeInput) {
@@ -439,25 +450,30 @@ export class GeminiProvider implements AiProvider {
     const buildStartedAt = nowMs();
     const prompt = buildPrompt(input);
     const requestBuildMs = Math.round(nowMs() - buildStartedAt);
-    const key = cacheKey(this.modelName, prompt);
-    const cached = getCachedEnhancement(key);
+    const modelSequence = this.getModelSequence();
 
-    if (cached) {
-      const totalMs = Math.round(nowMs() - startedAt);
-      recordAiMetric({
-        status: "cache_hit",
-        provider: this.name,
-        model: this.modelName,
-        attempts: 0,
-        errorCategory: "none",
-        errorOrigin: "none",
-        providerStatus: null,
-        providerErrorCode: null,
-        timings: { requestBuildMs, networkMs: 0, parseMs: 0, totalMs },
-        promptChars: prompt.length,
-        outputChars: cached.outputChars,
-      });
-      return mergeEnhancement(input.draftResponse, cached.enhancement, this.name, 1);
+    for (const modelName of modelSequence) {
+      const key = cacheKey(modelName, prompt);
+      const cached = getCachedEnhancement(key);
+
+      if (cached) {
+        const totalMs = Math.round(nowMs() - startedAt);
+        const providerName = `gemini:${modelName}`;
+        recordAiMetric({
+          status: "cache_hit",
+          provider: providerName,
+          model: modelName,
+          attempts: 0,
+          errorCategory: "none",
+          errorOrigin: "none",
+          providerStatus: null,
+          providerErrorCode: null,
+          timings: { requestBuildMs, networkMs: 0, parseMs: 0, totalMs },
+          promptChars: prompt.length,
+          outputChars: cached.outputChars,
+        });
+        return mergeEnhancement(input.draftResponse, cached.enhancement, providerName, 1);
+      }
     }
 
     const configuredAttempts = Number.parseInt(process.env.GEMINI_RETRY_ATTEMPTS ?? "2", 10);
@@ -469,76 +485,87 @@ export class GeminiProvider implements AiProvider {
     let networkMs = 0;
     let parseMs = 0;
     let outputChars = 0;
+    let lastModelName = this.modelName;
 
-    for (let attempt = 1; attempt <= attempts; attempt += 1) {
-      const abort = buildAbortSignal(timeoutMs);
-      const networkStartedAt = nowMs();
-      let recordedAttemptNetworkMs = false;
-      try {
-        const result = await this.client.models.generateContent({
-          model: this.modelName,
-          contents: prompt,
-          config: {
-            abortSignal: abort.signal,
-            responseMimeType: "application/json",
-            responseJsonSchema: enhancementJsonSchema,
-            temperature: 0.35,
-            maxOutputTokens: 2200,
-            thinkingConfig: {
-              thinkingLevel: ThinkingLevel.MINIMAL,
-              includeThoughts: false,
+    for (const modelName of modelSequence) {
+      lastModelName = modelName;
+      const key = cacheKey(modelName, prompt);
+
+      for (let attempt = 1; attempt <= attempts; attempt += 1) {
+        const abort = buildAbortSignal(timeoutMs);
+        const networkStartedAt = nowMs();
+        let recordedAttemptNetworkMs = false;
+        try {
+          const result = await this.client.models.generateContent({
+            model: modelName,
+            contents: prompt,
+            config: {
+              abortSignal: abort.signal,
+              responseMimeType: "application/json",
+              responseJsonSchema: enhancementJsonSchema,
+              temperature: 0.35,
+              maxOutputTokens: 2200,
+              thinkingConfig: {
+                thinkingLevel: ThinkingLevel.MINIMAL,
+                includeThoughts: false,
+              },
             },
-          },
-        });
-        networkMs += Math.round(nowMs() - networkStartedAt);
-        recordedAttemptNetworkMs = true;
-        if (!result.text) {
-          throw new Error("Invalid structured output: empty Gemini response.");
-        }
-        outputChars = result.text.length;
-        const parseStartedAt = nowMs();
-        const parsed = enhancementSchema.parse(safeJsonParse(result.text));
-        parseMs += Math.round(nowMs() - parseStartedAt);
-        setCachedEnhancement(key, parsed, outputChars);
-        recordAiMetric({
-          status: "enhanced",
-          provider: this.name,
-          model: this.modelName,
-          attempts: attempt,
-          errorCategory: "none",
-          errorOrigin: "none",
-          providerStatus: null,
-          providerErrorCode: null,
-          timings: {
-            requestBuildMs,
-            networkMs,
-            parseMs,
-            totalMs: Math.round(nowMs() - startedAt),
-          },
-          promptChars: prompt.length,
-          outputChars,
-        });
-        return mergeEnhancement(input.draftResponse, parsed, this.name, attempt);
-      } catch (error) {
-        if (!recordedAttemptNetworkMs) {
+          });
           networkMs += Math.round(nowMs() - networkStartedAt);
-        }
-        lastError = error;
-        if (attempt >= attempts || !isRetryableError(error)) {
-          break;
-        }
+          recordedAttemptNetworkMs = true;
+          if (!result.text) {
+            throw new Error("Invalid structured output: empty Gemini response.");
+          }
+          outputChars = result.text.length;
+          const parseStartedAt = nowMs();
+          const parsed = enhancementSchema.parse(safeJsonParse(result.text));
+          parseMs += Math.round(nowMs() - parseStartedAt);
+          setCachedEnhancement(key, parsed, outputChars);
+          const providerName = `gemini:${modelName}`;
+          recordAiMetric({
+            status: "enhanced",
+            provider: providerName,
+            model: modelName,
+            attempts: attempt,
+            errorCategory: "none",
+            errorOrigin: "none",
+            providerStatus: null,
+            providerErrorCode: null,
+            timings: {
+              requestBuildMs,
+              networkMs,
+              parseMs,
+              totalMs: Math.round(nowMs() - startedAt),
+            },
+            promptChars: prompt.length,
+            outputChars,
+          });
+          return mergeEnhancement(input.draftResponse, parsed, providerName, attempt);
+        } catch (error) {
+          if (!recordedAttemptNetworkMs) {
+            networkMs += Math.round(nowMs() - networkStartedAt);
+          }
+          lastError = error;
+          if (attempt >= attempts || !isRetryableError(error)) {
+            break;
+          }
 
-        await sleep(baseDelayMs * 2 ** (attempt - 1));
-      } finally {
-        abort.clear();
+          await sleep(baseDelayMs * 2 ** (attempt - 1));
+        } finally {
+          abort.clear();
+        }
+      }
+
+      if (errorCategory(lastError) !== "rate_limit") {
+        break;
       }
     }
 
     const providerDetails = getProviderErrorDetails(lastError);
     recordAiMetric({
       status: errorCategory(lastError) === "timeout" ? "timeout" : "error",
-      provider: this.name,
-      model: this.modelName,
+      provider: `gemini:${lastModelName}`,
+      model: lastModelName,
       attempts,
       errorCategory: errorCategory(lastError),
       errorOrigin: errorOrigin(lastError),
