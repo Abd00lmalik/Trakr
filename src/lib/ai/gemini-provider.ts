@@ -1,7 +1,11 @@
 import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { createHash } from "node:crypto";
 import { z } from "zod";
-import { recordAiMetric, type AiErrorCategory } from "@/lib/ai/metrics";
+import {
+  recordAiMetric,
+  type AiErrorCategory,
+  type AiErrorOrigin,
+} from "@/lib/ai/metrics";
 import { recommendationResponseSchema } from "@/lib/types/opportunities";
 import type { AiProvider, RecommendationNarrativeInput } from "@/lib/ai/provider";
 import type { Recommendation, RecommendationResponse } from "@/lib/types/opportunities";
@@ -134,11 +138,16 @@ function isRetryableError(error: unknown) {
     return true;
   }
 
+  const details = getProviderErrorDetails(error);
+  if (details.status) {
+    return [408, 409, 429, 500, 502, 503, 504].includes(details.status);
+  }
+
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
   return (
-    message.includes("429") ||
-    message.includes("503") ||
-    message.includes("500") ||
+    /\b429\b/.test(message) ||
+    /\b503\b/.test(message) ||
+    /\b500\b/.test(message) ||
     message.includes("timeout") ||
     message.includes("overloaded") ||
     message.includes("unavailable") ||
@@ -152,15 +161,115 @@ function safeJsonParse(text: string) {
   return JSON.parse(extractJson(text)) as unknown;
 }
 
+function getRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" ? (value as Record<string, unknown>) : null;
+}
+
+function getNestedRecord(value: unknown, key: string) {
+  const record = getRecord(value);
+  return record ? getRecord(record[key]) : null;
+}
+
+function firstString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+function getProviderErrorDetails(error: unknown) {
+  const record = getRecord(error);
+  const errorRecord = getNestedRecord(error, "error");
+  const headersRecord = getNestedRecord(error, "headers");
+  const providerStatus =
+    typeof record?.status === "number"
+      ? record.status
+      : typeof record?.statusCode === "number"
+        ? record.statusCode
+        : null;
+  const providerErrorCode = firstString(
+    errorRecord?.status,
+    errorRecord?.code,
+    record?.code,
+    headersRecord?.["x-goog-api-error-code"],
+  );
+  const message =
+    error instanceof Error
+      ? error.message
+      : firstString(errorRecord?.message, record?.message) ?? String(error);
+
+  return {
+    message,
+    status: providerStatus,
+    code: providerErrorCode,
+  };
+}
+
+function errorOrigin(error: unknown): AiErrorOrigin {
+  if (error instanceof SyntaxError || error instanceof z.ZodError) {
+    return "app";
+  }
+
+  const details = getProviderErrorDetails(error);
+  if (details.status !== null) {
+    return "gemini_api";
+  }
+
+  const message = details.message.toLowerCase();
+  if (message.includes("fetch") || message.includes("network")) {
+    return "network";
+  }
+  if (
+    message.includes("invalid structured output") ||
+    message.includes("empty gemini response") ||
+    message.includes("json")
+  ) {
+    return "app";
+  }
+
+  return "sdk";
+}
+
 function errorCategory(error: unknown): AiErrorCategory {
+  const details = getProviderErrorDetails(error);
+  if (details.status === 400) {
+    return "bad_request";
+  }
+  if (details.status === 401 || details.status === 403) {
+    return "auth";
+  }
+  if (details.status === 408 || details.status === 504) {
+    return "timeout";
+  }
+  if (details.status === 429) {
+    return "rate_limit";
+  }
+  if (details.status && details.status >= 500) {
+    return "provider_unavailable";
+  }
+
+  const providerCode = details.code?.toLowerCase();
+  if (providerCode === "resource_exhausted") {
+    return "rate_limit";
+  }
+  if (providerCode === "unauthenticated" || providerCode === "permission_denied") {
+    return "auth";
+  }
+  if (providerCode === "invalid_argument" || providerCode === "failed_precondition") {
+    return "bad_request";
+  }
+
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
   if (message.includes("abort") || message.includes("timeout") || message.includes("timed out")) {
     return "timeout";
   }
-  if (message.includes("429") || message.includes("quota") || message.includes("rate")) {
+  if (/\b429\b/.test(message) || /\bquota\b/.test(message) || /\brate limit(ed|ing)?\b/.test(message)) {
     return "rate_limit";
   }
-  if (message.includes("503") || message.includes("500") || message.includes("unavailable") || message.includes("overloaded")) {
+  if (/\b503\b/.test(message) || /\b500\b/.test(message) || message.includes("unavailable") || message.includes("overloaded")) {
     return "provider_unavailable";
   }
   if (error instanceof SyntaxError || error instanceof z.ZodError || message.includes("json")) {
@@ -341,6 +450,9 @@ export class GeminiProvider implements AiProvider {
         model: this.modelName,
         attempts: 0,
         errorCategory: "none",
+        errorOrigin: "none",
+        providerStatus: null,
+        providerErrorCode: null,
         timings: { requestBuildMs, networkMs: 0, parseMs: 0, totalMs },
         promptChars: prompt.length,
         outputChars: cached.outputChars,
@@ -360,8 +472,9 @@ export class GeminiProvider implements AiProvider {
 
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       const abort = buildAbortSignal(timeoutMs);
+      const networkStartedAt = nowMs();
+      let recordedAttemptNetworkMs = false;
       try {
-        const networkStartedAt = nowMs();
         const result = await this.client.models.generateContent({
           model: this.modelName,
           contents: prompt,
@@ -378,6 +491,7 @@ export class GeminiProvider implements AiProvider {
           },
         });
         networkMs += Math.round(nowMs() - networkStartedAt);
+        recordedAttemptNetworkMs = true;
         if (!result.text) {
           throw new Error("Invalid structured output: empty Gemini response.");
         }
@@ -392,6 +506,9 @@ export class GeminiProvider implements AiProvider {
           model: this.modelName,
           attempts: attempt,
           errorCategory: "none",
+          errorOrigin: "none",
+          providerStatus: null,
+          providerErrorCode: null,
           timings: {
             requestBuildMs,
             networkMs,
@@ -403,6 +520,9 @@ export class GeminiProvider implements AiProvider {
         });
         return mergeEnhancement(input.draftResponse, parsed, this.name, attempt);
       } catch (error) {
+        if (!recordedAttemptNetworkMs) {
+          networkMs += Math.round(nowMs() - networkStartedAt);
+        }
         lastError = error;
         if (attempt >= attempts || !isRetryableError(error)) {
           break;
@@ -414,12 +534,16 @@ export class GeminiProvider implements AiProvider {
       }
     }
 
+    const providerDetails = getProviderErrorDetails(lastError);
     recordAiMetric({
       status: errorCategory(lastError) === "timeout" ? "timeout" : "error",
       provider: this.name,
       model: this.modelName,
       attempts,
       errorCategory: errorCategory(lastError),
+      errorOrigin: errorOrigin(lastError),
+      providerStatus: providerDetails.status,
+      providerErrorCode: providerDetails.code,
       timings: {
         requestBuildMs,
         networkMs,
