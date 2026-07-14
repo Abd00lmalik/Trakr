@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { z } from "zod";
 import { recommendationResponseSchema } from "@/lib/types/opportunities";
 import type { AiProvider, RecommendationNarrativeInput } from "@/lib/ai/provider";
@@ -20,6 +20,72 @@ const enhancementSchema = z.object({
 });
 
 type Enhancement = z.infer<typeof enhancementSchema>;
+
+const enhancementJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    recommendations: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          id: { type: "string" },
+          reasoning: { type: "string" },
+          missingRequirements: {
+            type: "array",
+            items: { type: "string" },
+            maxItems: 8,
+          },
+          recommendedAction: {
+            type: "string",
+            enum: ["Apply Now", "Prepare First", "Skip"],
+          },
+          nextSteps: {
+            type: "array",
+            items: { type: "string" },
+            minItems: 2,
+            maxItems: 5,
+          },
+        },
+        required: [
+          "id",
+          "reasoning",
+          "missingRequirements",
+          "recommendedAction",
+          "nextSteps",
+        ],
+      },
+    },
+    actionPlan: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        immediate: { type: "array", items: { type: "string" } },
+        sevenDayPlan: { type: "array", items: { type: "string" } },
+        thirtyDayPlan: { type: "array", items: { type: "string" } },
+      },
+      required: ["immediate", "sevenDayPlan", "thirtyDayPlan"],
+    },
+    learningRoadmap: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        focusAreas: { type: "array", items: { type: "string" } },
+        resourcesToFind: { type: "array", items: { type: "string" } },
+        practiceProjects: { type: "array", items: { type: "string" } },
+      },
+      required: ["focusAreas", "resourcesToFind", "practiceProjects"],
+    },
+    agentNotes: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 6,
+    },
+  },
+  required: ["recommendations", "actionPlan", "learningRoadmap", "agentNotes"],
+};
 
 function extractJson(text: string) {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
@@ -54,6 +120,10 @@ function timeoutPromise<T>(promise: Promise<T>, timeoutMs: number) {
 }
 
 function isRetryableError(error: unknown) {
+  if (error instanceof SyntaxError || error instanceof z.ZodError) {
+    return true;
+  }
+
   const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
   return (
     message.includes("429") ||
@@ -62,7 +132,9 @@ function isRetryableError(error: unknown) {
     message.includes("timeout") ||
     message.includes("overloaded") ||
     message.includes("unavailable") ||
-    message.includes("fetch failed")
+    message.includes("fetch failed") ||
+    message.includes("invalid json") ||
+    message.includes("invalid structured output")
   );
 }
 
@@ -228,66 +300,16 @@ export class GeminiProvider implements AiProvider {
             contents: buildPrompt(input),
             config: {
               responseMimeType: "application/json",
-              responseSchema: {
-                type: Type.OBJECT,
-                properties: {
-                  recommendations: {
-                    type: Type.ARRAY,
-                    items: {
-                      type: Type.OBJECT,
-                      properties: {
-                        id: { type: Type.STRING },
-                        reasoning: { type: Type.STRING },
-                        missingRequirements: {
-                          type: Type.ARRAY,
-                          items: { type: Type.STRING },
-                        },
-                        recommendedAction: {
-                          type: Type.STRING,
-                          enum: ["Apply Now", "Prepare First", "Skip"],
-                        },
-                        nextSteps: {
-                          type: Type.ARRAY,
-                          items: { type: Type.STRING },
-                        },
-                      },
-                      required: [
-                        "id",
-                        "reasoning",
-                        "missingRequirements",
-                        "recommendedAction",
-                        "nextSteps",
-                      ],
-                    },
-                  },
-                  actionPlan: {
-                    type: Type.OBJECT,
-                    properties: {
-                      immediate: { type: Type.ARRAY, items: { type: Type.STRING } },
-                      sevenDayPlan: { type: Type.ARRAY, items: { type: Type.STRING } },
-                      thirtyDayPlan: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    },
-                    required: ["immediate", "sevenDayPlan", "thirtyDayPlan"],
-                  },
-                  learningRoadmap: {
-                    type: Type.OBJECT,
-                    properties: {
-                      focusAreas: { type: Type.ARRAY, items: { type: Type.STRING } },
-                      resourcesToFind: { type: Type.ARRAY, items: { type: Type.STRING } },
-                      practiceProjects: { type: Type.ARRAY, items: { type: Type.STRING } },
-                    },
-                    required: ["focusAreas", "resourcesToFind", "practiceProjects"],
-                  },
-                  agentNotes: { type: Type.ARRAY, items: { type: Type.STRING } },
-                },
-                required: ["recommendations", "actionPlan", "learningRoadmap", "agentNotes"],
-              },
+              responseJsonSchema: enhancementJsonSchema,
               temperature: 0.35,
               maxOutputTokens: 6000,
             },
           }),
           timeoutMs,
         );
+        if (!result.text) {
+          throw new Error("Invalid structured output: empty Gemini response.");
+        }
         const parsed = enhancementSchema.parse(safeJsonParse(result.text ?? ""));
         return mergeEnhancement(input.draftResponse, parsed, this.name, attempt);
       } catch (error) {
