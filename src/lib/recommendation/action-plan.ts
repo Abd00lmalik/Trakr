@@ -3,20 +3,20 @@ import type { Recommendation, ScoredOpportunity } from "@/lib/types/opportunitie
 export function buildRecommendationNarrative(candidate: ScoredOpportunity): string {
   const { opportunity, matchedSignals, missingRequirements, action } = candidate;
   const strengths = matchedSignals.length
-    ? matchedSignals.slice(0, 3).join("; ")
+    ? matchedSignals.slice(0, 4).join("; ")
     : "The opportunity has topical alignment with the user's goals.";
   const gaps = missingRequirements.length
     ? `Main gaps: ${missingRequirements.slice(0, 3).join(", ")}.`
     : "No major required-skill gaps detected.";
 
-  return `${opportunity.title} is a ${action.toLowerCase()} candidate because ${strengths}. ${gaps}`;
+  return `${opportunity.title} is a ${action.toLowerCase()} candidate because ${strengths}. Trakr rated source quality at ${candidate.qualityScore}/100 and personal relevance at ${candidate.relevanceScore}/100. ${gaps}`;
 }
 
 export function buildNextSteps(candidate: ScoredOpportunity) {
   if (candidate.action === "Apply Now") {
     return [
       "Review the official opportunity page and confirm eligibility.",
-      "Tailor the profile, portfolio, or proposal around the strongest matched signals.",
+      "Tailor the profile, portfolio, or proposal around the strongest matched signals and expected value.",
       "Submit before the deadline and track follow-up requirements.",
     ];
   }
@@ -24,7 +24,7 @@ export function buildNextSteps(candidate: ScoredOpportunity) {
   if (candidate.action === "Prepare First") {
     return [
       `Close the top gaps: ${candidate.missingRequirements.slice(0, 3).join(", ") || "portfolio proof"}.`,
-      "Create one small proof-of-work artifact aligned with the opportunity.",
+      "Create one small proof-of-work artifact aligned with the opportunity's source and category.",
       "Re-check fit after preparation and apply if the deadline still allows.",
     ];
   }

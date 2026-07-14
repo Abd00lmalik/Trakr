@@ -180,10 +180,26 @@ try {
 
   if (
     recommendation.body?.service !== "trakr" ||
+    !["enhanced", "retrying", "degraded", "fallback"].includes(recommendation.body?.aiStatus) ||
     !Array.isArray(recommendation.body?.recommendations) ||
     recommendation.body.recommendations.length === 0
   ) {
     throw new Error("Recommendation response did not match the expected A2MCP shape.");
+  }
+
+  const forbiddenTitles = [/^all jobs?$/i, /^apply here$/i, /^expression of interest/i];
+  const badRecommendation = recommendation.body.recommendations.find((item) =>
+    forbiddenTitles.some((pattern) => pattern.test(item.opportunity.title)),
+  );
+  if (badRecommendation) {
+    throw new Error(`Low-quality generic listing was recommended: ${badRecommendation.opportunity.title}`);
+  }
+
+  const rawProviderLeak = JSON.stringify(recommendation.body).match(
+    /quota|generativelanguage\.googleapis\.com|GoogleGenerativeAI Error|stack trace/i,
+  );
+  if (rawProviderLeak) {
+    throw new Error("Recommendation response leaked raw AI provider details.");
   }
 
   const invalid = await requestJson("/api/a2mcp/recommend", {
@@ -205,6 +221,8 @@ try {
         parsedResumeTypes: ["pdf", "docx"],
         recommendationCount: recommendation.body.recommendations.length,
         provider: recommendation.body.provider,
+        aiStatus: recommendation.body.aiStatus,
+        topRecommendation: recommendation.body.recommendations[0].opportunity.title,
       },
       null,
       2,

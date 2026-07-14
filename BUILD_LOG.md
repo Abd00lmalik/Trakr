@@ -44,6 +44,32 @@
 - Added protected structured ingestion from Devpost and RemoteOK, plus GitHub scheduled ingestion workflow.
 - Added CI workflow and `.mcp.json.example` for agent-facing metadata.
 
+## 2026-07-14 Quality Sprint
+
+- Kept Gemini provider default on `gemini-3.5-flash`, matching the current official stable Gemini Flash model naming, while moving to the current `@google/genai` SDK.
+- Reworked Gemini enhancement to use the current `@google/genai` SDK with structured JSON output, retries, timeout handling, and no raw provider-error leakage.
+- Preserved deterministic pre-ranking order after Gemini narrative enhancement so AI text cannot promote weak/irrelevant items above stronger grounded matches.
+- Added quality and domain-fit scoring stages covering category relevance, skill fit, experience level, location, deadline urgency, source quality, expected value, and domain alignment.
+- Expanded the official curated catalog from 10 to 18 grounded opportunities, adding official AI/data, cybersecurity, creator, founder, and student/developer sources.
+- Tightened generic/low-information listing suppression so titles like "All Jobs" and "Apply Here" cannot rank near the top.
+- Local persona stress test highlights after rebuild:
+  - Web3 builder: ETHGlobal, Solana Grants, DoraHacks ranked top 3.
+  - AI engineer: Kaggle Competitions and Google Research Student Programs ranked top 2.
+  - Cybersecurity student: CTFtime and HackerOne ranked top 2.
+  - Creator: YouTube Creator Programs and TikTok Creator Academy ranked top 2.
+  - Startup founder: Y Combinator and AWS Activate ranked top 2.
+- Local verification passed:
+  - `npm run typecheck`
+  - `npm run lint`
+  - `npm run build`
+  - `npm run smoke`
+
+Remaining production-dependent checks:
+
+- Railway must redeploy from GitHub after this commit is pushed.
+- Production smoke should be rerun against `https://trakr-production-c70e.up.railway.app`.
+- Railway/GitHub environment variables should keep `GEMINI_MODEL=gemini-3.5-flash`, `TRAKR_SERVICE_URL=https://trakr-production-c70e.up.railway.app`, and `NEXT_PUBLIC_APP_URL=https://trakr-production-c70e.up.railway.app`.
+
 ## Latest Local Verification
 
 Commands run successfully:

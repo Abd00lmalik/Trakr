@@ -51,7 +51,62 @@ export async function GET() {
           },
           responses: {
             "200": {
-              description: "Ranked recommendations",
+              description:
+                "Ranked recommendations with grounded opportunity records, aiStatus, reasoning, gaps, next steps, action plan, and learning roadmap.",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: [
+                      "service",
+                      "version",
+                      "requestId",
+                      "generatedAt",
+                      "provider",
+                      "aiStatus",
+                      "querySummary",
+                      "recommendations",
+                      "actionPlan",
+                      "learningRoadmap",
+                      "agentNotes",
+                    ],
+                    properties: {
+                      service: { const: "trakr" },
+                      version: { type: "string" },
+                      requestId: { type: "string" },
+                      generatedAt: { type: "string", format: "date-time" },
+                      provider: { type: "string" },
+                      aiStatus: {
+                        type: "string",
+                        enum: ["enhanced", "retrying", "degraded", "fallback"],
+                      },
+                      recommendations: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            rank: { type: "integer" },
+                            matchScore: { type: "number", minimum: 0, maximum: 100 },
+                            reasoning: { type: "string" },
+                            missingRequirements: {
+                              type: "array",
+                              items: { type: "string" },
+                            },
+                            recommendedAction: {
+                              type: "string",
+                              enum: ["Apply Now", "Prepare First", "Skip"],
+                            },
+                            nextSteps: {
+                              type: "array",
+                              items: { type: "string" },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
             },
             "400": {
               description: "Structured validation error",

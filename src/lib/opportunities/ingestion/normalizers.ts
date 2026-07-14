@@ -42,6 +42,45 @@ function extractTags(values: unknown) {
     .slice(0, 12);
 }
 
+const blockedRemoteOkTitles = [
+  /^all jobs?$/i,
+  /^apply here$/i,
+  /^general application$/i,
+  /^expression of interest/i,
+  /^open application/i,
+  /^future opportunities$/i,
+];
+
+const technicalOrCreatorTags = new Set([
+  "ai",
+  "analytics",
+  "backend",
+  "content",
+  "copywriting",
+  "crypto",
+  "css",
+  "data",
+  "design",
+  "developer",
+  "engineering",
+  "figma",
+  "frontend",
+  "javascript",
+  "marketing",
+  "ml",
+  "node",
+  "python",
+  "react",
+  "security",
+  "seo",
+  "solidity",
+  "typescript",
+  "ux",
+  "video",
+  "web3",
+  "wordpress",
+]);
+
 export function normalizeDevpostHackathon(raw: Record<string, unknown>): Opportunity | null {
   const title = String(raw.title ?? raw.name ?? "").trim();
   const url = String(raw.url ?? raw.devpost_url ?? "").trim();
@@ -81,7 +120,20 @@ export function normalizeRemoteOkJob(raw: Record<string, unknown>): Opportunity 
     return null;
   }
 
+  if (blockedRemoteOkTitles.some((pattern) => pattern.test(position))) {
+    return null;
+  }
+
   const tags = extractTags(raw.tags).map((tag) => tag.toLowerCase());
+  const joined = [position, company, tags.join(" ")].join(" ").toLowerCase();
+  const hasRelevantSignal =
+    tags.some((tag) => technicalOrCreatorTags.has(tag)) ||
+    [...technicalOrCreatorTags].some((tag) => joined.includes(tag));
+
+  if (!hasRelevantSignal) {
+    return null;
+  }
+
   const requiredSkills = tags.filter((tag) =>
     ["react", "typescript", "javascript", "python", "node", "nextjs", "solidity"].includes(
       tag,

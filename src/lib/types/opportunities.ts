@@ -16,6 +16,13 @@ export const recommendationActionSchema = z.enum([
   "Skip",
 ]);
 
+export const aiStatusSchema = z.enum([
+  "enhanced",
+  "retrying",
+  "degraded",
+  "fallback",
+]);
+
 export const experienceLevelSchema = z.enum([
   "student",
   "beginner",
@@ -91,6 +98,8 @@ export const opportunitySchema = z.object({
 export const scoredOpportunitySchema = z.object({
   opportunity: opportunitySchema,
   score: z.number().min(0).max(100),
+  qualityScore: z.number().min(0).max(100),
+  relevanceScore: z.number().min(0).max(100),
   matchedSignals: z.array(z.string()),
   missingRequirements: z.array(z.string()),
   action: recommendationActionSchema,
@@ -124,6 +133,7 @@ export const recommendationResponseSchema = z.object({
   requestId: z.string(),
   generatedAt: z.string().datetime(),
   provider: z.string(),
+  aiStatus: aiStatusSchema,
   querySummary: z.object({
     profileSignals: z.array(z.string()),
     filtersApplied: recommendationFiltersSchema,
@@ -137,6 +147,7 @@ export const recommendationResponseSchema = z.object({
 
 export type OpportunityCategory = z.infer<typeof opportunityCategorySchema>;
 export type RecommendationAction = z.infer<typeof recommendationActionSchema>;
+export type AiStatus = z.infer<typeof aiStatusSchema>;
 export type StructuredUserProfile = z.infer<typeof structuredUserProfileSchema>;
 export type RecommendationFilters = z.infer<typeof recommendationFiltersSchema>;
 export type RecommendationRequest = z.infer<typeof recommendationRequestSchema>;

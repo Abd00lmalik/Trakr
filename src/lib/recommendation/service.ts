@@ -46,6 +46,7 @@ function buildDraftResponse(
     requestId: request.requestId ?? nanoid(),
     generatedAt: new Date().toISOString(),
     provider: providerName,
+    aiStatus: providerName === "deterministic-local" ? "fallback" : "degraded",
     querySummary: {
       profileSignals: extractProfileSignals(request),
       filtersApplied: request.filters,
@@ -55,8 +56,8 @@ function buildDraftResponse(
     actionPlan: buildActionPlan(recommendations),
     learningRoadmap: buildLearningRoadmap(recommendations),
     agentNotes: [
-      "Scores combine deterministic skill, category, goal, location, and deadline signals.",
-      "Phase 1 uses a seeded structured catalog; production feeds should be added through OpportunitySource adapters.",
+      "Candidates are grounded in stored or structured source opportunities before AI enhancement.",
+      "Scores combine category fit, skills, experience level, location, source quality, deadline urgency, and expected value.",
       "Responses are designed for direct consumption by other AI agents.",
     ],
   };
@@ -99,11 +100,11 @@ export async function generateRecommendations(
     } catch (error) {
       response = {
         ...draftResponse,
+        provider: aiProvider.name,
+        aiStatus: "fallback",
         agentNotes: [
           ...draftResponse.agentNotes,
-          `AI enhancement failed; returned deterministic recommendations. Reason: ${
-            error instanceof Error ? error.message : "Unknown provider error"
-          }`,
+          "AI enhancement was unavailable after retry; returned grounded deterministic recommendations.",
         ],
       };
     }

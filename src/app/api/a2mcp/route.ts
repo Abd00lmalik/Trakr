@@ -44,6 +44,7 @@ export async function GET() {
       "web3_bounty",
     ],
     actions: ["Apply Now", "Prepare First", "Skip"],
+    aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
     inputModes: ["structured_profile", "resume_text"],
     futureBilling: {
       compatibleWith: "x402",
@@ -54,6 +55,15 @@ export async function GET() {
       responseMode: "HTTP 200 JSON for Phase 1",
       paidUpgradePath: "x402 middleware on /api/a2mcp/recommend",
     },
-    dataSources: ["seeded catalog", "Devpost API", "RemoteOK API"],
+    dataSources: [
+      "Devpost API",
+      "RemoteOK API with quality filters",
+      "Official curated source import",
+    ],
+    qualityControls: [
+      "low-information listings are filtered or penalized",
+      "ranking combines category, skill, experience, location, quality, deadline, and expected value",
+      "raw AI provider errors are never returned to callers",
+    ],
   });
 }

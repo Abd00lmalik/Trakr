@@ -2,6 +2,7 @@ import {
   normalizeDevpostHackathon,
   normalizeRemoteOkJob,
 } from "@/lib/opportunities/ingestion/normalizers";
+import { curatedOfficialOpportunities } from "@/lib/opportunities/data/curated-official-opportunities";
 import type { Opportunity } from "@/lib/types/opportunities";
 
 async function fetchJson(url: string, init?: RequestInit) {
@@ -66,5 +67,13 @@ export async function fetchStructuredOpportunities() {
       : [],
   );
 
-  return { opportunities, errors };
+  return {
+    opportunities: [...opportunities, ...curatedOfficialOpportunities],
+    errors,
+    sources: [
+      "Devpost API",
+      "RemoteOK API",
+      "Official curated source import",
+    ],
+  };
 }

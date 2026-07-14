@@ -40,4 +40,12 @@ This endpoint is intentionally outside the public A2MCP surface. It exists for d
 
 ## ADR 010: Gemini Flash Model Pin
 
-Trakr pins Gemini to `gemini-3.5-flash` by default. The provider abstraction still allows switching models or providers through environment variables without changing recommendation logic.
+Trakr pins Gemini to `gemini-3.5-flash` by default after verifying the current official Gemini API model naming. The provider abstraction still allows switching models or providers through environment variables without changing recommendation logic.
+
+## ADR 011: Grounded Ranking Before AI Enhancement
+
+Trakr ranks real, stored opportunities before calling Gemini. AI enhancement may improve reasoning, missing-skill language, next steps, action plans, and learning roadmaps, but it must not invent opportunities or reorder weak listings above stronger grounded matches.
+
+## ADR 012: Official Curated Catalog as Quality Floor
+
+Structured ingestion remains important, but Phase 1 requires reliable recommendations even when third-party feeds are unavailable or sparse. Trakr keeps an official curated catalog with verified source URLs across Web3, AI/data, cybersecurity, creator, founder, student, open-source, and developer programs. This catalog acts as the minimum quality floor and database fallback.
