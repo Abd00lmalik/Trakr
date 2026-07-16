@@ -93,17 +93,16 @@ async function waitForHealth() {
 
 let server;
 if (shouldStartServer) {
-  const command = process.platform === "win32" ? "cmd" : "npm";
-  const args =
-    process.platform === "win32"
-      ? ["/c", "npm", "run", "start", "--", "--port", String(port)]
-      : ["run", "start", "--", "--port", String(port)];
-  server = spawn(command, args, {
+  server = spawn(
+    process.execPath,
+    ["node_modules/next/dist/bin/next", "start", "--port", String(port)],
+    {
     cwd: process.cwd(),
     env: process.env,
     shell: false,
     stdio: ["ignore", "pipe", "pipe"],
-  });
+    },
+  );
   server.stdout.on("data", (chunk) => process.stdout.write(chunk));
   server.stderr.on("data", (chunk) => process.stderr.write(chunk));
 }
