@@ -23,20 +23,39 @@ async function fetchJson(url: string, init?: RequestInit) {
   return response.json();
 }
 
+export function deduplicateOpportunities(opportunities: Opportunity[]) {
+  const seenIds = new Set<string>();
+  const seenUrls = new Set<string>();
+
+  return opportunities.filter((opportunity) => {
+    if (
+      seenIds.has(opportunity.id) ||
+      seenUrls.has(opportunity.canonicalUrl)
+    ) {
+      return false;
+    }
+
+    seenIds.add(opportunity.id);
+    seenUrls.add(opportunity.canonicalUrl);
+    return true;
+  });
+}
+
 export async function fetchDevpostOpportunities(): Promise<Opportunity[]> {
   const data = await fetchJson("https://devpost.com/api/hackathons?status=open");
   const records: unknown[] =
     data && typeof data === "object" && "hackathons" in data && Array.isArray(data.hackathons)
       ? data.hackathons
       : [];
-  return records
-    .map((item: unknown) =>
-      item && typeof item === "object"
-        ? normalizeDevpostHackathon(item as Record<string, unknown>)
-        : null,
-    )
-    .filter((item): item is Opportunity => Boolean(item))
-    .slice(0, 50);
+  return deduplicateOpportunities(
+    records
+      .map((item: unknown) =>
+        item && typeof item === "object"
+          ? normalizeDevpostHackathon(item as Record<string, unknown>)
+          : null,
+      )
+      .filter((item): item is Opportunity => Boolean(item)),
+  ).slice(0, 50);
 }
 
 export async function fetchRemoteOkOpportunities(): Promise<Opportunity[]> {

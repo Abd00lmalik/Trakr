@@ -15,7 +15,9 @@
     "smoke": "node scripts/smoke-test.mjs",
     "test:privacy": "tsx --test tests/privacy-logging.test.ts",
     "test:verification": "tsx --test tests/source-verification.test.ts",
-    "verify": "npm run test:privacy && npm run test:verification && npm run typecheck && npm run lint && npm run build && npm run smoke",
+    "test:devpost": "tsx --test tests/devpost-normalization.test.ts",
+    "devpost:compare": "tsx scripts/compare-devpost-normalization.ts",
+    "verify": "npm run test:privacy && npm run test:verification && npm run test:devpost && npm run typecheck && npm run lint && npm run build && npm run smoke",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "ingest": "node scripts/ingest.mjs"
