@@ -53,10 +53,19 @@ export async function fetchRemoteOkOpportunities(): Promise<Opportunity[]> {
 }
 
 export async function fetchStructuredOpportunities() {
-  const results = await Promise.allSettled([
-    fetchDevpostOpportunities(),
-    fetchRemoteOkOpportunities(),
-  ]);
+  const sourceFetches = [
+    {
+      sourceName: "Devpost API",
+      publicName: "Devpost API",
+      promise: fetchDevpostOpportunities(),
+    },
+    {
+      sourceName: "RemoteOK API",
+      publicName: "RemoteOK API",
+      promise: fetchRemoteOkOpportunities(),
+    },
+  ];
+  const results = await Promise.allSettled(sourceFetches.map((source) => source.promise));
 
   const opportunities = results.flatMap((result) =>
     result.status === "fulfilled" ? result.value : [],
@@ -66,14 +75,14 @@ export async function fetchStructuredOpportunities() {
       ? [result.reason instanceof Error ? result.reason.message : "Unknown fetch error"]
       : [],
   );
+  const successfulSourceNames = results.flatMap((result, index) =>
+    result.status === "fulfilled" ? [sourceFetches[index].sourceName] : [],
+  );
 
   return {
     opportunities: [...opportunities, ...curatedOfficialOpportunities],
     errors,
-    sources: [
-      "Devpost API",
-      "RemoteOK API",
-      "Official curated source import",
-    ],
+    sources: [...sourceFetches.map((source) => source.publicName), "Official curated source import"],
+    successfulSourceNames: [...successfulSourceNames, "Official curated source"],
   };
 }

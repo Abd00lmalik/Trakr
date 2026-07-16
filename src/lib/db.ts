@@ -26,6 +26,7 @@ export async function checkDatabase() {
       pgvector: false,
       schemaReady: false,
       privacyLoggingReady: false,
+      sourceVerificationReady: false,
     };
   }
 
@@ -57,6 +58,23 @@ export async function checkDatabase() {
             and column_name in ('request_payload', 'response_payload')
         ) as ready`,
     );
+    const sourceVerification = await db.query<{ ready: boolean }>(
+      `select count(*) = 9 as ready
+       from information_schema.columns
+       where table_schema = 'public'
+         and table_name = 'opportunities'
+         and column_name in (
+           'verification_status',
+           'last_verified_at',
+           'last_seen_at',
+           'source_status',
+           'http_status',
+           'canonical_url',
+           'publisher_domain',
+           'is_active',
+           'verification_confidence'
+         )`,
+    );
 
     return {
       configured: true,
@@ -64,6 +82,7 @@ export async function checkDatabase() {
       pgvector: pgvector.rows[0]?.installed ?? false,
       schemaReady: schema.rows[0]?.ready ?? false,
       privacyLoggingReady: privacyLogging.rows[0]?.ready ?? false,
+      sourceVerificationReady: sourceVerification.rows[0]?.ready ?? false,
     };
   } catch (error) {
     return {
@@ -72,6 +91,7 @@ export async function checkDatabase() {
       pgvector: false,
       schemaReady: false,
       privacyLoggingReady: false,
+      sourceVerificationReady: false,
       error: error instanceof Error ? error.message : "Unknown database error",
     };
   }

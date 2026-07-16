@@ -1,6 +1,19 @@
 import type { Opportunity } from "@/lib/types/opportunities";
 
-export const staticOpportunities: Opportunity[] = [
+type StaticOpportunity = Omit<
+  Opportunity,
+  | "verificationStatus"
+  | "lastVerifiedAt"
+  | "lastSeenAt"
+  | "sourceStatus"
+  | "httpStatus"
+  | "canonicalUrl"
+  | "publisherDomain"
+  | "isActive"
+  | "verificationConfidence"
+>;
+
+const staticOpportunityCatalog: StaticOpportunity[] = [
   {
     id: "ethglobal-online-buildathon",
     title: "ETHGlobal Online Buildathon",
@@ -135,3 +148,18 @@ export const staticOpportunities: Opportunity[] = [
     difficulty: "high",
   },
 ];
+
+export const staticOpportunities: Opportunity[] = staticOpportunityCatalog.map(
+  (opportunity) => ({
+    ...opportunity,
+    verificationStatus: "unverified",
+    lastVerifiedAt: null,
+    lastSeenAt: null,
+    sourceStatus: "unverified",
+    httpStatus: null,
+    canonicalUrl: opportunity.sourceUrl,
+    publisherDomain: new URL(opportunity.sourceUrl).hostname.replace(/^www\./, ""),
+    isActive: true,
+    verificationConfidence: 0,
+  }),
+);

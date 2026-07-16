@@ -1,13 +1,32 @@
 import { fetchStructuredOpportunities } from "@/lib/opportunities/ingestion/fetchers";
-import { upsertOpportunities } from "@/lib/repositories/opportunity-repository";
+import { verifyOpportunities } from "@/lib/opportunities/verification";
+import { storeIngestionBatch } from "@/lib/repositories/opportunity-repository";
 
 export async function ingestOpportunities() {
-  const { opportunities, errors, sources } = await fetchStructuredOpportunities();
-  const stored = opportunities.length ? await upsertOpportunities(opportunities) : 0;
+  const startedAt = new Date();
+  const { opportunities, errors, sources, successfulSourceNames } =
+    await fetchStructuredOpportunities();
+  const lastSeenAt = startedAt.toISOString();
+  const verified = await verifyOpportunities(
+    opportunities.map((opportunity) => ({ ...opportunity, lastSeenAt })),
+  );
+  const result = await storeIngestionBatch(verified, successfulSourceNames, startedAt);
 
   return {
     fetched: opportunities.length,
-    stored,
+    stored: result.stored,
+    deactivated: result.deactivated,
+    verification: {
+      verified: verified.filter((item) => item.verificationStatus === "verified").length,
+      programDirectories: verified.filter(
+        (item) => item.verificationStatus === "program_directory",
+      ).length,
+      inactive: verified.filter(
+        (item) => item.verificationStatus === "inactive_listing",
+      ).length,
+      unverified: verified.filter((item) => item.verificationStatus === "unverified")
+        .length,
+    },
     errors,
     sources,
   };

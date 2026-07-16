@@ -62,6 +62,15 @@ SMOKE_BASE_URL=https://your-railway-domain npm run smoke
 TRAKR_SERVICE_URL=https://your-railway-domain INGEST_API_KEY=your_ingest_key npm run ingest
 ```
 
+Each ingestion run verifies every opportunity URL with redirect following and
+records source status, HTTP status, canonical URL, publisher domain, activity,
+verification confidence, and last-seen timestamps. Records that disappear from
+a successfully refreshed source are deactivated. A failed source refresh does
+not deactivate that source's existing records.
+
+Only verified active opportunity pages may receive `Apply Now`. Program
+directories remain discoverable but are limited to `Prepare First` or `Skip`.
+
 ## OKX.AI A2MCP Registration
 
 For the first submission, register Trakr as a free A2MCP service:
@@ -81,6 +90,7 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - `GET /api/health` should return `ok: true`.
 - `ai.configured` should be `true` when `GEMINI_API_KEY` is configured.
 - `database.connected`, `database.pgvector`, and `database.schemaReady` should be `true` once Railway Postgres is configured and migrated.
+- `database.sourceVerificationReady` should be `true` after the source verification migration.
 - `POST /api/a2mcp/recommend` should return `HTTP 200` for the free OKX submission path.
 - Leave `TRAKR_API_KEY` unset for public free OKX review unless OKX gives a shared secret or gateway header to enforce.
 - Set `INGEST_API_KEY` before enabling scheduled ingestion.

@@ -27,15 +27,72 @@ create table if not exists opportunities (
   benefits text[] not null default '{}',
   tags text[] not null default '{}',
   difficulty text not null check (difficulty in ('low', 'medium', 'high')),
+  verification_status text not null default 'unverified' check (
+    verification_status in (
+      'verified',
+      'program_directory',
+      'inactive_listing',
+      'unverified'
+    )
+  ),
+  last_verified_at timestamptz,
+  last_seen_at timestamptz,
+  source_status text not null default 'unverified' check (
+    source_status in (
+      'active',
+      'redirected',
+      'blocked',
+      'unreachable',
+      'inactive',
+      'stale',
+      'unverified'
+    )
+  ),
+  http_status integer check (http_status between 100 and 599),
+  canonical_url text not null default '',
+  publisher_domain text not null default '',
+  is_active boolean not null default true,
+  verification_confidence numeric(4,3) not null default 0 check (
+    verification_confidence between 0 and 1
+  ),
   embedding vector(1536),
   raw_payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+alter table opportunities
+  add column if not exists verification_status text not null default 'unverified',
+  add column if not exists last_verified_at timestamptz,
+  add column if not exists last_seen_at timestamptz,
+  add column if not exists source_status text not null default 'unverified',
+  add column if not exists http_status integer,
+  add column if not exists canonical_url text not null default '',
+  add column if not exists publisher_domain text not null default '',
+  add column if not exists is_active boolean not null default true,
+  add column if not exists verification_confidence numeric(4,3) not null default 0;
+
+update opportunities
+set canonical_url = source_url
+where canonical_url = '';
+
+update opportunities
+set publisher_domain = lower(
+  regexp_replace(
+    split_part(regexp_replace(source_url, '^https?://', ''), '/', 1),
+    '^www\.',
+    ''
+  )
+)
+where publisher_domain = '';
+
 create index if not exists opportunities_category_idx on opportunities (category);
 create index if not exists opportunities_deadline_idx on opportunities (deadline);
 create index if not exists opportunities_remote_idx on opportunities (remote);
+create index if not exists opportunities_active_idx
+  on opportunities (is_active, verification_status);
+create index if not exists opportunities_last_seen_idx
+  on opportunities (source_name, last_seen_at);
 create index if not exists opportunities_embedding_idx
   on opportunities using ivfflat (embedding vector_cosine_ops)
   with (lists = 100);

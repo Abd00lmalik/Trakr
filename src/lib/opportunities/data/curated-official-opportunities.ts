@@ -1,6 +1,19 @@
 import type { Opportunity } from "@/lib/types/opportunities";
 
-export const curatedOfficialOpportunities: Opportunity[] = [
+type CuratedOpportunity = Omit<
+  Opportunity,
+  | "verificationStatus"
+  | "lastVerifiedAt"
+  | "lastSeenAt"
+  | "sourceStatus"
+  | "httpStatus"
+  | "canonicalUrl"
+  | "publisherDomain"
+  | "isActive"
+  | "verificationConfidence"
+>;
+
+const curatedOfficialCatalog: CuratedOpportunity[] = [
   {
     id: "official-ethglobal-events",
     title: "ETHGlobal Hackathons and Events",
@@ -344,3 +357,18 @@ export const curatedOfficialOpportunities: Opportunity[] = [
     difficulty: "low",
   },
 ];
+
+export const curatedOfficialOpportunities: Opportunity[] = curatedOfficialCatalog.map(
+  (opportunity) => ({
+    ...opportunity,
+    verificationStatus: "program_directory",
+    lastVerifiedAt: null,
+    lastSeenAt: null,
+    sourceStatus: "unverified",
+    httpStatus: null,
+    canonicalUrl: opportunity.sourceUrl,
+    publisherDomain: new URL(opportunity.sourceUrl).hostname.replace(/^www\./, ""),
+    isActive: true,
+    verificationConfidence: 0,
+  }),
+);

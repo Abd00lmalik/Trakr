@@ -1,4 +1,8 @@
 import type { Opportunity } from "@/lib/types/opportunities";
+import {
+  canonicalizeUrl,
+  publisherDomain,
+} from "@/lib/opportunities/verification";
 
 function slugify(value: string) {
   return value
@@ -109,6 +113,15 @@ export function normalizeDevpostHackathon(raw: Record<string, unknown>): Opportu
     benefits: ["Prizes", "Portfolio proof", "Community exposure"],
     tags,
     difficulty: "medium",
+    verificationStatus: "unverified",
+    lastVerifiedAt: null,
+    lastSeenAt: null,
+    sourceStatus: "unverified",
+    httpStatus: null,
+    canonicalUrl: canonicalizeUrl(url),
+    publisherDomain: publisherDomain(url),
+    isActive: true,
+    verificationConfidence: 0,
   };
 }
 
@@ -157,5 +170,14 @@ export function normalizeRemoteOkJob(raw: Record<string, unknown>): Opportunity 
     benefits: ["Paid remote role", "Professional experience"],
     tags: [...new Set(["remote", "job", ...tags])].slice(0, 12),
     difficulty: "high",
+    verificationStatus: "unverified",
+    lastVerifiedAt: null,
+    lastSeenAt: null,
+    sourceStatus: "unverified",
+    httpStatus: null,
+    canonicalUrl: canonicalizeUrl(url),
+    publisherDomain: publisherDomain(url),
+    isActive: true,
+    verificationConfidence: 0,
   };
 }

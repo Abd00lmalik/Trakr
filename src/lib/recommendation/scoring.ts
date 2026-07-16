@@ -6,6 +6,7 @@ import type {
   ScoredOpportunity,
   StructuredUserProfile,
 } from "@/lib/types/opportunities";
+import { canApplyNow } from "@/lib/opportunities/verification";
 
 const stopWords = new Set([
   "and",
@@ -392,12 +393,22 @@ function domainFitScore(opportunity: Opportunity, request: RecommendationRequest
   return 18;
 }
 
-function decideAction(score: number, missingRequirements: string[], quality: number): RecommendationAction {
+function decideAction(
+  opportunity: Opportunity,
+  score: number,
+  missingRequirements: string[],
+  quality: number,
+): RecommendationAction {
   if (quality < 35 || score < 38) {
     return "Skip";
   }
 
-  if (score >= 76 && missingRequirements.length <= 2 && quality >= 55) {
+  if (
+    canApplyNow(opportunity) &&
+    score >= 76 &&
+    missingRequirements.length <= 2 &&
+    quality >= 55
+  ) {
     return "Apply Now";
   }
 
@@ -470,7 +481,7 @@ export function scoreOpportunity(
   }
 
   score = Math.max(0, Math.min(100, score));
-  const action = decideAction(score, skill.missingRequirements, quality);
+  const action = decideAction(opportunity, score, skill.missingRequirements, quality);
   const matchedSignals = [
     ...skill.matches,
     `Category relevance: ${category}/100`,

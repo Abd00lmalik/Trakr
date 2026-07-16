@@ -1,5 +1,18 @@
 # Build Log
 
+## 2026-07-16 Source Verification and Stale Record Handling
+
+- Added bounded-concurrency URL verification with redirect detection,
+  canonical URL normalization, publisher domains, HTTP status tracking, and
+  confidence metadata.
+- Added verified, program-directory, inactive, blocked, unreachable, and stale
+  source lifecycle handling.
+- Added source-aware stale deactivation that only runs after a successful
+  refresh for that source.
+- Restricted `Apply Now` to verified active opportunities in deterministic
+  ranking and after Gemini enhancement.
+- Added focused source verification tests and production smoke assertions.
+
 ## 2026-07-16 Privacy-Safe Recommendation Logging
 
 - Replaced raw recommendation request and response persistence with aggregate-only analytics summaries.

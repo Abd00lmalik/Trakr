@@ -100,6 +100,54 @@ export async function GET() {
                               type: "array",
                               items: { type: "string" },
                             },
+                            opportunity: {
+                              type: "object",
+                              properties: {
+                                verificationStatus: {
+                                  type: "string",
+                                  enum: [
+                                    "verified",
+                                    "program_directory",
+                                    "inactive_listing",
+                                    "unverified",
+                                  ],
+                                },
+                                lastVerifiedAt: {
+                                  type: ["string", "null"],
+                                  format: "date-time",
+                                },
+                                lastSeenAt: {
+                                  type: ["string", "null"],
+                                  format: "date-time",
+                                },
+                                sourceStatus: {
+                                  type: "string",
+                                  enum: [
+                                    "active",
+                                    "redirected",
+                                    "blocked",
+                                    "unreachable",
+                                    "inactive",
+                                    "stale",
+                                    "unverified",
+                                  ],
+                                },
+                                httpStatus: {
+                                  type: ["integer", "null"],
+                                },
+                                canonicalUrl: {
+                                  type: "string",
+                                  format: "uri",
+                                },
+                                publisherDomain: { type: "string" },
+                                isActive: { type: "boolean" },
+                                verificationConfidence: {
+                                  type: "number",
+                                  minimum: 0,
+                                  maximum: 1,
+                                },
+                              },
+                            },
                           },
                         },
                       },

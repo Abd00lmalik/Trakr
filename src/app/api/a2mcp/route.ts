@@ -63,6 +63,8 @@ export async function GET() {
     qualityControls: [
       "low-information listings are filtered or penalized",
       "ranking combines category, skill, experience, location, quality, deadline, and expected value",
+      "only verified active opportunity pages may receive Apply Now",
+      "program directories and inactive listings are explicitly identified",
       "raw AI provider errors are never returned to callers",
     ],
   });

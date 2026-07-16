@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "smoke": "node scripts/smoke-test.mjs",
     "test:privacy": "tsx --test tests/privacy-logging.test.ts",
-    "verify": "npm run test:privacy && npm run typecheck && npm run lint && npm run build && npm run smoke",
+    "test:verification": "tsx --test tests/source-verification.test.ts",
+    "verify": "npm run test:privacy && npm run test:verification && npm run typecheck && npm run lint && npm run build && npm run smoke",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "ingest": "node scripts/ingest.mjs"

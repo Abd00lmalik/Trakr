@@ -16,6 +16,23 @@ export const recommendationActionSchema = z.enum([
   "Skip",
 ]);
 
+export const verificationStatusSchema = z.enum([
+  "verified",
+  "program_directory",
+  "inactive_listing",
+  "unverified",
+]);
+
+export const sourceStatusSchema = z.enum([
+  "active",
+  "redirected",
+  "blocked",
+  "unreachable",
+  "inactive",
+  "stale",
+  "unverified",
+]);
+
 export const aiStatusSchema = z.enum([
   "enhanced",
   "retrying",
@@ -93,6 +110,15 @@ export const opportunitySchema = z.object({
   benefits: z.array(z.string()),
   tags: z.array(z.string()),
   difficulty: z.enum(["low", "medium", "high"]),
+  verificationStatus: verificationStatusSchema,
+  lastVerifiedAt: z.string().datetime().nullable(),
+  lastSeenAt: z.string().datetime().nullable(),
+  sourceStatus: sourceStatusSchema,
+  httpStatus: z.number().int().min(100).max(599).nullable(),
+  canonicalUrl: z.string().url(),
+  publisherDomain: z.string(),
+  isActive: z.boolean(),
+  verificationConfidence: z.number().min(0).max(1),
 });
 
 export const scoredOpportunitySchema = z.object({
@@ -147,6 +173,8 @@ export const recommendationResponseSchema = z.object({
 
 export type OpportunityCategory = z.infer<typeof opportunityCategorySchema>;
 export type RecommendationAction = z.infer<typeof recommendationActionSchema>;
+export type VerificationStatus = z.infer<typeof verificationStatusSchema>;
+export type SourceStatus = z.infer<typeof sourceStatusSchema>;
 export type AiStatus = z.infer<typeof aiStatusSchema>;
 export type StructuredUserProfile = z.infer<typeof structuredUserProfileSchema>;
 export type RecommendationFilters = z.infer<typeof recommendationFiltersSchema>;

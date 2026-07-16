@@ -9,6 +9,7 @@ import {
 import { recommendationResponseSchema } from "@/lib/types/opportunities";
 import type { AiProvider, RecommendationNarrativeInput } from "@/lib/ai/provider";
 import type { Recommendation, RecommendationResponse } from "@/lib/types/opportunities";
+import { enforceApplyNowEligibility } from "@/lib/opportunities/verification";
 
 const enhancedRecommendationSchema = z.object({
   id: z.string(),
@@ -304,6 +305,9 @@ function candidateForPrompt(candidate: RecommendationNarrativeInput["scoredOppor
     benefits: candidate.opportunity.benefits.slice(0, 3),
     deadline: candidate.opportunity.deadline,
     summary: candidate.opportunity.summary.slice(0, 240),
+    verificationStatus: candidate.opportunity.verificationStatus,
+    sourceStatus: candidate.opportunity.sourceStatus,
+    isActive: candidate.opportunity.isActive,
   };
 }
 
@@ -327,6 +331,7 @@ function buildPrompt(input: RecommendationNarrativeInput) {
     "Return only valid JSON. Do not wrap JSON in markdown.",
     "Enhance only the narrative fields for the already-ranked real opportunities.",
     "Never invent opportunities, URLs, deadlines, organizations, scores, or eligibility requirements.",
+    "Never use Apply Now unless verificationStatus is verified and isActive is true.",
     "If an opportunity is weak, explain the concern and use Prepare First or Skip.",
     "Keep reasoning specific and concise: why this, main gap, and next move.",
     "",
@@ -391,10 +396,14 @@ function mergeEnhancement(
         return recommendation;
       }
 
-      const recommendedAction =
+      let recommendedAction =
         recommendation.recommendedAction === "Apply Now" && enhanced.recommendedAction === "Skip"
           ? recommendation.recommendedAction
           : enhanced.recommendedAction;
+      recommendedAction = enforceApplyNowEligibility(
+        recommendation.opportunity,
+        recommendedAction,
+      );
 
       return {
         ...recommendation,

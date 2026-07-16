@@ -201,6 +201,18 @@ try {
     throw new Error(`Low-quality generic listing was recommended: ${badRecommendation.opportunity.title}`);
   }
 
+  const unsafeApplyNow = recommendation.body.recommendations.find(
+    (item) =>
+      item.recommendedAction === "Apply Now" &&
+      (item.opportunity.verificationStatus !== "verified" ||
+        item.opportunity.isActive !== true),
+  );
+  if (unsafeApplyNow) {
+    throw new Error(
+      `Unverified or inactive opportunity received Apply Now: ${unsafeApplyNow.opportunity.title}`,
+    );
+  }
+
   const rawProviderLeak = JSON.stringify(recommendation.body).match(
     /quota|generativelanguage\.googleapis\.com|GoogleGenerativeAI Error|stack trace/i,
   );
