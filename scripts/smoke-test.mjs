@@ -140,6 +140,9 @@ try {
       `PDF resume upload did not parse expected text: ${JSON.stringify(parsedPdf.body)}`,
     );
   }
+  if (parsedPdf.response.headers.get("cache-control") !== "no-store") {
+    throw new Error("Resume parsing response must be marked no-store.");
+  }
 
   if (!parsedDocx.response.ok || !parsedDocx.body?.resumeText?.includes("TypeScript")) {
     throw new Error(
@@ -176,6 +179,9 @@ try {
         recommendation.body,
       )}`,
     );
+  }
+  if (recommendation.response.headers.get("cache-control") !== "no-store") {
+    throw new Error("Recommendation response must be marked no-store.");
   }
 
   if (

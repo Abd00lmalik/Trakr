@@ -15,6 +15,8 @@ TRAKR_SERVICE_URL=https://your-railway-domain
 DATABASE_URL=postgresql://...
 RECOMMENDATION_LIMIT=7
 RATE_LIMIT_REQUESTS_PER_MINUTE=60
+RECOMMENDATION_LOG_RETENTION_DAYS=30
+RECOMMENDATION_LOG_HASH_KEY=generate_a_long_random_value
 INGEST_API_KEY=generate_a_long_random_value
 TRAKR_ADMIN_API_KEY=generate_a_long_random_value
 ```
@@ -82,6 +84,8 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - `POST /api/a2mcp/recommend` should return `HTTP 200` for the free OKX submission path.
 - Leave `TRAKR_API_KEY` unset for public free OKX review unless OKX gives a shared secret or gateway header to enforce.
 - Set `INGEST_API_KEY` before enabling scheduled ingestion.
+- Set `RECOMMENDATION_LOG_HASH_KEY` to enable keyed request correlation without storing raw identifiers or resume content.
+- Set `RECOMMENDATION_LOG_RETENTION_DAYS` between 1 and 365. Expired recommendation analytics are pruned during normal recommendation traffic.
 
 ## Current Railway Deployment
 

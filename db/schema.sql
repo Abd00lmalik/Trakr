@@ -42,15 +42,48 @@ create index if not exists opportunities_embedding_idx
 
 create table if not exists recommendation_runs (
   id bigserial primary key,
-  request_id text not null,
+  request_id_hash text,
+  request_fingerprint text,
   provider text not null,
-  request_payload jsonb not null,
-  response_payload jsonb not null,
+  ai_status text not null,
+  input_summary jsonb not null default '{}'::jsonb,
+  output_summary jsonb not null default '{}'::jsonb,
+  duration_ms integer,
+  retention_days smallint not null default 30,
+  expires_at timestamptz not null default (now() + interval '30 days'),
   created_at timestamptz not null default now()
 );
 
-create index if not exists recommendation_runs_request_id_idx
-  on recommendation_runs (request_id);
+alter table recommendation_runs
+  add column if not exists request_id_hash text,
+  add column if not exists request_fingerprint text,
+  add column if not exists ai_status text not null default 'unknown',
+  add column if not exists input_summary jsonb not null default '{}'::jsonb,
+  add column if not exists output_summary jsonb not null default '{}'::jsonb,
+  add column if not exists duration_ms integer,
+  add column if not exists retention_days smallint not null default 30,
+  add column if not exists expires_at timestamptz
+    not null default (now() + interval '30 days');
+
+update recommendation_runs
+set input_summary = '{"schemaVersion":1,"legacyRecord":true}'::jsonb,
+    output_summary = '{"schemaVersion":1,"legacyRecord":true}'::jsonb
+where input_summary = '{}'::jsonb
+  and output_summary = '{}'::jsonb;
+
+drop index if exists recommendation_runs_request_id_idx;
+
+alter table recommendation_runs
+  drop column if exists request_id,
+  drop column if exists request_payload,
+  drop column if exists response_payload;
+
+create index if not exists recommendation_runs_request_id_hash_idx
+  on recommendation_runs (request_id_hash)
+  where request_id_hash is not null;
 
 create index if not exists recommendation_runs_created_at_idx
   on recommendation_runs (created_at desc);
+
+create index if not exists recommendation_runs_expires_at_idx
+  on recommendation_runs (expires_at);

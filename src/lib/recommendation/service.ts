@@ -66,6 +66,7 @@ function buildDraftResponse(
 export async function generateRecommendations(
   request: RecommendationRequest,
 ): Promise<RecommendationResponse> {
+  const startedAt = Date.now();
   const aiProvider = getAiProvider();
   const source = opportunitySource;
   const opportunities = await source.fetchOpportunities(request, request.filters);
@@ -110,6 +111,8 @@ export async function generateRecommendations(
     }
   }
 
-  await logRecommendationRun(request, response).catch(() => undefined);
+  await logRecommendationRun(request, response, Date.now() - startedAt).catch(
+    () => undefined,
+  );
   return response;
 }

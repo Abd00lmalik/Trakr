@@ -1,5 +1,14 @@
 # Build Log
 
+## 2026-07-16 Privacy-Safe Recommendation Logging
+
+- Replaced raw recommendation request and response persistence with aggregate-only analytics summaries.
+- Added optional HMAC-SHA256 request correlation through `RECOMMENDATION_LOG_HASH_KEY`; raw request IDs, profile fields, resume text, reasoning, and next actions are not stored.
+- Added configurable 1-365 day retention through `RECOMMENDATION_LOG_RETENTION_DAYS`, per-row expiry timestamps, and automatic expired-record pruning.
+- Added an idempotent migration that removes legacy raw payload columns from `recommendation_runs`.
+- Marked resume parsing and recommendation responses `Cache-Control: no-store`.
+- Added focused privacy tests and smoke assertions for resume upload and recommendation caching behavior.
+
 ## 2026-07-12
 
 - Added a protected `POST /api/admin/database` operator endpoint for Railway database migration and seed operations when direct CLI/database shell access is unavailable.
