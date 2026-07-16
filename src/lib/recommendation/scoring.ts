@@ -279,13 +279,19 @@ function locationScore(opportunity: Opportunity, request: RecommendationRequest)
   return normalize(opportunity.location).includes(normalize(requestedLocation)) ? 88 : 30;
 }
 
-function deadlineScore(deadline: string | null) {
+type RankingOptions = {
+  now?: Date;
+};
+
+function deadlineScore(deadline: string | null, now = new Date()) {
   if (!deadline) {
     return 58;
   }
 
   const deadlineMs = Date.parse(`${deadline}T23:59:59Z`);
-  const daysLeft = Math.ceil((deadlineMs - Date.now()) / (1000 * 60 * 60 * 24));
+  const daysLeft = Math.ceil(
+    (deadlineMs - now.getTime()) / (1000 * 60 * 60 * 24),
+  );
 
   if (Number.isNaN(deadlineMs) || daysLeft < 0) {
     return 0;
@@ -442,12 +448,13 @@ export function buildProfileText(request: RecommendationRequest) {
 export function scoreOpportunity(
   opportunity: Opportunity,
   request: RecommendationRequest,
+  options: RankingOptions = {},
 ): ScoredOpportunity {
   const skill = skillScore(opportunity, request);
   const category = categoryScore(opportunity, request);
   const experience = experienceScore(opportunity, request);
   const location = locationScore(opportunity, request);
-  const deadline = deadlineScore(opportunity.deadline);
+  const deadline = deadlineScore(opportunity.deadline, options.now);
   const quality = qualityScore(opportunity);
   const value = valueScore(opportunity);
   const domain = domainFitScore(opportunity, request);
@@ -505,16 +512,17 @@ export function scoreOpportunity(
 export function rankOpportunities(
   opportunities: Opportunity[],
   request: RecommendationRequest,
+  options: RankingOptions = {},
 ) {
   return opportunities
-    .map((opportunity) => scoreOpportunity(opportunity, request))
+    .map((opportunity) => scoreOpportunity(opportunity, request, options))
     .filter((candidate) => candidate.qualityScore >= 40 && candidate.score >= 35)
     .sort((a, b) => {
       const actionWeight = (action: RecommendationAction) =>
         action === "Apply Now" ? 2 : action === "Prepare First" ? 1 : 0;
       return (
-        actionWeight(b.action) - actionWeight(a.action) ||
         b.score - a.score ||
+        actionWeight(b.action) - actionWeight(a.action) ||
         b.qualityScore - a.qualityScore
       );
     });
