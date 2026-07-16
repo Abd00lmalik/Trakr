@@ -9,6 +9,8 @@
   source lifecycle handling.
 - Added source-aware stale deactivation that only runs after a successful
   refresh for that source.
+- Added one-time cleanup for active legacy rows with no ingestion
+  `last_seen_at`, preventing old seed fixtures from remaining recommendable.
 - Restricted `Apply Now` to verified active opportunities in deterministic
   ranking and after Gemini enhancement.
 - Added focused source verification tests and production smoke assertions.

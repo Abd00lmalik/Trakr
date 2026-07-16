@@ -155,7 +155,8 @@ test("database schema and repository include stale-record lifecycle support", as
   ]) {
     assert.match(schema, new RegExp(`\\b${field}\\b`));
   }
+  assert.match(repository, /last_seen_at is null/);
   assert.match(repository, /source_name = any\(\$1::text\[\]\)/);
-  assert.match(repository, /last_seen_at is null or last_seen_at < \$2/);
+  assert.match(repository, /last_seen_at < \$2/);
   assert.match(repository, /source_status = 'stale'/);
 });

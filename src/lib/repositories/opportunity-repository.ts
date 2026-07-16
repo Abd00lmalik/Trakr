@@ -188,7 +188,18 @@ export async function storeIngestionBatch(
       );
     }
 
-    const staleResult = refreshedSourceNames.length
+    const legacyStaleResult = await client.query(
+      `update opportunities
+       set verification_status = 'inactive_listing',
+           source_status = 'stale',
+           is_active = false,
+           verification_confidence = 1,
+           updated_at = now()
+       where is_active = true
+         and last_seen_at is null`,
+    );
+
+    const sourceStaleResult = refreshedSourceNames.length
       ? await client.query(
           `update opportunities
            set verification_status = 'inactive_listing',
@@ -197,7 +208,8 @@ export async function storeIngestionBatch(
                verification_confidence = 1,
                updated_at = now()
            where source_name = any($1::text[])
-             and (last_seen_at is null or last_seen_at < $2)`,
+             and is_active = true
+             and last_seen_at < $2`,
           [refreshedSourceNames, ingestionStartedAt.toISOString()],
         )
       : { rowCount: 0 };
@@ -205,7 +217,8 @@ export async function storeIngestionBatch(
 
     return {
       stored: opportunities.length,
-      deactivated: staleResult.rowCount ?? 0,
+      deactivated:
+        (legacyStaleResult.rowCount ?? 0) + (sourceStaleResult.rowCount ?? 0),
     };
   } catch (error) {
     await client.query("rollback");
