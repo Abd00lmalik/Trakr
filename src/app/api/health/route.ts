@@ -8,7 +8,12 @@ export async function GET() {
   const database = await checkDatabase();
   const aiConfigured = Boolean(process.env.GEMINI_API_KEY);
   const databaseReady =
-    !database.configured || (database.connected && database.pgvector && database.schemaReady);
+    !database.configured ||
+    (database.connected &&
+      database.pgvector &&
+      database.schemaReady &&
+      database.privacyLoggingReady &&
+      database.sourceVerificationReady);
   const status = databaseReady ? "ok" : "degraded";
 
   return NextResponse.json({

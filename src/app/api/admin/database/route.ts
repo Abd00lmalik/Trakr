@@ -38,7 +38,12 @@ export async function POST(request: Request) {
     const database = await checkDatabase();
 
     return NextResponse.json({
-      ok: database.connected && database.pgvector && database.schemaReady,
+      ok:
+        database.connected &&
+        database.pgvector &&
+        database.schemaReady &&
+        database.privacyLoggingReady &&
+        database.sourceVerificationReady,
       migration,
       seed,
       database,

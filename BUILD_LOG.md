@@ -12,6 +12,8 @@
 - Restricted `Apply Now` to verified active opportunities in deterministic
   ranking and after Gemini enhancement.
 - Added focused source verification tests and production smoke assertions.
+- Added source-verification readiness to health and database-admin success
+  checks so incomplete migrations cannot be reported as production-ready.
 
 ## 2026-07-16 Privacy-Safe Recommendation Logging
 
