@@ -17,9 +17,10 @@
     "test:verification": "tsx --test tests/source-verification.test.ts",
     "test:devpost": "tsx --test tests/devpost-normalization.test.ts",
     "test:ranking": "tsx --test tests/ranking-evaluation.test.ts",
+    "test:workspace": "tsx --test tests/workspace.test.ts",
     "devpost:compare": "tsx scripts/compare-devpost-normalization.ts",
     "evaluate:ranking": "tsx scripts/evaluate-ranking.ts",
-    "verify": "npm run test:privacy && npm run test:verification && npm run test:devpost && npm run test:ranking && npm run typecheck && npm run lint && npm run build && npm run smoke",
+    "verify": "npm run test:privacy && npm run test:verification && npm run test:devpost && npm run test:ranking && npm run test:workspace && npm run typecheck && npm run lint && npm run build && npm run smoke",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "ingest": "node scripts/ingest.mjs"
@@ -27,6 +28,7 @@
   "dependencies": {
     "@google/genai": "^2.11.0",
     "@types/pg": "^8.15.6",
+    "lucide-react": "^0.468.0",
     "mammoth": "^1.12.0",
     "nanoid": "^5.1.5",
     "next": "^15.5.7",
