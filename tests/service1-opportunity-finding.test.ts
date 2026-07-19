@@ -559,6 +559,30 @@ test("conversation continuation preserves requested opportunity type and remote 
   );
 });
 
+test("conversation continuation recognizes hyphenated early-career answers", async () => {
+  const initial = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message:
+        "I am a self-taught developer in Ghana seeking remote blockchain hackathons.",
+    }),
+  );
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "My experience level is early-career and I use JavaScript.",
+      continuation: initial.conversation?.continuation,
+    }),
+  );
+
+  assert.equal(response.conversation?.profile.draft.experienceLevel, "early-career");
+  assert.ok(response.conversation?.profile.draft.skills.includes("JavaScript"));
+  assert.notEqual(
+    response.conversation?.missingInformation.some(
+      (item) => item.field === "experienceLevel" && item.required,
+    ),
+    true,
+  );
+});
+
 test("AI prompt context excludes instruction-like resume content", () => {
   const request = recommendationRequestSchema.parse({
     user: {

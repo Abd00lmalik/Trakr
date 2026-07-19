@@ -138,9 +138,9 @@ function inferLocation(message: string) {
   }
 
   const match = message.match(
-    /\b(?:from|based in|located in|living in|student in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]{2,50}?)(?=[,.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
+    /\b(?:from|based in|located in|living in|student in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
   );
-  return match?.[1]?.trim();
+  return match?.[1]?.trim().replace(/[.;]+$/, "");
 }
 
 function inferPreferredLocation(message: string) {
@@ -166,7 +166,7 @@ function explicitExperienceLevel(
   }
   if (/\b(mid-level|mid level|[3-6]\+?\s+years?)\b/.test(lower)) return "mid-level";
   if (/\b(beginner|new to|just starting)\b/.test(lower)) return "beginner";
-  if (/\b(junior|graduate|early career|1\s+year|2\s+years?)\b/.test(lower)) {
+  if (/\b(junior|graduate|early[- ]career|1\s+year|2\s+years?)\b/.test(lower)) {
     return "early-career";
   }
   return undefined;

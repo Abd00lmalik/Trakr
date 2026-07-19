@@ -88,6 +88,25 @@ AWS Certified Cloud Practitioner`,
   );
 });
 
+test("resume extraction preserves natural locations and does not invent a headline", () => {
+  const parsed = extractProfileFromText(
+    `Jordan Okafor
+Self-taught developer based in Accra, Ghana.
+Skills: JavaScript, React, TypeScript.
+Experience: Built a fictional community dashboard.
+Goals: Seeking remote entry-level software opportunities.`,
+  );
+
+  assert.equal(parsed.profile.location, "Accra, Ghana");
+  assert.equal(parsed.profile.headline, undefined);
+  assert.ok(
+    parsed.profile.workHistory.every(
+      (entry) => !/^Goals:/i.test(entry),
+    ),
+  );
+  assert.ok(parsed.profile.goals.includes("Find remote opportunities"));
+});
+
 test("workspace exposes the outcome-first Opportunity Finding journey", async () => {
   const workspace = await readFile(
     new URL("../src/components/opportunity-workspace.tsx", import.meta.url),

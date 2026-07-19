@@ -145,7 +145,7 @@ function inferExperienceLevel(
   if (/\b(mid-level|mid level|[3-6]\+? years)\b/.test(lower)) {
     return "mid-level";
   }
-  if (/\b(intern|internship|junior|graduate|early career)\b/.test(lower)) {
+  if (/\b(intern|internship|junior|graduate|early[- ]career)\b/.test(lower)) {
     return "early-career";
   }
   return undefined;
@@ -253,9 +253,9 @@ function inferLocation(text: string) {
   if (labeled) return labeled.split("\n")[0].trim();
 
   const match = text.match(
-    /\b(?:based in|located in|living in|from)\s+([A-Z][A-Za-z .'-]{2,60})(?=[,.;]|\s+(?:and|with|seeking|open|looking)\b|$)/i,
+    /\b(?:based in|located in|living in|from|student in)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:and|with|seeking|open|looking)\b|$)/i,
   );
-  return match?.[1]?.trim();
+  return match?.[1]?.trim().replace(/[.;]+$/, "");
 }
 
 function inferName(text: string) {
@@ -280,9 +280,7 @@ function inferHeadline(text: string, skills: string[]) {
       .join(" ");
   }
 
-  return skills.length
-    ? `${skills.slice(0, 3).join(", ")} professional`
-    : "Opportunity-seeking professional";
+  return undefined;
 }
 
 function buildSummary(text: string) {
@@ -312,6 +310,7 @@ export function extractProfileFromText(
     "Education",
     "Certifications",
     "Location",
+    "Goals",
   ]);
   const projects = extractEntries(
     extractLabeledBlock(cleaned, "Projects", [
@@ -321,6 +320,7 @@ export function extractProfileFromText(
       "Education",
       "Certifications",
       "Location",
+      "Goals",
     ]),
   );
   const workHistory = extractEntries(
@@ -331,6 +331,7 @@ export function extractProfileFromText(
       "Education",
       "Certifications",
       "Location",
+      "Goals",
     ]),
   );
   const education = extractEntries(
@@ -341,6 +342,7 @@ export function extractProfileFromText(
       "Projects",
       "Certifications",
       "Location",
+      "Goals",
     ]),
   );
   const certifications = extractEntries(
@@ -351,6 +353,7 @@ export function extractProfileFromText(
       "Projects",
       "Education",
       "Location",
+      "Goals",
     ]),
   );
   const profile: StructuredUserProfile = {
