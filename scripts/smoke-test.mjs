@@ -219,6 +219,97 @@ try {
     throw new Error("Recommendation response leaked raw AI provider details.");
   }
 
+  const vagueConversation = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: "I want opportunities." }),
+  });
+  if (
+    !vagueConversation.response.ok ||
+    vagueConversation.body?.conversation?.state !== "needs_more_information" ||
+    !vagueConversation.body?.conversation?.missingInformation?.length
+  ) {
+    throw new Error(
+      `Vague conversational request did not ask for missing information: ${JSON.stringify(
+        vagueConversation.body,
+      )}`,
+    );
+  }
+
+  const conversationalRecommendation = await requestJson(
+    "/api/a2mcp/recommend",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message:
+          "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
+      }),
+    },
+  );
+  if (
+    !conversationalRecommendation.response.ok ||
+    conversationalRecommendation.body?.conversation?.state !==
+      "recommendations" ||
+    !Array.isArray(conversationalRecommendation.body?.recommendations) ||
+    conversationalRecommendation.body.recommendations.length === 0 ||
+    conversationalRecommendation.body.recommendations.length > 10
+  ) {
+    throw new Error(
+      `Natural-language recommendation journey failed: ${JSON.stringify(
+        conversationalRecommendation.body,
+      )}`,
+    );
+  }
+
+  const continuation =
+    conversationalRecommendation.body?.conversation?.continuation;
+  if (!continuation?.selectedOpportunityId) {
+    throw new Error(
+      "Conversational recommendation did not return caller-scoped continuation context.",
+    );
+  }
+
+  const explanation = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "Why did you recommend this?",
+      context: continuation,
+    }),
+  });
+  if (
+    !explanation.response.ok ||
+    explanation.body?.conversation?.state !== "explanation" ||
+    explanation.body?.capabilityResult?.explanation?.opportunityId !==
+      continuation.selectedOpportunityId
+  ) {
+    throw new Error(
+      `Follow-up explanation journey failed: ${JSON.stringify(
+        explanation.body,
+      )}`,
+    );
+  }
+
+  const readiness = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "What am I missing for this opportunity?",
+      context: continuation,
+    }),
+  });
+  if (
+    !readiness.response.ok ||
+    readiness.body?.conversation?.state !== "readiness" ||
+    typeof readiness.body?.capabilityResult?.readiness?.readinessScore !==
+      "number"
+  ) {
+    throw new Error(
+      `Readiness journey failed: ${JSON.stringify(readiness.body)}`,
+    );
+  }
+
   const invalid = await requestJson("/api/a2mcp/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -237,9 +328,17 @@ try {
         health,
         parsedResumeTypes: ["pdf", "docx"],
         recommendationCount: recommendation.body.recommendations.length,
+        conversationalRecommendationCount:
+          conversationalRecommendation.body.recommendations.length,
         provider: recommendation.body.provider,
         aiStatus: recommendation.body.aiStatus,
         topRecommendation: recommendation.body.recommendations[0].opportunity.title,
+        conversationalState:
+          conversationalRecommendation.body.conversation.state,
+        followUpStates: [
+          explanation.body.conversation.state,
+          readiness.body.conversation.state,
+        ],
       },
       null,
       2,

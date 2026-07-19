@@ -19,11 +19,11 @@
 - Protected DB setup: `https://trakr-production-c70e.up.railway.app/api/admin/database`
 - MCP metadata template: `.mcp.json.example`
 - Paste-ready registration form: `OKX_REGISTRATION_FORM.md`
-- Marketplace review status: Listing under review
+- Marketplace review status: Listed and active
 
 ## Description
 
-Trakr is an AI-powered Opportunity Companion that helps students, developers, freelancers, creators, and builders discover relevant opportunities and act on them. It accepts a structured profile or resume text and returns ranked opportunities, match scores, explainable reasoning, missing requirements, recommended actions, an action plan, and a learning roadmap.
+Trakr is a conversational AI Opportunity Companion that helps students, developers, freelancers, creators, and builders discover relevant opportunities and act on them. It accepts structured profiles, resumes, natural-language background, or caller-scoped continuation context and returns profile guidance, ranked opportunities, match explanations, readiness analysis, grounded resume intelligence, action plans, and learning roadmaps.
 
 ## Why It Fits A2MCP
 
@@ -70,8 +70,8 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 5. Done: Configure `INGEST_API_KEY` and run `npm run ingest` with `TRAKR_SERVICE_URL`.
 6. Done: Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
 7. Done: Submit as free for first review.
-8. Waiting: OKX marketplace review result by email.
-9. Later: Add x402 only after free endpoint stability is proven or OKX requires paid calls.
+8. Done: Listed publicly on OKX.AI.
+9. Current phase: Keep the service free and preserve the registered endpoint and identity.
 
 ## OKX Registration Result
 
@@ -83,8 +83,8 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 - Service type: A2MCP
 - Fee: `0 USDT`
 - Endpoint: `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`
-- Current status: Listing under review
-- Review note: AI quality review suggested pass
+- Current status: Listed and active
+- Pricing remains: `0 USDT`
 
 ## Manual/User-Gated Steps
 

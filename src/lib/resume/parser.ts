@@ -84,7 +84,7 @@ function inferInterests(text: string) {
     lower.includes("internship") ? "internships" : "",
     lower.includes("remote") ? "remote work" : "",
     lower.includes("web3") || lower.includes("blockchain") ? "web3" : "",
-    lower.includes("ai") || lower.includes("machine learning") ? "AI" : "",
+    /\bai\b/.test(lower) || lower.includes("machine learning") ? "AI" : "",
   ].filter(Boolean);
 }
 

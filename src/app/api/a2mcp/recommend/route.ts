@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
+import { handleOpportunityCompanionRequest } from "@/lib/companion/service";
 import { generateRecommendations } from "@/lib/recommendation/service";
 import { checkRateLimit, getClientKey } from "@/lib/security/rate-limit";
-import { recommendationRequestSchema } from "@/lib/types/opportunities";
+import {
+  opportunityCompanionRequestSchema,
+  recommendationRequestSchema,
+} from "@/lib/types/opportunities";
 
 export const runtime = "nodejs";
 
@@ -38,6 +42,17 @@ function isAuthorized(request: Request) {
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
 
   return providedKey === requiredKey;
+}
+
+function hasConversationalFields(payload: unknown) {
+  if (!payload || typeof payload !== "object") {
+    return false;
+  }
+
+  const record = payload as Record<string, unknown>;
+  return ["message", "intent", "context", "target"].some((field) =>
+    Object.prototype.hasOwnProperty.call(record, field),
+  );
 }
 
 export async function POST(request: Request) {
@@ -77,12 +92,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const parsed = recommendationRequestSchema.safeParse(payload);
+  const parsed = opportunityCompanionRequestSchema.safeParse(payload);
   if (!parsed.success) {
     return json(
       {
         error: "validation_error",
-        message: "Request does not match the Trakr recommendation schema.",
+        message:
+          "Request does not match the Trakr opportunity companion schema.",
         issues: parsed.error.issues,
       },
       400,
@@ -90,7 +106,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await generateRecommendations(parsed.data);
+    const legacyRequest = hasConversationalFields(payload)
+      ? null
+      : recommendationRequestSchema.safeParse(payload);
+    const response = legacyRequest?.success
+      ? await generateRecommendations(legacyRequest.data)
+      : await handleOpportunityCompanionRequest(parsed.data);
     return json(response);
   } catch (error) {
     return json(

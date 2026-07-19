@@ -13,7 +13,7 @@ GEMINI_MODEL=gemini-3.1-flash-lite
 GEMINI_FALLBACK_MODELS=gemini-3.5-flash
 TRAKR_SERVICE_URL=https://your-railway-domain
 DATABASE_URL=postgresql://...
-RECOMMENDATION_LIMIT=7
+RECOMMENDATION_LIMIT=10
 RATE_LIMIT_REQUESTS_PER_MINUTE=60
 RECOMMENDATION_LOG_RETENTION_DAYS=30
 RECOMMENDATION_LOG_HASH_KEY=generate_a_long_random_value
@@ -80,8 +80,10 @@ For the first submission, register Trakr as a free A2MCP service:
 - Interface URL: `https://your-railway-domain/api/a2mcp/recommend`
 - Method: `POST`
 - Pricing: free for Phase 1 validation
-- Input: structured profile or resume text with optional filters
-- Output: ranked opportunities, match scores, reasoning, missing requirements, recommended actions, action plan, and learning roadmap
+- Input: structured profile, resume text, natural-language background, or caller-scoped continuation context
+- Output: conversational state, ranked opportunities, explanations, readiness analysis, grounded resume intelligence, action plan, and learning roadmap
+
+The current service remains free. This capability phase does not add payment requirements or change the registered endpoint.
 
 After the free endpoint passes review and has stable behavior, add x402 payment middleware around `POST /api/a2mcp/recommend` and resubmit/update the listing as pay-per-call.
 

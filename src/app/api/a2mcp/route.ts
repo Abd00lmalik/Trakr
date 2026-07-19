@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 export async function GET() {
   return NextResponse.json({
     service: "trakr",
-    version: "0.1.0",
+    version: "0.2.0",
     type: "A2MCP",
     description:
       "AI-powered Opportunity Companion for ranked, explainable opportunity recommendations.",
@@ -14,7 +14,7 @@ export async function GET() {
         method: "POST",
         path: "/api/a2mcp/recommend",
         description:
-          "Accepts a structured profile or resume text and returns ranked opportunities, reasoning, gaps, next actions, action plan, and learning roadmap.",
+          "Accepts a structured profile, resume text, natural-language background, or caller-scoped continuation context. Returns conversational guidance, ranked opportunities, explanations, readiness analysis, and grounded resume intelligence.",
       },
       health: {
         method: "GET",
@@ -45,7 +45,29 @@ export async function GET() {
     ],
     actions: ["Apply Now", "Prepare First", "Skip"],
     aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
-    inputModes: ["structured_profile", "resume_text"],
+    inputModes: [
+      "structured_profile",
+      "resume_text",
+      "natural_language",
+      "continuation_context",
+    ],
+    conversationalStates: [
+      "needs_more_information",
+      "profile_confirmation",
+      "recommendations",
+      "explanation",
+      "readiness",
+      "resume_benchmark",
+      "resume_optimization",
+    ],
+    capabilities: [
+      "profile building without a resume",
+      "opportunity matching and explanation",
+      "eligibility and skill-gap analysis",
+      "opportunity readiness assessment",
+      "ATS and resume benchmarking",
+      "grounded role-specific resume optimization",
+    ],
     futureBilling: {
       compatibleWith: "x402",
       status: "not_enabled_in_phase_1",
@@ -53,7 +75,7 @@ export async function GET() {
     submission: {
       pricing: "free",
       responseMode: "HTTP 200 JSON for Phase 1",
-      paidUpgradePath: "x402 middleware on /api/a2mcp/recommend",
+      paymentRequired: false,
     },
     dataSources: [
       "Devpost API",
@@ -65,6 +87,9 @@ export async function GET() {
       "ranking combines category, skill, experience, location, quality, deadline, and expected value",
       "only verified active opportunity pages may receive Apply Now",
       "program directories and inactive listings are explicitly identified",
+      "unknown profile information remains unknown rather than being invented",
+      "resume optimization never fabricates jobs, degrees, projects, metrics, certifications, or skills",
+      "conversation continuation context is caller-scoped and not stored as shared user memory",
       "raw AI provider errors are never returned to callers",
     ],
   });

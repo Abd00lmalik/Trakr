@@ -8,7 +8,11 @@ import {
 } from "@/lib/ai/metrics";
 import { recommendationResponseSchema } from "@/lib/types/opportunities";
 import type { AiProvider, RecommendationNarrativeInput } from "@/lib/ai/provider";
-import type { Recommendation, RecommendationResponse } from "@/lib/types/opportunities";
+import type {
+  CompanionGuidanceAction,
+  Recommendation,
+  RecommendationResponse,
+} from "@/lib/types/opportunities";
 import { enforceApplyNowEligibility } from "@/lib/opportunities/verification";
 
 const enhancedRecommendationSchema = z.object({
@@ -404,6 +408,15 @@ function mergeEnhancement(
         recommendation.opportunity,
         recommendedAction,
       );
+      const guidanceAction: CompanionGuidanceAction =
+        recommendedAction === "Apply Now"
+          ? "apply_now"
+          : recommendedAction === "Skip"
+            ? "not_currently_recommended"
+            : recommendation.opportunity.verificationStatus ===
+                "program_directory"
+              ? "explore"
+              : "prepare_first";
 
       return {
         ...recommendation,
@@ -411,6 +424,7 @@ function mergeEnhancement(
         missingRequirements: enhanced.missingRequirements,
         recommendedAction,
         nextSteps: enhanced.nextSteps,
+        guidanceAction,
       };
     })
     .map((recommendation, index) => ({

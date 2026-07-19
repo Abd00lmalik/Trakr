@@ -10,9 +10,12 @@ import {
 } from "@/lib/recommendation/action-plan";
 import { logRecommendationRun } from "@/lib/repositories/recommendation-log";
 import type {
+  CompanionGuidanceAction,
+  Opportunity,
   Recommendation,
   RecommendationRequest,
   RecommendationResponse,
+  ScoredOpportunity,
 } from "@/lib/types/opportunities";
 
 const SERVICE_VERSION = "0.1.0";
@@ -20,8 +23,49 @@ const SERVICE_VERSION = "0.1.0";
 function getLimit(request: RecommendationRequest) {
   return (
     request.filters.limit ??
-    Number.parseInt(process.env.RECOMMENDATION_LIMIT ?? "7", 10)
+    Number.parseInt(process.env.RECOMMENDATION_LIMIT ?? "10", 10)
   );
+}
+
+function profileCompleteness(request: RecommendationRequest) {
+  const user = request.user;
+  const checks = [
+    Boolean(user?.headline || user?.bio || request.resumeText),
+    Boolean(user?.skills.length),
+    Boolean(user?.goals.length || request.goals?.length),
+    Boolean(user?.interests.length || request.interests?.length),
+    Boolean(user?.experienceLevel),
+    Boolean(user?.location || request.filters.remote === true),
+  ];
+  return checks.filter(Boolean).length / checks.length;
+}
+
+function guidanceAction(
+  opportunity: Opportunity,
+  action: Recommendation["recommendedAction"],
+): CompanionGuidanceAction {
+  if (action === "Apply Now") return "apply_now";
+  if (action === "Skip") return "not_currently_recommended";
+  if (opportunity.verificationStatus === "program_directory") return "explore";
+  return "prepare_first";
+}
+
+function eligibilityConcerns(candidate: ScoredOpportunity) {
+  const concerns: string[] = [];
+  if (candidate.opportunity.verificationStatus !== "verified") {
+    concerns.push("The source is not a verified active application page.");
+  }
+  if (!candidate.opportunity.isActive) {
+    concerns.push("The opportunity is not currently active.");
+  }
+  if (candidate.opportunity.eligibility.length) {
+    concerns.push(
+      ...candidate.opportunity.eligibility
+        .slice(0, 3)
+        .map((rule) => `Confirm eligibility: ${rule}`),
+    );
+  }
+  return concerns;
 }
 
 function extractProfileSignals(request: RecommendationRequest) {
@@ -80,6 +124,17 @@ export async function generateRecommendations(
     missingRequirements: candidate.missingRequirements,
     recommendedAction: candidate.action,
     nextSteps: buildNextSteps(candidate),
+    confidenceScore: Math.round(
+      Math.min(
+        100,
+        candidate.score * 0.55 +
+          candidate.qualityScore * 0.25 +
+          candidate.opportunity.verificationConfidence * 100 * 0.1 +
+          profileCompleteness(request) * 100 * 0.1,
+      ),
+    ),
+    guidanceAction: guidanceAction(candidate.opportunity, candidate.action),
+    eligibilityConcerns: eligibilityConcerns(candidate),
   }));
 
   const draftResponse = buildDraftResponse(

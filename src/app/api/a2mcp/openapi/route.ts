@@ -7,9 +7,9 @@ export async function GET() {
     openapi: "3.1.0",
     info: {
       title: "Trakr A2MCP API",
-      version: "0.1.0",
+      version: "0.2.0",
       description:
-        "Trakr recommends relevant opportunities with match scores, reasoning, missing requirements, action guidance, and a learning roadmap.",
+        "Trakr is a conversational AI Opportunity Companion. Existing structured requests continue to return direct recommendations, while natural-language requests can progressively build a profile, request missing information, explain matches, assess readiness, and provide grounded resume intelligence.",
     },
     servers: [
       {
@@ -39,12 +39,49 @@ export async function GET() {
                   properties: {
                     user: { type: "object" },
                     resumeText: { type: "string" },
+                    message: {
+                      type: "string",
+                      description:
+                        "Natural-language goal, background, or follow-up question.",
+                    },
+                    intent: {
+                      type: "string",
+                      enum: [
+                        "auto",
+                        "profile_build",
+                        "opportunity_matching",
+                        "explain_recommendation",
+                        "readiness_assessment",
+                        "resume_benchmark",
+                        "resume_optimization",
+                      ],
+                      default: "auto",
+                    },
+                    context: {
+                      type: "object",
+                      description:
+                        "Caller-scoped continuation context returned by a previous response. Trakr does not keep shared in-memory user profiles.",
+                    },
+                    target: {
+                      type: "object",
+                      properties: {
+                        opportunityId: { type: "string" },
+                        opportunityTitle: { type: "string" },
+                        role: { type: "string" },
+                        industry: { type: "string" },
+                      },
+                    },
                     goals: { type: "array", items: { type: "string" } },
                     interests: { type: "array", items: { type: "string" } },
                     filters: { type: "object" },
                     requestId: { type: "string" },
                   },
-                  anyOf: [{ required: ["user"] }, { required: ["resumeText"] }],
+                  anyOf: [
+                    { required: ["user"] },
+                    { required: ["resumeText"] },
+                    { required: ["message"] },
+                    { required: ["context"] },
+                  ],
                 },
               },
             },
@@ -95,6 +132,20 @@ export async function GET() {
                             recommendedAction: {
                               type: "string",
                               enum: ["Apply Now", "Prepare First", "Skip"],
+                            },
+                            confidenceScore: {
+                              type: "number",
+                              minimum: 0,
+                              maximum: 100,
+                            },
+                            guidanceAction: {
+                              type: "string",
+                              enum: [
+                                "apply_now",
+                                "prepare_first",
+                                "explore",
+                                "not_currently_recommended",
+                              ],
                             },
                             nextSteps: {
                               type: "array",
@@ -150,6 +201,42 @@ export async function GET() {
                             },
                           },
                         },
+                      },
+                      conversation: {
+                        type: "object",
+                        description:
+                          "Additive conversational state for natural-language and follow-up requests.",
+                        properties: {
+                          state: {
+                            type: "string",
+                            enum: [
+                              "needs_more_information",
+                              "profile_confirmation",
+                              "ready_to_recommend",
+                              "recommendations",
+                              "explanation",
+                              "readiness",
+                              "resume_benchmark",
+                              "resume_optimization",
+                            ],
+                          },
+                          message: { type: "string" },
+                          profile: { type: "object" },
+                          missingInformation: {
+                            type: "array",
+                            items: { type: "object" },
+                          },
+                          nextActions: {
+                            type: "array",
+                            items: { type: "string" },
+                          },
+                          continuation: { type: "object" },
+                        },
+                      },
+                      capabilityResult: {
+                        type: "object",
+                        description:
+                          "Grounded explanation, readiness, resume benchmark, or resume optimization output when requested.",
                       },
                     },
                   },

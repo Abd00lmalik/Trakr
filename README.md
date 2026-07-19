@@ -2,7 +2,7 @@
 
 ![Trakr logo](public/trakr-logo.png)
 
-Trakr is an AI-powered Opportunity Companion exposed as an A2MCP-style API service. It accepts a structured user profile or resume text and returns ranked opportunity recommendations with match scores, reasoning, missing requirements, recommended actions, an action plan, and a learning roadmap.
+Trakr is a conversational AI Opportunity Companion exposed as an A2MCP-style API service. Existing clients can send a structured profile or resume text and receive direct recommendations. Conversational callers can also start with a natural-language goal, progressively build a profile without a resume, explain matches, assess opportunity readiness, and benchmark or optimize application materials without fabricated experience.
 
 ## MVP Scope
 
@@ -16,6 +16,8 @@ Trakr is an AI-powered Opportunity Companion exposed as an A2MCP-style API servi
 - Gemini provider abstraction with deterministic local fallback when `GEMINI_API_KEY` is not configured.
 - Structured opportunity source interface with a seeded catalog for Phase 1.
 - Zod validation for clean agent-consumable input and output contracts.
+- Stateless conversational continuation context so calling agents can conduct multi-turn journeys without unsafe shared user memory.
+- Grounded readiness, ATS benchmarking, and resume-positioning capabilities that preserve factual integrity.
 
 ## Folder Structure
 
@@ -75,6 +77,28 @@ npm run verify
 }
 ```
 
+## Conversational Request
+
+```json
+{
+  "message": "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I want remote AI and Web3 hackathons, grants, fellowships, and internships."
+}
+```
+
+If the request is incomplete, Trakr returns `conversation.state: "needs_more_information"` with the minimum questions the calling agent should ask. When enough context is available, Trakr returns grounded recommendations and a caller-scoped `conversation.continuation` object that can be sent back for follow-up requests:
+
+```json
+{
+  "message": "What am I missing for this opportunity?",
+  "context": {
+    "profile": {},
+    "profileEvidence": [],
+    "selectedOpportunityId": "returned-opportunity-id",
+    "profileConfirmed": false
+  }
+}
+```
+
 ## Response Shape
 
 The API returns:
@@ -83,6 +107,14 @@ The API returns:
 - `actionPlan`: immediate, seven-day, and thirty-day guidance.
 - `learningRoadmap`: focus areas, resources to find, and practice projects.
 - `agentNotes`: implementation notes for downstream agents.
+- `conversation`: additive state, natural-language guidance, profile provenance, missing information, and continuation context.
+- `capabilityResult`: grounded explanation, readiness, resume benchmark, or resume optimization output when requested.
+
+Complete legacy structured requests continue to use the original direct recommendation flow without conversational interruption.
+
+## Factual Integrity
+
+Trakr may improve wording, structure, relevance, ordering, and keyword alignment using facts the user supplied. It does not invent jobs, degrees, skills, projects, achievements, metrics, certifications, or eligibility.
 
 ## Extending Sources
 
