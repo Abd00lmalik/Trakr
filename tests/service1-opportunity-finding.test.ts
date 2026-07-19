@@ -527,6 +527,45 @@ test("hard mismatch gates reject expired, ineligible, and senior-only results", 
   }
 });
 
+test("short domain terms do not create false AI matches inside blockchain text", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Self-taught blockchain developer",
+      location: "Ghana",
+      experienceLevel: "early-career",
+      skills: ["JavaScript", "React", "Solidity"],
+      interests: ["Web3"],
+      goals: ["Compete in blockchain hackathons"],
+    },
+    filters: { categories: ["hackathon"], remote: true },
+  });
+  const unrelatedAiHackathon = opportunity(
+    "ai-only",
+    "AI Optimization Challenge",
+    ["AI", "machine learning", "optimization"],
+    {
+      category: "hackathon",
+      summary:
+        "Build a machine learning optimization project using Python and model deployment tools.",
+      requiredSkills: ["Python", "machine learning"],
+      preferredSkills: ["PyTorch"],
+    },
+  );
+
+  const result = scoreOpportunity(unrelatedAiHackathon, request, {
+    now: new Date("2026-07-19T12:00:00.000Z"),
+  });
+
+  assert.equal(result.hardMismatch, true);
+  assert.equal(result.action, "Skip");
+  assert.ok(result.score <= 20);
+  assert.ok(
+    result.mismatchReasons?.some((reason) =>
+      /target domain|capability overlap/i.test(reason),
+    ) ?? false,
+  );
+});
+
 test("conversation continuation preserves requested opportunity type and remote constraints", async () => {
   const initial = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({

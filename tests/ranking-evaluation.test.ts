@@ -317,4 +317,16 @@ test("post-enhancement consistency prevents negative reasoning and action promot
     "Prepare First",
   );
   assert.equal(consistent.recommendations[0].matchScore, 82);
+  assert.equal(
+    consistent.recommendations[0].reasoning,
+    base.recommendations[0].reasoning,
+  );
+  assert.deepEqual(
+    consistent.recommendations[0].missingRequirements,
+    base.recommendations[0].missingRequirements,
+  );
+  assert.deepEqual(
+    consistent.recommendations[0].nextSteps,
+    base.recommendations[0].nextSteps,
+  );
 });

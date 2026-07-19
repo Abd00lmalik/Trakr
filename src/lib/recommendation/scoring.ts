@@ -357,9 +357,27 @@ function tokenize(values: string[]) {
   );
 }
 
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function includesPhrase(values: string[], phrases: string[]) {
-  const haystack = normalize(values.join(" "));
-  return phrases.some((phrase) => haystack.includes(normalize(phrase)));
+  const haystack = normalize(values.join(" ")).replace(/\s+/g, " ").trim();
+  return phrases.some((phrase) => {
+    const normalizedPhrase = normalize(phrase).trim();
+    if (!normalizedPhrase) return false;
+    if (normalizedPhrase.length > 3) {
+      return haystack.includes(normalizedPhrase);
+    }
+    const pattern = escapeRegExp(normalizedPhrase).replace(
+      /(?:\\ |\\-|\s|-)+/g,
+      "[\\s-]+",
+    );
+    return new RegExp(
+      `(^|[^a-z0-9+#.])${pattern}(?=$|[^a-z0-9+#.])`,
+      "i",
+    ).test(haystack);
+  });
 }
 
 function profileValues(user?: StructuredUserProfile, resumeText?: string) {
@@ -882,11 +900,23 @@ export function scoreOpportunity(
   const quality = qualityScore(opportunity);
   const value = valueScore(opportunity);
   const domain = domainFitScore(opportunity, request);
-  const mismatch = hardMismatchAssessment(
+  const baseMismatch = hardMismatchAssessment(
     opportunity,
     request,
     options.now,
   );
+  const mismatch =
+    !baseMismatch.hardMismatch &&
+    opportunity.verificationStatus !== "program_directory" &&
+    domain < 30 &&
+    skill.score < 25
+      ? {
+          hardMismatch: true,
+          reasons: [
+            "The opportunity does not match a supported target domain and lacks strong capability overlap.",
+          ],
+        }
+      : baseMismatch;
 
   const relevance = Math.round(
     category * 0.24 +
@@ -912,8 +942,8 @@ export function scoreOpportunity(
     score -= 12;
   }
 
-  if (domain < 30 && category < 80) {
-    score -= 18;
+  if (domain < 30) {
+    score -= 24;
   }
 
   score = Math.max(0, Math.min(100, score));

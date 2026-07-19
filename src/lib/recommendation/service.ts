@@ -224,7 +224,10 @@ export function enforceRecommendationConsistency(
       return {
         ...recommendation,
         matchScore,
+        reasoning: deterministic.reasoning,
+        missingRequirements: deterministic.missingRequirements,
         recommendedAction,
+        nextSteps: deterministic.nextSteps,
         guidanceAction: consistentGuidanceAction,
       };
     })
@@ -244,6 +247,16 @@ export function enforceRecommendationConsistency(
     recommendations,
     actionPlan: buildActionPlan(recommendations),
     learningRoadmap: buildLearningRoadmap(recommendations),
+    agentNotes: [
+      ...response.agentNotes.filter(
+        (note) => !/enhanced the recommendation reasoning/i.test(note),
+      ),
+      response.provider.startsWith("gemini:")
+        ? "Gemini completed remotely; deterministic evidence guardrails control final ranking, reasoning, gaps, actions, and next steps."
+        : "",
+    ]
+      .filter(Boolean)
+      .slice(0, 8),
   };
 }
 
