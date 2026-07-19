@@ -323,8 +323,30 @@ const industrialSummarySignals = [
   "hand and power tools",
 ];
 
+const instructionLikeContent =
+  /\b(ignore (?:all|any|the|previous)|system prompt|developer message|assistant instruction|tool call|reveal secrets?|exfiltrate|override instructions?|send (?:the )?(?:resume|profile|personal|user)?\s*data to|send (?:the )?(?:resume|profile) to)\b/i;
+
 function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9+#.\s-]/g, " ");
+}
+
+function sanitizeUntrustedText(value: string) {
+  return value
+    .split(/\r?\n/)
+    .filter((line) => !instructionLikeContent.test(line))
+    .join(" ")
+    .trim();
+}
+
+function formatUntrustedField(label: string, value: string | undefined) {
+  if (!value) return "";
+  const sanitized = sanitizeUntrustedText(value);
+  return sanitized ? `${label}: ${sanitized}` : "";
+}
+
+function formatUntrustedList(label: string, values: string[]) {
+  const sanitized = values.map(sanitizeUntrustedText).filter(Boolean);
+  return sanitized.length ? `${label}: ${sanitized.join("; ")}` : "";
 }
 
 function tokenize(values: string[]) {
@@ -485,6 +507,38 @@ type RankingOptions = {
   now?: Date;
 };
 
+const locationEligibilityRules: Array<{
+  pattern: RegExp;
+  allowedLocations: RegExp;
+  label: string;
+}> = [
+  {
+    pattern:
+      /\b(?:united states|u\.s\.|us)[ -]?(?:only|based|residents?|citizens?)\b|\bmust (?:be|reside) in (?:the )?(?:united states|u\.s\.|us)\b/i,
+    allowedLocations: /\b(united states|usa|u\.s\.|america)\b/i,
+    label: "United States-only eligibility",
+  },
+  {
+    pattern:
+      /\b(?:united kingdom|u\.k\.|uk)[ -]?(?:only|based|residents?|citizens?)\b|\bmust (?:be|reside) in (?:the )?(?:united kingdom|u\.k\.|uk)\b/i,
+    allowedLocations: /\b(united kingdom|uk|england|scotland|wales)\b/i,
+    label: "United Kingdom-only eligibility",
+  },
+  {
+    pattern:
+      /\b(?:canada|canadian)[ -]?(?:only|based|residents?|citizens?)\b|\bmust (?:be|reside) in canada\b/i,
+    allowedLocations: /\bcanada\b/i,
+    label: "Canada-only eligibility",
+  },
+  {
+    pattern:
+      /\b(?:europe|european union|eu)[ -]?(?:only|based|residents?)\b|\bmust (?:be|reside) in (?:europe|the european union|the eu)\b/i,
+    allowedLocations:
+      /\b(europe|european union|eu|ireland|france|germany|spain|italy|netherlands|belgium|portugal|poland|sweden|finland|denmark|norway|austria|switzerland)\b/i,
+    label: "Europe-only eligibility",
+  },
+];
+
 function deadlineScore(deadline: string | null, now = new Date()) {
   if (!deadline) {
     return 58;
@@ -545,7 +599,6 @@ function qualityScore(opportunity: Opportunity) {
   if (opportunity.sourceName.includes("Structured")) {
     score -= 18;
   }
-
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
@@ -621,7 +674,52 @@ function matchingFamilies(
 function hardMismatchAssessment(
   opportunity: Opportunity,
   request: RecommendationRequest,
+  now = new Date(),
 ) {
+  const generalReasons: string[] = [];
+  if (
+    !opportunity.isActive ||
+    opportunity.verificationStatus === "inactive_listing" ||
+    opportunity.sourceStatus === "inactive" ||
+    opportunity.sourceStatus === "stale"
+  ) {
+    generalReasons.push("The source record is inactive or stale.");
+  }
+  if (
+    opportunity.deadline &&
+    Date.parse(`${opportunity.deadline}T23:59:59Z`) < now.getTime()
+  ) {
+    generalReasons.push("The application deadline has passed.");
+  }
+  if (
+    request.filters.categories?.length &&
+    !request.filters.categories.includes(opportunity.category)
+  ) {
+    generalReasons.push(
+      "The opportunity type does not match the requested categories.",
+    );
+  }
+  if (request.filters.remote === true && !opportunity.remote) {
+    generalReasons.push("The user requested remote-only opportunities.");
+  }
+  const userLocation = request.user?.location;
+  if (userLocation) {
+    const eligibilityText = opportunity.eligibility.join(" ");
+    for (const rule of locationEligibilityRules) {
+      if (
+        rule.pattern.test(eligibilityText) &&
+        !rule.allowedLocations.test(userLocation)
+      ) {
+        generalReasons.push(
+          `${rule.label} conflicts with the supplied location.`,
+        );
+      }
+    }
+  }
+  if (generalReasons.length) {
+    return { hardMismatch: true, reasons: generalReasons };
+  }
+
   if (opportunity.category !== "remote_job") {
     return { hardMismatch: false, reasons: [] };
   }
@@ -636,6 +734,22 @@ function hardMismatchAssessment(
     [opportunity.title],
     roleFamilies,
   );
+  if (
+    ["student", "beginner", "early-career"].includes(
+      request.user?.experienceLevel ?? "",
+    ) &&
+    includesPhrase(
+      [opportunity.title, opportunity.summary],
+      seniorSignals,
+    )
+  ) {
+    return {
+      hardMismatch: true,
+      reasons: [
+        "Experience-level mismatch: the role explicitly requires senior, lead, staff, principal, manager, head, or director scope.",
+      ],
+    };
+  }
   if (
     normalize(opportunity.title).includes("operator") &&
     includesPhrase([opportunity.summary], industrialSummarySignals) &&
@@ -724,25 +838,33 @@ export function buildProfileText(request: RecommendationRequest) {
   const user = request.user;
   const structured = user
     ? [
-        user.name && `Name: ${user.name}`,
-        user.headline && `Headline: ${user.headline}`,
-        user.bio && `Bio: ${user.bio}`,
-        user.location && `Location: ${user.location}`,
+        formatUntrustedField("Name", user.name),
+        formatUntrustedField("Headline", user.headline),
+        formatUntrustedField("Bio", user.bio),
+        formatUntrustedField("Location", user.location),
         user.experienceLevel && `Experience level: ${user.experienceLevel}`,
-        user.skills.length && `Skills: ${user.skills.join(", ")}`,
-        user.interests.length && `Interests: ${user.interests.join(", ")}`,
-        user.goals.length && `Goals: ${user.goals.join(", ")}`,
-        user.education.length && `Education: ${user.education.join("; ")}`,
-        user.workHistory.length && `Work history: ${user.workHistory.join("; ")}`,
-        user.projects.length && `Projects: ${user.projects.join("; ")}`,
-        user.certifications.length &&
-          `Certifications: ${user.certifications.join("; ")}`,
+        formatUntrustedList("Skills", user.skills),
+        formatUntrustedList("Interests", user.interests),
+        formatUntrustedList("Goals", user.goals),
+        formatUntrustedList("Education", user.education),
+        formatUntrustedList("Work history", user.workHistory),
+        formatUntrustedList("Projects", user.projects),
+        formatUntrustedList("Certifications", user.certifications),
       ]
         .filter(Boolean)
         .join("\n")
     : "";
 
-  return [structured, request.resumeText, request.goals?.join(", "), request.interests?.join(", ")]
+  const unstructured =
+    !user && request.resumeText
+      ? request.resumeText
+          .split(/\r?\n/)
+          .filter((line) => !instructionLikeContent.test(line))
+          .join("\n")
+          .slice(0, 1200)
+      : "";
+
+  return [structured, unstructured, request.goals?.join(", "), request.interests?.join(", ")]
     .filter(Boolean)
     .join("\n\n");
 }
@@ -760,7 +882,11 @@ export function scoreOpportunity(
   const quality = qualityScore(opportunity);
   const value = valueScore(opportunity);
   const domain = domainFitScore(opportunity, request);
-  const mismatch = hardMismatchAssessment(opportunity, request);
+  const mismatch = hardMismatchAssessment(
+    opportunity,
+    request,
+    options.now,
+  );
 
   const relevance = Math.round(
     category * 0.24 +

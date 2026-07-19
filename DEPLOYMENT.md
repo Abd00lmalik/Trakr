@@ -17,6 +17,8 @@ RECOMMENDATION_LIMIT=10
 RATE_LIMIT_REQUESTS_PER_MINUTE=60
 RECOMMENDATION_LOG_RETENTION_DAYS=30
 RECOMMENDATION_LOG_HASH_KEY=generate_a_long_random_value
+TRAKR_SESSION_SECRET=generate_a_different_long_random_value
+TRAKR_SESSION_TTL_MINUTES=30
 INGEST_API_KEY=generate_a_long_random_value
 TRAKR_ADMIN_API_KEY=generate_a_long_random_value
 ```
@@ -97,6 +99,8 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - Leave `TRAKR_API_KEY` unset for public free OKX review unless OKX gives a shared secret or gateway header to enforce.
 - Set `INGEST_API_KEY` before enabling scheduled ingestion.
 - Set `RECOMMENDATION_LOG_HASH_KEY` to enable keyed request correlation without storing raw identifiers or resume content.
+- Set `TRAKR_SESSION_SECRET` to a separate long random value. It encrypts opaque, short-lived caller-carried session references; do not rotate it while active sessions must remain resumable.
+- `TRAKR_SESSION_TTL_MINUTES` is bounded between 5 and 120 minutes and defaults to 30.
 - Set `RECOMMENDATION_LOG_RETENTION_DAYS` between 1 and 365. Expired recommendation analytics are pruned during normal recommendation traffic.
 
 ## Current Railway Deployment

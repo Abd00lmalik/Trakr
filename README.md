@@ -2,7 +2,9 @@
 
 ![Trakr logo](public/trakr-logo.png)
 
-Trakr is a conversational AI Opportunity Companion exposed as an A2MCP-style API service. Existing clients can send a structured profile or resume text and receive direct recommendations. Conversational callers can also start with a natural-language goal, progressively build a profile without a resume, explain matches, assess opportunity readiness, and benchmark or optimize application materials without fabricated experience.
+Trakr is an outcome-first AI Opportunity Companion exposed as an A2MCP-style API service. The product presents three visible services: Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. They share one capability layer and the stable public endpoint, `POST /api/a2mcp/recommend`.
+
+Service 1, Opportunity Finding, is currently production-ready in this repository. It accepts a resume, conversational background, or a free-form opportunity request. The other two services are visible and have additive operations reserved in the contract, but return an honest staged-service response until their separate release gates are complete.
 
 ## MVP Scope
 
@@ -16,8 +18,9 @@ Trakr is a conversational AI Opportunity Companion exposed as an A2MCP-style API
 - Gemini provider abstraction with deterministic local fallback when `GEMINI_API_KEY` is not configured.
 - Structured opportunity source interface with a seeded catalog for Phase 1.
 - Zod validation for clean agent-consumable input and output contracts.
-- Stateless conversational continuation context so calling agents can conduct multi-turn journeys without unsafe shared user memory.
-- Grounded readiness, ATS benchmarking, and resume-positioning capabilities that preserve factual integrity.
+- Encrypted, short-lived caller-carried session references so calling agents can conduct multi-turn journeys without a permanent shared user profile.
+- Evidence ledger fields that distinguish explicit facts, reasonable inferences, and unknown information.
+- Source provenance, deadline confidence, eligibility checks, canonical duplicate filtering, and quality-gated multi-interest coverage.
 
 ## Folder Structure
 
@@ -77,7 +80,27 @@ npm run verify
 }
 ```
 
-## Conversational Request
+## Outcome-First Conversation
+
+An empty conversational request returns the three service choices. An external agent can make the selection explicitly:
+
+```json
+{
+  "operation": "discover"
+}
+```
+
+For Opportunity Finding, the agent can choose a route with `intakeRoute` or let natural-language intent determine it:
+
+```json
+{
+  "operation": "discover",
+  "intakeRoute": "request",
+  "message": "Find remote AI internships for a student in Nigeria."
+}
+```
+
+## Natural-Language Request
 
 ```json
 {
@@ -85,16 +108,15 @@ npm run verify
 }
 ```
 
-If the request is incomplete, Trakr returns `conversation.state: "needs_more_information"` with the minimum questions the calling agent should ask. When enough context is available, Trakr returns grounded recommendations and a caller-scoped `conversation.continuation` object that can be sent back for follow-up requests:
+If the request is incomplete, Trakr returns `conversation.state: "needs_more_information"` with the minimum questions the calling agent should ask. When enough context is available, Trakr returns grounded recommendations and an opaque `conversation.continuation` reference that must be sent back unchanged for follow-up requests:
 
 ```json
 {
   "message": "What am I missing for this opportunity?",
-  "context": {
-    "profile": {},
-    "profileEvidence": [],
-    "selectedOpportunityId": "returned-opportunity-id",
-    "profileConfirmed": false
+  "continuation": {
+    "token": "returned-encrypted-session-token",
+    "expiresAt": "2026-07-19T12:30:00.000Z",
+    "sessionVersion": "2"
   }
 }
 ```
@@ -110,7 +132,7 @@ The API returns:
 - `conversation`: additive state, natural-language guidance, profile provenance, missing information, and continuation context.
 - `capabilityResult`: grounded explanation, readiness, resume benchmark, or resume optimization output when requested.
 
-Complete legacy structured requests continue to use the original direct recommendation flow without conversational interruption.
+Complete legacy structured requests continue to use the original direct recommendation flow without conversational interruption. The endpoint remains free and does not require an OKX payment challenge in this phase.
 
 ## Factual Integrity
 
@@ -118,7 +140,7 @@ Trakr may improve wording, structure, relevance, ordering, and keyword alignment
 
 ## Extending Sources
 
-Add official APIs or structured feeds by implementing `OpportunitySource` in `src/lib/opportunities/source.ts`, then combine those sources in `src/lib/recommendation/service.ts`. The seeded catalog is intentionally small and should be replaced or supplemented with live provider adapters as the service matures.
+Add official APIs or structured feeds by implementing `OpportunitySource` in `src/lib/opportunities/source.ts`, then combine those sources in `src/lib/recommendation/service.ts`. Review and document every candidate in `src/lib/opportunities/source-registry.ts` first. DoraHacks and Encode Club remain directory-only until Trakr has a documented API, feed, partner delivery, or permissioned ingestion agreement; the service does not scrape protected or undocumented interfaces.
 
 ## Deployment
 

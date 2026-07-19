@@ -30,6 +30,22 @@ const knownSkills = [
   "Cybersecurity",
   "AI",
   "Web3",
+  "Climate tech",
+  "Fintech",
+  "Research",
+  "Statistics",
+  "R",
+  "Java",
+  "C++",
+  "Docker",
+  "Kubernetes",
+  "Git",
+  "GitHub",
+  "User research",
+  "Prototyping",
+  "Data visualization",
+  "Grant writing",
+  "Academic writing",
 ];
 
 const roleSignals = [
@@ -95,6 +111,24 @@ function inferInterests(text: string) {
     lower.includes("remote") ? "remote work" : "",
     lower.includes("web3") || lower.includes("blockchain") ? "web3" : "",
     /\bai\b/.test(lower) || lower.includes("machine learning") ? "AI" : "",
+    lower.includes("climate") ||
+    lower.includes("sustainability") ||
+    lower.includes("renewable")
+      ? "Climate"
+      : "",
+    lower.includes("fintech") ||
+    lower.includes("financial technology") ||
+    lower.includes("payments")
+      ? "Fintech"
+      : "",
+    lower.includes("research") || lower.includes("academic") ? "Research" : "",
+    lower.includes("design") || lower.includes("figma") ? "Design" : "",
+    lower.includes("cybersecurity") || lower.includes("infosec")
+      ? "Cybersecurity"
+      : "",
+    lower.includes("open source") || lower.includes("github")
+      ? "Open source"
+      : "",
   ].filter(Boolean);
 }
 

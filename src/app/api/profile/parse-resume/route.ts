@@ -22,6 +22,18 @@ export async function POST(request: Request) {
   try {
     const formData = await request.formData();
     const file = formData.get("resume");
+    const consent = formData.get("consent");
+
+    if (consent !== "true") {
+      return json(
+        {
+          error: "resume_consent_required",
+          message:
+            "Resume processing requires explicit consent for session-only processing.",
+        },
+        403,
+      );
+    }
 
     if (!(file instanceof File)) {
       return json(

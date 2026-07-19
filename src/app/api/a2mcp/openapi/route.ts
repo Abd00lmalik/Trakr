@@ -7,9 +7,9 @@ export async function GET() {
     openapi: "3.1.0",
     info: {
       title: "Trakr A2MCP API",
-      version: "0.2.0",
+      version: "0.3.0",
       description:
-        "Trakr is a conversational AI Opportunity Companion. Existing structured requests continue to return direct recommendations, while natural-language requests can progressively build a profile, request missing information, explain matches, assess readiness, and provide grounded resume intelligence.",
+        "Trakr is an outcome-first conversational AI Opportunity Companion. Three visible services share one capability layer behind the stable POST /api/a2mcp/recommend endpoint.",
     },
     servers: [
       {
@@ -36,6 +36,8 @@ export async function GET() {
               "application/json": {
                 schema: {
                   type: "object",
+                  description:
+                    "An empty object opens the service chooser. Operation-only requests such as {\"operation\":\"discover\"} are valid. Legacy requests may continue to provide user or resumeText directly.",
                   properties: {
                     user: { type: "object" },
                     profile: {
@@ -43,7 +45,26 @@ export async function GET() {
                       description:
                         "Additive alias for user. Existing user requests remain supported.",
                     },
-                    resumeText: { type: "string" },
+                    resumeText: {
+                      type: "string",
+                      description:
+                        "Resume text. Additive conversational requests must include affirmative consent; legacy direct recommendation payloads remain compatible.",
+                    },
+                    operation: {
+                      type: "string",
+                      enum: [
+                        "auto",
+                        "discover",
+                        "benchmark",
+                        "optimize",
+                        "generate_resume",
+                      ],
+                      default: "auto",
+                    },
+                    intakeRoute: {
+                      type: "string",
+                      enum: ["resume", "background", "request"],
+                    },
                     message: {
                       type: "string",
                       description:
@@ -59,6 +80,7 @@ export async function GET() {
                         "readiness_assessment",
                         "resume_benchmark",
                         "resume_optimization",
+                        "resume_generation",
                       ],
                       default: "auto",
                     },
@@ -68,9 +90,33 @@ export async function GET() {
                         "Caller-scoped continuation context returned by a previous response. Trakr does not keep shared in-memory user profiles.",
                     },
                     continuation: {
-                      type: "object",
+                      oneOf: [
+                        { type: "string", minLength: 40 },
+                        {
+                          type: "object",
+                          properties: {
+                            token: { type: "string", minLength: 40 },
+                            expiresAt: { type: "string", format: "date-time" },
+                            sessionVersion: { const: "2" },
+                          },
+                          required: ["token", "expiresAt", "sessionVersion"],
+                        },
+                        { type: "object" },
+                      ],
                       description:
-                        "Additive alias for context. Send back the caller-scoped continuation returned by the previous response.",
+                        "Additive alias for context. Send back the opaque, encrypted, short-lived continuation returned by the previous response.",
+                    },
+                    consent: {
+                      type: "object",
+                      properties: {
+                        processPersonalData: { type: "boolean" },
+                        retention: { const: "session_only" },
+                        source: {
+                          type: "string",
+                          enum: ["explicit", "implicit_legacy"],
+                        },
+                      },
+                      required: ["processPersonalData"],
                     },
                     target: {
                       type: "object",
@@ -86,14 +132,6 @@ export async function GET() {
                     filters: { type: "object" },
                     requestId: { type: "string" },
                   },
-                  anyOf: [
-                    { required: ["user"] },
-                    { required: ["resumeText"] },
-                    { required: ["message"] },
-                    { required: ["context"] },
-                    { required: ["profile"] },
-                    { required: ["continuation"] },
-                  ],
                 },
               },
             },
@@ -222,6 +260,9 @@ export async function GET() {
                           state: {
                             type: "string",
                             enum: [
+                              "choose_service",
+                              "service_pending",
+                              "consent_required",
                               "choose_profile_source",
                               "awaiting_resume",
                               "collecting_background",
@@ -235,6 +276,31 @@ export async function GET() {
                               "resume_optimization",
                             ],
                           },
+                          service: {
+                            type: "string",
+                            enum: [
+                              "opportunity_finding",
+                              "resume_benchmarking_optimization",
+                              "resume_generation",
+                            ],
+                          },
+                          operation: {
+                            type: "string",
+                            enum: [
+                              "auto",
+                              "discover",
+                              "benchmark",
+                              "optimize",
+                              "generate_resume",
+                            ],
+                          },
+                          profileSource: {
+                            type: "string",
+                            enum: ["resume", "background", "request"],
+                            description:
+                              "The active Opportunity Finding intake route for this response.",
+                          },
+                          stage: { type: "string" },
                           message: { type: "string" },
                           profile: { type: "object" },
                           missingInformation: {
@@ -271,11 +337,15 @@ export async function GET() {
               },
             },
             "400": {
-              description: "Structured validation error",
+              description: "Structured validation, session, or request error",
             },
-            "429": {
-              description: "Rate limit exceeded",
+            "409": {
+              description: "Idempotency key conflict",
             },
+            "410": {
+              description: "Expired continuation reference",
+            },
+            "429": { description: "Rate limit exceeded" },
           },
         },
       },
@@ -288,11 +358,17 @@ export async function GET() {
               "multipart/form-data": {
                 schema: {
                   type: "object",
-                  required: ["resume"],
+                  required: ["resume", "consent"],
                   properties: {
                     resume: {
                       type: "string",
                       format: "binary",
+                    },
+                    consent: {
+                      type: "string",
+                      enum: ["true", "false"],
+                      description:
+                        "Required explicit session-only resume-processing consent. Only the value true permits processing.",
                     },
                   },
                 },
@@ -305,6 +381,13 @@ export async function GET() {
             },
             "400": {
               description: "Unsupported or missing resume",
+            },
+            "403": {
+              description:
+                "Resume processing consent is absent or not affirmative",
+            },
+            "422": {
+              description: "Resume contains insufficient readable text",
             },
           },
         },

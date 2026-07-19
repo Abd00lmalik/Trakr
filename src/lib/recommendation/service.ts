@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { getAiProvider } from "@/lib/ai/factory";
 import { opportunitySource } from "@/lib/opportunities/sources";
+import { extractProfileFromText } from "@/lib/resume/parser";
+import { diversifyRankedOpportunities } from "@/lib/recommendation/diversification";
 import { rankOpportunities, buildProfileText } from "@/lib/recommendation/scoring";
 import {
   buildActionPlan,
@@ -69,6 +71,41 @@ function eligibilityConcerns(candidate: ScoredOpportunity) {
   return concerns;
 }
 
+function recommendationProvenance(opportunity: Opportunity) {
+  const verifiedAt = opportunity.lastVerifiedAt
+    ? Date.parse(opportunity.lastVerifiedAt)
+    : Number.NaN;
+  const ageDays = Number.isNaN(verifiedAt)
+    ? null
+    : Math.max(0, (Date.now() - verifiedAt) / (24 * 60 * 60 * 1_000));
+  const freshness =
+    ageDays === null
+      ? ("unknown" as const)
+      : ageDays <= 7
+        ? ("fresh" as const)
+        : ("aging" as const);
+  const deadlineConfidence = opportunity.deadline
+    ? opportunity.verificationStatus === "verified"
+      ? ("high" as const)
+      : ("medium" as const)
+    : ("rolling_or_unknown" as const);
+  const eligibilityConfidence = opportunity.eligibility.length
+    ? ("needs_confirmation" as const)
+    : ("unknown" as const);
+
+  return {
+    canonicalUrl: opportunity.canonicalUrl,
+    sourceName: opportunity.sourceName,
+    publisherDomain: opportunity.publisherDomain,
+    verificationStatus: opportunity.verificationStatus,
+    sourceStatus: opportunity.sourceStatus,
+    lastVerifiedAt: opportunity.lastVerifiedAt,
+    freshness,
+    deadlineConfidence,
+    eligibilityConfidence,
+  };
+}
+
 function extractProfileSignals(request: RecommendationRequest) {
   return [
     ...(request.user?.skills ?? []).map((skill) => `skill:${skill}`),
@@ -84,6 +121,7 @@ function buildDraftResponse(
   providerName: string,
   recommendations: Recommendation[],
   totalCandidates: number,
+  coverage: RecommendationResponse["coverage"],
 ): RecommendationResponse {
   return {
     service: "trakr",
@@ -100,6 +138,7 @@ function buildDraftResponse(
     recommendations,
     actionPlan: buildActionPlan(recommendations),
     learningRoadmap: buildLearningRoadmap(recommendations),
+    coverage,
     agentNotes: [
       "Candidates are grounded in stored or structured source opportunities before AI enhancement.",
       "Scores combine category fit, skills, experience level, location, source quality, deadline urgency, and expected value.",
@@ -132,6 +171,12 @@ export function enforceRecommendationConsistency(
     draft.recommendations.map((recommendation) => [
       recommendation.opportunity.id,
       recommendation,
+    ]),
+  );
+  const draftRankById = new Map(
+    draft.recommendations.map((recommendation) => [
+      recommendation.opportunity.id,
+      recommendation.rank,
     ]),
   );
 
@@ -186,9 +231,8 @@ export function enforceRecommendationConsistency(
     .filter((recommendation) => recommendation.matchScore >= 35)
     .sort(
       (left, right) =>
-        right.matchScore - left.matchScore ||
-        actionPriority(right.recommendedAction) -
-          actionPriority(left.recommendedAction),
+        (draftRankById.get(left.opportunity.id) ?? Number.MAX_SAFE_INTEGER) -
+        (draftRankById.get(right.opportunity.id) ?? Number.MAX_SAFE_INTEGER),
     )
     .map((recommendation, index) => ({
       ...recommendation,
@@ -207,10 +251,26 @@ export async function generateRecommendations(
   request: RecommendationRequest,
 ): Promise<RecommendationResponse> {
   const startedAt = Date.now();
+  const groundedRequest =
+    request.user || !request.resumeText
+      ? request
+      : {
+          ...request,
+          user: extractProfileFromText(request.resumeText).profile,
+        };
   const aiProvider = getAiProvider();
   const source = opportunitySource;
-  const opportunities = await source.fetchOpportunities(request, request.filters);
-  const ranked = rankOpportunities(opportunities, request).slice(0, getLimit(request));
+  const opportunities = await source.fetchOpportunities(
+    groundedRequest,
+    groundedRequest.filters,
+  );
+  const baseRanked = rankOpportunities(opportunities, groundedRequest);
+  const diversified = diversifyRankedOpportunities(
+    baseRanked,
+    groundedRequest,
+    getLimit(groundedRequest),
+  );
+  const ranked = diversified.ranked;
 
   const recommendations: Recommendation[] = ranked.map((candidate, index) => ({
     rank: index + 1,
@@ -231,21 +291,23 @@ export async function generateRecommendations(
     ),
     guidanceAction: guidanceAction(candidate.opportunity, candidate.action),
     eligibilityConcerns: eligibilityConcerns(candidate),
+    provenance: recommendationProvenance(candidate.opportunity),
   }));
 
   const draftResponse = buildDraftResponse(
-    request,
+    groundedRequest,
     aiProvider.name,
     recommendations,
     opportunities.length,
+    diversified.coverage,
   );
 
   let response = draftResponse;
   if (recommendations.length) {
     try {
       response = await aiProvider.enhanceRecommendations({
-        request,
-        profileText: buildProfileText(request),
+        request: groundedRequest,
+        profileText: buildProfileText(groundedRequest),
         scoredOpportunities: ranked,
         draftResponse,
       });
@@ -263,7 +325,11 @@ export async function generateRecommendations(
   }
   response = enforceRecommendationConsistency(response, draftResponse);
 
-  await logRecommendationRun(request, response, Date.now() - startedAt).catch(
+  await logRecommendationRun(
+    groundedRequest,
+    response,
+    Date.now() - startedAt,
+  ).catch(
     () => undefined,
   );
   return response;

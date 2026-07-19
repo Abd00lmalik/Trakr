@@ -6,6 +6,8 @@ import {
   extractProfileFromText,
   parseResumeFile,
 } from "../src/lib/resume/parser";
+import { POST as parseResume } from "../src/app/api/profile/parse-resume/route";
+import { GET as getOpenApi } from "../src/app/api/a2mcp/openapi/route";
 
 const resumeText =
   "Amina Yusuf is a frontend developer and university student with React, TypeScript, JavaScript, SQL, and open source experience. Built accessible dashboards and API integrations for developer communities. Interested in hackathons, fellowships, remote work, AI, Web3, and grant-funded public goods. Portfolio https://example.com/amina";
@@ -86,7 +88,7 @@ AWS Certified Cloud Practitioner`,
   );
 });
 
-test("workspace includes the complete milestone journey", async () => {
+test("workspace exposes the outcome-first Opportunity Finding journey", async () => {
   const workspace = await readFile(
     new URL("../src/components/opportunity-workspace.tsx", import.meta.url),
     "utf8",
@@ -94,11 +96,16 @@ test("workspace includes the complete milestone journey", async () => {
 
   for (const requirement of [
     "XMLHttpRequest",
-    "Generating profile...",
-    "Review profile",
-    "Profile summary",
-    "Find matches",
-    "Your matches",
+    "Opportunity Finding",
+    "Resume Benchmarking & Optimization",
+    "Resume Generation",
+    "Tell Trakr what you need",
+    "Use my resume or CV",
+    "Tell Trakr about my background",
+    "Describe what I am looking for",
+    "Session context is caller-carried",
+    "Grounded matches",
+    "No qualified matches yet",
     "Missing requirements",
     "Next actions",
     "verificationConfidence",
@@ -107,4 +114,64 @@ test("workspace includes the complete milestone journey", async () => {
   ]) {
     assert.match(workspace, new RegExp(requirement.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+});
+
+test("resume parser honors explicitly declined session-only consent", async () => {
+  const formData = new FormData();
+  formData.append(
+    "resume",
+    new File([resumeText], "amina-resume.txt", { type: "text/plain" }),
+  );
+  formData.append("consent", "false");
+
+  const response = await parseResume(
+    new Request("http://localhost/api/profile/parse-resume", {
+      method: "POST",
+      body: formData,
+    }),
+  );
+
+  assert.equal(response.status, 403);
+  assert.equal((await response.json()).error, "resume_consent_required");
+});
+
+test("resume parser requires affirmative session-only consent", async () => {
+  const formData = new FormData();
+  formData.append(
+    "resume",
+    new File([resumeText], "amina-resume.txt", { type: "text/plain" }),
+  );
+
+  const response = await parseResume(
+    new Request("http://localhost/api/profile/parse-resume", {
+      method: "POST",
+      body: formData,
+    }),
+  );
+
+  assert.equal(response.status, 403);
+  assert.equal((await response.json()).error, "resume_consent_required");
+});
+
+test("OpenAPI documents additive discovery requests and required resume consent", async () => {
+  const response = await getOpenApi();
+  const document = await response.json();
+  const recommendationSchema =
+    document.paths["/api/a2mcp/recommend"].post.requestBody.content[
+      "application/json"
+    ].schema;
+  const resumeOperation =
+    document.paths["/api/profile/parse-resume"].post;
+  const resumeSchema =
+    resumeOperation.requestBody.content["multipart/form-data"].schema;
+
+  assert.equal(recommendationSchema.type, "object");
+  assert.equal("anyOf" in recommendationSchema, false);
+  assert.match(recommendationSchema.description, /empty object/i);
+  assert.deepEqual(resumeSchema.required, ["resume", "consent"]);
+  assert.match(
+    resumeSchema.properties.consent.description,
+    /required explicit/i,
+  );
+  assert.ok(resumeOperation.responses["403"]);
 });

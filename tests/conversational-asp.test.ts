@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { handleOpportunityCompanionRequest } from "../src/lib/companion/service";
+import { resolveSessionContext } from "../src/lib/companion/session";
 import {
   opportunityCompanionRequestSchema,
   opportunityCompanionResponseSchema,
@@ -10,7 +11,7 @@ import {
 import { generateRecommendations } from "../src/lib/recommendation/service";
 import { POST } from "../src/app/api/a2mcp/recommend/route";
 
-test("profileless first contact offers resume and background paths", async () => {
+test("profileless first contact offers all Opportunity Finding intake paths", async () => {
   const request = opportunityCompanionRequestSchema.parse({
     message: "I want opportunities.",
   });
@@ -19,10 +20,13 @@ test("profileless first contact offers resume and background paths", async () =>
   assert.doesNotThrow(() => opportunityCompanionResponseSchema.parse(response));
   assert.equal(response.conversation?.state, "choose_profile_source");
   assert.equal(response.recommendations.length, 0);
-  assert.match(response.conversation?.message ?? "", /do not need a resume/i);
+  assert.match(
+    response.conversation?.message ?? "",
+    /without requiring a resume/i,
+  );
   assert.deepEqual(
     response.conversation?.choices?.map((choice) => choice.id),
-    ["resume", "background"],
+    ["resume", "background", "request"],
   );
 });
 
@@ -79,12 +83,20 @@ Experience: Built and maintained a React dashboard for 2,500 users.
 Projects: Created an open-source Web3 opportunity tracker with API ingestion.
 Education: Computer Science student at University of Lagos.
 Goals: Seeking remote AI and Web3 internships and hackathons.`,
+      consent: {
+        processPersonalData: true,
+        retention: "session_only",
+        source: "explicit",
+      },
       continuation: awaitingResume.conversation?.continuation,
     }),
   );
 
   assert.equal(response.conversation?.state, "recommendations");
-  assert.equal(response.conversation?.continuation.profileSource, "resume");
+  assert.equal(
+    resolveSessionContext(response.conversation?.continuation)?.profileSource,
+    "resume",
+  );
   assert.ok(response.conversation?.profile.draft.projects.length);
   assert.equal(
     response.conversation?.profile.evidence.find(
@@ -214,7 +226,8 @@ test("follow-up explanation and readiness use caller-scoped continuation context
     }),
   );
   const context = initial.conversation?.continuation;
-  assert.ok(context?.selectedOpportunityId);
+  const resolvedContext = resolveSessionContext(context);
+  assert.ok(resolvedContext?.selectedOpportunityId);
 
   const explanation = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
@@ -228,7 +241,7 @@ test("follow-up explanation and readiness use caller-scoped continuation context
   );
   assert.equal(
     explanation.capabilityResult?.explanation?.opportunityId,
-    context?.selectedOpportunityId,
+    resolvedContext?.selectedOpportunityId,
   );
   assert.ok(
     explanation.capabilityResult?.explanation?.whyItMatches.length,
@@ -244,7 +257,7 @@ test("follow-up explanation and readiness use caller-scoped continuation context
   assert.doesNotThrow(() => opportunityCompanionResponseSchema.parse(readiness));
   assert.equal(
     readiness.capabilityResult?.readiness?.opportunityId,
-    context?.selectedOpportunityId,
+    resolvedContext?.selectedOpportunityId,
   );
   assert.ok(
     readiness.capabilityResult?.readiness?.evidenceAssessment.some((item) =>
@@ -414,9 +427,12 @@ test("profile confirmation and corrections preserve session facts", async () => 
   );
   assert.equal(confirmed.conversation?.state, "recommendations");
   assert.equal(confirmed.conversation?.profile.draft.bio, originalBio);
-  assert.equal(confirmed.conversation?.continuation.profileConfirmed, true);
+  const confirmedContext = resolveSessionContext(
+    confirmed.conversation?.continuation,
+  );
+  assert.equal(confirmedContext?.profileConfirmed, true);
   assert.equal(
-    confirmed.conversation?.continuation.awaitingProfileConfirmation,
+    confirmedContext?.awaitingProfileConfirmation,
     false,
   );
 

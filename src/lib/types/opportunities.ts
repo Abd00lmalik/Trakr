@@ -81,11 +81,18 @@ export const profileEvidenceSourceSchema = z.enum([
 ]);
 
 export const profileEvidenceSchema = z.object({
+  claimId: z.string().optional(),
   field: z.string(),
   source: profileEvidenceSourceSchema,
+  value: z.union([z.string(), z.array(z.string())]).optional(),
   evidence: z.string().optional(),
   origin: z
     .enum(["user", "resume", "context", "structured_profile", "inference"])
+    .optional(),
+  confidence: z.number().min(0).max(1).optional(),
+  confirmed: z.boolean().optional(),
+  allowedUse: z
+    .array(z.enum(["matching", "assessment", "optimization", "generation"]))
     .optional(),
 });
 
@@ -125,17 +132,71 @@ export const companionIntentSchema = z.enum([
   "readiness_assessment",
   "resume_benchmark",
   "resume_optimization",
+  "resume_generation",
 ]);
+
+export const serviceOperationSchema = z.enum([
+  "auto",
+  "discover",
+  "benchmark",
+  "optimize",
+  "generate_resume",
+]);
+
+export const userFacingServiceSchema = z.enum([
+  "opportunity_finding",
+  "resume_benchmarking_optimization",
+  "resume_generation",
+]);
+
+export const opportunityIntakeRouteSchema = z.enum([
+  "resume",
+  "background",
+  "request",
+]);
+
+export const consentSchema = z.object({
+  processPersonalData: z.boolean(),
+  retention: z.literal("session_only").default("session_only"),
+  source: z.enum(["explicit", "implicit_legacy"]).default("explicit"),
+});
+
+export const documentReferenceSchema = z.object({
+  id: z.string().min(8).max(160),
+  kind: z.enum(["resume", "cv", "background"]),
+  contentType: z.string().max(160).optional(),
+  receivedAt: z.string().datetime(),
+  retention: z.literal("session_only"),
+});
 
 export const companionContextSchema = z.object({
   profile: structuredUserProfileSchema.optional(),
-  profileEvidence: z.array(profileEvidenceSchema).max(40).default([]),
+  profileEvidence: z.array(profileEvidenceSchema).max(80).default([]),
   selectedOpportunityId: z.string().min(1).max(240).optional(),
   profileConfirmed: z.boolean().default(false),
-  profileSource: z.enum(["resume", "background"]).optional(),
+  profileSource: opportunityIntakeRouteSchema.optional(),
   awaitingProfileConfirmation: z.boolean().optional(),
-  sessionVersion: z.literal("1").optional(),
+  service: userFacingServiceSchema.optional(),
+  operation: serviceOperationSchema.optional(),
+  stage: z.string().min(1).max(120).optional(),
+  unansweredQuestions: z.array(z.string().max(500)).max(12).default([]),
+  documentReferences: z.array(documentReferenceSchema).max(8).default([]),
+  consent: consentSchema.optional(),
+  filters: recommendationFiltersSchema.optional(),
+  sessionVersion: z.enum(["1", "2"]).optional(),
 });
+
+export const companionSessionReferenceSchema = z.object({
+  token: z.string().min(40).max(24000),
+  expiresAt: z.string().datetime(),
+  sessionVersion: z.literal("2"),
+});
+
+export const companionContinuationInputSchema = z.union([
+  companionSessionReferenceSchema,
+  z.string().min(40).max(24000),
+  companionContextSchema,
+]);
 
 export const companionTargetSchema = z.object({
   opportunityId: z.string().min(1).max(240).optional(),
@@ -155,18 +216,24 @@ export const opportunityCompanionRequestSchema = z
     requestId: z.string().optional(),
     message: z.string().min(1).max(6000).optional(),
     intent: companionIntentSchema.default("auto"),
-    context: companionContextSchema.optional(),
-    continuation: companionContextSchema.optional(),
+    operation: serviceOperationSchema.default("auto"),
+    intakeRoute: opportunityIntakeRouteSchema.optional(),
+    consent: consentSchema.optional(),
+    context: companionContinuationInputSchema.optional(),
+    continuation: companionContinuationInputSchema.optional(),
     target: companionTargetSchema.optional(),
   })
   .superRefine((value, ctx) => {
+    const hasFilters = Object.keys(value.filters).length > 0;
     if (
       !value.user &&
       !value.profile &&
       !value.resumeText &&
       !value.message &&
-      !value.context?.profile &&
-      !value.continuation?.profile
+      !value.context &&
+      !value.continuation &&
+      value.operation === "auto" &&
+      hasFilters
     ) {
       ctx.addIssue({
         code: "custom",
@@ -228,6 +295,23 @@ export const recommendationSchema = z.object({
   confidenceScore: z.number().min(0).max(100).optional(),
   guidanceAction: companionGuidanceActionSchema.optional(),
   eligibilityConcerns: z.array(z.string()).optional(),
+  provenance: z
+    .object({
+      canonicalUrl: z.string().url(),
+      sourceName: z.string(),
+      publisherDomain: z.string(),
+      verificationStatus: verificationStatusSchema,
+      sourceStatus: sourceStatusSchema,
+      lastVerifiedAt: z.string().datetime().nullable(),
+      freshness: z.enum(["fresh", "aging", "unknown"]),
+      deadlineConfidence: z.enum(["high", "medium", "rolling_or_unknown"]),
+      eligibilityConfidence: z.enum([
+        "high",
+        "needs_confirmation",
+        "unknown",
+      ]),
+    })
+    .optional(),
 });
 
 export const actionPlanSchema = z.object({
@@ -258,10 +342,32 @@ export const recommendationResponseSchema = z.object({
   actionPlan: actionPlanSchema,
   learningRoadmap: learningRoadmapSchema,
   agentNotes: z.array(z.string()),
+  operation: serviceOperationSchema.optional(),
+  coverage: z
+    .object({
+      requestedInterests: z.array(z.string()),
+      interests: z.array(
+        z.object({
+          interest: z.string(),
+          status: z.enum(["covered", "limited", "no_qualified_matches"]),
+          resultCount: z.number().int().nonnegative(),
+          qualifyingCandidateCount: z.number().int().nonnegative(),
+          explanation: z.string(),
+        }),
+      ),
+      sourceCount: z.number().int().nonnegative(),
+      opportunityTypeCount: z.number().int().nonnegative(),
+      notes: z.array(z.string()),
+    })
+    .optional(),
 });
 
 export const companionStateSchema = z.enum([
+  "choose_service",
+  "service_pending",
+  "consent_required",
   "choose_profile_source",
+  "collecting_request",
   "awaiting_resume",
   "collecting_background",
   "needs_more_information",
@@ -285,6 +391,10 @@ export const companionProfileSchema = z.object({
 export const companionConversationSchema = z.object({
   state: companionStateSchema,
   intent: companionIntentSchema,
+  service: userFacingServiceSchema,
+  operation: serviceOperationSchema,
+  profileSource: opportunityIntakeRouteSchema.optional(),
+  stage: z.string(),
   message: z.string(),
   profile: companionProfileSchema,
   missingInformation: z.array(
@@ -295,7 +405,7 @@ export const companionConversationSchema = z.object({
     }),
   ),
   nextActions: z.array(z.string()),
-  continuation: companionContextSchema,
+  continuation: companionSessionReferenceSchema,
   requiredAction: z.string().optional(),
   choices: z
     .array(
@@ -386,7 +496,20 @@ export type ScoredOpportunity = z.infer<typeof scoredOpportunitySchema>;
 export type Recommendation = z.infer<typeof recommendationSchema>;
 export type RecommendationResponse = z.infer<typeof recommendationResponseSchema>;
 export type CompanionIntent = z.infer<typeof companionIntentSchema>;
+export type ServiceOperation = z.infer<typeof serviceOperationSchema>;
+export type UserFacingService = z.infer<typeof userFacingServiceSchema>;
+export type OpportunityIntakeRoute = z.infer<
+  typeof opportunityIntakeRouteSchema
+>;
 export type CompanionContext = z.infer<typeof companionContextSchema>;
+export type CompanionSessionReference = z.infer<
+  typeof companionSessionReferenceSchema
+>;
+export type CompanionContinuationInput = z.infer<
+  typeof companionContinuationInputSchema
+>;
+export type Consent = z.infer<typeof consentSchema>;
+export type DocumentReference = z.infer<typeof documentReferenceSchema>;
 export type ProfileEvidence = z.infer<typeof profileEvidenceSchema>;
 export type CompanionConversation = z.infer<typeof companionConversationSchema>;
 export type CompanionCapabilityResult = z.infer<

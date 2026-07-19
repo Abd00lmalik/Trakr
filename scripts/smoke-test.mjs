@@ -8,6 +8,13 @@ const port = Number.parseInt(process.env.SMOKE_PORT ?? "3101", 10);
 const baseUrl = process.env.SMOKE_BASE_URL ?? `http://127.0.0.1:${port}`;
 const shouldStartServer = !process.env.SMOKE_BASE_URL;
 
+// A locally spawned production server needs a stable key to exercise opaque
+// continuation references. Remote smoke tests must use the deployed secret.
+if (shouldStartServer && !process.env.TRAKR_SESSION_SECRET) {
+  process.env.TRAKR_SESSION_SECRET =
+    "smoke-test-session-secret-not-for-production";
+}
+
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -68,6 +75,7 @@ async function uploadResume(filePath, type) {
   const bytes = await fs.readFile(filePath);
   const form = new FormData();
   form.append("resume", new File([bytes], path.basename(filePath), { type }));
+  form.append("consent", "true");
   return requestJson("/api/profile/parse-resume", {
     method: "POST",
     body: form,
@@ -228,11 +236,33 @@ try {
     !profilelessConversation.response.ok ||
     profilelessConversation.body?.conversation?.state !==
       "choose_profile_source" ||
-    profilelessConversation.body?.conversation?.choices?.length !== 2
+    profilelessConversation.body?.conversation?.choices?.length !== 3 ||
+    JSON.stringify(profilelessConversation.body?.conversation?.choices).includes(
+      "service",
+    )
   ) {
     throw new Error(
-      `Profileless conversational request did not offer both profile paths: ${JSON.stringify(
+      `Profileless conversational request did not offer all Opportunity Finding paths: ${JSON.stringify(
         profilelessConversation.body,
+      )}`,
+    );
+  }
+
+  const requestChoice = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "3",
+      continuation: profilelessConversation.body?.conversation?.continuation,
+    }),
+  });
+  if (
+    !requestChoice.response.ok ||
+    requestChoice.body?.conversation?.state !== "collecting_request"
+  ) {
+    throw new Error(
+      `Free-form request route did not continue correctly: ${JSON.stringify(
+        requestChoice.body,
       )}`,
     );
   }
@@ -285,12 +315,64 @@ try {
 
   const continuation =
     conversationalRecommendation.body?.conversation?.continuation;
-  if (!continuation?.selectedOpportunityId) {
+  if (
+    typeof continuation?.token !== "string" ||
+    !continuation.token ||
+    /Nigerian|React|TypeScript|Solidity/i.test(continuation.token)
+  ) {
     throw new Error(
-      "Conversational recommendation did not return caller-scoped continuation context.",
+      "Conversational recommendation did not return an opaque caller-carried continuation reference.",
     );
   }
 
+  const constrainedInitial = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "Find remote AI internships for a student in Nigeria.",
+    }),
+  });
+  if (
+    !constrainedInitial.response.ok ||
+    constrainedInitial.body?.conversation?.state !== "needs_more_information"
+  ) {
+    throw new Error(
+      `Constrained discovery intake did not request the essential missing profile facts: ${JSON.stringify(
+        constrainedInitial.body,
+      )}`,
+    );
+  }
+
+  const constrainedFollowUp = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "I use React, TypeScript, Python, and machine learning.",
+      continuation: constrainedInitial.body?.conversation?.continuation,
+    }),
+  });
+  const constrainedCategories =
+    constrainedFollowUp.body?.querySummary?.filtersApplied?.categories;
+  const wrongTypeRecommendation =
+    constrainedFollowUp.body?.recommendations?.find(
+      (item) => item.opportunity?.category !== "internship",
+    );
+  if (
+    !constrainedFollowUp.response.ok ||
+    constrainedFollowUp.body?.conversation?.state !== "recommendations" ||
+    JSON.stringify(constrainedCategories) !== JSON.stringify(["internship"]) ||
+    constrainedFollowUp.body?.querySummary?.filtersApplied?.remote !== true ||
+    wrongTypeRecommendation
+  ) {
+    throw new Error(
+      `Continuation lost or violated explicit discovery constraints: ${JSON.stringify(
+        constrainedFollowUp.body,
+      )}`,
+    );
+  }
+
+  const topOpportunityId =
+    conversationalRecommendation.body.recommendations[0].opportunity.id;
   const explanation = await requestJson("/api/a2mcp/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -303,7 +385,7 @@ try {
     !explanation.response.ok ||
     explanation.body?.conversation?.state !== "explanation" ||
     explanation.body?.capabilityResult?.explanation?.opportunityId !==
-      continuation.selectedOpportunityId
+      topOpportunityId
   ) {
     throw new Error(
       `Follow-up explanation journey failed: ${JSON.stringify(
@@ -331,6 +413,54 @@ try {
     );
   }
 
+  const pendingService = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      operation: "generate_resume",
+      message: "Create a fictional resume for a research fellowship.",
+    }),
+  });
+  if (
+    !pendingService.response.ok ||
+    pendingService.body?.conversation?.service !== "resume_generation" ||
+    pendingService.body?.conversation?.state !== "service_pending"
+  ) {
+    throw new Error(
+      `Explicit service operation did not preserve staged capability state: ${JSON.stringify(
+        pendingService.body,
+      )}`,
+    );
+  }
+
+  const replayBody = JSON.stringify({
+    operation: "generate_resume",
+    message: "Create a fictional resume for a research fellowship.",
+  });
+  const replayFirst = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": "smoke-service1-replay",
+    },
+    body: replayBody,
+  });
+  const replaySecond = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Idempotency-Key": "smoke-service1-replay",
+    },
+    body: replayBody,
+  });
+  if (
+    !replayFirst.response.ok ||
+    !replaySecond.response.ok ||
+    replaySecond.response.headers.get("x-idempotency-status") !== "replayed"
+  ) {
+    throw new Error("Idempotency replay smoke test failed.");
+  }
+
   const invalid = await requestJson("/api/a2mcp/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -351,6 +481,8 @@ try {
         recommendationCount: recommendation.body.recommendations.length,
         conversationalRecommendationCount:
           conversationalRecommendation.body.recommendations.length,
+        constrainedRecommendationCount:
+          constrainedFollowUp.body.recommendations.length,
         provider: recommendation.body.provider,
         aiStatus: recommendation.body.aiStatus,
         topRecommendation: recommendation.body.recommendations[0].opportunity.title,
@@ -358,8 +490,10 @@ try {
           conversationalRecommendation.body.conversation.state,
         onboardingStates: [
           profilelessConversation.body.conversation.state,
+          requestChoice.body.conversation.state,
           backgroundChoice.body.conversation.state,
         ],
+        explicitServiceState: pendingService.body.conversation.state,
         followUpStates: [
           explanation.body.conversation.state,
           readiness.body.conversation.state,

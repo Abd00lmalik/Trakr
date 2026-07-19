@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   buildProfileDraftFromBackground,
   extractProfileFromText,
@@ -59,6 +60,19 @@ const countryDemonyms: Array<[RegExp, string]> = [
   [/\bcanadian\b/i, "Canada"],
   [/\bamerican\b/i, "United States"],
   [/\bbritish\b/i, "United Kingdom"],
+];
+
+const interestAliases: Array<[RegExp, string]> = [
+  [/\b(ai|artificial intelligence|machine learning|llms?)\b/i, "AI"],
+  [/\b(web3|blockchain|crypto|solidity|ethereum)\b/i, "Web3"],
+  [/\b(climate|clean ?tech|sustainability|renewable energy)\b/i, "Climate"],
+  [/\b(fintech|financial technology|payments?|banking)\b/i, "Fintech"],
+  [/\b(cybersecurity|security|infosec)\b/i, "Cybersecurity"],
+  [/\b(product design|ux|ui|figma|design)\b/i, "Design"],
+  [/\b(research|academic|science|scientific)\b/i, "Research"],
+  [/\b(open source|oss)\b/i, "Open source"],
+  [/\b(healthcare|health tech|healthtech|medical)\b/i, "Healthcare"],
+  [/\b(startups?|entrepreneurship|founder)\b/i, "Startups"],
 ];
 
 const emptyProfile: StructuredUserProfile = {
@@ -124,7 +138,14 @@ function inferLocation(message: string) {
   }
 
   const match = message.match(
-    /\b(?:from|based in|located in|living in)\s+([A-Z][A-Za-z .'-]{2,50}?)(?=[,.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
+    /\b(?:from|based in|located in|living in|student in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]{2,50}?)(?=[,.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
+  );
+  return match?.[1]?.trim();
+}
+
+function inferPreferredLocation(message: string) {
+  const match = message.match(
+    /\b(?:opportunities|roles|jobs|internships?|fellowships?|scholarships?|grants?|hackathons?)\s+(?:based\s+)?in\s+([A-Z][A-Za-z .'-]{2,50}?)(?=[,.;]|\s+(?:or|and|that|which|with|for)\b|$)/,
   );
   return match?.[1]?.trim();
 }
@@ -156,6 +177,12 @@ function categoriesFromText(message: string) {
   return categorySignals
     .filter(({ signals }) => signals.some((signal) => lower.includes(signal)))
     .map(({ category }) => category);
+}
+
+function interestsFromText(message: string) {
+  return interestAliases
+    .filter(([pattern]) => pattern.test(message))
+    .map(([, interest]) => interest);
 }
 
 function meaningfulMessage(message: string | undefined) {
@@ -223,6 +250,53 @@ function addEvidence(
     return;
   }
   evidence.push({ field, source, evidence: detail, origin });
+}
+
+function enrichEvidence(
+  evidence: ProfileEvidence[],
+  profile: StructuredUserProfile,
+) {
+  return evidence.slice(-80).map((item, index) => {
+    const rawValue = profile[item.field as keyof StructuredUserProfile];
+    const value =
+      typeof rawValue === "string" || Array.isArray(rawValue)
+        ? rawValue
+        : undefined;
+    const claimId = createHash("sha256")
+      .update(
+        `${item.field}\0${item.origin ?? "unknown"}\0${JSON.stringify(value)}\0${index}`,
+      )
+      .digest("hex")
+      .slice(0, 20);
+    return {
+      ...item,
+      claimId: item.claimId ?? `claim_${claimId}`,
+      value: item.value ?? value,
+      confidence:
+        item.confidence ??
+        (item.source === "explicit"
+          ? 1
+          : item.source === "inferred"
+            ? 0.65
+            : 0),
+      confirmed: item.confirmed ?? item.source === "explicit",
+      allowedUse:
+        item.allowedUse ??
+        (item.source === "unknown"
+          ? []
+          : (["matching", "assessment"] as const)),
+    };
+  });
+}
+
+function contextFromRequest(
+  request: OpportunityCompanionRequest,
+): CompanionContext | undefined {
+  const candidate = request.context ?? request.continuation;
+  if (!candidate || typeof candidate === "string" || "token" in candidate) {
+    return undefined;
+  }
+  return candidate as CompanionContext;
 }
 
 function evidenceFromProvidedProfile(
@@ -364,7 +438,7 @@ function completenessScore(
 export function buildConversationalProfile(
   request: OpportunityCompanionRequest,
 ) {
-  const context = request.context ?? request.continuation;
+  const context = contextFromRequest(request);
   const providedProfile = request.user ?? request.profile;
   const evidence: ProfileEvidence[] = [...(context?.profileEvidence ?? [])];
   const message = meaningfulMessage(request.message);
@@ -386,10 +460,13 @@ export function buildConversationalProfile(
         location: inferLocation(message),
         experienceLevel: explicitExperienceLevel(message),
         skills: skillsFromMessage,
-        interests: messageProfile?.interests ?? [],
+        interests: unique([
+          ...(messageProfile?.interests ?? []),
+          ...interestsFromText(message),
+        ]),
         goals: messageProfile?.goals ?? [],
-        education: /\b(student|university|college|degree|bachelor|master)\b/i.test(message)
-          ? [message.match(/[^.!?]*(?:student|university|college|degree|bachelor|master)[^.!?]*/i)?.[0]?.trim() ?? ""].filter(Boolean)
+        education: /\b(studying|study at|university|college|degree|bachelor|master|bsc|msc|phd)\b/i.test(message)
+          ? [message.match(/[^.!?]*(?:studying|study at|university|college|degree|bachelor|master|bsc|msc|phd)[^.!?]*/i)?.[0]?.trim() ?? ""].filter(Boolean)
           : [],
         workHistory: unique([
           ...(messageProfile?.workHistory ?? []),
@@ -465,15 +542,23 @@ export function buildConversationalProfile(
   }
 
   const categories = unique([
+    ...(context?.filters?.categories ?? []),
     ...(request.filters.categories ?? []),
     ...categoriesFromText(request.message ?? ""),
   ]) as OpportunityCategory[];
   const filters: RecommendationFilters = {
+    ...(context?.filters ?? {}),
     ...request.filters,
     categories: categories.length ? categories : request.filters.categories,
+    location:
+      request.filters.location ??
+      inferPreferredLocation(request.message ?? "") ??
+      context?.filters?.location,
     remote:
       request.filters.remote ??
-      (/\bremote\b/i.test(request.message ?? "") ? true : undefined),
+      (/\bremote\b/i.test(request.message ?? "")
+        ? true
+        : context?.filters?.remote),
   };
 
   if (
@@ -492,14 +577,15 @@ export function buildConversationalProfile(
   return {
     profile,
     filters,
-    evidence,
+    evidence: enrichEvidence(evidence, profile),
     missingInformation,
     unknownFields,
     completenessScore: completenessScore(profile, filters),
     sufficient: missingInformation.every((item) => !item.required),
     profileSource:
       context?.profileSource ??
-      (request.resumeText ? "resume" : message ? "background" : undefined),
+      request.intakeRoute ??
+      (request.resumeText ? "resume" : message ? "request" : undefined),
   };
 }
 
@@ -511,13 +597,22 @@ export function buildContinuationContext(
   updates: Partial<
     Pick<
       CompanionContext,
-      "profileConfirmed" | "profileSource" | "awaitingProfileConfirmation"
+      | "profileConfirmed"
+      | "profileSource"
+      | "awaitingProfileConfirmation"
+      | "service"
+      | "operation"
+      | "stage"
+      | "unansweredQuestions"
+      | "documentReferences"
+      | "consent"
+      | "filters"
     >
   > = {},
 ): CompanionContext {
   return {
     profile,
-    profileEvidence: evidence.slice(-40),
+    profileEvidence: evidence.slice(-80),
     selectedOpportunityId:
       selectedOpportunityId ?? context?.selectedOpportunityId,
     profileConfirmed: updates.profileConfirmed ?? context?.profileConfirmed ?? false,
@@ -527,6 +622,15 @@ export function buildContinuationContext(
       (updates.profileConfirmed || context?.profileConfirmed
         ? false
         : context?.awaitingProfileConfirmation),
-    sessionVersion: "1",
+    service: updates.service ?? context?.service,
+    operation: updates.operation ?? context?.operation,
+    stage: updates.stage ?? context?.stage,
+    unansweredQuestions:
+      updates.unansweredQuestions ?? context?.unansweredQuestions ?? [],
+    documentReferences:
+      updates.documentReferences ?? context?.documentReferences ?? [],
+    consent: updates.consent ?? context?.consent,
+    filters: updates.filters ?? context?.filters,
+    sessionVersion: "2",
   };
 }

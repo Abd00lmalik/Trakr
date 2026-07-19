@@ -1,20 +1,21 @@
 import { NextResponse } from "next/server";
+import { opportunitySourceRegistry } from "@/lib/opportunities/source-registry";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   return NextResponse.json({
     service: "trakr",
-    version: "0.2.0",
+    version: "0.3.0",
     type: "A2MCP",
     description:
-      "AI-powered Opportunity Companion for ranked, explainable opportunity recommendations.",
+      "Outcome-first AI Opportunity Companion with three user-facing services and one additive A2MCP endpoint.",
     endpoints: {
       recommend: {
         method: "POST",
         path: "/api/a2mcp/recommend",
         description:
-          "Accepts a structured profile, resume text, natural-language background, or caller-scoped continuation context. Returns conversational guidance, ranked opportunities, explanations, readiness analysis, and grounded resume intelligence.",
+          "Accepts explicit operations, structured profile data, resume text, natural-language requests, or an opaque caller-carried continuation reference. Existing legacy structured recommendation requests remain supported.",
       },
       health: {
         method: "GET",
@@ -45,6 +46,28 @@ export async function GET() {
     ],
     actions: ["Apply Now", "Prepare First", "Skip"],
     aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
+    services: [
+      {
+        id: "opportunity_finding",
+        label: "Opportunity Finding",
+        operation: "discover",
+        status: "available",
+        intakeRoutes: ["resume", "background", "request"],
+      },
+      {
+        id: "resume_benchmarking_optimization",
+        label: "Resume Benchmarking & Optimization",
+        operations: ["benchmark", "optimize"],
+        status: "service_selection_and_legacy_compatibility",
+      },
+      {
+        id: "resume_generation",
+        label: "Resume Generation",
+        operation: "generate_resume",
+        status: "service_selection_only_until_phase_3",
+      },
+    ],
+    operations: ["auto", "discover", "benchmark", "optimize", "generate_resume"],
     inputModes: [
       "structured_profile",
       "profile_alias",
@@ -54,6 +77,9 @@ export async function GET() {
       "continuation_alias",
     ],
     conversationalStates: [
+      "choose_service",
+      "service_pending",
+      "consent_required",
       "choose_profile_source",
       "awaiting_resume",
       "collecting_background",
@@ -71,8 +97,8 @@ export async function GET() {
       "opportunity matching and explanation",
       "eligibility and skill-gap analysis",
       "opportunity readiness assessment",
-      "ATS and resume benchmarking",
-      "grounded role-specific resume optimization",
+      "resume benchmarking and optimization compatibility path",
+      "resume generation service selection",
     ],
     futureBilling: {
       compatibleWith: "x402",
@@ -83,11 +109,7 @@ export async function GET() {
       responseMode: "HTTP 200 JSON for Phase 1",
       paymentRequired: false,
     },
-    dataSources: [
-      "Devpost API",
-      "RemoteOK API with quality filters",
-      "Official curated source import",
-    ],
+    dataSources: opportunitySourceRegistry,
     qualityControls: [
       "low-information listings are filtered or penalized",
       "ranking combines category, skill, experience, location, quality, deadline, and expected value",
@@ -97,6 +119,13 @@ export async function GET() {
       "resume optimization never fabricates jobs, degrees, projects, metrics, certifications, or skills",
       "conversation continuation context is caller-scoped and not stored as shared user memory",
       "raw AI provider errors are never returned to callers",
+      "DoraHacks and Encode Club are explore-only until a documented API, feed, partnership, or permissioned ingestion path is approved",
     ],
+    requestHeaders: {
+      "Idempotency-Key":
+        "Optional caller key for replay-safe requests within the deployment window.",
+      "X-Request-Id":
+        "Optional caller correlation value; response always includes X-Request-Id.",
+    },
   });
 }
