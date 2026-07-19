@@ -47,11 +47,16 @@ export async function GET() {
     aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
     inputModes: [
       "structured_profile",
+      "profile_alias",
       "resume_text",
       "natural_language",
       "continuation_context",
+      "continuation_alias",
     ],
     conversationalStates: [
+      "choose_profile_source",
+      "awaiting_resume",
+      "collecting_background",
       "needs_more_information",
       "profile_confirmation",
       "recommendations",
@@ -62,6 +67,7 @@ export async function GET() {
     ],
     capabilities: [
       "profile building without a resume",
+      "session-scoped profile evidence with explicit, inferred, and unknown facts",
       "opportunity matching and explanation",
       "eligibility and skill-gap analysis",
       "opportunity readiness assessment",

@@ -1,5 +1,8 @@
 import mammoth from "mammoth";
-import type { StructuredUserProfile } from "@/lib/types/opportunities";
+import type {
+  ProfileEvidence,
+  StructuredUserProfile,
+} from "@/lib/types/opportunities";
 
 const knownSkills = [
   "React",
@@ -49,7 +52,14 @@ const roleSignals = [
 ];
 
 function normalizeWhitespace(text: string) {
-  return text.replace(/\s+/g, " ").trim();
+  return text
+    .replace(/\r\n?/g, "\n")
+    .replace(/\t/g, " ")
+    .split("\n")
+    .map((line) => line.replace(/[ ]{2,}/g, " ").trim())
+    .filter(Boolean)
+    .join("\n")
+    .trim();
 }
 
 function findSkillIndex(text: string, skill: string) {
@@ -92,15 +102,9 @@ function inferExperienceLevel(
   text: string,
 ): StructuredUserProfile["experienceLevel"] {
   const lower = text.toLowerCase();
-  if (/\b(founder|co-founder|startup owner)\b/.test(lower)) {
-    return "founder";
-  }
-  if (/\b(creator|content creator|video creator)\b/.test(lower)) {
-    return "creator";
-  }
-  if (/\b(senior|staff|principal|lead engineer)\b/.test(lower)) {
-    return "senior";
-  }
+  if (/\b(founder|co-founder|startup owner)\b/.test(lower)) return "founder";
+  if (/\b(creator|content creator|video creator)\b/.test(lower)) return "creator";
+  if (/\b(senior|staff|principal|lead engineer)\b/.test(lower)) return "senior";
   if (/\b(student|undergraduate|university|college)\b/.test(lower)) {
     return "student";
   }
@@ -110,7 +114,7 @@ function inferExperienceLevel(
   if (/\b(intern|internship|junior|graduate|early career)\b/.test(lower)) {
     return "early-career";
   }
-  return "early-career";
+  return undefined;
 }
 
 function inferGoals(text: string) {
@@ -137,6 +141,101 @@ function inferLinks(text: string) {
   ].slice(0, 8);
 }
 
+function extractLabeledBlock(text: string, label: string, nextLabels: string[]) {
+  const lines = text.split("\n");
+  const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const headingPattern = new RegExp(`^${escapedLabel}\\s*:?(?:\\s+(.*))?$`, "i");
+  const nextHeadingPattern = new RegExp(
+    `^(?:${nextLabels
+      .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|")})\\s*:?(?:\\s+.*)?$`,
+    "i",
+  );
+  const startIndex = lines.findIndex((line) => headingPattern.test(line.trim()));
+  if (startIndex >= 0) {
+    const headingMatch = headingPattern.exec(lines[startIndex].trim());
+    const entries = headingMatch?.[1] ? [headingMatch[1]] : [];
+    for (let index = startIndex + 1; index < lines.length; index += 1) {
+      const line = lines[index].trim();
+      if (nextHeadingPattern.test(line)) break;
+      entries.push(line);
+    }
+    const block = entries.filter(Boolean).join("\n").trim();
+    if (block) return block;
+  }
+
+  const next = nextLabels
+    .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  const pattern = new RegExp(
+    `(?:^|\\n|\\s)${escapedLabel}\\s*:\\s*([\\s\\S]*?)(?=\\n\\s*(?:${next})\\s*:|\\s+(?:${next})\\s*:|$)`,
+    "i",
+  );
+  return pattern.exec(text)?.[1]?.trim() ?? "";
+}
+
+function extractSkills(block: string, text: string) {
+  const explicitSkills = block
+    .split(/\n|,|;|\||•|·/)
+    .map((entry) =>
+      entry
+        .replace(/^[-*]\s*/, "")
+        .replace(/^(?:languages|frameworks|tools|technologies)\s*:\s*/i, "")
+        .trim(),
+    )
+    .filter(
+      (entry) =>
+        entry.length >= 1 &&
+        entry.length <= 60 &&
+        !/^(?:skills?|technical skills?)$/i.test(entry),
+    );
+  return [
+    ...new Set([
+      ...inferSkills(block || text),
+      ...explicitSkills,
+      ...inferSkills(text),
+    ]),
+  ].slice(0, 40);
+}
+
+function extractEntries(block: string) {
+  if (!block) return [];
+  const entries = block
+    .split(/\n|(?<=\.)\s+(?=[-*])/)
+    .map((entry) => entry.replace(/^[-*]\s*/, "").trim())
+    .filter(Boolean);
+  return entries.length ? entries.slice(0, 12) : [block];
+}
+
+function inferLocation(text: string) {
+  const labeled = extractLabeledBlock(text, "Location", [
+    "Summary",
+    "Skills",
+    "Experience",
+    "Projects",
+    "Education",
+    "Certifications",
+  ]);
+  if (labeled) return labeled.split("\n")[0].trim();
+
+  const match = text.match(
+    /\b(?:based in|located in|living in|from)\s+([A-Z][A-Za-z .'-]{2,60})(?=[,.;]|\s+(?:and|with|seeking|open|looking)\b|$)/i,
+  );
+  return match?.[1]?.trim();
+}
+
+function inferName(text: string) {
+  const firstLine = text.split("\n")[0]?.trim() ?? "";
+  if (
+    firstLine &&
+    firstLine.length <= 80 &&
+    /^[A-Za-z][A-Za-z .'-]+$/.test(firstLine) &&
+    !roleSignals.some((role) => firstLine.toLowerCase().includes(role))
+  ) {
+    return firstLine;
+  }
+}
+
 function inferHeadline(text: string, skills: string[]) {
   const lower = text.toLowerCase();
   const role = roleSignals.find((signal) => lower.includes(signal));
@@ -154,28 +253,156 @@ function inferHeadline(text: string, skills: string[]) {
 
 function buildSummary(text: string) {
   const sentences = text
-    .split(/(?<=[.!?])\s+/)
+    .split(/(?<=[.!?])\s+|\n+/)
     .map((sentence) => sentence.trim())
     .filter((sentence) => sentence.length >= 24);
   const summary = sentences.slice(0, 3).join(" ");
   return (summary || text).slice(0, 480);
 }
 
-export function buildProfileDraftFromText(text: string): StructuredUserProfile {
-  const cleaned = normalizeWhitespace(text);
-  const skills = inferSkills(cleaned);
+export type ProfileExtraction = {
+  profile: StructuredUserProfile;
+  evidence: ProfileEvidence[];
+};
 
-  return {
-    headline: inferHeadline(cleaned, skills),
+export function extractProfileFromText(
+  text: string,
+  origin: "resume" | "user" = "resume",
+): ProfileExtraction {
+  const cleaned = normalizeWhitespace(text);
+  const allSkills = inferSkills(cleaned);
+  const skillsBlock = extractLabeledBlock(cleaned, "Skills", [
+    "Summary",
+    "Experience",
+    "Projects",
+    "Education",
+    "Certifications",
+    "Location",
+  ]);
+  const projects = extractEntries(
+    extractLabeledBlock(cleaned, "Projects", [
+      "Summary",
+      "Skills",
+      "Experience",
+      "Education",
+      "Certifications",
+      "Location",
+    ]),
+  );
+  const workHistory = extractEntries(
+    extractLabeledBlock(cleaned, "Experience", [
+      "Summary",
+      "Skills",
+      "Projects",
+      "Education",
+      "Certifications",
+      "Location",
+    ]),
+  );
+  const education = extractEntries(
+    extractLabeledBlock(cleaned, "Education", [
+      "Summary",
+      "Skills",
+      "Experience",
+      "Projects",
+      "Certifications",
+      "Location",
+    ]),
+  );
+  const certifications = extractEntries(
+    extractLabeledBlock(cleaned, "Certifications", [
+      "Summary",
+      "Skills",
+      "Experience",
+      "Projects",
+      "Education",
+      "Location",
+    ]),
+  );
+  const profile: StructuredUserProfile = {
+    name: inferName(cleaned),
+    headline: inferHeadline(cleaned, allSkills),
     bio: buildSummary(cleaned),
+    location: inferLocation(cleaned),
     experienceLevel: inferExperienceLevel(cleaned),
-    skills,
+    skills: extractSkills(skillsBlock, cleaned),
     interests: inferInterests(cleaned),
     goals: inferGoals(cleaned),
-    education: [],
-    workHistory: [],
+    education,
+    workHistory,
+    projects,
+    certifications,
     links: inferLinks(cleaned),
   };
+
+  const explicitEvidenceFields = [
+    "name",
+    "location",
+    "skills",
+    "education",
+    "workHistory",
+    "projects",
+    "certifications",
+    "links",
+  ];
+  const evidence: ProfileEvidence[] = explicitEvidenceFields
+    .filter((field) => {
+      const value = profile[field as keyof StructuredUserProfile];
+      return Array.isArray(value) ? value.length > 0 : Boolean(value);
+    })
+    .map((field) => ({
+      field,
+      source: "explicit" as const,
+      origin,
+      evidence: `Extracted from supplied ${origin === "resume" ? "resume text" : "user background"}.`,
+    }));
+
+  for (const [field, value, detail] of [
+    [
+      "bio",
+      profile.bio,
+      "Summarized from supplied text without adding new facts.",
+    ],
+    [
+      "headline",
+      profile.headline,
+      "Inferred from role and skill language in supplied text.",
+    ],
+    [
+      "experienceLevel",
+      profile.experienceLevel,
+      "Inferred from seniority, student, or experience language.",
+    ],
+    [
+      "interests",
+      profile.interests.length ? profile.interests : undefined,
+      "Inferred from opportunity and domain language in supplied text.",
+    ],
+    [
+      "goals",
+      profile.goals.length ? profile.goals : undefined,
+      "Inferred from stated opportunity preferences in supplied text.",
+    ],
+  ] as const) {
+    if (value) {
+      evidence.push({
+        field,
+        source: "inferred",
+        origin: "inference",
+        evidence: detail,
+      });
+    }
+  }
+
+  return { profile, evidence };
+}
+
+export function buildProfileDraftFromText(text: string): StructuredUserProfile {
+  return extractProfileFromText(text).profile;
+}
+
+export function buildProfileDraftFromBackground(text: string) {
+  return extractProfileFromText(text, "user");
 }
 
 export async function parseResumeFile(file: File) {

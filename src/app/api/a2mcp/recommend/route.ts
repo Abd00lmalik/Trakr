@@ -50,9 +50,24 @@ function hasConversationalFields(payload: unknown) {
   }
 
   const record = payload as Record<string, unknown>;
-  return ["message", "intent", "context", "target"].some((field) =>
+  return ["message", "intent", "context", "continuation", "target"].some((field) =>
     Object.prototype.hasOwnProperty.call(record, field),
   );
+}
+
+function normalizePayload(payload: unknown) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const normalized = { ...(payload as Record<string, unknown>) };
+  if (!normalized.user && normalized.profile) {
+    normalized.user = normalized.profile;
+  }
+  if (!normalized.context && normalized.continuation) {
+    normalized.context = normalized.continuation;
+  }
+  return normalized;
 }
 
 export async function POST(request: Request) {
@@ -92,7 +107,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const parsed = opportunityCompanionRequestSchema.safeParse(payload);
+  const normalizedPayload = normalizePayload(payload);
+  const parsed = opportunityCompanionRequestSchema.safeParse(normalizedPayload);
   if (!parsed.success) {
     return json(
       {
@@ -106,9 +122,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const legacyRequest = hasConversationalFields(payload)
+    const legacyRequest = hasConversationalFields(normalizedPayload)
       ? null
-      : recommendationRequestSchema.safeParse(payload);
+      : recommendationRequestSchema.safeParse(normalizedPayload);
     const response = legacyRequest?.success
       ? await generateRecommendations(legacyRequest.data)
       : await handleOpportunityCompanionRequest(parsed.data);

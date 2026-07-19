@@ -10,16 +10,116 @@ import {
 import { generateRecommendations } from "../src/lib/recommendation/service";
 import { POST } from "../src/app/api/a2mcp/recommend/route";
 
-test("vague requests return a conversational missing-information state", async () => {
+test("profileless first contact offers resume and background paths", async () => {
   const request = opportunityCompanionRequestSchema.parse({
     message: "I want opportunities.",
   });
   const response = await handleOpportunityCompanionRequest(request);
 
   assert.doesNotThrow(() => opportunityCompanionResponseSchema.parse(response));
-  assert.equal(response.conversation?.state, "needs_more_information");
+  assert.equal(response.conversation?.state, "choose_profile_source");
   assert.equal(response.recommendations.length, 0);
   assert.match(response.conversation?.message ?? "", /do not need a resume/i);
+  assert.deepEqual(
+    response.conversation?.choices?.map((choice) => choice.id),
+    ["resume", "background"],
+  );
+});
+
+test("source choice continues into background collection without requiring a resume", async () => {
+  const initial = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message:
+        "I want to use Agent #5198, the Opportunity Matching API, through its A2MCP endpoint.",
+    }),
+  );
+  assert.equal(initial.conversation?.state, "choose_profile_source");
+
+  const collecting = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "2",
+      continuation: initial.conversation?.continuation,
+    }),
+  );
+  assert.equal(collecting.conversation?.state, "collecting_background");
+  assert.equal(collecting.conversation?.requiredAction, "provide_background");
+
+  const matched = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message:
+        "I am a Nigerian computer science student. I use React, TypeScript, Python, and Solidity. I have built two small web apps and want remote AI and Web3 hackathons or internships.",
+      continuation: collecting.conversation?.continuation,
+    }),
+  );
+  assert.equal(matched.conversation?.state, "recommendations");
+  assert.ok(matched.recommendations.length > 0);
+});
+
+test("resume path preserves extracted evidence and continues within the session", async () => {
+  const initial = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Use the Opportunity Matching API from Agent #5198.",
+    }),
+  );
+  const awaitingResume = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "1",
+      continuation: initial.conversation?.continuation,
+    }),
+  );
+  assert.equal(awaitingResume.conversation?.state, "awaiting_resume");
+
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      resumeText: `Amina Yusuf
+Frontend Developer
+Location: Lagos, Nigeria
+Skills: React, TypeScript, Python, Solidity
+Experience: Built and maintained a React dashboard for 2,500 users.
+Projects: Created an open-source Web3 opportunity tracker with API ingestion.
+Education: Computer Science student at University of Lagos.
+Goals: Seeking remote AI and Web3 internships and hackathons.`,
+      continuation: awaitingResume.conversation?.continuation,
+    }),
+  );
+
+  assert.equal(response.conversation?.state, "recommendations");
+  assert.equal(response.conversation?.continuation.profileSource, "resume");
+  assert.ok(response.conversation?.profile.draft.projects.length);
+  assert.equal(
+    response.conversation?.profile.evidence.find(
+      (item) => item.field === "projects",
+    )?.origin,
+    "resume",
+  );
+  const headlineEvidence = response.conversation?.profile.evidence.find(
+    (item) => item.field === "headline" && item.origin === "inference",
+  );
+  assert.equal(headlineEvidence?.source, "inferred");
+
+  const followUp = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "What am I missing for the top opportunity?",
+      continuation: response.conversation?.continuation,
+    }),
+  );
+  assert.equal(
+    followUp.conversation?.profile.evidence.find(
+      (item) => item.field === "headline" && item.origin === "inference",
+    )?.source,
+    "inferred",
+  );
+});
+
+test("minimal student input asks for gates instead of making weak recommendations", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "I am a student interested in AI and Web3.",
+    }),
+  );
+
+  assert.equal(response.conversation?.state, "needs_more_information");
+  assert.equal(response.recommendations.length, 0);
   assert.ok(
     response.conversation?.missingInformation.some(
       (item) => item.field === "skills" && item.required,
@@ -27,7 +127,7 @@ test("vague requests return a conversational missing-information state", async (
   );
   assert.ok(
     response.conversation?.missingInformation.some(
-      (item) => item.field === "experienceLevel" && item.required,
+      (item) => item.field === "goals" && item.required,
     ),
   );
 });
@@ -64,6 +164,21 @@ test("natural-language background builds a grounded profile and recommendations"
         typeof item.confidenceScore === "number" &&
         Boolean(item.guidanceAction),
     ),
+  );
+});
+
+test("natural skill phrasing ending in experience clears the skill gate", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message:
+        "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
+    }),
+  );
+
+  assert.equal(response.conversation?.state, "recommendations");
+  assert.deepEqual(
+    response.conversation?.profile.draft.skills.slice(0, 4),
+    ["React", "TypeScript", "Python", "Solidity"],
   );
 });
 
@@ -229,4 +344,93 @@ test("mixed structured and conversational input does not ignore the requested in
   assert.equal(response.status, 200);
   assert.equal(body.conversation?.state, "resume_optimization");
   assert.ok(body.capabilityResult?.resumeOptimization);
+});
+
+test("profile and continuation aliases remain compatible at the API boundary", async () => {
+  const legacyAlias = await POST(
+    new Request("http://localhost/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        profile: {
+          headline: "Frontend developer",
+          experienceLevel: "early-career",
+          location: "Nigeria",
+          skills: ["React", "TypeScript"],
+          interests: ["Web3"],
+          goals: ["Find a remote role"],
+          education: [],
+          workHistory: [],
+          projects: [],
+          certifications: [],
+          links: [],
+        },
+        filters: { remote: true, limit: 2 },
+      }),
+    }),
+  );
+  const legacyBody = await legacyAlias.json();
+  assert.equal(legacyAlias.status, 200);
+  assert.equal("conversation" in legacyBody, false);
+  assert.ok(Array.isArray(legacyBody.recommendations));
+
+  const initial = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message:
+        "I am a Nigerian student with React, TypeScript, Python, and Solidity skills looking for remote AI and Web3 opportunities.",
+    }),
+  );
+  const continuationAlias = await POST(
+    new Request("http://localhost/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Why is this a good fit?",
+        continuation: initial.conversation?.continuation,
+      }),
+    }),
+  );
+  const continuationBody = await continuationAlias.json();
+  assert.equal(continuationAlias.status, 200);
+  assert.equal(continuationBody.conversation?.state, "explanation");
+});
+
+test("profile confirmation and corrections preserve session facts", async () => {
+  const draft = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      intent: "profile_build",
+      message:
+        "I am an early career frontend developer in Nigeria. I know React and TypeScript. I want a remote frontend job.",
+    }),
+  );
+  assert.equal(draft.conversation?.state, "profile_confirmation");
+  const originalBio = draft.conversation?.profile.draft.bio;
+
+  const confirmed = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Yes, looks good.",
+      continuation: draft.conversation?.continuation,
+    }),
+  );
+  assert.equal(confirmed.conversation?.state, "recommendations");
+  assert.equal(confirmed.conversation?.profile.draft.bio, originalBio);
+  assert.equal(confirmed.conversation?.continuation.profileConfirmed, true);
+  assert.equal(
+    confirmed.conversation?.continuation.awaitingProfileConfirmation,
+    false,
+  );
+
+  const corrected = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message:
+        "I am now based in Ghana and I am a mid-level frontend developer.",
+      continuation: confirmed.conversation?.continuation,
+    }),
+  );
+  assert.equal(corrected.conversation?.profile.draft.location, "Ghana");
+  assert.equal(
+    corrected.conversation?.profile.draft.experienceLevel,
+    "mid-level",
+  );
+  assert.ok(corrected.conversation?.profile.draft.skills.includes("React"));
 });

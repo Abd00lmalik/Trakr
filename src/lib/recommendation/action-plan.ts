@@ -37,6 +37,14 @@ export function buildNextSteps(candidate: ScoredOpportunity) {
 }
 
 export function buildActionPlan(recommendations: Recommendation[]) {
+  if (!recommendations.length) {
+    return {
+      immediate: [],
+      sevenDayPlan: [],
+      thirtyDayPlan: [],
+    };
+  }
+
   const applyNow = recommendations.filter((item) => item.recommendedAction === "Apply Now");
   const prepare = recommendations.filter((item) => item.recommendedAction === "Prepare First");
 
@@ -64,6 +72,14 @@ export function buildActionPlan(recommendations: Recommendation[]) {
 }
 
 export function buildLearningRoadmap(recommendations: Recommendation[]) {
+  if (!recommendations.length) {
+    return {
+      focusAreas: [],
+      resourcesToFind: [],
+      practiceProjects: [],
+    };
+  }
+
   const missing = recommendations.flatMap((item) => item.missingRequirements);
   const uniqueMissing = [...new Set(missing)].slice(0, 6);
   const topCategories = [...new Set(recommendations.map((item) => item.opportunity.category))].slice(0, 3);

@@ -49,3 +49,25 @@ Trakr ranks real, stored opportunities before calling Gemini. AI enhancement may
 ## ADR 012: Official Curated Catalog as Quality Floor
 
 Structured ingestion remains important, but Phase 1 requires reliable recommendations even when third-party feeds are unavailable or sparse. Trakr keeps an official curated catalog with verified source URLs across Web3, AI/data, cybersecurity, creator, founder, student, open-source, and developer programs. This catalog acts as the minimum quality floor and database fallback.
+
+## ADR 013: Session-Scoped Profiles, Not Permanent User Records
+
+Trakr treats every new ASP interaction as a fresh profile-building session. The caller carries the returned continuation context between requests; Trakr does not require a permanently stored personal profile. Continuation preserves supplied facts, evidence provenance, selected opportunity context, and confirmation state for the current conversation only.
+
+Profile evidence distinguishes explicit facts, reasonable inferences, and unknown fields. A fact does not become explicit merely because it passed through continuation context.
+
+## ADR 014: Deterministic Gates Around AI Reasoning
+
+AI may extract, summarize, and explain, but deterministic logic owns minimum profile gates, verified opportunity records, hard role-family mismatches, score bounds, and action eligibility. AI enhancement may demote a recommendation but cannot promote it above the deterministic action or score.
+
+If generated reasoning says an opportunity is unrelated or a poor fit, consistency enforcement lowers or removes that recommendation and rebuilds the action plan from the remaining ranked results.
+
+## ADR 015: Capability Milestone Sequence
+
+Trakr capabilities share one session profile, evidence model, opportunity record, and target-opportunity context.
+
+1. Foundation: session profile building, resume evidence extraction, minimum-information gates, continuation, matching consistency, and backward compatibility.
+2. Decision support: readiness analysis, skill-gap analysis, application action plans, and profile/resume benchmarking.
+3. Application materials: ATS analysis, role-specific resume optimization, and resume generation grounded only in confirmed evidence and the selected opportunity.
+
+The website and ASP should call the same capability services. External agents receive structured conversational state and operations through the existing additive A2MCP contract.

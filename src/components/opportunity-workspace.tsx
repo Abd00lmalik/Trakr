@@ -56,6 +56,8 @@ const emptyProfile: StructuredUserProfile = {
   goals: [],
   education: [],
   workHistory: [],
+  projects: [],
+  certifications: [],
   links: [],
 };
 
@@ -81,6 +83,8 @@ function normalizeProfile(profile: StructuredUserProfile) {
     goals: profile.goals ?? [],
     education: profile.education ?? [],
     workHistory: profile.workHistory ?? [],
+    projects: profile.projects ?? [],
+    certifications: profile.certifications ?? [],
     links: profile.links ?? [],
   };
 }

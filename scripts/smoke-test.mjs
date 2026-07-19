@@ -219,19 +219,40 @@ try {
     throw new Error("Recommendation response leaked raw AI provider details.");
   }
 
-  const vagueConversation = await requestJson("/api/a2mcp/recommend", {
+  const profilelessConversation = await requestJson("/api/a2mcp/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ message: "I want opportunities." }),
   });
   if (
-    !vagueConversation.response.ok ||
-    vagueConversation.body?.conversation?.state !== "needs_more_information" ||
-    !vagueConversation.body?.conversation?.missingInformation?.length
+    !profilelessConversation.response.ok ||
+    profilelessConversation.body?.conversation?.state !==
+      "choose_profile_source" ||
+    profilelessConversation.body?.conversation?.choices?.length !== 2
   ) {
     throw new Error(
-      `Vague conversational request did not ask for missing information: ${JSON.stringify(
-        vagueConversation.body,
+      `Profileless conversational request did not offer both profile paths: ${JSON.stringify(
+        profilelessConversation.body,
+      )}`,
+    );
+  }
+
+  const backgroundChoice = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "2",
+      continuation:
+        profilelessConversation.body?.conversation?.continuation,
+    }),
+  });
+  if (
+    !backgroundChoice.response.ok ||
+    backgroundChoice.body?.conversation?.state !== "collecting_background"
+  ) {
+    throw new Error(
+      `Background source choice did not continue correctly: ${JSON.stringify(
+        backgroundChoice.body,
       )}`,
     );
   }
@@ -275,7 +296,7 @@ try {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       message: "Why did you recommend this?",
-      context: continuation,
+      continuation,
     }),
   });
   if (
@@ -335,6 +356,10 @@ try {
         topRecommendation: recommendation.body.recommendations[0].opportunity.title,
         conversationalState:
           conversationalRecommendation.body.conversation.state,
+        onboardingStates: [
+          profilelessConversation.body.conversation.state,
+          backgroundChoice.body.conversation.state,
+        ],
         followUpStates: [
           explanation.body.conversation.state,
           readiness.body.conversation.state,

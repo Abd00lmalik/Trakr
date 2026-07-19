@@ -65,6 +65,11 @@ function evidenceAssessment(profile: StructuredUserProfile) {
   } else {
     results.push("No work history evidence was provided.");
   }
+  if (profile.projects.length) {
+    results.push("Project evidence is present.");
+  } else {
+    results.push("No project evidence was provided.");
+  }
   if (profile.links.length) {
     results.push("Portfolio or public proof links are present.");
   } else {
@@ -168,7 +173,9 @@ export function buildResumeBenchmark(
     profile.bio ?? "",
     ...profile.skills,
     ...profile.workHistory,
+    ...profile.projects,
     ...profile.education,
+    ...profile.certifications,
   ]);
   const matchedKeywords = targetKeywords.filter((keyword) =>
     profileKeywords.some(
@@ -182,8 +189,10 @@ export function buildResumeBenchmark(
   );
   const evidenceScore =
     (profile.workHistory.length ? 15 : 0) +
+    (profile.projects.length ? 10 : 0) +
     (profile.links.length ? 10 : 0) +
-    (profile.education.length ? 5 : 0);
+    (profile.education.length ? 5 : 0) +
+    (profile.certifications.length ? 5 : 0);
   const coverage = targetKeywords.length
     ? matchedKeywords.length / targetKeywords.length
     : Math.min(profile.skills.length / 5, 1);
@@ -202,6 +211,9 @@ export function buildResumeBenchmark(
         ? `Relevant skills are available to prioritize: ${profile.skills.slice(0, 6).join(", ")}.`
         : "",
       profile.links.length ? "Public proof links can support the application." : "",
+      profile.projects.length
+        ? "Project evidence can support capability claims."
+        : "",
     ].filter(Boolean),
     concerns: [
       !profile.workHistory.length
@@ -260,8 +272,9 @@ export function buildResumeOptimization(
     optimizedHeadline: `${identity} | ${target}`,
     professionalSummary,
     skillsOrder,
-    experienceGuidance: profile.workHistory.length
-      ? profile.workHistory.map(
+    experienceGuidance:
+      profile.workHistory.length || profile.projects.length
+      ? [...profile.workHistory, ...profile.projects].map(
           (entry) =>
             `Keep this experience factual, then lead with the most relevant action, evidence, and outcome: ${entry}`,
         )

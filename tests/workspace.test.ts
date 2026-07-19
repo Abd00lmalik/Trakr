@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   buildProfileDraftFromText,
+  extractProfileFromText,
   parseResumeFile,
 } from "../src/lib/resume/parser";
 
@@ -41,6 +42,48 @@ test("skill detection does not match short skills inside unrelated words", () =>
   );
 
   assert.ok(!profile.skills.includes("AI"));
+});
+
+test("resume extraction preserves evidence and separates inference from facts", () => {
+  const parsed = extractProfileFromText(
+    `Amina Yusuf
+Frontend Developer
+Location: Lagos, Nigeria
+
+Skills:
+React, TypeScript, Rust, Solidity
+
+Experience:
+Built a payment dashboard serving 12,000 monthly users.
+
+Projects:
+Open-source grant tracker with 35 contributors and automated API ingestion.
+
+Education:
+BSc Computer Science, University of Lagos
+
+Certifications:
+AWS Certified Cloud Practitioner`,
+  );
+
+  assert.equal(parsed.profile.location, "Lagos, Nigeria");
+  assert.ok(parsed.profile.skills.includes("Rust"));
+  assert.ok(
+    parsed.profile.projects.some((project) => /35 contributors/i.test(project)),
+  );
+  assert.ok(
+    parsed.profile.workHistory.some((entry) => /12,000 monthly users/i.test(entry)),
+  );
+  assert.ok(parsed.profile.education.some((entry) => /BSc Computer Science/i.test(entry)));
+  assert.ok(parsed.profile.certifications.includes("AWS Certified Cloud Practitioner"));
+  assert.equal(
+    parsed.evidence.find((item) => item.field === "skills")?.source,
+    "explicit",
+  );
+  assert.equal(
+    parsed.evidence.find((item) => item.field === "headline")?.source,
+    "inferred",
+  );
 });
 
 test("workspace includes the complete milestone journey", async () => {

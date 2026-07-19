@@ -38,6 +38,11 @@ export async function GET() {
                   type: "object",
                   properties: {
                     user: { type: "object" },
+                    profile: {
+                      type: "object",
+                      description:
+                        "Additive alias for user. Existing user requests remain supported.",
+                    },
                     resumeText: { type: "string" },
                     message: {
                       type: "string",
@@ -62,6 +67,11 @@ export async function GET() {
                       description:
                         "Caller-scoped continuation context returned by a previous response. Trakr does not keep shared in-memory user profiles.",
                     },
+                    continuation: {
+                      type: "object",
+                      description:
+                        "Additive alias for context. Send back the caller-scoped continuation returned by the previous response.",
+                    },
                     target: {
                       type: "object",
                       properties: {
@@ -81,6 +91,8 @@ export async function GET() {
                     { required: ["resumeText"] },
                     { required: ["message"] },
                     { required: ["context"] },
+                    { required: ["profile"] },
+                    { required: ["continuation"] },
                   ],
                 },
               },
@@ -210,6 +222,9 @@ export async function GET() {
                           state: {
                             type: "string",
                             enum: [
+                              "choose_profile_source",
+                              "awaiting_resume",
+                              "collecting_background",
                               "needs_more_information",
                               "profile_confirmation",
                               "ready_to_recommend",
@@ -231,6 +246,18 @@ export async function GET() {
                             items: { type: "string" },
                           },
                           continuation: { type: "object" },
+                          requiredAction: { type: "string" },
+                          choices: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                id: { type: "string" },
+                                label: { type: "string" },
+                                description: { type: "string" },
+                              },
+                            },
+                          },
                         },
                       },
                       capabilityResult: {

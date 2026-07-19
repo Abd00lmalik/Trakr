@@ -69,6 +69,8 @@ export const structuredUserProfileSchema = z.object({
   goals: z.array(z.string().min(1)).default([]),
   education: z.array(z.string()).default([]),
   workHistory: z.array(z.string()).default([]),
+  projects: z.array(z.string()).default([]),
+  certifications: z.array(z.string()).default([]),
   links: z.array(z.string().url()).default([]),
 });
 
@@ -82,6 +84,9 @@ export const profileEvidenceSchema = z.object({
   field: z.string(),
   source: profileEvidenceSourceSchema,
   evidence: z.string().optional(),
+  origin: z
+    .enum(["user", "resume", "context", "structured_profile", "inference"])
+    .optional(),
 });
 
 export const recommendationFiltersSchema = z.object({
@@ -127,6 +132,9 @@ export const companionContextSchema = z.object({
   profileEvidence: z.array(profileEvidenceSchema).max(40).default([]),
   selectedOpportunityId: z.string().min(1).max(240).optional(),
   profileConfirmed: z.boolean().default(false),
+  profileSource: z.enum(["resume", "background"]).optional(),
+  awaitingProfileConfirmation: z.boolean().optional(),
+  sessionVersion: z.literal("1").optional(),
 });
 
 export const companionTargetSchema = z.object({
@@ -139,22 +147,26 @@ export const companionTargetSchema = z.object({
 export const opportunityCompanionRequestSchema = z
   .object({
     user: structuredUserProfileSchema.optional(),
+    profile: structuredUserProfileSchema.optional(),
     resumeText: z.string().min(80).max(40000).optional(),
     goals: z.array(z.string().min(1)).optional(),
     interests: z.array(z.string().min(1)).optional(),
     filters: recommendationFiltersSchema.default({}),
     requestId: z.string().optional(),
-    message: z.string().min(2).max(6000).optional(),
+    message: z.string().min(1).max(6000).optional(),
     intent: companionIntentSchema.default("auto"),
     context: companionContextSchema.optional(),
+    continuation: companionContextSchema.optional(),
     target: companionTargetSchema.optional(),
   })
   .superRefine((value, ctx) => {
     if (
       !value.user &&
+      !value.profile &&
       !value.resumeText &&
       !value.message &&
-      !value.context?.profile
+      !value.context?.profile &&
+      !value.continuation?.profile
     ) {
       ctx.addIssue({
         code: "custom",
@@ -201,6 +213,8 @@ export const scoredOpportunitySchema = z.object({
   matchedSignals: z.array(z.string()),
   missingRequirements: z.array(z.string()),
   action: recommendationActionSchema,
+  hardMismatch: z.boolean().optional(),
+  mismatchReasons: z.array(z.string()).optional(),
 });
 
 export const recommendationSchema = z.object({
@@ -247,6 +261,9 @@ export const recommendationResponseSchema = z.object({
 });
 
 export const companionStateSchema = z.enum([
+  "choose_profile_source",
+  "awaiting_resume",
+  "collecting_background",
   "needs_more_information",
   "profile_confirmation",
   "ready_to_recommend",
@@ -279,6 +296,16 @@ export const companionConversationSchema = z.object({
   ),
   nextActions: z.array(z.string()),
   continuation: companionContextSchema,
+  requiredAction: z.string().optional(),
+  choices: z
+    .array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+        description: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 export const opportunityExplanationSchema = z.object({

@@ -400,10 +400,7 @@ function mergeEnhancement(
         return recommendation;
       }
 
-      let recommendedAction =
-        recommendation.recommendedAction === "Apply Now" && enhanced.recommendedAction === "Skip"
-          ? recommendation.recommendedAction
-          : enhanced.recommendedAction;
+      let recommendedAction = enhanced.recommendedAction;
       recommendedAction = enforceApplyNowEligibility(
         recommendation.opportunity,
         recommendedAction,

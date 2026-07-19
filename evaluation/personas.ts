@@ -298,6 +298,8 @@ export const evaluationPersonas: EvaluationPersona[] = archetypes.flatMap(
           goals: [...archetype.goals, variant.goal],
           education: [],
           workHistory: [],
+          projects: [],
+          certifications: [],
           links: [],
         },
         filters: {

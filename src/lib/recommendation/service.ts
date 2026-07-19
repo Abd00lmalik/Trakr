@@ -8,6 +8,7 @@ import {
   buildNextSteps,
   buildRecommendationNarrative,
 } from "@/lib/recommendation/action-plan";
+import { enforceApplyNowEligibility } from "@/lib/opportunities/verification";
 import { logRecommendationRun } from "@/lib/repositories/recommendation-log";
 import type {
   CompanionGuidanceAction,
@@ -107,6 +108,101 @@ function buildDraftResponse(
   };
 }
 
+const negativeFitSignals = [
+  /\bnot (?:a |an )?(?:good |strong )?fit\b/i,
+  /\bpoor fit\b/i,
+  /\bweak match\b/i,
+  /\bunrelated\b/i,
+  /\bdoes not align\b/i,
+  /\bnot currently recommended\b/i,
+  /\bdo not prioritize\b/i,
+];
+
+function actionPriority(action: Recommendation["recommendedAction"]) {
+  if (action === "Apply Now") return 2;
+  if (action === "Prepare First") return 1;
+  return 0;
+}
+
+export function enforceRecommendationConsistency(
+  response: RecommendationResponse,
+  draft: RecommendationResponse,
+) {
+  const draftById = new Map(
+    draft.recommendations.map((recommendation) => [
+      recommendation.opportunity.id,
+      recommendation,
+    ]),
+  );
+
+  const recommendations = response.recommendations
+    .map((recommendation) => {
+      const deterministic =
+        draftById.get(recommendation.opportunity.id) ?? recommendation;
+      const negativeReasoning = negativeFitSignals.some((pattern) =>
+        pattern.test(recommendation.reasoning),
+      );
+      let matchScore = Math.min(
+        recommendation.matchScore,
+        deterministic.matchScore,
+      );
+      let recommendedAction =
+        actionPriority(recommendation.recommendedAction) <=
+        actionPriority(deterministic.recommendedAction)
+          ? recommendation.recommendedAction
+          : deterministic.recommendedAction;
+
+      if (negativeReasoning) {
+        matchScore = Math.min(matchScore, 34);
+        recommendedAction = "Skip";
+      } else if (matchScore < 38) {
+        recommendedAction = "Skip";
+      } else if (
+        recommendedAction === "Apply Now" &&
+        (matchScore < 76 || recommendation.missingRequirements.length > 2)
+      ) {
+        recommendedAction = "Prepare First";
+      }
+
+      recommendedAction = enforceApplyNowEligibility(
+        recommendation.opportunity,
+        recommendedAction,
+      );
+      if (recommendedAction === "Skip") {
+        matchScore = Math.min(matchScore, 34);
+      }
+      const consistentGuidanceAction = guidanceAction(
+        recommendation.opportunity,
+        recommendedAction,
+      );
+
+      return {
+        ...recommendation,
+        matchScore,
+        recommendedAction,
+        guidanceAction: consistentGuidanceAction,
+      };
+    })
+    .filter((recommendation) => recommendation.matchScore >= 35)
+    .sort(
+      (left, right) =>
+        right.matchScore - left.matchScore ||
+        actionPriority(right.recommendedAction) -
+          actionPriority(left.recommendedAction),
+    )
+    .map((recommendation, index) => ({
+      ...recommendation,
+      rank: index + 1,
+    }));
+
+  return {
+    ...response,
+    recommendations,
+    actionPlan: buildActionPlan(recommendations),
+    learningRoadmap: buildLearningRoadmap(recommendations),
+  };
+}
+
 export async function generateRecommendations(
   request: RecommendationRequest,
 ): Promise<RecommendationResponse> {
@@ -165,6 +261,7 @@ export async function generateRecommendations(
       };
     }
   }
+  response = enforceRecommendationConsistency(response, draftResponse);
 
   await logRecommendationRun(request, response, Date.now() - startedAt).catch(
     () => undefined,

@@ -31,6 +31,8 @@ const request: RecommendationRequest = {
     goals: ["Find a fellowship"],
     education: ["Private University"],
     workHistory: [sensitiveValues[4]],
+    projects: [],
+    certifications: [],
     links: [sensitiveValues[3]],
   },
   resumeText: `Confidential resume for ${sensitiveValues.join(" ")}`,

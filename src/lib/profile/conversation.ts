@@ -1,4 +1,7 @@
-import { buildProfileDraftFromText } from "@/lib/resume/parser";
+import {
+  buildProfileDraftFromBackground,
+  extractProfileFromText,
+} from "@/lib/resume/parser";
 import type {
   CompanionContext,
   OpportunityCategory,
@@ -64,6 +67,8 @@ const emptyProfile: StructuredUserProfile = {
   goals: [],
   education: [],
   workHistory: [],
+  projects: [],
+  certifications: [],
   links: [],
 };
 
@@ -78,17 +83,22 @@ function mergeProfiles(
 
   for (const profile of profiles) {
     if (!profile) continue;
-    result.name ??= profile.name;
-    result.headline ??= profile.headline;
-    result.bio ??= profile.bio;
-    result.location ??= profile.location;
-    result.timezone ??= profile.timezone;
-    result.experienceLevel ??= profile.experienceLevel;
+    if (profile.name) result.name = profile.name;
+    if (profile.headline) result.headline = profile.headline;
+    if (profile.bio) result.bio = profile.bio;
+    if (profile.location) result.location = profile.location;
+    if (profile.timezone) result.timezone = profile.timezone;
+    if (profile.experienceLevel) result.experienceLevel = profile.experienceLevel;
     result.skills = unique([...result.skills, ...profile.skills]);
     result.interests = unique([...result.interests, ...profile.interests]);
     result.goals = unique([...result.goals, ...profile.goals]);
     result.education = unique([...result.education, ...profile.education]);
     result.workHistory = unique([...result.workHistory, ...profile.workHistory]);
+    result.projects = unique([...result.projects, ...profile.projects]);
+    result.certifications = unique([
+      ...result.certifications,
+      ...profile.certifications,
+    ]);
     result.links = unique([...result.links, ...profile.links]);
   }
 
@@ -114,7 +124,7 @@ function inferLocation(message: string) {
   }
 
   const match = message.match(
-    /\b(?:from|based in|located in|living in)\s+([A-Z][A-Za-z .'-]{2,50})(?=[,.;]|\s+(?:with|and|who|looking|seeking|interested|want)\b|$)/,
+    /\b(?:from|based in|located in|living in)\s+([A-Z][A-Za-z .'-]{2,50}?)(?=[,.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
   );
   return match?.[1]?.trim();
 }
@@ -151,10 +161,39 @@ function categoriesFromText(message: string) {
 function meaningfulMessage(message: string | undefined) {
   if (!message) return undefined;
   const cleaned = message.trim();
-  if (/^(find|show|get|give)\s+me\s+(some\s+)?opportunities[.!]?$/i.test(cleaned)) {
+  const serviceInvocation =
+    /\b(agent\s*#?\s*5198|opportunity matching api|service type|a2mcp|public service endpoint|use the service)\b/i.test(
+      cleaned,
+    );
+  const personalBackground =
+    /\b(i am|i'm|my (?:skills|background|experience|education|projects?)|i (?:know|use|built|created|developed|studied|worked)|student|developer|designer|engineer|founder|creator)\b/i.test(
+      cleaned,
+    );
+  if (serviceInvocation && !personalBackground) {
+    return undefined;
+  }
+  if (
+    /^(find|show|get|give)\s+me\s+(some\s+)?opportunities[.!]?$/i.test(
+      cleaned,
+    )
+  ) {
     return undefined;
   }
   if (/^i\s+(want|need)\s+opportunities[.!]?$/i.test(cleaned)) {
+    return undefined;
+  }
+  if (
+    /^(1|2|option\s+[12]|resume|cv|background|use my resume or cv|tell trakr about my background)[.!]?$/i.test(
+      cleaned,
+    )
+  ) {
+    return undefined;
+  }
+  if (
+    /^(yes|correct|confirmed|looks good|that(?:'s| is) right|proceed|continue)[.!]?$/i.test(
+      cleaned,
+    )
+  ) {
     return undefined;
   }
   return cleaned;
@@ -165,21 +204,33 @@ function addEvidence(
   field: string,
   source: ProfileEvidence["source"],
   detail?: string,
+  origin?: ProfileEvidence["origin"],
 ) {
-  const existing = evidence.find((item) => item.field === field);
-  if (existing && existing.source === "explicit") return;
-  if (existing) {
-    existing.source = source;
-    existing.evidence = detail;
+  if (
+    source === "unknown" &&
+    evidence.some((item) => item.field === field && item.source !== "unknown")
+  ) {
     return;
   }
-  evidence.push({ field, source, evidence: detail });
+  const existing = evidence.find(
+    (item) => item.field === field && item.origin === origin,
+  );
+  if (existing) {
+    if (existing.source === "explicit" && source !== "explicit") return;
+    existing.source = source;
+    existing.evidence = detail;
+    existing.origin = origin;
+    return;
+  }
+  evidence.push({ field, source, evidence: detail, origin });
 }
 
 function evidenceFromProvidedProfile(
   profile: StructuredUserProfile | undefined,
   evidence: ProfileEvidence[],
   source: "explicit" | "inferred",
+  origin: ProfileEvidence["origin"],
+  onlyIfFieldMissing = false,
 ) {
   if (!profile) return;
   for (const field of [
@@ -192,12 +243,42 @@ function evidenceFromProvidedProfile(
     "goals",
     "education",
     "workHistory",
+    "projects",
+    "certifications",
     "links",
   ] as const) {
     const value = profile[field];
     const hasValue = Array.isArray(value) ? value.length > 0 : Boolean(value);
-    if (hasValue) addEvidence(evidence, field, source);
+    if (
+      onlyIfFieldMissing &&
+      evidence.some((item) => item.field === field)
+    ) {
+      continue;
+    }
+    if (hasValue) addEvidence(evidence, field, source, undefined, origin);
   }
+}
+
+function explicitSkillText(message: string) {
+  const matches = [
+    ...message.matchAll(
+      /\b(?:skills?(?:\s+include|\s+are)?|tools?(?:\s+include|\s+are)?|i\s+(?:know|use|work with)|experience with|experienced with|proficient in|skilled in|strong in)\s*:?\s*([^.!?]+)/gi,
+    ),
+    ...message.matchAll(/\bwith\s+([^.!?]+?)\s+skills?\b/gi),
+    ...message.matchAll(/\bwith\s+([^.!?]+?)\s+experience\b/gi),
+    ...message.matchAll(
+      /\b(?:experience|background)\s+(?:using|in)\s+([^.!?]+)/gi,
+    ),
+  ];
+  return matches.map((match) => match[1]).filter(Boolean).join(", ");
+}
+
+function evidenceSentences(message: string, pattern: RegExp) {
+  return message
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => pattern.test(sentence))
+    .slice(0, 8);
 }
 
 function buildMissingInformation(
@@ -210,7 +291,13 @@ function buildMissingInformation(
     required: boolean;
   }> = [];
 
-  if (!profile.headline && !profile.bio && !profile.education.length && !profile.workHistory.length) {
+  if (
+    !profile.headline &&
+    !profile.bio &&
+    !profile.education.length &&
+    !profile.workHistory.length &&
+    !profile.projects.length
+  ) {
     missing.push({
       field: "background",
       question: "What is your current background, role, field of study, or strongest experience?",
@@ -226,7 +313,6 @@ function buildMissingInformation(
   }
   if (
     !profile.goals.length &&
-    !profile.interests.length &&
     !filters.categories?.length
   ) {
     missing.push({
@@ -260,7 +346,13 @@ function completenessScore(
   filters: RecommendationFilters,
 ) {
   const checks = [
-    Boolean(profile.headline || profile.bio || profile.education.length || profile.workHistory.length),
+    Boolean(
+      profile.headline ||
+        profile.bio ||
+        profile.education.length ||
+        profile.workHistory.length ||
+        profile.projects.length,
+    ),
     profile.skills.length > 0,
     Boolean(profile.goals.length || profile.interests.length || filters.categories?.length),
     Boolean(profile.experienceLevel),
@@ -272,32 +364,55 @@ function completenessScore(
 export function buildConversationalProfile(
   request: OpportunityCompanionRequest,
 ) {
-  const evidence: ProfileEvidence[] = [...(request.context?.profileEvidence ?? [])];
+  const context = request.context ?? request.continuation;
+  const providedProfile = request.user ?? request.profile;
+  const evidence: ProfileEvidence[] = [...(context?.profileEvidence ?? [])];
   const message = meaningfulMessage(request.message);
-  const resumeProfile = request.resumeText
-    ? buildProfileDraftFromText(request.resumeText)
+  const resumeExtraction = request.resumeText
+    ? extractProfileFromText(request.resumeText, "resume")
     : undefined;
-  const messageProfile = message ? buildProfileDraftFromText(message) : undefined;
+  const resumeProfile = resumeExtraction?.profile;
+  const messageExtraction = message
+    ? buildProfileDraftFromBackground(message)
+    : undefined;
+  const messageProfile = messageExtraction?.profile;
+  const skillsFromMessage = message
+    ? buildProfileDraftFromBackground(explicitSkillText(message)).profile.skills
+    : [];
   const explicitMessageProfile: StructuredUserProfile | undefined = message
     ? {
         headline: inferHeadline(message),
         bio: message.length >= 40 ? message.slice(0, 480) : undefined,
         location: inferLocation(message),
         experienceLevel: explicitExperienceLevel(message),
-        skills: messageProfile?.skills ?? [],
+        skills: skillsFromMessage,
         interests: messageProfile?.interests ?? [],
         goals: messageProfile?.goals ?? [],
         education: /\b(student|university|college|degree|bachelor|master)\b/i.test(message)
           ? [message.match(/[^.!?]*(?:student|university|college|degree|bachelor|master)[^.!?]*/i)?.[0]?.trim() ?? ""].filter(Boolean)
           : [],
-        workHistory: [],
+        workHistory: unique([
+          ...(messageProfile?.workHistory ?? []),
+          ...evidenceSentences(
+            message,
+            /\b(worked|employed|interned|contracted|experience at|experience as)\b/i,
+          ),
+        ]),
+        projects: unique([
+          ...(messageProfile?.projects ?? []),
+          ...evidenceSentences(
+            message,
+            /\b(built|created|developed|shipped|launched|implemented)\b/i,
+          ),
+        ]),
+        certifications: messageProfile?.certifications ?? [],
         links: messageProfile?.links ?? [],
       }
     : undefined;
 
   const profile = mergeProfiles(
-    request.context?.profile,
-    request.user,
+    context?.profile,
+    providedProfile,
     resumeProfile,
     explicitMessageProfile,
     {
@@ -306,22 +421,45 @@ export function buildConversationalProfile(
       goals: request.goals ?? [],
       education: [],
       workHistory: [],
+      projects: [],
+      certifications: [],
       links: [],
     },
   );
 
-  evidenceFromProvidedProfile(request.context?.profile, evidence, "explicit");
-  evidenceFromProvidedProfile(request.user, evidence, "explicit");
-  evidenceFromProvidedProfile(resumeProfile, evidence, "inferred");
-  evidenceFromProvidedProfile(explicitMessageProfile, evidence, "explicit");
+  evidenceFromProvidedProfile(
+    context?.profile,
+    evidence,
+    "explicit",
+    "context",
+    true,
+  );
+  evidenceFromProvidedProfile(
+    providedProfile,
+    evidence,
+    "explicit",
+    "structured_profile",
+  );
+  if (resumeExtraction) {
+    evidence.push(...resumeExtraction.evidence);
+  }
+  evidenceFromProvidedProfile(
+    explicitMessageProfile,
+    evidence,
+    "explicit",
+    "user",
+  );
   if (
     message &&
     explicitMessageProfile?.location &&
     locationWasInferredFromDemonym(message)
   ) {
-    const locationEvidence = evidence.find((item) => item.field === "location");
+    const locationEvidence = evidence.find(
+      (item) => item.field === "location" && item.origin === "user",
+    );
     if (locationEvidence) {
       locationEvidence.source = "inferred";
+      locationEvidence.origin = "inference";
       locationEvidence.evidence = `Inferred from "${message.match(countryDemonyms.find(([pattern]) => pattern.test(message))?.[0] ?? /$^/)?.[0] ?? "regional wording"}".`;
     }
   }
@@ -359,6 +497,9 @@ export function buildConversationalProfile(
     unknownFields,
     completenessScore: completenessScore(profile, filters),
     sufficient: missingInformation.every((item) => !item.required),
+    profileSource:
+      context?.profileSource ??
+      (request.resumeText ? "resume" : message ? "background" : undefined),
   };
 }
 
@@ -367,12 +508,25 @@ export function buildContinuationContext(
   evidence: ProfileEvidence[],
   context: CompanionContext | undefined,
   selectedOpportunityId?: string,
+  updates: Partial<
+    Pick<
+      CompanionContext,
+      "profileConfirmed" | "profileSource" | "awaitingProfileConfirmation"
+    >
+  > = {},
 ): CompanionContext {
   return {
     profile,
-    profileEvidence: evidence,
+    profileEvidence: evidence.slice(-40),
     selectedOpportunityId:
       selectedOpportunityId ?? context?.selectedOpportunityId,
-    profileConfirmed: context?.profileConfirmed ?? false,
+    profileConfirmed: updates.profileConfirmed ?? context?.profileConfirmed ?? false,
+    profileSource: updates.profileSource ?? context?.profileSource,
+    awaitingProfileConfirmation:
+      updates.awaitingProfileConfirmation ??
+      (updates.profileConfirmed || context?.profileConfirmed
+        ? false
+        : context?.awaitingProfileConfirmation),
+    sessionVersion: "1",
   };
 }

@@ -123,6 +123,108 @@ const domainSignals = {
   design: ["design", "designer", "figma", "ui", "ux", "prototyping", "product design"],
 };
 
+const technicalRoleFamilies = {
+  software: [
+    "frontend",
+    "front-end",
+    "backend",
+    "back-end",
+    "full stack",
+    "full-stack",
+    "software developer",
+    "software engineer",
+    "web developer",
+    "mobile developer",
+    "react",
+    "typescript",
+    "javascript",
+    "node.js",
+  ],
+  ai_data: [
+    "artificial intelligence",
+    "machine learning",
+    "ai engineer",
+    "ml engineer",
+    "data scientist",
+    "data engineer",
+    "data analyst",
+    "python",
+    "pytorch",
+    "tensorflow",
+  ],
+  web3: [
+    "web3",
+    "blockchain",
+    "solidity",
+    "smart contract",
+    "ethereum",
+    "defi",
+  ],
+  security: [
+    "cybersecurity",
+    "security engineer",
+    "security analyst",
+    "penetration testing",
+    "bug bounty",
+    "vulnerability",
+  ],
+  design: [
+    "product designer",
+    "ux designer",
+    "ui designer",
+    "figma",
+    "user experience",
+    "user interface",
+  ],
+};
+
+const operationalRoleFamilies = {
+  procurement: [
+    "procurement",
+    "purchasing officer",
+    "purchasing specialist",
+    "strategic buyer",
+    "sourcing specialist",
+  ],
+  logistics: [
+    "courier",
+    "delivery driver",
+    "dispatch rider",
+    "warehouse associate",
+    "warehouse operative",
+    "fleet coordinator",
+    "logistics coordinator",
+  ],
+  retail: [
+    "merchandiser",
+    "retail associate",
+    "store manager",
+    "shop assistant",
+    "visual merchandising",
+  ],
+  sales: [
+    "field sales",
+    "sales representative",
+    "account executive",
+    "business development representative",
+    "door to door sales",
+  ],
+  administration: [
+    "administrative assistant",
+    "office administrator",
+    "receptionist",
+    "clerical assistant",
+    "data entry clerk",
+  ],
+  operations: [
+    "machine operator",
+    "production operator",
+    "plant operator",
+    "forklift operator",
+    "equipment operator",
+  ],
+};
+
 function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9+#.\s-]/g, " ");
 }
@@ -151,6 +253,8 @@ function profileValues(user?: StructuredUserProfile, resumeText?: string) {
     ...(user?.goals ?? []),
     ...(user?.education ?? []),
     ...(user?.workHistory ?? []),
+    ...(user?.projects ?? []),
+    ...(user?.certifications ?? []),
     resumeText,
   ].filter(Boolean) as string[];
 }
@@ -399,6 +503,68 @@ function domainFitScore(opportunity: Opportunity, request: RecommendationRequest
   return 18;
 }
 
+function matchingFamilies(
+  values: string[],
+  families: Record<string, string[]>,
+) {
+  return Object.entries(families)
+    .filter(([, signals]) => includesPhrase(values, signals))
+    .map(([family]) => family);
+}
+
+function hardMismatchAssessment(
+  opportunity: Opportunity,
+  request: RecommendationRequest,
+) {
+  if (opportunity.category !== "remote_job") {
+    return { hardMismatch: false, reasons: [] };
+  }
+
+  const profile = profileValues(request.user, request.resumeText);
+  const technicalProfileFamilies = matchingFamilies(
+    profile,
+    technicalRoleFamilies,
+  );
+  if (!technicalProfileFamilies.length) {
+    return { hardMismatch: false, reasons: [] };
+  }
+
+  const candidateRoleValues = [
+    opportunity.title,
+    ...opportunity.requiredSkills,
+    ...opportunity.preferredSkills,
+  ];
+  const operationalFamilies = matchingFamilies(
+    candidateRoleValues,
+    operationalRoleFamilies,
+  );
+  if (!operationalFamilies.length) {
+    return { hardMismatch: false, reasons: [] };
+  }
+
+  const profileOperationalFamilies = matchingFamilies(
+    profile,
+    operationalRoleFamilies,
+  );
+  const supportedOperationalFamilies = operationalFamilies.filter((family) =>
+    profileOperationalFamilies.includes(family),
+  );
+  if (supportedOperationalFamilies.length) {
+    return { hardMismatch: false, reasons: [] };
+  }
+
+  return {
+    hardMismatch: true,
+    reasons: [
+      `Role-family mismatch: the opportunity is primarily ${operationalFamilies.join(
+        "/",
+      )}, while the supplied evidence is concentrated in ${technicalProfileFamilies.join(
+        "/",
+      )}.`,
+    ],
+  };
+}
+
 function decideAction(
   opportunity: Opportunity,
   score: number,
@@ -435,6 +601,9 @@ export function buildProfileText(request: RecommendationRequest) {
         user.goals.length && `Goals: ${user.goals.join(", ")}`,
         user.education.length && `Education: ${user.education.join("; ")}`,
         user.workHistory.length && `Work history: ${user.workHistory.join("; ")}`,
+        user.projects.length && `Projects: ${user.projects.join("; ")}`,
+        user.certifications.length &&
+          `Certifications: ${user.certifications.join("; ")}`,
       ]
         .filter(Boolean)
         .join("\n")
@@ -458,6 +627,7 @@ export function scoreOpportunity(
   const quality = qualityScore(opportunity);
   const value = valueScore(opportunity);
   const domain = domainFitScore(opportunity, request);
+  const mismatch = hardMismatchAssessment(opportunity, request);
 
   const relevance = Math.round(
     category * 0.24 +
@@ -488,7 +658,12 @@ export function scoreOpportunity(
   }
 
   score = Math.max(0, Math.min(100, score));
-  const action = decideAction(opportunity, score, skill.missingRequirements, quality);
+  if (mismatch.hardMismatch) {
+    score = Math.min(score, 20);
+  }
+  const action = mismatch.hardMismatch
+    ? "Skip"
+    : decideAction(opportunity, score, skill.missingRequirements, quality);
   const matchedSignals = [
     ...skill.matches,
     `Category relevance: ${category}/100`,
@@ -496,6 +671,7 @@ export function scoreOpportunity(
     `Domain fit: ${domain}/100`,
     `Opportunity quality: ${quality}/100`,
     opportunity.remote ? "Remote-compatible opportunity" : "",
+    ...mismatch.reasons,
   ].filter(Boolean);
 
   return {
@@ -506,6 +682,8 @@ export function scoreOpportunity(
     matchedSignals,
     missingRequirements: skill.missingRequirements,
     action,
+    hardMismatch: mismatch.hardMismatch,
+    mismatchReasons: mismatch.reasons,
   };
 }
 
@@ -516,7 +694,12 @@ export function rankOpportunities(
 ) {
   return opportunities
     .map((opportunity) => scoreOpportunity(opportunity, request, options))
-    .filter((candidate) => candidate.qualityScore >= 40 && candidate.score >= 35)
+    .filter(
+      (candidate) =>
+        !candidate.hardMismatch &&
+        candidate.qualityScore >= 40 &&
+        candidate.score >= 35,
+    )
     .sort((a, b) => {
       const actionWeight = (action: RecommendationAction) =>
         action === "Apply Now" ? 2 : action === "Prepare First" ? 1 : 0;

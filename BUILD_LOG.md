@@ -1,5 +1,26 @@
 # Build Log
 
+## 2026-07-19 Session Profile and Matching Foundation
+
+- Added profileless two-path onboarding for external agents:
+  - Use a resume or CV.
+  - Provide background conversationally.
+- Kept profiles caller-scoped through continuation context with no permanent personal-profile requirement.
+- Added additive `profile` and `continuation` aliases while preserving legacy `user` and `context` requests.
+- Preserved resume sections, project metrics, work history, education, certifications, links, and evidence provenance.
+- Added minimum-information gates so incomplete student or role-only profiles do not trigger weak recommendations.
+- Added deterministic hard-mismatch filtering for unrelated procurement, logistics, retail, sales, administration, and operator roles.
+- Added post-AI consistency enforcement so scores, reasoning, and actions cannot contradict deterministic ranking.
+- Expanded automated coverage for onboarding paths, resume continuation, profile corrections, follow-up intent routing, alias compatibility, mismatch filtering, and action consistency.
+- Full `npm run verify` passed locally, including production build and smoke tests.
+- Pre-deployment production verification:
+  - Public Railway endpoint returned `HTTP 200`.
+  - No payment challenge was returned; OKX Agent Payments Protocol quote reported no payment required.
+  - Gemini was configured and healthy.
+  - Railway Postgres, pgvector, schema, privacy logging, and source verification were ready.
+  - Agent #5198 remained active and listed.
+  - `Opportunity Matching API` remained free at `0 USDT` with the unchanged endpoint.
+
 ## 2026-07-16 Source Verification and Stale Record Handling
 
 - Added bounded-concurrency URL verification with redirect detection,

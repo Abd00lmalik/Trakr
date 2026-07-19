@@ -37,19 +37,96 @@ function detectIntent(request: OpportunityCompanionRequest): CompanionIntent {
     return "resume_benchmark";
   }
   if (
-    /\b(am i ready|readiness|what am i missing|what do i lack|skill gaps?)\b/.test(
+    /\b(am i ready|readiness|what am i missing|what do i lack|skill gaps?|what should i do first|what should i improve|improve before applying|ready to apply)\b/.test(
       message,
     )
   ) {
     return "readiness_assessment";
   }
-  if (/\bwhy\b.*\b(recommend|match|suggest)/.test(message)) {
+  if (
+    /\bwhy\b.*\b(recommend|match|suggest|fit)\b/.test(message) ||
+    /\b(good fit|fit for me|which opportunity should i prioritize|which should i prioritize|best opportunity)\b/.test(
+      message,
+    )
+  ) {
     return "explain_recommendation";
   }
   if (/\b(build|create|review|confirm)\b.*\bprofile\b/.test(message)) {
     return "profile_build";
   }
   return "opportunity_matching";
+}
+
+function activeContext(request: OpportunityCompanionRequest) {
+  return request.context ?? request.continuation;
+}
+
+function hasMeaningfulProfile(profile: StructuredUserProfile | undefined) {
+  if (!profile) return false;
+  return Boolean(
+    profile.name ||
+      profile.headline ||
+      profile.bio ||
+      profile.location ||
+      profile.timezone ||
+      profile.experienceLevel ||
+      profile.skills.length ||
+      profile.interests.length ||
+      profile.goals.length ||
+      profile.education.length ||
+      profile.workHistory.length ||
+      profile.projects.length ||
+      profile.certifications.length ||
+      profile.links.length
+  );
+}
+
+function profileSourceChoice(message: string | undefined) {
+  const normalized = message?.trim().toLowerCase() ?? "";
+  if (
+    /^(1|option 1|resume|cv)$/.test(normalized) ||
+    /\b(use|upload|attach|paste|provide)\b.*\b(resume|cv)\b/.test(normalized)
+  ) {
+    return "resume" as const;
+  }
+  if (
+    /^(2|option 2|background)$/.test(normalized) ||
+    /\b(tell|provide|describe|share)\b.*\b(background|experience|profile)\b/.test(
+      normalized,
+    ) ||
+    /\b(don't|do not|no|without)\b.*\b(resume|cv)\b/.test(normalized)
+  ) {
+    return "background" as const;
+  }
+}
+
+function shouldOfferProfileSource(
+  request: OpportunityCompanionRequest,
+  built: ReturnType<typeof buildConversationalProfile>,
+) {
+  if (
+    hasMeaningfulProfile(activeContext(request)?.profile) ||
+    request.user ||
+    request.profile ||
+    request.resumeText
+  ) {
+    return false;
+  }
+  const message = request.message?.trim() ?? "";
+  const serviceInvocation =
+    /\b(agent\s*#?\s*5198|opportunity matching api|service type|a2mcp|public service endpoint|use the service)\b/i.test(
+      message,
+    );
+  return !message || serviceInvocation || built.completenessScore === 0;
+}
+
+function confirmedProfile(request: OpportunityCompanionRequest) {
+  const context = activeContext(request);
+  if (context?.profileConfirmed) return true;
+  if (!context?.awaitingProfileConfirmation) return false;
+  return /^(yes|correct|confirmed|looks good|that's right|that is right|proceed|continue)\b/i.test(
+    request.message?.trim() ?? "",
+  );
 }
 
 function toRecommendationRequest(
@@ -116,7 +193,15 @@ function conversationFor(
   message: string,
   nextActions: string[],
   selectedOpportunityId?: string,
+  options: {
+    requiredAction?: string;
+    choices?: CompanionConversation["choices"];
+    profileConfirmed?: boolean;
+    profileSource?: "resume" | "background";
+    awaitingProfileConfirmation?: boolean;
+  } = {},
 ): CompanionConversation {
+  const context = activeContext(request);
   return {
     state,
     intent,
@@ -126,16 +211,23 @@ function conversationFor(
       evidence: built.evidence,
       unknownFields: built.unknownFields,
       completenessScore: built.completenessScore,
-      confirmed: request.context?.profileConfirmed ?? false,
+      confirmed: options.profileConfirmed ?? confirmedProfile(request),
     },
     missingInformation: built.missingInformation,
     nextActions,
     continuation: buildContinuationContext(
       built.profile,
       built.evidence,
-      request.context,
+      context,
       selectedOpportunityId,
+      {
+        profileConfirmed: options.profileConfirmed ?? confirmedProfile(request),
+        profileSource: options.profileSource ?? built.profileSource,
+        awaitingProfileConfirmation: options.awaitingProfileConfirmation,
+      },
     ),
+    requiredAction: options.requiredAction,
+    choices: options.choices,
   };
 }
 
@@ -163,7 +255,7 @@ async function findTargetOpportunity(
   recommendationRequest: RecommendationRequest,
 ) {
   const opportunityId =
-    request.target?.opportunityId ?? request.context?.selectedOpportunityId;
+    request.target?.opportunityId ?? activeContext(request)?.selectedOpportunityId;
   const opportunityTitle = request.target?.opportunityTitle;
   if (!opportunityId && !opportunityTitle) return null;
 
@@ -205,6 +297,77 @@ export async function handleOpportunityCompanionRequest(
 ): Promise<OpportunityCompanionResponse> {
   const intent = detectIntent(request);
   const built = buildConversationalProfile(request);
+  const sourceChoice = profileSourceChoice(request.message);
+
+  if (shouldOfferProfileSource(request, built) && !sourceChoice) {
+    const conversation = conversationFor(
+      request,
+      built,
+      "profile_build",
+      "choose_profile_source",
+      "I can help you build a current opportunity profile, find grounded matches, understand readiness gaps, and plan what to do next. You do not need a resume. Choose how you would like to begin: 1. Use my resume or CV. 2. Tell Trakr about my background.",
+      [
+        "Ask the user to choose the resume path or the conversational background path.",
+      ],
+      undefined,
+      {
+        requiredAction: "select_profile_source",
+        choices: [
+          {
+            id: "resume",
+            label: "Use my resume or CV",
+            description:
+              "Attach a resume or provide its text so Trakr can extract a session profile.",
+          },
+          {
+            id: "background",
+            label: "Tell Trakr about my background",
+            description:
+              "Describe the relevant background once in natural language.",
+          },
+        ],
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (sourceChoice === "resume" && !request.resumeText) {
+    const conversation = conversationFor(
+      request,
+      built,
+      "profile_build",
+      "awaiting_resume",
+      "Attach your resume or CV, or paste its text. I will extract the facts it contains, keep reasonable inferences separate, and ask only for important missing information.",
+      ["Ask the user or calling agent to provide resume text for this session."],
+      undefined,
+      {
+        requiredAction: "provide_resume",
+        profileSource: "resume",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (
+    sourceChoice === "background" &&
+    !hasMeaningfulProfile(activeContext(request)?.profile) &&
+    built.completenessScore === 0
+  ) {
+    const conversation = conversationFor(
+      request,
+      built,
+      "profile_build",
+      "collecting_background",
+      "Tell me about your current role or field of study, the skills and tools you can actually use, your experience level and supporting projects or work, the opportunity types and fields you want, your location or remote preference, and your immediate goal. Share it naturally in one message; optional details can be added later.",
+      ["Ask the user for one natural-language background message."],
+      undefined,
+      {
+        requiredAction: "provide_background",
+        profileSource: "background",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
 
   if (!built.sufficient) {
     const conversation = conversationFor(
@@ -216,6 +379,11 @@ export async function handleOpportunityCompanionRequest(
       built.missingInformation
         .filter((item) => item.required)
         .map((item) => `Ask the user: ${item.question}`),
+      undefined,
+      {
+        requiredAction: "provide_missing_profile_information",
+        profileSource: sourceChoice ?? built.profileSource,
+      },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
   }
@@ -231,6 +399,12 @@ export async function handleOpportunityCompanionRequest(
         "Ask the user to confirm or correct the profile.",
         "Send the returned continuation context back with profileConfirmed set to true.",
       ],
+      undefined,
+      {
+        requiredAction: "review_profile",
+        profileConfirmed: false,
+        awaitingProfileConfirmation: true,
+      },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
   }
