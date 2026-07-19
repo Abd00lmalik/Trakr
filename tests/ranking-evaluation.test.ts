@@ -156,6 +156,31 @@ test("hard mismatch filtering excludes unrelated operational roles", () => {
     "Founder Residence",
     ["remote collaboration"],
   );
+  const contentCreator = opportunity(
+    "content-creator-role",
+    "Creador de Contenido Pago por Video",
+    ["remote collaboration"],
+  );
+  const interiorDesigner = opportunity(
+    "interior-designer-role",
+    "Designer de Interiores",
+    ["remote collaboration"],
+  );
+  const medicalScheduler = opportunity(
+    "medical-scheduler-role",
+    "Medical Scheduler",
+    ["remote collaboration"],
+  );
+  const gatehouseOperator = opportunity(
+    "gatehouse-role",
+    "Operador de Portaria Remota Recife PE",
+    ["remote collaboration"],
+  );
+  const ambiguousRecruitingTitle = opportunity(
+    "ambiguous-recruiting-role",
+    "Contribute Building a Secure Nation",
+    ["React"],
+  );
 
   for (const unrelated of [
     procurement,
@@ -168,6 +193,11 @@ test("hard mismatch filtering excludes unrelated operational roles", () => {
     graphicDesigner,
     socialMedia,
     founderResidence,
+    contentCreator,
+    interiorDesigner,
+    medicalScheduler,
+    gatehouseOperator,
+    ambiguousRecruitingTitle,
   ]) {
     const scored = scoreOpportunity(unrelated, request);
     assert.equal(
@@ -192,6 +222,12 @@ test("hard mismatch filtering excludes unrelated operational roles", () => {
       graphicDesigner,
       socialMedia,
       founderResidence,
+      contentCreator,
+      interiorDesigner,
+      medicalScheduler,
+      gatehouseOperator,
+      ambiguousRecruitingTitle,
+      opportunity("short-title", "Et", ["React"]),
       opportunity("generic-role", "Create Your Own Role", ["React"]),
       opportunity("open-position", "Open Position - Dauphine", ["React"]),
     ],

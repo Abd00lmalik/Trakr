@@ -137,6 +137,15 @@ const roleFamilies = {
     "software engineer",
     "web developer",
     "mobile developer",
+    "developer",
+    "software",
+    "programmer",
+    "engineer",
+    "devops",
+    "site reliability",
+    "cloud engineer",
+    "qa engineer",
+    "test engineer",
     "react",
     "typescript",
     "javascript",
@@ -173,6 +182,8 @@ const roleFamilies = {
   design: [
     "product designer",
     "graphic designer",
+    "interior designer",
+    "designer de interiores",
     "ux designer",
     "ui designer",
     "figma",
@@ -193,6 +204,10 @@ const roleFamilies = {
   ],
   marketing_content: [
     "content creator",
+    "creador de contenido",
+    "criador de conteúdo",
+    "content marketing",
+    "digital marketing",
     "social media",
     "instagram",
     "marketing assistant",
@@ -243,6 +258,8 @@ const roleFamilies = {
     "receptionist",
     "clerical assistant",
     "data entry clerk",
+    "medical scheduler",
+    "appointment scheduler",
   ],
   industrial_operations: [
     "machine operator",
@@ -263,7 +280,36 @@ const roleFamilies = {
     "collections management",
     "cultural institution",
   ],
+  facilities_security: [
+    "security guard",
+    "gatehouse operator",
+    "operador de portaria",
+    "portaria remota",
+  ],
 };
+
+const coreProfessionalFamilies = new Set([
+  "software",
+  "ai_data",
+  "web3",
+  "security",
+  "design",
+  "product",
+]);
+
+const clearlyNontechnicalFamilies = new Set([
+  "marketing_content",
+  "customer_service",
+  "procurement",
+  "logistics",
+  "retail",
+  "sales",
+  "administration",
+  "industrial_operations",
+  "business_operations",
+  "museum_collections",
+  "facilities_security",
+]);
 
 const industrialSummarySignals = [
   "plant operator",
@@ -504,8 +550,10 @@ function qualityScore(opportunity: Opportunity) {
 }
 
 function hasGenericTitle(opportunity: Opportunity) {
-  return genericTitlePatterns.some((pattern) =>
-    pattern.test(opportunity.title.trim()),
+  const title = opportunity.title.trim();
+  return (
+    normalize(title).replace(/\s+/g, "").length <= 3 ||
+    genericTitlePatterns.some((pattern) => pattern.test(title))
   );
 }
 
@@ -595,13 +643,45 @@ function hardMismatchAssessment(
   ) {
     candidateRoleFamilies.push("industrial_operations");
   }
-  if (!candidateRoleFamilies.length) {
+  const broadVerifiedDirectory =
+    opportunity.verificationStatus === "program_directory" &&
+    opportunity.sourceName === "Official curated source";
+  if (!candidateRoleFamilies.length && broadVerifiedDirectory) {
     return { hardMismatch: false, reasons: [] };
+  }
+
+  const profileHasCoreProfessionalRole = profileRoleFamilies.some((family) =>
+    coreProfessionalFamilies.has(family),
+  );
+  if (!candidateRoleFamilies.length && profileHasCoreProfessionalRole) {
+    return {
+      hardMismatch: true,
+      reasons: [
+        "Role-family mismatch: the individual job title does not establish a compatible professional role.",
+      ],
+    };
   }
 
   const supportedFamilies = candidateRoleFamilies.filter((family) =>
     profileRoleFamilies.includes(family),
   );
+  const unsupportedNontechnicalFamilies = candidateRoleFamilies.filter(
+    (family) =>
+      clearlyNontechnicalFamilies.has(family) &&
+      !profileRoleFamilies.includes(family),
+  );
+  if (unsupportedNontechnicalFamilies.length) {
+    return {
+      hardMismatch: true,
+      reasons: [
+        `Role-family mismatch: the opportunity is primarily ${unsupportedNontechnicalFamilies.join(
+          "/",
+        )}, while the supplied evidence is concentrated in ${profileRoleFamilies.join(
+          "/",
+        )}.`,
+      ],
+    };
+  }
   if (supportedFamilies.length) {
     return { hardMismatch: false, reasons: [] };
   }
