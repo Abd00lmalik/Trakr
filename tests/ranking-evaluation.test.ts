@@ -62,13 +62,14 @@ function opportunity(
   id: string,
   title: string,
   requiredSkills: string[],
+  summary = `${title} with a clear active role description and documented responsibilities for qualified applicants.`,
 ): Opportunity {
   return opportunitySchema.parse({
     id,
     title,
     organization: "Example Organization",
     category: "remote_job",
-    summary: `${title} with a clear active role description and documented responsibilities for qualified applicants.`,
+    summary,
     sourceName: "Official curated source",
     sourceUrl: `https://example.com/${id}`,
     location: "Remote",
@@ -126,16 +127,74 @@ test("hard mismatch filtering excludes unrelated operational roles", () => {
     "machine operation",
     "production line safety",
   ]);
+  const ambiguousOperator = opportunity(
+    "ambiguous-operator-role",
+    "Exuma Operator",
+    ["React"],
+    "Plant operator responsible for water treatment, desalination equipment, mechanical maintenance, and hand and power tools.",
+  );
+  const museum = opportunity("museum-role", "Museum Specialist", [
+    "remote collaboration",
+  ]);
+  const customerEngagement = opportunity(
+    "customer-engagement-role",
+    "Associate Customer Engagement",
+    ["remote collaboration"],
+  );
+  const graphicDesigner = opportunity(
+    "graphic-designer-role",
+    "Graphic Designer",
+    ["remote collaboration"],
+  );
+  const socialMedia = opportunity(
+    "social-media-role",
+    "Social Media Assistant Instagram",
+    ["remote collaboration"],
+  );
+  const founderResidence = opportunity(
+    "founder-residence-role",
+    "Founder Residence",
+    ["remote collaboration"],
+  );
 
-  for (const unrelated of [procurement, courier, merchandising, operator]) {
+  for (const unrelated of [
+    procurement,
+    courier,
+    merchandising,
+    operator,
+    ambiguousOperator,
+    museum,
+    customerEngagement,
+    graphicDesigner,
+    socialMedia,
+    founderResidence,
+  ]) {
     const scored = scoreOpportunity(unrelated, request);
-    assert.equal(scored.hardMismatch, true);
+    assert.equal(
+      scored.hardMismatch,
+      true,
+      `${unrelated.title} should be a hard mismatch`,
+    );
     assert.equal(scored.action, "Skip");
     assert.ok(scored.score <= 20);
   }
 
   const ranked = rankOpportunities(
-    [procurement, frontend, courier, merchandising, operator],
+    [
+      procurement,
+      frontend,
+      courier,
+      merchandising,
+      operator,
+      ambiguousOperator,
+      museum,
+      customerEngagement,
+      graphicDesigner,
+      socialMedia,
+      founderResidence,
+      opportunity("generic-role", "Create Your Own Role", ["React"]),
+      opportunity("open-position", "Open Position - Dauphine", ["React"]),
+    ],
     request,
   );
   assert.deepEqual(

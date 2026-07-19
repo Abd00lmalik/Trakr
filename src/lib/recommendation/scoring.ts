@@ -108,6 +108,8 @@ const genericTitlePatterns = [
   /^general application$/i,
   /^expression of interest/i,
   /^open application/i,
+  /^open position\b/i,
+  /^create your own role$/i,
   /^future opportunities$/i,
 ];
 
@@ -123,7 +125,7 @@ const domainSignals = {
   design: ["design", "designer", "figma", "ui", "ux", "prototyping", "product design"],
 };
 
-const technicalRoleFamilies = {
+const roleFamilies = {
   software: [
     "frontend",
     "front-end",
@@ -170,15 +172,41 @@ const technicalRoleFamilies = {
   ],
   design: [
     "product designer",
+    "graphic designer",
     "ux designer",
     "ui designer",
     "figma",
     "user experience",
     "user interface",
   ],
-};
-
-const operationalRoleFamilies = {
+  product: [
+    "product manager",
+    "product management",
+    "product owner",
+    "product operations",
+  ],
+  founder: [
+    "founder",
+    "co-founder",
+    "founder in residence",
+    "founder residence",
+  ],
+  marketing_content: [
+    "content creator",
+    "social media",
+    "instagram",
+    "marketing assistant",
+    "content assistant",
+    "community manager",
+    "video creator",
+  ],
+  customer_service: [
+    "customer engagement",
+    "customer service",
+    "customer support",
+    "contact center",
+    "call center",
+  ],
   procurement: [
     "procurement",
     "purchasing officer",
@@ -216,14 +244,38 @@ const operationalRoleFamilies = {
     "clerical assistant",
     "data entry clerk",
   ],
-  operations: [
+  industrial_operations: [
     "machine operator",
     "production operator",
     "plant operator",
     "forklift operator",
     "equipment operator",
   ],
+  business_operations: [
+    "operations coordinator",
+    "operations manager",
+    "business operations",
+    "people operations",
+  ],
+  museum_collections: [
+    "museum specialist",
+    "museum collections",
+    "collections management",
+    "cultural institution",
+  ],
 };
+
+const industrialSummarySignals = [
+  "plant operator",
+  "plant operations",
+  "water treatment",
+  "wastewater treatment",
+  "desalination",
+  "industrial process",
+  "mechanical maintenance",
+  "electrical maintenance",
+  "hand and power tools",
+];
 
 function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9+#.\s-]/g, " ");
@@ -451,6 +503,12 @@ function qualityScore(opportunity: Opportunity) {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
+function hasGenericTitle(opportunity: Opportunity) {
+  return genericTitlePatterns.some((pattern) =>
+    pattern.test(opportunity.title.trim()),
+  );
+}
+
 function valueScore(opportunity: Opportunity) {
   const values = [...opportunity.benefits, opportunity.summary, ...opportunity.tags];
   let score = 45;
@@ -521,44 +579,39 @@ function hardMismatchAssessment(
   }
 
   const profile = profileValues(request.user, request.resumeText);
-  const technicalProfileFamilies = matchingFamilies(
-    profile,
-    technicalRoleFamilies,
-  );
-  if (!technicalProfileFamilies.length) {
+  const profileRoleFamilies = matchingFamilies(profile, roleFamilies);
+  if (!profileRoleFamilies.length) {
     return { hardMismatch: false, reasons: [] };
   }
 
-  const candidateRoleValues = [
-    opportunity.title,
-    ...opportunity.requiredSkills,
-    ...opportunity.preferredSkills,
-  ];
-  const operationalFamilies = matchingFamilies(
-    candidateRoleValues,
-    operationalRoleFamilies,
+  const candidateRoleFamilies = matchingFamilies(
+    [opportunity.title],
+    roleFamilies,
   );
-  if (!operationalFamilies.length) {
+  if (
+    normalize(opportunity.title).includes("operator") &&
+    includesPhrase([opportunity.summary], industrialSummarySignals) &&
+    !candidateRoleFamilies.includes("industrial_operations")
+  ) {
+    candidateRoleFamilies.push("industrial_operations");
+  }
+  if (!candidateRoleFamilies.length) {
     return { hardMismatch: false, reasons: [] };
   }
 
-  const profileOperationalFamilies = matchingFamilies(
-    profile,
-    operationalRoleFamilies,
+  const supportedFamilies = candidateRoleFamilies.filter((family) =>
+    profileRoleFamilies.includes(family),
   );
-  const supportedOperationalFamilies = operationalFamilies.filter((family) =>
-    profileOperationalFamilies.includes(family),
-  );
-  if (supportedOperationalFamilies.length) {
+  if (supportedFamilies.length) {
     return { hardMismatch: false, reasons: [] };
   }
 
   return {
     hardMismatch: true,
     reasons: [
-      `Role-family mismatch: the opportunity is primarily ${operationalFamilies.join(
+      `Role-family mismatch: the opportunity is primarily ${candidateRoleFamilies.join(
         "/",
-      )}, while the supplied evidence is concentrated in ${technicalProfileFamilies.join(
+      )}, while the supplied evidence is concentrated in ${profileRoleFamilies.join(
         "/",
       )}.`,
     ],
@@ -697,6 +750,7 @@ export function rankOpportunities(
     .filter(
       (candidate) =>
         !candidate.hardMismatch &&
+        !hasGenericTitle(candidate.opportunity) &&
         candidate.qualityScore >= 40 &&
         candidate.score >= 35,
     )
