@@ -1,253 +1,17 @@
 {
-  "generatedAt": "2026-07-16T18:28:52.264Z",
+  "generatedAt": "2026-07-19T19:58:36.605Z",
   "evaluationDate": "2026-07-16T12:00:00.000Z",
   "personaCount": 60,
   "catalogSize": 25,
   "metrics": {
     "precisionAt3": 1,
     "precisionAt5": 1,
-    "ndcgAt5": 0.8656355482331881,
-    "recall": 0.5074404761904764,
+    "ndcgAt5": 0.9672372305615642,
+    "recall": 0.8953373015873016,
     "irrelevantResultRate": 0,
     "falseApplyNowRate": 0
   },
-  "weakPersonas": [
-    {
-      "id": "ai-engineer-core",
-      "archetype": "AI engineer",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.708512626044815,
-      "recall": 0.4166666666666667,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-wellfound-startup-jobs",
-          "title": "Wellfound Startup Jobs",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "startup-founder-core",
-      "archetype": "Startup founder",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-y-combinator-apply",
-          "title": "Y Combinator Startup Accelerator",
-          "score": 89,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-aws-activate",
-          "title": "AWS Activate",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 70,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        }
-      ]
-    },
-    {
-      "id": "startup-founder-portfolio",
-      "archetype": "Startup founder",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-y-combinator-apply",
-          "title": "Y Combinator Startup Accelerator",
-          "score": 89,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-aws-activate",
-          "title": "AWS Activate",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 70,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        }
-      ]
-    },
-    {
-      "id": "startup-founder-technical",
-      "archetype": "Startup founder",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-y-combinator-apply",
-          "title": "Y Combinator Startup Accelerator",
-          "score": 89,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-aws-activate",
-          "title": "AWS Activate",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 72,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        }
-      ]
-    },
-    {
-      "id": "startup-founder-career",
-      "archetype": "Startup founder",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-y-combinator-apply",
-          "title": "Y Combinator Startup Accelerator",
-          "score": 89,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-aws-activate",
-          "title": "AWS Activate",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 71,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        }
-      ]
-    }
-  ],
+  "weakPersonas": [],
   "personas": [
     {
       "id": "web3-builder-core",
@@ -255,7 +19,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9030970842075382,
-      "recall": 0.4166666666666667,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -302,7 +66,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.8777221344374128,
-      "recall": 0.4166666666666667,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -349,7 +113,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.8777221344374128,
-      "recall": 0.4166666666666667,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -396,7 +160,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.4166666666666667,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -443,7 +207,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.8777221344374128,
-      "recall": 0.4166666666666667,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -490,7 +254,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.625,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -537,7 +301,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.625,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -584,7 +348,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.625,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -631,7 +395,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9250256699929476,
-      "recall": 0.625,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -678,7 +442,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.625,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -724,8 +488,8 @@
       "archetype": "AI engineer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.708512626044815,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 0.9832909166300543,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -735,20 +499,6 @@
           "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-wellfound-startup-jobs",
-          "title": "Wellfound Startup Jobs",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         },
         {
           "id": "official-google-research-student-programs",
@@ -763,6 +513,20 @@
           "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 2
+        },
+        {
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 48,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-wellfound-startup-jobs",
+          "title": "Wellfound Startup Jobs",
+          "score": 47,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -771,8 +535,8 @@
       "archetype": "AI engineer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7907168770909129,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 0.9828921171931015,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -798,18 +562,11 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 78,
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 48,
           "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 68,
-          "action": "Prepare First",
-          "relevanceGrade": 1
+          "relevanceGrade": 3
         }
       ]
     },
@@ -818,8 +575,8 @@
       "archetype": "AI engineer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8352618319893308,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 0.9828921171931015,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -845,18 +602,11 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 78,
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 48,
           "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-youtube-creators",
-          "title": "YouTube Creator Programs",
-          "score": 68,
-          "action": "Prepare First",
-          "relevanceGrade": 2
+          "relevanceGrade": 3
         }
       ]
     },
@@ -865,8 +615,8 @@
       "archetype": "AI engineer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7907168770909129,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 0.9828921171931015,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -892,18 +642,11 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 78,
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 48,
           "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 72,
-          "action": "Prepare First",
-          "relevanceGrade": 1
+          "relevanceGrade": 3
         }
       ]
     },
@@ -912,8 +655,8 @@
       "archetype": "AI engineer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7907168770909129,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 0.9828921171931015,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -939,18 +682,11 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 78,
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 48,
           "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 68,
-          "action": "Prepare First",
-          "relevanceGrade": 1
+          "relevanceGrade": 3
         }
       ]
     },
@@ -959,8 +695,8 @@
       "archetype": "Cybersecurity student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7623370622671015,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -972,32 +708,11 @@
           "relevanceGrade": 3
         },
         {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-hackerone-bug-bounty",
           "title": "HackerOne Bug Bounty Programs",
           "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 73,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 70,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         }
       ]
     },
@@ -1006,8 +721,8 @@
       "archetype": "Cybersecurity student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7623370622671015,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1019,32 +734,11 @@
           "relevanceGrade": 3
         },
         {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-hackerone-bug-bounty",
           "title": "HackerOne Bug Bounty Programs",
           "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 73,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 68,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         }
       ]
     },
@@ -1053,8 +747,8 @@
       "archetype": "Cybersecurity student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7623370622671015,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1066,32 +760,11 @@
           "relevanceGrade": 3
         },
         {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-hackerone-bug-bounty",
           "title": "HackerOne Bug Bounty Programs",
           "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 73,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 68,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         }
       ]
     },
@@ -1100,8 +773,8 @@
       "archetype": "Cybersecurity student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8875385049894211,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1113,32 +786,11 @@
           "relevanceGrade": 3
         },
         {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-hackerone-bug-bounty",
           "title": "HackerOne Bug Bounty Programs",
           "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "official-dorahacks-hackathons",
-          "title": "DoraHacks Hackathons and Bounties",
-          "score": 76,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 73,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         }
       ]
     },
@@ -1147,8 +799,8 @@
       "archetype": "Cybersecurity student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7623370622671015,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1165,27 +817,6 @@
           "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 73,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 68,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         }
       ]
     },
@@ -1195,7 +826,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.5555555555555556,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1241,43 +872,43 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9165323715184533,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 0.9030970842075382,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 86,
+          "score": 83,
           "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 81,
-          "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-wellfound-startup-jobs",
           "title": "Wellfound Startup Jobs",
-          "score": 75,
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-summer-of-code",
           "title": "Google Summer of Code",
-          "score": 73,
+          "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 2
         },
         {
+          "id": "official-mlh-fellowship",
+          "title": "MLH Fellowship",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
           "id": "remote-frontend-intern",
           "title": "Remote Frontend Engineering Internship",
-          "score": 69,
+          "score": 76,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1288,43 +919,43 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8061941684150765,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 0.8777221344374128,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 76,
+          "score": 83,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
         {
+          "id": "official-google-summer-of-code",
+          "title": "Google Summer of Code",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        },
+        {
           "id": "official-wellfound-startup-jobs",
           "title": "Wellfound Startup Jobs",
-          "score": 73,
+          "score": 79,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-mlh-fellowship",
           "title": "MLH Fellowship",
-          "score": 71,
+          "score": 78,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "remote-frontend-intern",
           "title": "Remote Frontend Engineering Internship",
-          "score": 69,
+          "score": 76,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1336,7 +967,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.8777221344374128,
-      "recall": 0.5555555555555556,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1382,8 +1013,8 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7652606394268341,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 0.8777221344374128,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1416,11 +1047,11 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
+          "id": "remote-frontend-intern",
+          "title": "Remote Frontend Engineering Internship",
           "score": 76,
           "action": "Prepare First",
-          "relevanceGrade": 1
+          "relevanceGrade": 3
         }
       ]
     },
@@ -1429,22 +1060,76 @@
       "archetype": "Open-source student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 91,
+          "score": 88,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
         {
           "id": "official-mlh-fellowship",
           "title": "MLH Fellowship",
-          "score": 88,
+          "score": 84,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-summer-of-code",
+          "title": "Google Summer of Code",
+          "score": 82,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 80,
+          "action": "Apply Now",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "open-source-student-portfolio",
+      "archetype": "Open-source student",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 1,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 86,
+          "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-mlh-fellowship",
+          "title": "MLH Fellowship",
+          "score": 82,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
@@ -1456,64 +1141,10 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
           "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "open-source-student-portfolio",
-      "archetype": "Open-source student",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 89,
           "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 80,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 79,
-          "action": "Prepare First",
           "relevanceGrade": 2
         }
       ]
@@ -1524,42 +1155,42 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.8777221344374128,
-      "recall": 0.5,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 89,
+          "score": 86,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
         {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
-          "score": 86,
+          "score": 83,
           "action": "Apply Now",
           "relevanceGrade": 2
         },
         {
           "id": "official-mlh-fellowship",
           "title": "MLH Fellowship",
-          "score": 86,
+          "score": 82,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-summer-of-code",
           "title": "Google Summer of Code",
-          "score": 85,
+          "score": 82,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 83,
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1570,44 +1201,44 @@
       "archetype": "Open-source student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 89,
+          "score": 86,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
         {
           "id": "official-mlh-fellowship",
           "title": "MLH Fellowship",
-          "score": 86,
+          "score": 82,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-summer-of-code",
           "title": "Google Summer of Code",
-          "score": 81,
+          "score": 82,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-github-education",
           "title": "GitHub Education Student Developer Pack",
-          "score": 80,
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 79,
-          "action": "Prepare First",
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 80,
+          "action": "Apply Now",
           "relevanceGrade": 2
         }
       ]
@@ -1617,45 +1248,45 @@
       "archetype": "Open-source student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9030970842075382,
-      "recall": 0.5,
+      "ndcgAt5": 1,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 89,
+          "score": 86,
           "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-summer-of-code",
+          "title": "Google Summer of Code",
+          "score": 83,
+          "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-mlh-fellowship",
           "title": "MLH Fellowship",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 81,
+          "score": 82,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-github-education",
           "title": "GitHub Education Student Developer Pack",
-          "score": 80,
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 80,
+          "action": "Apply Now",
+          "relevanceGrade": 2
         }
       ]
     },
@@ -1664,8 +1295,8 @@
       "archetype": "Startup founder",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1680,27 +1311,6 @@
           "id": "official-aws-activate",
           "title": "AWS Activate",
           "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 70,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1711,8 +1321,8 @@
       "archetype": "Startup founder",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1727,27 +1337,6 @@
           "id": "official-aws-activate",
           "title": "AWS Activate",
           "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 70,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1758,8 +1347,8 @@
       "archetype": "Startup founder",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7623370622671015,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1776,27 +1365,6 @@
           "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 82,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
         }
       ]
     },
@@ -1805,8 +1373,8 @@
       "archetype": "Startup founder",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1821,27 +1389,6 @@
           "id": "official-aws-activate",
           "title": "AWS Activate",
           "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 72,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1852,8 +1399,8 @@
       "archetype": "Startup founder",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.7294441835889875,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1870,27 +1417,6 @@
           "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "gitcoin-public-goods-grants",
-          "title": "Public Goods Builder Grant",
-          "score": 71,
-          "action": "Prepare First",
-          "relevanceGrade": 3
         }
       ]
     },
@@ -1899,8 +1425,8 @@
       "archetype": "Digital creator",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9030970842075382,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1915,27 +1441,6 @@
           "id": "official-tiktok-creator-academy",
           "title": "TikTok Creator Academy",
           "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 74,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1946,8 +1451,8 @@
       "archetype": "Digital creator",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9030970842075382,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1962,27 +1467,6 @@
           "id": "official-tiktok-creator-academy",
           "title": "TikTok Creator Academy",
           "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 74,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1993,8 +1477,8 @@
       "archetype": "Digital creator",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9030970842075382,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2013,25 +1497,11 @@
           "relevanceGrade": 3
         },
         {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 82,
-          "action": "Apply Now",
-          "relevanceGrade": 2
-        },
-        {
           "id": "official-google-developer-programs",
           "title": "Google Developer Programs",
-          "score": 81,
+          "score": 47,
           "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 74,
-          "action": "Prepare First",
-          "relevanceGrade": 3
+          "relevanceGrade": 2
         }
       ]
     },
@@ -2040,8 +1510,8 @@
       "archetype": "Digital creator",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9030970842075382,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2056,27 +1526,6 @@
           "id": "official-tiktok-creator-academy",
           "title": "TikTok Creator Academy",
           "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 74,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -2087,8 +1536,8 @@
       "archetype": "Digital creator",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8196294557259916,
-      "recall": 0.4166666666666667,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2105,27 +1554,6 @@
           "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
         }
       ]
     },
@@ -2134,45 +1562,45 @@
       "archetype": "Cloud computing student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.3333333333333333,
+      "ndcgAt5": 0.9908183105074706,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
-          "score": 86,
+          "score": 82,
           "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-microsoft-learn-student-hub",
           "title": "Microsoft Learn Student Hub",
-          "score": 86,
+          "score": 82,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 78,
+          "action": "Apply Now",
+          "relevanceGrade": 2
         },
         {
           "id": "official-google-developer-programs",
           "title": "Google Developer Programs",
-          "score": 83,
+          "score": 78,
           "action": "Prepare First",
           "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 2
         }
       ]
     },
@@ -2181,43 +1609,43 @@
       "archetype": "Cloud computing student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.3333333333333333,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
-          "score": 86,
+          "score": 82,
           "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-microsoft-learn-student-hub",
           "title": "Microsoft Learn Student Hub",
-          "score": 86,
+          "score": 82,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-developer-programs",
           "title": "Google Developer Programs",
-          "score": 83,
+          "score": 78,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 79,
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 64,
           "action": "Prepare First",
           "relevanceGrade": 2
         }
@@ -2228,15 +1656,415 @@
       "archetype": "Cloud computing student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.3333333333333333,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
-          "score": 89,
+          "score": 85,
+          "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-developer-programs",
+          "title": "Google Developer Programs",
+          "score": 83,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-microsoft-learn-student-hub",
+          "title": "Microsoft Learn Student Hub",
+          "score": 82,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 64,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "cloud-student-technical",
+      "archetype": "Cloud computing student",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 0.9250256699929476,
+      "recall": 0.7142857142857143,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 82,
+          "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-microsoft-learn-student-hub",
+          "title": "Microsoft Learn Student Hub",
+          "score": 82,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-developer-programs",
+          "title": "Google Developer Programs",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 64,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "cloud-student-career",
+      "archetype": "Cloud computing student",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 0.9908183105074706,
+      "recall": 0.7142857142857143,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 82,
+          "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-microsoft-learn-student-hub",
+          "title": "Microsoft Learn Student Hub",
+          "score": 82,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        },
+        {
+          "id": "official-google-developer-programs",
+          "title": "Google Developer Programs",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        }
+      ]
+    },
+    {
+      "id": "ml-researcher-core",
+      "archetype": "Machine learning researcher",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 1,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "official-kaggle-competitions",
+          "title": "Kaggle Competitions",
+          "score": 86,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ethglobal-online-buildathon",
+          "title": "ETHGlobal Online Buildathon",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "ml-researcher-portfolio",
+      "archetype": "Machine learning researcher",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 1,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "official-kaggle-competitions",
+          "title": "Kaggle Competitions",
+          "score": 86,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ethglobal-online-buildathon",
+          "title": "ETHGlobal Online Buildathon",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "ml-researcher-community",
+      "archetype": "Machine learning researcher",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 1,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "official-kaggle-competitions",
+          "title": "Kaggle Competitions",
+          "score": 86,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ethglobal-online-buildathon",
+          "title": "ETHGlobal Online Buildathon",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "ml-researcher-technical",
+      "archetype": "Machine learning researcher",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 1,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "official-kaggle-competitions",
+          "title": "Kaggle Competitions",
+          "score": 86,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ethglobal-online-buildathon",
+          "title": "ETHGlobal Online Buildathon",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "ml-researcher-career",
+      "archetype": "Machine learning researcher",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 1,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "official-kaggle-competitions",
+          "title": "Kaggle Competitions",
+          "score": 86,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ethglobal-online-buildathon",
+          "title": "ETHGlobal Online Buildathon",
+          "score": 78,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "student-tools-core",
+      "archetype": "Student seeking developer benefits",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 0.9165323715184533,
+      "recall": 0.625,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 87,
+          "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-developer-programs",
+          "title": "Google Developer Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 84,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 81,
+          "action": "Apply Now",
+          "relevanceGrade": 2
+        },
+        {
+          "id": "official-microsoft-learn-student-hub",
+          "title": "Microsoft Learn Student Hub",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        }
+      ]
+    },
+    {
+      "id": "student-tools-portfolio",
+      "archetype": "Student seeking developer benefits",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 0.7142857142857143,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 87,
+          "action": "Apply Now",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-developer-programs",
+          "title": "Google Developer Programs",
+          "score": 85,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-github-education",
+          "title": "GitHub Education Student Developer Pack",
+          "score": 84,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "official-microsoft-learn-student-hub",
+          "title": "Microsoft Learn Student Hub",
+          "score": 81,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 78,
+          "action": "Apply Now",
+          "relevanceGrade": 2
+        }
+      ]
+    },
+    {
+      "id": "student-tools-community",
+      "archetype": "Student seeking developer benefits",
+      "precisionAt3": 1,
+      "precisionAt5": 1,
+      "ndcgAt5": 1,
+      "recall": 0.7142857142857143,
+      "irrelevantResultRate": 0,
+      "falseApplyNowRate": 0,
+      "topResults": [
+        {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 88,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
@@ -2250,492 +2078,22 @@
         {
           "id": "official-github-education",
           "title": "GitHub Education Student Developer Pack",
-          "score": 86,
+          "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-microsoft-learn-student-hub",
           "title": "Microsoft Learn Student Hub",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "cloud-student-technical",
-      "archetype": "Cloud computing student",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.3333333333333333,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 86,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 83,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "cloud-student-career",
-      "archetype": "Cloud computing student",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.3333333333333333,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 86,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 83,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 82,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "ml-researcher-core",
-      "archetype": "Machine learning researcher",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9163693527837478,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 85,
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
-          "score": 81,
+          "score": 78,
           "action": "Apply Now",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 77,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        }
-      ]
-    },
-    {
-      "id": "ml-researcher-portfolio",
-      "archetype": "Machine learning researcher",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.7907168770909129,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 85,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 75,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 74,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        }
-      ]
-    },
-    {
-      "id": "ml-researcher-community",
-      "archetype": "Machine learning researcher",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9394902670967448,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 85,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 77,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 75,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        }
-      ]
-    },
-    {
-      "id": "ml-researcher-technical",
-      "archetype": "Machine learning researcher",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9243517417861665,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 85,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-google-summer-of-code",
-          "title": "Google Summer of Code",
-          "score": 77,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        }
-      ]
-    },
-    {
-      "id": "ml-researcher-career",
-      "archetype": "Machine learning researcher",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.7907168770909129,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "official-kaggle-competitions",
-          "title": "Kaggle Competitions",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 85,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "ethglobal-online-buildathon",
-          "title": "ETHGlobal Online Buildathon",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        },
-        {
-          "id": "official-ctftime-events",
-          "title": "CTFtime Competitions",
-          "score": 75,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        },
-        {
-          "id": "official-ethglobal-events",
-          "title": "ETHGlobal Hackathons and Events",
-          "score": 74,
-          "action": "Prepare First",
-          "relevanceGrade": 1
-        }
-      ]
-    },
-    {
-      "id": "student-tools-core",
-      "archetype": "Student seeking developer benefits",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 90,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 88,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "student-tools-portfolio",
-      "archetype": "Student seeking developer benefits",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 90,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 88,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 81,
-          "action": "Apply Now",
-          "relevanceGrade": 2
-        }
-      ]
-    },
-    {
-      "id": "student-tools-community",
-      "archetype": "Student seeking developer benefits",
-      "precisionAt3": 1,
-      "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
-      "irrelevantResultRate": 0,
-      "falseApplyNowRate": 0,
-      "topResults": [
-        {
-          "id": "google-student-scholarship",
-          "title": "Developer Student Scholarship",
-          "score": 92,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 90,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 86,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-microsoft-learn-student-hub",
-          "title": "Microsoft Learn Student Hub",
-          "score": 84,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 81,
-          "action": "Prepare First",
           "relevanceGrade": 2
         }
       ]
@@ -2745,44 +2103,44 @@
       "archetype": "Student seeking developer benefits",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
+      "ndcgAt5": 1,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
-          "score": 90,
+          "score": 87,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-developer-programs",
           "title": "Google Developer Programs",
-          "score": 88,
+          "score": 85,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-github-education",
           "title": "GitHub Education Student Developer Pack",
-          "score": 86,
+          "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-microsoft-learn-student-hub",
           "title": "Microsoft Learn Student Hub",
-          "score": 84,
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
-          "id": "official-google-research-student-programs",
-          "title": "Google Research Student Programs",
-          "score": 81,
-          "action": "Prepare First",
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 78,
+          "action": "Apply Now",
           "relevanceGrade": 2
         }
       ]
@@ -2792,43 +2150,43 @@
       "archetype": "Student seeking developer benefits",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.5,
+      "ndcgAt5": 1,
+      "recall": 0.7142857142857143,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
         {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
-          "score": 90,
+          "score": 87,
           "action": "Apply Now",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-developer-programs",
           "title": "Google Developer Programs",
-          "score": 88,
+          "score": 85,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-github-education",
           "title": "GitHub Education Student Developer Pack",
-          "score": 86,
+          "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-microsoft-learn-student-hub",
           "title": "Microsoft Learn Student Hub",
-          "score": 84,
+          "score": 81,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
           "id": "official-google-research-student-programs",
           "title": "Google Research Student Programs",
-          "score": 82,
+          "score": 79,
           "action": "Prepare First",
           "relevanceGrade": 2
         }
@@ -2840,7 +2198,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 1,
-      "recall": 0.5555555555555556,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2848,20 +2206,6 @@
           "id": "official-wellfound-startup-jobs",
           "title": "Wellfound Startup Jobs",
           "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 79,
-          "action": "Apply Now",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 76,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
@@ -2878,6 +2222,13 @@
           "score": 67,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 62,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -2886,8 +2237,8 @@
       "archetype": "Remote full-stack developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8875385049894211,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2913,16 +2264,9 @@
           "relevanceGrade": 3
         },
         {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 65,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-youtube-creators",
-          "title": "YouTube Creator Programs",
-          "score": 63,
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 62,
           "action": "Prepare First",
           "relevanceGrade": 1
         }
@@ -2933,8 +2277,8 @@
       "archetype": "Remote full-stack developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8875385049894211,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2960,16 +2304,9 @@
           "relevanceGrade": 3
         },
         {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 65,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-youtube-creators",
-          "title": "YouTube Creator Programs",
-          "score": 64,
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 62,
           "action": "Prepare First",
           "relevanceGrade": 1
         }
@@ -2980,8 +2317,8 @@
       "archetype": "Remote full-stack developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8875385049894211,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -3007,16 +2344,9 @@
           "relevanceGrade": 3
         },
         {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 65,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-youtube-creators",
-          "title": "YouTube Creator Programs",
-          "score": 63,
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 62,
           "action": "Prepare First",
           "relevanceGrade": 1
         }
@@ -3027,8 +2357,8 @@
       "archetype": "Remote full-stack developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8165832016561192,
-      "recall": 0.5555555555555556,
+      "ndcgAt5": 0.9217107771844201,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -3057,13 +2387,6 @@
           "id": "remote-frontend-intern",
           "title": "Remote Frontend Engineering Internship",
           "score": 67,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "mlh-fellowship-open-source",
-          "title": "MLH Open Source Fellowship",
-          "score": 65,
           "action": "Prepare First",
           "relevanceGrade": 3
         }

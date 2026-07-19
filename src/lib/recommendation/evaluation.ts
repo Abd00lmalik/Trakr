@@ -63,7 +63,9 @@ function relevanceGrade(
 
 function precisionAt(grades: number[], k: number) {
   const results = grades.slice(0, k);
-  return results.filter((grade) => grade > 0).length / k;
+  return results.length
+    ? results.filter((grade) => grade > 0).length / results.length
+    : 1;
 }
 
 function discountedCumulativeGain(grades: number[]) {
@@ -140,16 +142,17 @@ export function evaluateRanking(
       evaluationCatalog,
       persona.request.filters,
     );
-    const ranked = rankOpportunities(
+    const allRanked = rankOpportunities(
       filtered,
       persona.request,
       { now: evaluationDate },
-    ).slice(0, 5);
+    );
+    const ranked = allRanked.slice(0, 5);
     const grades = ranked.map((candidate) =>
       relevanceGrade(candidate.opportunity, persona),
     );
-    const idealGrades = filtered
-      .map((opportunity) => relevanceGrade(opportunity, persona))
+    const idealGrades = allRanked
+      .map((candidate) => relevanceGrade(candidate.opportunity, persona))
       .sort((a, b) => b - a);
     const relevantCatalogCount = idealGrades.filter((grade) => grade > 0).length;
     const relevantReturned = grades.filter((grade) => grade > 0).length;

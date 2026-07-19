@@ -120,8 +120,8 @@ const domainSignals = {
   web3: ["web3", "solidity", "foundry", "hardhat", "ethereum", "defi", "dao", "smart contract", "blockchain"],
   ai: ["ai", "machine learning", "ml", "llm", "llms", "pytorch", "tensorflow", "langchain", "data science"],
   security: ["cybersecurity", "security", "ctf", "ctfs", "linux", "networking", "bug bounty", "vulnerability"],
-  creator: ["creator", "content", "video", "community", "ambassador", "short-form", "audience"],
-  founder: ["founder", "startup", "fundraising", "pitch", "accelerator", "vc", "business"],
+  creator: ["creator", "content creator", "video creator", "ambassador", "short-form", "audience growth", "creator economy"],
+  founder: ["founder", "co-founder", "startup", "fundraising", "pitching", "accelerator", "venture capital"],
   design: ["design", "designer", "figma", "ui", "ux", "prototyping", "product design"],
 };
 
@@ -413,6 +413,17 @@ function opportunityValues(opportunity: Opportunity) {
   ];
 }
 
+function opportunityDomainValues(opportunity: Opportunity) {
+  return [
+    opportunity.title,
+    opportunity.organization,
+    opportunity.summary,
+    ...opportunity.requiredSkills,
+    ...opportunity.preferredSkills,
+    ...opportunity.tags,
+  ];
+}
+
 function overlap(profileTokens: Set<string>, candidateValues: string[]) {
   const candidateTokens = tokenize(candidateValues);
   const matches = [...candidateTokens].filter((token) => profileTokens.has(token));
@@ -649,15 +660,18 @@ function valueScore(opportunity: Opportunity) {
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-function domainFitScore(opportunity: Opportunity, request: RecommendationRequest) {
+function domainFitAssessment(
+  opportunity: Opportunity,
+  request: RecommendationRequest,
+) {
   const profile = profileValues(request.user, request.resumeText);
-  const candidate = opportunityValues(opportunity);
+  const candidate = opportunityDomainValues(opportunity);
   const activeDomains = Object.entries(domainSignals)
     .filter(([, signals]) => includesPhrase(profile, signals))
     .map(([domain]) => domain);
 
   if (!activeDomains.length) {
-    return 70;
+    return { score: 70, hasMatchedDomain: false };
   }
 
   const matchedDomains = activeDomains.filter((domain) =>
@@ -665,7 +679,7 @@ function domainFitScore(opportunity: Opportunity, request: RecommendationRequest
   );
 
   if (matchedDomains.length) {
-    return 94;
+    return { score: 94, hasMatchedDomain: true };
   }
 
   const broadStudentProgram =
@@ -674,10 +688,10 @@ function domainFitScore(opportunity: Opportunity, request: RecommendationRequest
     includesPhrase(candidate, ["student", "learning", "education", "developer program"]);
 
   if (broadStudentProgram) {
-    return 58;
+    return { score: 58, hasMatchedDomain: false };
   }
 
-  return 18;
+  return { score: 18, hasMatchedDomain: false };
 }
 
 function matchingFamilies(
@@ -899,21 +913,29 @@ export function scoreOpportunity(
   const deadline = deadlineScore(opportunity.deadline, options.now);
   const quality = qualityScore(opportunity);
   const value = valueScore(opportunity);
-  const domain = domainFitScore(opportunity, request);
+  const domain = domainFitAssessment(opportunity, request);
   const baseMismatch = hardMismatchAssessment(
     opportunity,
     request,
     options.now,
   );
+  const lacksDirectoryFit =
+    opportunity.verificationStatus === "program_directory" &&
+    !domain.hasMatchedDomain &&
+    skill.score < 25;
+  const lacksVerifiedOpportunityFit =
+    opportunity.verificationStatus !== "program_directory" &&
+    domain.score < 30 &&
+    skill.score < 25;
   const mismatch =
     !baseMismatch.hardMismatch &&
-    opportunity.verificationStatus !== "program_directory" &&
-    domain < 30 &&
-    skill.score < 25
+    (lacksDirectoryFit || lacksVerifiedOpportunityFit)
       ? {
           hardMismatch: true,
           reasons: [
-            "The opportunity does not match a supported target domain and lacks strong capability overlap.",
+            opportunity.verificationStatus === "program_directory"
+              ? "The program directory does not match a supported target domain and lacks meaningful capability overlap."
+              : "The opportunity does not match a supported target domain and lacks strong capability overlap.",
           ],
         }
       : baseMismatch;
@@ -921,7 +943,7 @@ export function scoreOpportunity(
   const relevance = Math.round(
     category * 0.24 +
       skill.score * 0.24 +
-      domain * 0.18 +
+      domain.score * 0.18 +
       experience * 0.14 +
       location * 0.08 +
       value * 0.08 +
@@ -942,7 +964,7 @@ export function scoreOpportunity(
     score -= 12;
   }
 
-  if (domain < 30) {
+  if (domain.score < 30) {
     score -= 24;
   }
 
@@ -957,7 +979,7 @@ export function scoreOpportunity(
     ...skill.matches,
     `Category relevance: ${category}/100`,
     `Experience fit: ${experience}/100`,
-    `Domain fit: ${domain}/100`,
+    `Domain fit: ${domain.score}/100`,
     `Opportunity quality: ${quality}/100`,
     opportunity.remote ? "Remote-compatible opportunity" : "",
     ...mismatch.reasons,

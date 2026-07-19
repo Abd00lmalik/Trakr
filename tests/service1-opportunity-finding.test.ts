@@ -10,9 +10,11 @@ import {
   activeAutomatedSources,
   opportunitySourceRegistry,
 } from "../src/lib/opportunities/source-registry";
+import { curatedOfficialOpportunities } from "../src/lib/opportunities/data/curated-official-opportunities";
 import { diversifyRankedOpportunities } from "../src/lib/recommendation/diversification";
 import {
   buildProfileText,
+  rankOpportunities,
   scoreOpportunity,
 } from "../src/lib/recommendation/scoring";
 import { beginIdempotentRequest } from "../src/lib/security/idempotency";
@@ -563,6 +565,84 @@ test("short domain terms do not create false AI matches inside blockchain text",
     result.mismatchReasons?.some((reason) =>
       /target domain|capability overlap/i.test(reason),
     ) ?? false,
+  );
+});
+
+test("unrelated program directories are filtered from a domain-specific profile", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Self-taught blockchain developer",
+      location: "Ghana",
+      experienceLevel: "early-career",
+      skills: ["JavaScript", "React", "Solidity"],
+      interests: ["Web3"],
+      goals: ["Find blockchain hackathons and entry-level opportunities"],
+    },
+    filters: { remote: true },
+  });
+  const securityDirectories = curatedOfficialOpportunities.filter((item) =>
+    ["official-hackerone-bug-bounty", "official-ctftime-events"].includes(
+      item.id,
+    ),
+  );
+
+  assert.equal(securityDirectories.length, 2);
+  for (const directory of securityDirectories) {
+    const result = scoreOpportunity(directory, request, {
+      now: new Date("2026-07-19T12:00:00.000Z"),
+    });
+    assert.equal(result.hardMismatch, true, directory.id);
+    assert.equal(result.action, "Skip", directory.id);
+    assert.ok(result.score <= 20, directory.id);
+    assert.match(
+      result.mismatchReasons?.join(" ") ?? "",
+      /program directory.*target domain.*capability overlap/i,
+    );
+  }
+
+  const rankedIds = rankOpportunities(
+    curatedOfficialOpportunities,
+    request,
+  ).map((candidate) => candidate.opportunity.id);
+  assert.equal(rankedIds.includes("official-hackerone-bug-bounty"), false);
+  assert.equal(rankedIds.includes("official-ctftime-events"), false);
+});
+
+test("matching program directories remain available as grounded exploration results", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Self-taught blockchain developer",
+      location: "Ghana",
+      experienceLevel: "early-career",
+      skills: ["JavaScript", "React", "TypeScript", "Solidity"],
+      interests: ["Web3"],
+      goals: ["Find blockchain hackathons and entry-level opportunities"],
+    },
+    filters: { remote: true },
+  });
+  const matchingDirectories = curatedOfficialOpportunities.filter((item) =>
+    ["official-ethglobal-events", "official-dorahacks-hackathons"].includes(
+      item.id,
+    ),
+  );
+
+  assert.equal(matchingDirectories.length, 2);
+  for (const directory of matchingDirectories) {
+    const result = scoreOpportunity(directory, request, {
+      now: new Date("2026-07-19T12:00:00.000Z"),
+    });
+    assert.equal(result.hardMismatch, false, directory.id);
+    assert.equal(result.action, "Prepare First", directory.id);
+    assert.equal(directory.verificationStatus, "program_directory");
+  }
+
+  const rankedIds = rankOpportunities(
+    matchingDirectories,
+    request,
+  ).map((candidate) => candidate.opportunity.id);
+  assert.deepEqual(
+    new Set(rankedIds),
+    new Set(["official-ethglobal-events", "official-dorahacks-hackathons"]),
   );
 });
 

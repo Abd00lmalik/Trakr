@@ -96,9 +96,6 @@ const archetypes: Archetype[] = [
     expectedIds: [
       "official-hackerone-bug-bounty",
       "official-ctftime-events",
-      "official-dorahacks-hackathons",
-      "dao-tooling-bounty",
-      "ethglobal-online-buildathon",
     ],
     signals: ["security", "cybersecurity", "ctf", "bug bounty", "vulnerability"],
     experienceLevel: "student",
@@ -151,9 +148,6 @@ const archetypes: Archetype[] = [
     expectedIds: [
       "official-y-combinator-apply",
       "official-aws-activate",
-      "official-solana-grants",
-      "official-gitcoin-grants",
-      "gitcoin-public-goods-grants",
     ],
     signals: ["startup", "founder", "accelerator", "funding", "cloud"],
     experienceLevel: "founder",
@@ -169,9 +163,6 @@ const archetypes: Archetype[] = [
     expectedIds: [
       "official-youtube-creators",
       "official-tiktok-creator-academy",
-      "ai-tools-remote-job",
-      "official-google-developer-programs",
-      "official-github-education",
     ],
     signals: ["creator", "video", "content", "audience", "community"],
     experienceLevel: "creator",

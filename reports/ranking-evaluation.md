@@ -1,6 +1,6 @@
 # Trakr Ranking Evaluation
 
-Generated: 2026-07-16T18:28:52.264Z
+Generated: 2026-07-19T19:58:36.605Z
 
 Evaluation date: 2026-07-16T12:00:00.000Z
 
@@ -16,8 +16,8 @@ Evaluation date: 2026-07-16T12:00:00.000Z
 | --- | ---: |
 | Precision@3 | 100.0% |
 | Precision@5 | 100.0% |
-| NDCG@5 | 86.6% |
-| Recall@5 | 50.7% |
+| NDCG@5 | 96.7% |
+| Recall@5 | 89.5% |
 | Irrelevant result rate | 0.0% |
 | False Apply Now rate | 0.0% |
 
@@ -27,8 +27,8 @@ Evaluation date: 2026-07-16T12:00:00.000Z
 | --- | ---: | ---: | ---: |
 | Precision@3 | 100.0% | 100.0% | 0.0% |
 | Precision@5 | 100.0% | 100.0% | 0.0% |
-| NDCG@5 | 83.3% | 86.6% | 3.3% |
-| Recall@5 | 50.7% | 50.7% | 0.0% |
+| NDCG@5 | 83.3% | 96.7% | 13.4% |
+| Recall@5 | 50.7% | 89.5% | 38.8% |
 | Irrelevant result rate | 0.0% | 0.0% | 0.0% |
 | False Apply Now rate | 0.0% | 0.0% | 0.0% |
 
@@ -38,11 +38,7 @@ Weak means Precision@3 below 80%, NDCG@5 below 75%, irrelevant result rate above
 
 | Persona | Precision@3 | NDCG@5 | Irrelevant | Top result |
 | --- | ---: | ---: | ---: | --- |
-| ai-engineer-core | 100.0% | 70.9% | 0.0% | Kaggle Competitions |
-| startup-founder-core | 100.0% | 72.9% | 0.0% | Y Combinator Startup Accelerator |
-| startup-founder-portfolio | 100.0% | 72.9% | 0.0% | Y Combinator Startup Accelerator |
-| startup-founder-technical | 100.0% | 72.9% | 0.0% | Y Combinator Startup Accelerator |
-| startup-founder-career | 100.0% | 72.9% | 0.0% | Y Combinator Startup Accelerator |
+| None | - | - | - | All personas met the weak-persona thresholds. |
 
 ## Method
 

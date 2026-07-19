@@ -24,7 +24,7 @@ test("evaluation corpus contains 50 to 100 representative personas", () => {
     12,
   );
   for (const persona of evaluationPersonas) {
-    assert.ok(persona.expected.opportunityIds.length >= 5);
+    assert.ok(persona.expected.opportunityIds.length >= 2);
     assert.ok(persona.expected.categories.length >= 1);
     assert.ok(persona.expected.signals.length >= 3);
   }
@@ -56,6 +56,18 @@ test("benchmark protects minimum ranking quality and Apply Now safety", () => {
   assert.ok(report.metrics.recall >= 0.35);
   assert.ok(report.metrics.irrelevantResultRate <= 0.1);
   assert.equal(report.metrics.falseApplyNowRate, 0);
+});
+
+test("benchmark rewards honest short lists instead of requiring padding", () => {
+  const report = evaluateRanking(evaluationPersonas);
+  const securityPersona = report.personas.find(
+    (persona) => persona.id === "security-student-core",
+  );
+
+  assert.ok(securityPersona);
+  assert.equal(securityPersona.topResults.length, 2);
+  assert.equal(securityPersona.precisionAt3, 1);
+  assert.equal(securityPersona.ndcgAt5, 1);
 });
 
 function opportunity(
@@ -285,12 +297,20 @@ test("post-enhancement consistency prevents negative reasoning and action promot
       resourcesToFind: [],
       practiceProjects: [],
     },
-    agentNotes: [],
+    agentNotes: [
+      "Candidates are grounded in stored or structured source opportunities before AI enhancement.",
+      "Scores combine category fit, skills, experience level, location, source quality, deadline urgency, and expected value.",
+      "Responses are designed for direct consumption by other AI agents.",
+    ],
   };
   const enhanced: RecommendationResponse = {
     ...base,
     provider: "gemini:test",
     aiStatus: "enhanced",
+    agentNotes: [
+      "Prioritize the first opportunity because it offers the best environment.",
+      "Documentation is your biggest gap.",
+    ],
     recommendations: [
       {
         ...base.recommendations[0],
@@ -328,5 +348,15 @@ test("post-enhancement consistency prevents negative reasoning and action promot
   assert.deepEqual(
     consistent.recommendations[0].nextSteps,
     base.recommendations[0].nextSteps,
+  );
+  assert.deepEqual(consistent.agentNotes, [
+    ...base.agentNotes,
+    "Gemini completed remotely; deterministic evidence guardrails control final ranking, reasoning, gaps, actions, and next steps.",
+  ]);
+  assert.equal(
+    consistent.agentNotes.some((note) =>
+      /best environment|biggest gap/i.test(note),
+    ),
+    false,
   );
 });

@@ -163,6 +163,31 @@ function actionPriority(action: Recommendation["recommendedAction"]) {
   return 0;
 }
 
+function buildGroundedAgentNotes(
+  response: RecommendationResponse,
+  draft: RecommendationResponse,
+) {
+  const notes = [...draft.agentNotes];
+
+  if (
+    response.provider.startsWith("gemini:") &&
+    response.aiStatus === "enhanced"
+  ) {
+    notes.push(
+      "Gemini completed remotely; deterministic evidence guardrails control final ranking, reasoning, gaps, actions, and next steps.",
+    );
+  } else if (
+    response.provider.startsWith("gemini:") &&
+    response.aiStatus === "fallback"
+  ) {
+    notes.push(
+      "AI enhancement was unavailable after retry; returned grounded deterministic recommendations.",
+    );
+  }
+
+  return [...new Set(notes)].slice(0, 8);
+}
+
 export function enforceRecommendationConsistency(
   response: RecommendationResponse,
   draft: RecommendationResponse,
@@ -247,16 +272,7 @@ export function enforceRecommendationConsistency(
     recommendations,
     actionPlan: buildActionPlan(recommendations),
     learningRoadmap: buildLearningRoadmap(recommendations),
-    agentNotes: [
-      ...response.agentNotes.filter(
-        (note) => !/enhanced the recommendation reasoning/i.test(note),
-      ),
-      response.provider.startsWith("gemini:")
-        ? "Gemini completed remotely; deterministic evidence guardrails control final ranking, reasoning, gaps, actions, and next steps."
-        : "",
-    ]
-      .filter(Boolean)
-      .slice(0, 8),
+    agentNotes: buildGroundedAgentNotes(response, draft),
   };
 }
 
