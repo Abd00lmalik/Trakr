@@ -749,6 +749,24 @@ test("conversation continuation recognizes hyphenated early-career answers", asy
   );
 });
 
+test("resume location wording preserves country evidence for external matching", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "resume",
+      resumeText:
+        "AMINA OKAFOR\nComputer Science undergraduate in Lagos, Nigeria.\nSkills: Python, React, SQL.\nProjects: Built a fictional data dashboard.\nGoal: Find remote AI internships.",
+      consent: {
+        processPersonalData: true,
+        retention: "session_only",
+        source: "explicit",
+      },
+    }),
+  );
+
+  assert.equal(response.conversation?.profile.draft.location, "Lagos, Nigeria");
+});
+
 test("AI prompt context excludes instruction-like resume content", () => {
   const request = recommendationRequestSchema.parse({
     user: {

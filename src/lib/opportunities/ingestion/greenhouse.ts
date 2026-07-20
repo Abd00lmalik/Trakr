@@ -175,10 +175,15 @@ function extractEligibility(location: string, content: string) {
       ),
     )
     .slice(0, 4);
+  const genericRemoteLocation =
+    /^(?:remote|remote worldwide|worldwide remote)$/i.test(location);
 
   return unique([
     location ? `Published location: ${location}` : "",
     locationRestriction,
+    location && !genericRemoteLocation && /\b(remote|distributed|work from home)\b/i.test(location)
+      ? `Published eligible locations: ${location}`
+      : "",
     ...sentences,
     "Confirm employer-specific work authorization and regional eligibility on the official job page.",
   ]);

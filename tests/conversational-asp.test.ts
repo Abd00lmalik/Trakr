@@ -303,6 +303,28 @@ test("new-graduate background preserves location and requested opportunity types
   assert.equal(response.querySummary.filtersApplied.remote, true);
 });
 
+test("background location and junior role intent survive natural wording", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "background",
+      message:
+        "I am a product designer in Portugal with three years of experience. I use Figma, design systems, prototyping, accessibility testing, and qualitative research. I want remote or Europe-accessible junior product roles in climate and fintech.",
+    }),
+  );
+
+  assert.equal(response.conversation?.profile.draft.location, "Portugal");
+  assert.equal(
+    response.conversation?.profile.draft.interests.includes("Research"),
+    false,
+  );
+  assert.equal(
+    response.querySummary.filtersApplied.categories?.includes("remote_job"),
+    true,
+  );
+  assert.equal(response.querySummary.filtersApplied.remote, true);
+});
+
 test("minimal student input asks for gates instead of making weak recommendations", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({

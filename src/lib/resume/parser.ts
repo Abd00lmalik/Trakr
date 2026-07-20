@@ -192,7 +192,10 @@ function inferSkills(text: string) {
 }
 
 function inferInterests(text: string) {
-  const researchText = text.replace(/\buser research\b/gi, "");
+  const researchText = text.replace(
+    /\b(?:user|qualitative|market|applied|academic) research\b/gi,
+    "",
+  );
   return [
     hasNonNegatedPhrase(text, ["hackathon", "hackathons"])
       ? "hackathons"
@@ -435,7 +438,7 @@ function inferLocation(text: string) {
   if (contactLineLocation) return contactLineLocation.trim();
 
   const match = text.match(
-    /\b(?:based in|located in|living in|from|student in)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:and|with|seeking|open|looking)\b|$)/i,
+    /\b(?:based in|located in|living in|from|student in|undergraduate in|graduate in|designer in|developer in|engineer in|researcher in|applicant in)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:and|with|seeking|open|looking)\b|$)/i,
   );
   return match?.[1]?.trim().replace(/[.;]+$/, "");
 }

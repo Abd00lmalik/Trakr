@@ -76,12 +76,13 @@ function opportunity(
   title: string,
   requiredSkills: string[],
   summary = `${title} with a clear active role description and documented responsibilities for qualified applicants.`,
+  category: Opportunity["category"] = "remote_job",
 ): Opportunity {
   return opportunitySchema.parse({
     id,
     title,
     organization: "Example Organization",
-    category: "remote_job",
+    category,
     summary,
     sourceName: "Official curated source",
     sourceUrl: `https://example.com/${id}`,
@@ -321,6 +322,39 @@ test("research profiles do not receive legal or finance roles from topical emplo
   assert.equal(scoreOpportunity(researchRole, request).hardMismatch, false);
   assert.equal(scoreOpportunity(legalRole, request).hardMismatch, true);
   assert.equal(scoreOpportunity(financeRole, request).hardMismatch, true);
+});
+
+test("research profiles do not receive unrelated employment-like fellowships", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Technology policy researcher",
+      experienceLevel: "mid-level",
+      location: "Uganda",
+      skills: ["qualitative research", "statistics", "academic writing"],
+      interests: ["Research"],
+      goals: ["Find research fellowships"],
+    },
+    filters: { categories: ["fellowship"] },
+  });
+  const legalFellowship = opportunity(
+    "legal-fellowship",
+    "Legal Fellow",
+    ["legal research", "regulatory compliance"],
+    undefined,
+    "fellowship",
+  );
+  const researchFellowship = opportunity(
+    "research-fellowship",
+    "Research Fellow",
+    ["qualitative research", "academic writing"],
+    undefined,
+    "fellowship",
+  );
+  assert.equal(scoreOpportunity(legalFellowship, request).hardMismatch, true);
+  assert.equal(
+    scoreOpportunity(researchFellowship, request).hardMismatch,
+    false,
+  );
 });
 
 test("post-enhancement consistency prevents negative reasoning and action promotion", () => {

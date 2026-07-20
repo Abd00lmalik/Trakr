@@ -44,7 +44,21 @@ const categorySignals: Array<{
   { category: "internship", signals: ["internship", "intern"] },
   {
     category: "remote_job",
-    signals: ["remote job", "remote role", "job", "employment", "freelance"],
+    signals: [
+      "remote job",
+      "remote role",
+      "job",
+      "employment",
+      "freelance",
+      "entry-level",
+      "entry level",
+      "junior",
+      "developer opportunities",
+      "career opportunities",
+      "software roles",
+      "technical roles",
+      "early-career roles",
+    ],
   },
   {
     category: "web3_bounty",
@@ -73,7 +87,6 @@ const interestAliases: Array<[RegExp, string]> = [
     /\b(product design|product designer|ux|ui|figma|design systems?|accessibility testing)\b/i,
     "Design",
   ],
-  [/\b(research|researcher|academic|phd|laboratory)\b/i, "Research"],
   [/\b(open source|oss)\b/i, "Open source"],
   [/\b(healthcare|health tech|healthtech|medical)\b/i, "Healthcare"],
   [/\b(startups?|entrepreneurship|founder)\b/i, "Startups"],
@@ -142,7 +155,7 @@ function inferLocation(message: string) {
   }
 
   const match = message.match(
-    /\b(?:from|based in|located in|living in|student in|graduate in|researcher in|professional in|applicant in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
+    /\b(?:from|based in|located in|living in|student in|graduate in|researcher in|professional in|applicant in|designer in|developer in|engineer in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
   );
   return match?.[1]?.trim().replace(/[.;]+$/, "");
 }
@@ -176,9 +189,17 @@ function categoriesFromText(message: string) {
 
 function interestsFromText(message: string) {
   const interestText = message.replace(/\buser research\b/gi, "");
-  return interestAliases
+  const researchText = interestText.replace(
+    /\b(?:qualitative|market|applied)\s+research\b/gi,
+    "",
+  );
+  const interests = interestAliases
     .filter(([pattern]) => pattern.test(interestText))
     .map(([, interest]) => interest);
+  if (/\b(research|researcher|academic|phd|laboratory)\b/i.test(researchText)) {
+    interests.push("Research");
+  }
+  return interests;
 }
 
 function meaningfulMessage(message: string | undefined) {

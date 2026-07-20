@@ -233,6 +233,7 @@ const roleFamilies = {
     "research associate",
     "research scientist",
     "research engineer",
+    "research fellow",
     "scientist",
     "academic research",
     "laboratory",
@@ -939,7 +940,12 @@ function hardMismatchAssessment(
     return { hardMismatch: true, reasons: generalReasons };
   }
 
-  if (opportunity.category !== "remote_job") {
+  if (
+    opportunity.verificationStatus === "program_directory" ||
+    ["hackathon", "grant", "scholarship", "web3_bounty"].includes(
+      opportunity.category,
+    )
+  ) {
     return { hardMismatch: false, reasons: [] };
   }
 
@@ -976,13 +982,6 @@ function hardMismatchAssessment(
   ) {
     candidateRoleFamilies.push("industrial_operations");
   }
-  const broadVerifiedDirectory =
-    opportunity.verificationStatus === "program_directory" &&
-    opportunity.sourceName === "Official curated source";
-  if (!candidateRoleFamilies.length && broadVerifiedDirectory) {
-    return { hardMismatch: false, reasons: [] };
-  }
-
   const profileHasCoreProfessionalRole = profileRoleFamilies.some((family) =>
     coreProfessionalFamilies.has(family),
   );

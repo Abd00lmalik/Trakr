@@ -86,6 +86,44 @@ test("Greenhouse regional restrictions remain hard eligibility gates", () => {
   );
 });
 
+test("remote Greenhouse country locations remain hard eligibility gates", () => {
+  const opportunity = normalizeGreenhouseJob(
+    {
+      id: 457,
+      title: "Site Reliability Engineer",
+      absolute_url: "https://job-boards.greenhouse.io/example/jobs/457",
+      location: { name: "Remote, South Africa" },
+      content: "Operate reliable fintech infrastructure with Python and AWS.",
+    },
+    moniepoint,
+  );
+  assert.ok(opportunity);
+  assert.ok(
+    opportunity.eligibility.some((item) =>
+      item.startsWith("Published eligible locations:"),
+    ),
+  );
+
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Frontend developer",
+      location: "Accra, Ghana",
+      experienceLevel: "early-career",
+      skills: ["JavaScript", "React"],
+      interests: ["Web3"],
+      goals: ["Find remote software roles"],
+    },
+    filters: { categories: ["remote_job"], remote: true },
+  });
+  const score = scoreOpportunity(opportunity, request);
+  assert.equal(score.hardMismatch, true);
+  assert.ok(
+    score.mismatchReasons?.some((reason) =>
+      /published eligible locations/i.test(reason),
+    ),
+  );
+});
+
 test("African employer postings preserve regional location evidence", () => {
   const opportunity = normalizeGreenhouseJob(
     {
