@@ -31,6 +31,7 @@ export type InventoryMonitoringSnapshot = {
   africaEvidenceCount: number;
   knownDeadlineCount: number;
   sourceCounts: Record<string, number>;
+  sourceGroupCounts: Record<string, number>;
   categoryCounts: Record<string, number>;
   alerts: InventoryAlert[];
 };
@@ -63,12 +64,14 @@ function isStale(opportunity: Opportunity, now: Date) {
 export function buildInventoryMonitoringSnapshot({
   opportunities,
   expectedSources,
+  sourceGroupCounts = {},
   failedSources = [],
   previous,
   now = new Date(),
 }: {
   opportunities: Opportunity[];
   expectedSources: string[];
+  sourceGroupCounts?: Record<string, number>;
   failedSources?: string[];
   previous?: InventoryMonitoringSnapshot;
   now?: Date;
@@ -89,7 +92,11 @@ export function buildInventoryMonitoringSnapshot({
   }
 
   for (const source of expectedSources) {
-    if (!sourceCounts[source] && !failedSources.includes(source)) {
+    if (
+      !sourceGroupCounts[source] &&
+      !sourceCounts[source] &&
+      !failedSources.includes(source)
+    ) {
       alerts.push({
         code: "source_zero_records",
         severity: "critical",
@@ -222,6 +229,7 @@ export function buildInventoryMonitoringSnapshot({
     africaEvidenceCount,
     knownDeadlineCount,
     sourceCounts,
+    sourceGroupCounts,
     categoryCounts,
     alerts,
   };

@@ -50,6 +50,10 @@ test("inventory monitoring reports healthy source and coverage counts", () => {
   const snapshot = buildInventoryMonitoringSnapshot({
     opportunities: records,
     expectedSources: ["Source A", "Source B"],
+    sourceGroupCounts: {
+      "Source A": 6,
+      "Source B": 6,
+    },
     now: new Date("2026-07-20T10:00:00.000Z"),
   });
 
@@ -104,6 +108,7 @@ test("inventory monitoring surfaces source, verification, stale, duplicate, and 
       africaEvidenceCount: 10,
       knownDeadlineCount: 20,
       sourceCounts: {},
+      sourceGroupCounts: {},
       categoryCounts: {},
       alerts: [],
     },

@@ -124,6 +124,17 @@ export async function fetchStructuredOpportunities() {
   const failedSourceNames = results.flatMap((result, index) =>
     result.status === "rejected" ? [sourceFetches[index].sourceName] : [],
   );
+  const sourceGroupCounts = Object.fromEntries([
+    ...results.map((result, index) => [
+      sourceFetches[index].sourceName,
+      result.status === "fulfilled"
+        ? Array.isArray(result.value)
+          ? result.value.length
+          : result.value.opportunities.length
+        : 0,
+    ]),
+    ["Official curated source", curatedOfficialOpportunities.length],
+  ]);
 
   return {
     opportunities: [...opportunities, ...curatedOfficialOpportunities],
@@ -134,5 +145,6 @@ export async function fetchStructuredOpportunities() {
     ],
     successfulSourceNames: [...successfulSourceNames, "Official curated source"],
     failedSourceNames,
+    sourceGroupCounts,
   };
 }

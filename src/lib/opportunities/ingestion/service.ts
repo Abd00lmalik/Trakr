@@ -11,6 +11,7 @@ export async function ingestOpportunities() {
     sources,
     successfulSourceNames,
     failedSourceNames,
+    sourceGroupCounts,
   } =
     await fetchStructuredOpportunities();
   const lastSeenAt = startedAt.toISOString();
@@ -21,6 +22,7 @@ export async function ingestOpportunities() {
   const monitoring = buildInventoryMonitoringSnapshot({
     opportunities: verified,
     expectedSources: successfulSourceNames,
+    sourceGroupCounts,
     failedSources: failedSourceNames,
     now: startedAt,
   });
