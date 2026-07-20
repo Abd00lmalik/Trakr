@@ -1,0 +1,920 @@
+[
+  {
+    "caseId": "S2C-0001",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0002",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0003",
+    "expectedHardFailure": "location_failure",
+    "contradiction": true,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0004",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0005",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0006",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0007",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0008",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0009",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0010",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0011",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0012",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0013",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0014",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0015",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0016",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0017",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0018",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0019",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0020",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0021",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0022",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0023",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0024",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0025",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0026",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0027",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0028",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0029",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0030",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0031",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0032",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0033",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0034",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0035",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0036",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0037",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0038",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0039",
+    "expectedHardFailure": "location_failure",
+    "contradiction": true,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0040",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0041",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0042",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0043",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0044",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0045",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0046",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0047",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0048",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0049",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0050",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0051",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0052",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0053",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0054",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0055",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0056",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0057",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0058",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0059",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0060",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0061",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0062",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0063",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0064",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0065",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0066",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0067",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0068",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0069",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0070",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0071",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0072",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0073",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0074",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0075",
+    "expectedHardFailure": "location_failure",
+    "contradiction": true,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0076",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0077",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0078",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0079",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0080",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0081",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0082",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0083",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0084",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0085",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0086",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0087",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0088",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0089",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0090",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0091",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0092",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0093",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0094",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0095",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0096",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0097",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0098",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0099",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0100",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0101",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0102",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0103",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0104",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0105",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0106",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0107",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0108",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0109",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0110",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0111",
+    "expectedHardFailure": "location_failure",
+    "contradiction": true,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0112",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0113",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0114",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0115",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0116",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0117",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0118",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0119",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0120",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0121",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0122",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0123",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0124",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0125",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0126",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0127",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0128",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0129",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0130",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0131",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0132",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0133",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0134",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0135",
+    "expectedHardFailure": "location_failure",
+    "contradiction": false,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0136",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0137",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0138",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": true,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0139",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0140",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0141",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0142",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0143",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0144",
+    "expectedHardFailure": "certification_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0145",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0146",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0147",
+    "expectedHardFailure": "location_failure",
+    "contradiction": true,
+    "adversarial": true
+  },
+  {
+    "caseId": "S2C-0148",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0149",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0150",
+    "expectedHardFailure": "experience_failure",
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0151",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0152",
+    "expectedHardFailure": null,
+    "contradiction": false,
+    "adversarial": false
+  },
+  {
+    "caseId": "S2C-0153",
+    "expectedHardFailure": "enrollment_failure",
+    "contradiction": false,
+    "adversarial": false
+  }
+]

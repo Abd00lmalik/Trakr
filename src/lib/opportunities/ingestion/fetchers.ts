@@ -121,6 +121,9 @@ export async function fetchStructuredOpportunities() {
         : result.value.successfulSourceNames
       : [],
   );
+  const failedSourceNames = results.flatMap((result, index) =>
+    result.status === "rejected" ? [sourceFetches[index].sourceName] : [],
+  );
 
   return {
     opportunities: [...opportunities, ...curatedOfficialOpportunities],
@@ -130,5 +133,6 @@ export async function fetchStructuredOpportunities() {
       "Official curated source import",
     ],
     successfulSourceNames: [...successfulSourceNames, "Official curated source"],
+    failedSourceNames,
   };
 }

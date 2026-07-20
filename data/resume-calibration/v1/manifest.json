@@ -1,0 +1,305 @@
+{
+  "corpusId": "trakr-service2-calibration",
+  "corpusVersion": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "rubricVersion": "resume-rubric-2026-07-20",
+  "createdAt": "2026-07-20T00:00:00.000Z",
+  "caseCount": 153,
+  "independenceStatus": "reviewer_blinded",
+  "contentPolicy": "synthetic_and_rights_cleared_only",
+  "description": "Independently AI-reviewed and adjudicated synthetic benchmark corpus.",
+  "coverage": {
+    "africa_based": 65,
+    "internship": 21,
+    "internship_or_early_career": 33,
+    "student": 11,
+    "technical": 48,
+    "technical_role": 48,
+    "career_changer": 51,
+    "no_formal_work": 96,
+    "adversarial_prompt_injection": 13,
+    "contradiction_uncertainty": 17,
+    "hard_eligibility_failure": 51,
+    "no_formal_experience": 45,
+    "job": 90,
+    "mid": 34,
+    "international_applicant": 88,
+    "research": 24,
+    "hackathon": 3,
+    "senior": 12,
+    "senior_leadership": 18,
+    "design": 27,
+    "design_role": 27,
+    "adjacent_role_confusion": 6,
+    "research_academic": 18,
+    "fellowship": 12,
+    "scholarship": 12,
+    "fellowship_grant": 12,
+    "fellowship_or_grant": 12,
+    "grant": 3,
+    "nontechnical": 24,
+    "leadership": 12
+  },
+  "files": {
+    "cases": {
+      "path": "cases.json",
+      "sha256": "25a71a0182aa6df7bc1a19a3fbaed6eacb73ca74211cf91c310a7c9056c01651",
+      "reviewerVisible": true
+    },
+    "authorSealedRisks": {
+      "path": "author-sealed-risks.json",
+      "sha256": "9937339c5b28f7aaff969af395a625bf640cc3046c19ef80d71432e6fca67066",
+      "reviewerVisible": false
+    }
+  },
+  "reviewPackets": [
+    {
+      "packetId": "S2P-01",
+      "path": "review-packets/packet-01.json",
+      "sha256": "6b4cfbd1a7b7d178bc44e0ed39b21f90e2ebc47508d0d6da0ea31318a32c5d9c",
+      "caseIds": [
+        "S2C-0001",
+        "S2C-0002",
+        "S2C-0003",
+        "S2C-0004",
+        "S2C-0005",
+        "S2C-0006",
+        "S2C-0007",
+        "S2C-0008",
+        "S2C-0009",
+        "S2C-0010",
+        "S2C-0011",
+        "S2C-0012",
+        "S2C-0013",
+        "S2C-0014",
+        "S2C-0015",
+        "S2C-0016",
+        "S2C-0017"
+      ]
+    },
+    {
+      "packetId": "S2P-02",
+      "path": "review-packets/packet-02.json",
+      "sha256": "b57aeebc0cf12ed02833e73cb7563f2c006dba02fc039f3e54a0dc6aef363587",
+      "caseIds": [
+        "S2C-0018",
+        "S2C-0019",
+        "S2C-0020",
+        "S2C-0021",
+        "S2C-0022",
+        "S2C-0023",
+        "S2C-0024",
+        "S2C-0025",
+        "S2C-0026",
+        "S2C-0027",
+        "S2C-0028",
+        "S2C-0029",
+        "S2C-0030",
+        "S2C-0031",
+        "S2C-0032",
+        "S2C-0033",
+        "S2C-0034"
+      ]
+    },
+    {
+      "packetId": "S2P-03",
+      "path": "review-packets/packet-03.json",
+      "sha256": "8f931f8a987f79fd96514721dcc70f184c750b65ad68a188332ed4ddc3908157",
+      "caseIds": [
+        "S2C-0035",
+        "S2C-0036",
+        "S2C-0037",
+        "S2C-0038",
+        "S2C-0039",
+        "S2C-0040",
+        "S2C-0041",
+        "S2C-0042",
+        "S2C-0043",
+        "S2C-0044",
+        "S2C-0045",
+        "S2C-0046",
+        "S2C-0047",
+        "S2C-0048",
+        "S2C-0049",
+        "S2C-0050",
+        "S2C-0051"
+      ]
+    },
+    {
+      "packetId": "S2P-04",
+      "path": "review-packets/packet-04.json",
+      "sha256": "9fb13c9b3dfa1b9157226a446990e3a45d205e0d6fce00797c80b00fb5e70fbe",
+      "caseIds": [
+        "S2C-0052",
+        "S2C-0053",
+        "S2C-0054",
+        "S2C-0055",
+        "S2C-0056",
+        "S2C-0057",
+        "S2C-0058",
+        "S2C-0059",
+        "S2C-0060",
+        "S2C-0061",
+        "S2C-0062",
+        "S2C-0063",
+        "S2C-0064",
+        "S2C-0065",
+        "S2C-0066",
+        "S2C-0067",
+        "S2C-0068"
+      ]
+    },
+    {
+      "packetId": "S2P-05",
+      "path": "review-packets/packet-05.json",
+      "sha256": "cb9534518b772f02abf56a4c3b05357c67299ccb90bc7363476f4b67b81942d7",
+      "caseIds": [
+        "S2C-0069",
+        "S2C-0070",
+        "S2C-0071",
+        "S2C-0072",
+        "S2C-0073",
+        "S2C-0074",
+        "S2C-0075",
+        "S2C-0076",
+        "S2C-0077",
+        "S2C-0078",
+        "S2C-0079",
+        "S2C-0080",
+        "S2C-0081",
+        "S2C-0082",
+        "S2C-0083",
+        "S2C-0084",
+        "S2C-0085"
+      ]
+    },
+    {
+      "packetId": "S2P-06",
+      "path": "review-packets/packet-06.json",
+      "sha256": "05b5b994dac1436d04d883176b4167db16ebcbe2fe093b9175b2540fbb9a2184",
+      "caseIds": [
+        "S2C-0086",
+        "S2C-0087",
+        "S2C-0088",
+        "S2C-0089",
+        "S2C-0090",
+        "S2C-0091",
+        "S2C-0092",
+        "S2C-0093",
+        "S2C-0094",
+        "S2C-0095",
+        "S2C-0096",
+        "S2C-0097",
+        "S2C-0098",
+        "S2C-0099",
+        "S2C-0100",
+        "S2C-0101",
+        "S2C-0102"
+      ]
+    },
+    {
+      "packetId": "S2P-07",
+      "path": "review-packets/packet-07.json",
+      "sha256": "f89c467f31bbe51bba5240084836e9474b76c87faf2b646faccaa579ede76e62",
+      "caseIds": [
+        "S2C-0103",
+        "S2C-0104",
+        "S2C-0105",
+        "S2C-0106",
+        "S2C-0107",
+        "S2C-0108",
+        "S2C-0109",
+        "S2C-0110",
+        "S2C-0111",
+        "S2C-0112",
+        "S2C-0113",
+        "S2C-0114",
+        "S2C-0115",
+        "S2C-0116",
+        "S2C-0117",
+        "S2C-0118",
+        "S2C-0119"
+      ]
+    },
+    {
+      "packetId": "S2P-08",
+      "path": "review-packets/packet-08.json",
+      "sha256": "e606fa82ac68f9f12efdf9676d64ce33d4962ff08ed7540c88e7068aa1bf2486",
+      "caseIds": [
+        "S2C-0120",
+        "S2C-0121",
+        "S2C-0122",
+        "S2C-0123",
+        "S2C-0124",
+        "S2C-0125",
+        "S2C-0126",
+        "S2C-0127",
+        "S2C-0128",
+        "S2C-0129",
+        "S2C-0130",
+        "S2C-0131",
+        "S2C-0132",
+        "S2C-0133",
+        "S2C-0134",
+        "S2C-0135",
+        "S2C-0136"
+      ]
+    },
+    {
+      "packetId": "S2P-09",
+      "path": "review-packets/packet-09.json",
+      "sha256": "6fe71cdd89b2094af0df858b04e001b8c76bb397d887445ff784ceea930d1f85",
+      "caseIds": [
+        "S2C-0137",
+        "S2C-0138",
+        "S2C-0139",
+        "S2C-0140",
+        "S2C-0141",
+        "S2C-0142",
+        "S2C-0143",
+        "S2C-0144",
+        "S2C-0145",
+        "S2C-0146",
+        "S2C-0147",
+        "S2C-0148",
+        "S2C-0149",
+        "S2C-0150",
+        "S2C-0151",
+        "S2C-0152",
+        "S2C-0153"
+      ]
+    }
+  ],
+  "guidance": [
+    {
+      "id": "reviewer_protocol",
+      "path": "data/resume-calibration/v1/reviewer-protocol.md",
+      "sha256": "6c0767c7213891bda1948b23c01517a2d27924b3c3afb6825a5cb7b3094e2839"
+    },
+    {
+      "id": "authoritative_research",
+      "path": "reports/service2-calibration-authoritative-research-2026-07-20.md",
+      "sha256": "3e305ed8af1efe65a8d1067c6bfb6408b7cdf0f713a528d41f4644c76bfadaac"
+    },
+    {
+      "id": "social_hypotheses",
+      "path": "reports/service2-calibration-social-research-2026-07-20.md",
+      "sha256": "fd05fe7aa903650743090943ec00e888942aa4e691b8b9f601eed924e775e3bf"
+    }
+  ],
+  "reviewerRules": {
+    "reviewersPerCase": 3,
+    "reviewerType": "AI",
+    "blindedToTrakr": true,
+    "blindedToOtherReviewers": true,
+    "blindedToAuthorSealedAnnotations": true,
+    "lowConsensusHumanReviewQueue": true
+  },
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-07-20",
+      "change": "Initial 153-case synthetic calibration corpus."
+    }
+  ]
+}
