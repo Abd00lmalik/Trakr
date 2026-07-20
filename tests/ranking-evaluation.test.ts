@@ -252,6 +252,44 @@ test("hard mismatch filtering excludes unrelated operational roles", () => {
   );
 });
 
+test("product design profiles do not receive interior design roles", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Product designer",
+      bio: "Product designer with climate dashboard and fintech onboarding projects.",
+      experienceLevel: "mid-level",
+      location: "Portugal",
+      skills: [
+        "Figma",
+        "user research",
+        "prototyping",
+        "design systems",
+        "accessibility testing",
+      ],
+      interests: ["Climate", "Fintech", "Design"],
+      goals: ["Find remote product design roles"],
+    },
+    filters: { categories: ["remote_job"], remote: true },
+  });
+  const interiorDesigner = opportunity(
+    "interior-designer-role",
+    "Designer de Interiores",
+    ["space planning", "interior design"],
+  );
+  const graphicDesigner = opportunity(
+    "graphic-designer-role",
+    "Graphic Designer",
+    ["Figma", "visual design"],
+  );
+
+  const interiorScore = scoreOpportunity(interiorDesigner, request);
+  const graphicScore = scoreOpportunity(graphicDesigner, request);
+
+  assert.equal(interiorScore.hardMismatch, true);
+  assert.equal(interiorScore.action, "Skip");
+  assert.equal(graphicScore.hardMismatch, false);
+});
+
 test("post-enhancement consistency prevents negative reasoning and action promotion", () => {
   const strong = opportunity("strong-role", "Frontend Developer", [
     "React",

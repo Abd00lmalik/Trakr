@@ -192,13 +192,18 @@ const roleFamilies = {
   design: [
     "product designer",
     "graphic designer",
-    "interior designer",
-    "designer de interiores",
     "ux designer",
     "ui designer",
     "figma",
     "user experience",
     "user interface",
+  ],
+  interior_design: [
+    "interior designer",
+    "interior design",
+    "designer de interiores",
+    "design de interiores",
+    "space planning",
   ],
   product: [
     "product manager",
@@ -304,6 +309,7 @@ const coreProfessionalFamilies = new Set([
   "web3",
   "security",
   "design",
+  "interior_design",
   "product",
 ]);
 
