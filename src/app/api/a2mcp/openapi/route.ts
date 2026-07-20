@@ -7,7 +7,7 @@ export async function GET() {
     openapi: "3.1.0",
     info: {
       title: "Trakr A2MCP API",
-      version: "0.3.0",
+      version: "0.4.0",
       description:
         "Trakr is an outcome-first conversational AI Opportunity Companion. Three visible services share one capability layer behind the stable POST /api/a2mcp/recommend endpoint.",
     },
@@ -125,6 +125,32 @@ export async function GET() {
                         opportunityTitle: { type: "string" },
                         role: { type: "string" },
                         industry: { type: "string" },
+                        organization: { type: "string" },
+                        opportunityType: {
+                          type: "string",
+                          enum: [
+                            "hackathon",
+                            "grant",
+                            "scholarship",
+                            "fellowship",
+                            "internship",
+                            "remote_job",
+                            "web3_bounty",
+                          ],
+                        },
+                        description: {
+                          type: "string",
+                          maxLength: 12000,
+                          description:
+                            "Captured target description or dated snapshot text. Unknown URLs are not scraped automatically.",
+                        },
+                        requirements: {
+                          type: "array",
+                          maxItems: 50,
+                          items: { type: "string", maxLength: 1000 },
+                        },
+                        url: { type: "string", format: "uri" },
+                        locale: { type: "string" },
                       },
                     },
                     goals: { type: "array", items: { type: "string" } },
@@ -329,7 +355,7 @@ export async function GET() {
                       capabilityResult: {
                         type: "object",
                         description:
-                          "Grounded explanation, readiness, resume benchmark, or resume optimization output when requested.",
+                          "Grounded explanation, readiness, target-specific benchmark, or evidence-traceable optimization output. Benchmark scores are transparent heuristics, not hiring predictions or a universal ATS score.",
                       },
                     },
                   },

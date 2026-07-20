@@ -71,3 +71,24 @@ Trakr capabilities share one session profile, evidence model, opportunity record
 3. Application materials: ATS analysis, role-specific resume optimization, and resume generation grounded only in confirmed evidence and the selected opportunity.
 
 The website and ASP should call the same capability services. External agents receive structured conversational state and operations through the existing additive A2MCP contract.
+
+## ADR 016: Benchmark Before Optimization
+
+Resume Benchmarking & Optimization is one visible service with two distinct
+operations. `benchmark` maps target requirements to session evidence and
+returns explicit uncertainty. `optimize` requires a compatible benchmark from
+the same encrypted caller-carried session. A changed target, changed profile,
+expired session, or withdrawn consent invalidates the benchmark.
+
+The benchmark score is a versioned heuristic, not a hiring prediction or a
+universal ATS score. Hard eligibility failures are separate and cap the
+overall score. Every optimization rewrite must be traceable to explicit
+evidence and remains subject to user confirmation.
+
+## ADR 017: Untrusted Resume And Target Content
+
+Resume text, target descriptions, links, and uploaded documents are untrusted
+data. Instruction-like content is excluded from evidence, requirement
+extraction, AI context, and rewrites. Unknown target URLs are not fetched or
+scraped by the benchmarking capability; callers provide a dated target
+snapshot unless the URL resolves to existing verified Trakr inventory.

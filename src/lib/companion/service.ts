@@ -1,9 +1,11 @@
 import { nanoid } from "nanoid";
 import {
+  buildBenchmarkReference,
   buildOpportunityExplanation,
   buildReadinessAssessment,
   buildResumeBenchmark,
   buildResumeOptimization,
+  isBenchmarkCompatible,
 } from "@/lib/companion/capabilities";
 import {
   buildDocumentReference,
@@ -23,6 +25,7 @@ import type {
   CompanionContext,
   CompanionConversation,
   CompanionIntent,
+  CompanionTarget,
   Opportunity,
   OpportunityCompanionRequest,
   OpportunityCompanionResponse,
@@ -30,9 +33,10 @@ import type {
   ServiceOperation,
   StructuredUserProfile,
   UserFacingService,
+  ResumeBenchmarkReference,
 } from "@/lib/types/opportunities";
 
-const SERVICE_VERSION = "0.3.0";
+const SERVICE_VERSION = "0.4.0";
 
 function serviceForOperation(operation: ServiceOperation): UserFacingService {
   if (operation === "benchmark" || operation === "optimize") {
@@ -56,16 +60,22 @@ function detectIntent(request: OpportunityCompanionRequest): CompanionIntent {
     return "resume_generation";
   }
   if (
-    /\b(optimi[sz]e|rewrite|tailor|improve)\b.*\b(resume|cv)\b/.test(
+    (/\b(optimi[sz]e|rewrite|tailor|improve)\b.*\b(resume|cv)\b/.test(
       message,
-    )
+    ) ||
+      /\b(resume|cv)\b.*\b(optimi[sz]e|optimized|rewrite|tailor|improve)\b/.test(
+        message,
+      ))
   ) {
     return "resume_optimization";
   }
   if (
-    /\b(ats|benchmark|score|evaluate|review)\b.*\b(resume|cv)\b/.test(
+    (/\b(ats|benchmark|score|evaluate|review)\b.*\b(resume|cv)\b/.test(
       message,
-    )
+    ) ||
+      /\b(resume|cv)\b.*\b(ats|benchmark|benchmarked|score|evaluate|review)\b/.test(
+        message,
+      ))
   ) {
     return "resume_benchmark";
   }
@@ -110,10 +120,31 @@ function activeContext(request: OpportunityCompanionRequest) {
 function normalizedRequest(request: OpportunityCompanionRequest) {
   const suppliedContext = request.context ?? request.continuation;
   const context = resolveSessionContext(suppliedContext);
+  const inferredTarget = targetFromMessage(request.message);
+  const contextTarget = context?.target;
+  const suppliedTarget = request.target;
+  const replacementTarget = suppliedTarget ?? inferredTarget;
+  const replacesContext =
+    Boolean(replacementTarget) &&
+    Boolean(
+      replacementTarget?.opportunityId ||
+        replacementTarget?.opportunityTitle ||
+        replacementTarget?.url ||
+        (replacementTarget?.role &&
+          contextTarget?.role &&
+          normalize(replacementTarget.role) !== normalize(contextTarget.role)),
+    );
   return {
     ...request,
     context,
     continuation: undefined,
+    target: replacementTarget
+      ? {
+          ...(replacesContext ? {} : contextTarget),
+          ...inferredTarget,
+          ...suppliedTarget,
+        }
+      : contextTarget,
   };
 }
 
@@ -291,6 +322,9 @@ function conversationFor(
     profileSource?: "resume" | "background" | "request";
     awaitingProfileConfirmation?: boolean;
     stage?: string;
+    target?: CompanionTarget;
+    lastBenchmark?: ResumeBenchmarkReference;
+    clearProfileFromSession?: boolean;
   } = {},
 ): CompanionConversation {
   const context = activeContext(request);
@@ -329,8 +363,16 @@ function conversationFor(
         source: request.consent ? "explicit" : "implicit_legacy",
       },
       filters: built.filters,
+      target: options.target ?? request.target ?? context?.target,
+      lastBenchmark: options.lastBenchmark ?? context?.lastBenchmark,
     },
   );
+  if (options.clearProfileFromSession) {
+    sessionContext.profile = undefined;
+    sessionContext.profileEvidence = [];
+    sessionContext.documentReferences = [];
+    sessionContext.lastBenchmark = undefined;
+  }
 
   return {
     state,
@@ -374,6 +416,51 @@ function normalize(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9+#.\s-]/g, " ").trim();
 }
 
+function targetFromMessage(
+  message: string | undefined,
+): CompanionTarget | undefined {
+  const value = message?.trim();
+  if (!value) return undefined;
+  const opportunityType = /\bhackathon|competition|challenge\b/i.test(value)
+    ? ("hackathon" as const)
+    : /\bscholarship\b/i.test(value)
+      ? ("scholarship" as const)
+      : /\bfellowship\b/i.test(value)
+        ? ("fellowship" as const)
+        : /\bgrant|funded program|funding opportunity\b/i.test(value)
+          ? ("grant" as const)
+          : /\binternship|intern\b/i.test(value)
+            ? ("internship" as const)
+            : /\bjob|role|position\b/i.test(value)
+              ? ("remote_job" as const)
+              : undefined;
+  const role = value
+    .match(
+      /\b(?:for|against|targeting)\s+(?:an?\s+|the\s+)?([^.!?]{3,180}?)(?=\s+(?:that|which|requiring|requires|must|where|at)\b|[.!?]|$)/i,
+    )?.[1]
+    ?.trim()
+    .replace(/\b(?:resume|cv)\b/gi, "")
+    .trim();
+  const requirements = value
+    .split(/\r?\n|(?<=[.!?])\s+/)
+    .map((item) => item.trim())
+    .filter(
+      (item) =>
+        item.length >= 8 &&
+        /\b(required|requires?|must|minimum|preferred|eligible|submit|portfolio|writing sample)\b/i.test(
+          item,
+        ),
+    )
+    .slice(0, 20);
+  if (!role && !requirements.length) return undefined;
+  return {
+    role,
+    opportunityType,
+    description: value.length >= 20 ? value.slice(0, 12000) : undefined,
+    requirements: requirements.length ? requirements : undefined,
+  };
+}
+
 async function findTargetOpportunity(
   request: OpportunityCompanionRequest,
   recommendationRequest: RecommendationRequest,
@@ -381,7 +468,8 @@ async function findTargetOpportunity(
   const opportunityId =
     request.target?.opportunityId ?? activeContext(request)?.selectedOpportunityId;
   const opportunityTitle = request.target?.opportunityTitle;
-  if (!opportunityId && !opportunityTitle) return null;
+  const opportunityUrl = request.target?.url;
+  if (!opportunityId && !opportunityTitle && !opportunityUrl) return null;
 
   const opportunities = await opportunitySource.fetchOpportunities(
     recommendationRequest,
@@ -403,6 +491,16 @@ async function findTargetOpportunity(
       null
     );
   }
+  if (opportunityUrl) {
+    const requested = normalize(opportunityUrl);
+    return (
+      opportunities.find(
+        (item) =>
+          normalize(item.canonicalUrl) === requested ||
+          normalize(item.sourceUrl) === requested,
+      ) ?? null
+    );
+  }
   return null;
 }
 
@@ -416,6 +514,54 @@ function targetPrompt(intent: CompanionIntent) {
   return "Which opportunity or target role should I use for the resume analysis?";
 }
 
+function targetForSession(
+  target: CompanionTarget | undefined,
+  opportunity: Opportunity | null,
+): CompanionTarget | undefined {
+  if (!target && !opportunity) return undefined;
+  return {
+    ...target,
+    opportunityId: opportunity?.id ?? target?.opportunityId,
+    opportunityTitle: opportunity?.title ?? target?.opportunityTitle,
+    organization: opportunity?.organization ?? target?.organization,
+    opportunityType: opportunity?.category ?? target?.opportunityType,
+    description: target?.description ?? opportunity?.summary,
+    requirements:
+      target?.requirements ??
+      (opportunity
+        ? [
+            ...opportunity.eligibility,
+            ...opportunity.requiredSkills,
+            ...opportunity.preferredSkills,
+          ]
+        : undefined),
+    url: opportunity?.canonicalUrl ?? target?.url,
+  };
+}
+
+function hasResumeEvidence(profile: StructuredUserProfile, resumeText?: string) {
+  return Boolean(
+    resumeText ||
+      profile.workHistory.length ||
+      profile.projects.length ||
+      profile.education.length ||
+      profile.certifications.length ||
+      profile.links.length,
+  );
+}
+
+function hasUsableTarget(
+  target: CompanionTarget | undefined,
+  opportunity: Opportunity | null,
+) {
+  return Boolean(
+    opportunity ||
+      target?.description ||
+      target?.requirements?.length ||
+      target?.role,
+  );
+}
+
 export async function handleOpportunityCompanionRequest(
   rawRequest: OpportunityCompanionRequest,
 ): Promise<OpportunityCompanionResponse> {
@@ -424,6 +570,64 @@ export async function handleOpportunityCompanionRequest(
   const operation = operationForRequest(request, intent);
   const service = serviceForOperation(operation);
   const priorConsent = activeContext(request)?.consent?.processPersonalData;
+  const contextHasPersonalData = Boolean(
+    activeContext(request)?.profile ||
+      activeContext(request)?.profileEvidence?.length ||
+      activeContext(request)?.documentReferences?.length,
+  );
+  if (
+    request.consent?.processPersonalData === false &&
+    (request.resumeText || contextHasPersonalData)
+  ) {
+    const withdrawnContext: CompanionContext = {
+      ...(activeContext(request) ?? {}),
+      profile: undefined,
+      profileEvidence: [],
+      profileConfirmed: false,
+      awaitingProfileConfirmation: false,
+      unansweredQuestions: [],
+      documentReferences: [],
+      consent: request.consent,
+      lastBenchmark: undefined,
+      target: request.target ?? activeContext(request)?.target,
+      sessionVersion: "2",
+    };
+    const consentSafeRequest = {
+      ...request,
+      user: undefined,
+      profile: undefined,
+      resumeText: undefined,
+      message: undefined,
+      context: withdrawnContext,
+    };
+    const consentSafeProfile = buildConversationalProfile(consentSafeRequest);
+    const conversation = conversationFor(
+      consentSafeRequest,
+      consentSafeProfile,
+      intent,
+      operation,
+      service,
+      "consent_required",
+      "Consent for personal-data processing was withdrawn. I removed the current session profile, evidence, document references, and benchmark reference. Continue only with new consent or without personal application data.",
+      [
+        "Ask whether the user wants to grant new session-only consent.",
+        "Allow the user to start a non-personal request without prior profile evidence.",
+      ],
+      undefined,
+      {
+        requiredAction: "confirm_resume_processing_consent",
+        stage: "consent_withdrawn",
+        target: withdrawnContext.target,
+        clearProfileFromSession: true,
+      },
+    );
+    return emptyResponse(
+      consentSafeRequest,
+      conversation,
+      undefined,
+      consentSafeProfile.filters,
+    );
+  }
   const resumeConsentGranted =
     request.consent?.processPersonalData === true ||
     (request.consent === undefined && priorConsent === true);
@@ -511,8 +715,6 @@ export async function handleOpportunityCompanionRequest(
   }
 
   if (
-    request.operation === "benchmark" ||
-    request.operation === "optimize" ||
     request.operation === "generate_resume" ||
     intent === "resume_generation"
   ) {
@@ -523,9 +725,9 @@ export async function handleOpportunityCompanionRequest(
       operation,
       service,
       "service_pending",
-      "This service is visible in Trakr's product flow, but this release is validating Opportunity Finding first. Your request is preserved for the next capability milestone.",
+      "Resume Generation remains staged for Service 3. Opportunity Finding and Resume Benchmarking & Optimization are available now, and this request is preserved in the current session.",
       [
-        "Keep the service choice and continue with the same session when Resume Benchmarking & Optimization or Resume Generation is enabled.",
+        "Keep the service choice and continue with the same session when Resume Generation is enabled.",
       ],
       undefined,
       {
@@ -534,6 +736,160 @@ export async function handleOpportunityCompanionRequest(
       },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (
+    operation === "benchmark" ||
+    operation === "optimize" ||
+    intent === "resume_benchmark" ||
+    intent === "resume_optimization"
+  ) {
+    const recommendationRequest = toRecommendationRequest(
+      request,
+      built.profile,
+      built.filters,
+    );
+    const targetOpportunity = await findTargetOpportunity(
+      request,
+      recommendationRequest,
+    );
+    const sessionTarget = targetForSession(request.target, targetOpportunity);
+
+    if (!hasUsableTarget(sessionTarget, targetOpportunity)) {
+      const message = request.target?.url
+        ? "I could not resolve that URL to a verified Trakr opportunity. Paste the target description or requirements so I can benchmark against stable evidence."
+        : "Provide the target opportunity, role, description, or requirements. Resume benchmarking is target-specific and does not produce a universal score.";
+      const conversation = conversationFor(
+        request,
+        built,
+        intent,
+        operation,
+        "resume_benchmarking_optimization",
+        "needs_more_information",
+        message,
+        [message],
+        targetOpportunity?.id,
+        {
+          requiredAction: "provide_target_details",
+          target: sessionTarget,
+          stage: "collecting_target",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+
+    if (!hasResumeEvidence(built.profile, request.resumeText)) {
+      const message =
+        "Provide a resume/CV or verified background evidence such as education, projects, work, publications, portfolio links, or certifications. I will not invent experience or missing history.";
+      const conversation = conversationFor(
+        request,
+        built,
+        intent,
+        operation,
+        "resume_benchmarking_optimization",
+        "needs_more_information",
+        message,
+        [message],
+        targetOpportunity?.id,
+        {
+          requiredAction: "provide_resume_or_verified_background",
+          target: sessionTarget,
+          stage: "collecting_evidence",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+
+    const capabilityRequest = { ...request, target: sessionTarget };
+    const benchmark = buildResumeBenchmark(
+      capabilityRequest,
+      built.profile,
+      built.evidence,
+      targetOpportunity,
+    );
+    const benchmarkReference = buildBenchmarkReference(
+      benchmark,
+      sessionTarget,
+      built.profile,
+    );
+    const requestedOptimization =
+      operation === "optimize" || intent === "resume_optimization";
+    const compatibleBenchmark = isBenchmarkCompatible(
+      activeContext(request)?.lastBenchmark,
+      sessionTarget,
+      built.profile,
+    );
+
+    if (requestedOptimization && compatibleBenchmark) {
+      const optimization = buildResumeOptimization(
+        capabilityRequest,
+        built.profile,
+        built.evidence,
+        targetOpportunity,
+      );
+      const conversation = conversationFor(
+        request,
+        built,
+        "resume_optimization",
+        "optimize",
+        "resume_benchmarking_optimization",
+        "resume_optimization",
+        "I created a target-specific optimization plan from the compatible benchmark. Every rewrite is tied to supplied evidence and still requires the user's factual confirmation.",
+        [
+          "Review prioritized changes and supported section rewrites.",
+          "Confirm every rewritten claim before using it.",
+        ],
+        targetOpportunity?.id,
+        {
+          requiredAction: "review_optimization",
+          target: sessionTarget,
+          lastBenchmark: benchmarkReference,
+          stage: "optimization_complete",
+        },
+      );
+      return emptyResponse(
+        request,
+        conversation,
+        { resumeOptimization: optimization },
+        built.filters,
+      );
+    }
+
+    const conversation = conversationFor(
+      request,
+      built,
+      "resume_benchmark",
+      requestedOptimization ? "optimize" : "benchmark",
+      "resume_benchmarking_optimization",
+      "resume_benchmark",
+      requestedOptimization
+        ? "Benchmarking comes first. I completed the diagnostic and preserved it in this session; review it, then continue with optimization."
+        : "I completed a target-specific diagnostic benchmark. Scores are explained heuristics, not hiring predictions or a universal ATS score.",
+      requestedOptimization
+        ? [
+            "Review eligibility, requirement evidence, gaps, and priority actions.",
+            "Continue with optimize using the returned continuation reference.",
+          ]
+        : [
+            "Review eligibility, requirement evidence, gaps, and priority actions.",
+            "Offer optimization only after the user reviews this diagnostic.",
+          ],
+      targetOpportunity?.id,
+      {
+        requiredAction: requestedOptimization
+          ? "review_benchmark_before_optimization"
+          : "review_benchmark",
+        target: sessionTarget,
+        lastBenchmark: benchmarkReference,
+        stage: "benchmark_complete",
+      },
+    );
+    return emptyResponse(
+      request,
+      conversation,
+      { resumeBenchmark: benchmark },
+      built.filters,
+    );
   }
 
   if (shouldOfferProfileSource(request, built) && !sourceChoice) {
@@ -718,16 +1074,7 @@ export async function handleOpportunityCompanionRequest(
     request,
     recommendationRequest,
   );
-  const targetRoleAvailable = Boolean(
-    request.target?.role || request.target?.industry,
-  );
-  if (
-    !targetOpportunity &&
-    !(
-      ["resume_benchmark", "resume_optimization"].includes(intent) &&
-      targetRoleAvailable
-    )
-  ) {
+  if (!targetOpportunity) {
     const conversation = conversationFor(
       request,
       built,
@@ -739,73 +1086,6 @@ export async function handleOpportunityCompanionRequest(
       [targetPrompt(intent)],
     );
     return emptyResponse(request, conversation, undefined, built.filters);
-  }
-
-  if (intent === "resume_benchmark" || intent === "resume_optimization") {
-    if (
-      !request.resumeText &&
-      !built.profile.workHistory.length &&
-      !built.profile.links.length
-    ) {
-      const conversation = conversationFor(
-        request,
-        built,
-        intent,
-        operation,
-        service,
-        "needs_more_information",
-        "I can benchmark or optimize the positioning, but I need real evidence to work from. Send a resume, portfolio link, project history, or verified work and education details. I will not invent experience.",
-        [
-          "Ask the user for a resume, portfolio, projects, work history, or education details.",
-          "Keep unknown experience unknown rather than generating unsupported claims.",
-        ],
-        targetOpportunity?.id,
-      );
-      return emptyResponse(request, conversation, undefined, built.filters);
-    }
-
-    const capabilityResult: CompanionCapabilityResult =
-      intent === "resume_benchmark"
-        ? {
-            resumeBenchmark: buildResumeBenchmark(
-              request,
-              built.profile,
-              targetOpportunity,
-            ),
-          }
-        : {
-            resumeOptimization: buildResumeOptimization(
-              request,
-              built.profile,
-              targetOpportunity,
-            ),
-          };
-    const state =
-      intent === "resume_benchmark"
-        ? ("resume_benchmark" as const)
-        : ("resume_optimization" as const);
-    const conversation = conversationFor(
-      request,
-      built,
-      intent,
-      operation,
-      service,
-      state,
-      intent === "resume_benchmark"
-        ? "I benchmarked the supplied profile and resume evidence against the target without adding unsupported claims."
-        : "I created a grounded optimization plan using only supplied facts. Unsupported target keywords remain flagged rather than being added as experience.",
-      [
-        "Review the benchmark or optimization with the user.",
-        "Ask the user to verify every factual claim before using the output.",
-      ],
-      targetOpportunity?.id,
-    );
-    return emptyResponse(
-      request,
-      conversation,
-      capabilityResult,
-      built.filters,
-    );
   }
 
   const candidate = scoreOpportunity(

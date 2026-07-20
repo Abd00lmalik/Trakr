@@ -249,6 +249,7 @@ function addEvidence(
   source: ProfileEvidence["source"],
   detail?: string,
   origin?: ProfileEvidence["origin"],
+  value?: ProfileEvidence["value"],
 ) {
   if (
     source === "unknown" &&
@@ -257,16 +258,20 @@ function addEvidence(
     return;
   }
   const existing = evidence.find(
-    (item) => item.field === field && item.origin === origin,
+    (item) =>
+      item.field === field &&
+      item.origin === origin &&
+      JSON.stringify(item.value) === JSON.stringify(value),
   );
   if (existing) {
     if (existing.source === "explicit" && source !== "explicit") return;
     existing.source = source;
     existing.evidence = detail;
     existing.origin = origin;
+    existing.value = value;
     return;
   }
-  evidence.push({ field, source, evidence: detail, origin });
+  evidence.push({ field, source, evidence: detail, origin, value });
 }
 
 function enrichEvidence(
@@ -301,7 +306,9 @@ function enrichEvidence(
         item.allowedUse ??
         (item.source === "unknown"
           ? []
-          : (["matching", "assessment"] as const)),
+          : item.source === "explicit"
+            ? (["matching", "assessment", "optimization"] as const)
+            : (["matching", "assessment"] as const)),
     };
   });
 }
@@ -346,7 +353,16 @@ function evidenceFromProvidedProfile(
     ) {
       continue;
     }
-    if (hasValue) addEvidence(evidence, field, source, undefined, origin);
+    if (hasValue) {
+      addEvidence(
+        evidence,
+        field,
+        source,
+        undefined,
+        origin,
+        value as ProfileEvidence["value"],
+      );
+    }
   }
 }
 
@@ -366,8 +382,21 @@ function explicitSkillText(message: string) {
 
 function explicitSkillsFromMessage(message: string) {
   const stated = explicitSkillText(message);
-  if (!stated) return [];
+  const withClauses = [...message.matchAll(/\bwith\s+([^.!?]+)/gi)]
+    .map((match) => match[1]?.trim() ?? "")
+    .filter(
+      (value) =>
+        value &&
+        !/^(?:an?\s+)?(?:interest|interests|goal|goals|preference|preferences)\b/i.test(
+          value,
+        ),
+    )
+    .join(", ");
+  if (!stated && !withClauses) return [];
   const parsed = buildProfileDraftFromBackground(stated).profile.skills;
+  const withClauseSkills = buildProfileDraftFromBackground(
+    withClauses,
+  ).profile.skills;
   const entries = stated
     .split(/,|;|\band\b/gi)
     .map((entry) =>
@@ -386,7 +415,7 @@ function explicitSkillsFromMessage(message: string) {
         !/\b(?:want|seeking|looking for|opportunities?)\b/i.test(entry),
     );
   const seen = new Set<string>();
-  return [...parsed, ...entries].filter((entry) => {
+  return [...parsed, ...withClauseSkills, ...entries].filter((entry) => {
     const key = entry.toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
@@ -625,7 +654,14 @@ export function buildConversationalProfile(
     (profile.interests.length || categories.length)
   ) {
     profile.goals = ["Find relevant opportunities"];
-    addEvidence(evidence, "goals", "explicit", "User asked to find opportunities.");
+    addEvidence(
+      evidence,
+      "goals",
+      "explicit",
+      "User asked to find opportunities.",
+      "user",
+      profile.goals,
+    );
   }
 
   const missingInformation = buildMissingInformation(profile, filters);
@@ -665,6 +701,8 @@ export function buildContinuationContext(
       | "documentReferences"
       | "consent"
       | "filters"
+      | "target"
+      | "lastBenchmark"
     >
   > = {},
 ): CompanionContext {
@@ -689,6 +727,8 @@ export function buildContinuationContext(
       updates.documentReferences ?? context?.documentReferences ?? [],
     consent: updates.consent ?? context?.consent,
     filters: updates.filters ?? context?.filters,
+    target: updates.target ?? context?.target,
+    lastBenchmark: updates.lastBenchmark ?? context?.lastBenchmark,
     sessionVersion: "2",
   };
 }

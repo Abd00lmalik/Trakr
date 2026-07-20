@@ -20,11 +20,12 @@
     "test:ashby": "tsx --test tests/ashby-normalization.test.ts",
     "test:ranking": "tsx --test tests/ranking-evaluation.test.ts",
     "test:service1": "tsx --test tests/service1-opportunity-finding.test.ts",
+    "test:service2": "tsx --test tests/service2-resume-intelligence.test.ts",
     "test:workspace": "tsx --test tests/workspace.test.ts",
     "test:companion": "tsx --test tests/conversational-asp.test.ts",
     "devpost:compare": "tsx scripts/compare-devpost-normalization.ts",
     "evaluate:ranking": "tsx scripts/evaluate-ranking.ts",
-    "verify": "npm run test:privacy && npm run test:verification && npm run test:devpost && npm run test:greenhouse && npm run test:ashby && npm run test:ranking && npm run test:service1 && npm run test:workspace && npm run test:companion && npm run typecheck && npm run lint && npm run build && npm run smoke",
+    "verify": "npm run test:privacy && npm run test:verification && npm run test:devpost && npm run test:greenhouse && npm run test:ashby && npm run test:ranking && npm run test:service1 && npm run test:service2 && npm run test:workspace && npm run test:companion && npm run typecheck && npm run lint && npm run build && npm run smoke",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:seed": "node scripts/db-seed.mjs",
     "ingest": "node scripts/ingest.mjs"

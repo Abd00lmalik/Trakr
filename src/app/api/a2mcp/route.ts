@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export async function GET() {
   return NextResponse.json({
     service: "trakr",
-    version: "0.3.0",
+    version: "0.4.0",
     type: "A2MCP",
     description:
       "Outcome-first AI Opportunity Companion with three user-facing services and one additive A2MCP endpoint.",
@@ -58,7 +58,7 @@ export async function GET() {
         id: "resume_benchmarking_optimization",
         label: "Resume Benchmarking & Optimization",
         operations: ["benchmark", "optimize"],
-        status: "service_selection_and_legacy_compatibility",
+        status: "available",
       },
       {
         id: "resume_generation",
@@ -97,7 +97,8 @@ export async function GET() {
       "opportunity matching and explanation",
       "eligibility and skill-gap analysis",
       "opportunity readiness assessment",
-      "resume benchmarking and optimization compatibility path",
+      "target-specific resume benchmarking with evidence mapping",
+      "grounded resume optimization after a compatible benchmark",
       "resume generation service selection",
     ],
     futureBilling: {

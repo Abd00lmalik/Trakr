@@ -105,6 +105,25 @@ per-URL timeout:
 No inactive or expired listing appeared in the audited results. Unreachable
 records remain unverified and cannot become `Apply Now` recommendations.
 
+## Production Refresh
+
+After deployment and production ingestion on 2026-07-20, Railway reported:
+
+| Production state | Count |
+| --- | ---: |
+| Fetched and stored | 559 |
+| Verified listings | 541 |
+| Program directories | 17 |
+| Inactive listings | 1 |
+| Unverified listings | 0 |
+| Source errors | 0 |
+
+The production refresh completed independently of the local development
+process. The final seven-journey Opportunity Finding matrix was restarted
+against the public Railway endpoint and passed with no canonical duplicates,
+expired or inactive recommendations, unsafe `Apply Now` actions, contact
+leakage, senior-role mismatch, or interior-design mismatch.
+
 ## Deterministic Ranking Audit
 
 After verification and hard-gate filtering:

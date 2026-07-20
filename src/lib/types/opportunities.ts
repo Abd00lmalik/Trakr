@@ -161,6 +161,27 @@ export const consentSchema = z.object({
   source: z.enum(["explicit", "implicit_legacy"]).default("explicit"),
 });
 
+export const companionTargetSchema = z.object({
+  opportunityId: z.string().min(1).max(240).optional(),
+  opportunityTitle: z.string().min(2).max(300).optional(),
+  role: z.string().min(2).max(200).optional(),
+  industry: z.string().min(2).max(200).optional(),
+  organization: z.string().min(2).max(240).optional(),
+  opportunityType: opportunityCategorySchema.optional(),
+  description: z.string().min(20).max(12000).optional(),
+  requirements: z.array(z.string().min(2).max(1000)).max(50).optional(),
+  url: z.string().url().optional(),
+  locale: z.string().min(2).max(80).optional(),
+});
+
+export const resumeBenchmarkReferenceSchema = z.object({
+  benchmarkId: z.string().min(12).max(120),
+  rubricVersion: z.string().min(1).max(80),
+  targetFingerprint: z.string().min(16).max(120),
+  evidenceFingerprint: z.string().min(16).max(120),
+  completedAt: z.string().datetime(),
+});
+
 export const documentReferenceSchema = z.object({
   id: z.string().min(8).max(160),
   kind: z.enum(["resume", "cv", "background"]),
@@ -183,6 +204,8 @@ export const companionContextSchema = z.object({
   documentReferences: z.array(documentReferenceSchema).max(8).default([]),
   consent: consentSchema.optional(),
   filters: recommendationFiltersSchema.optional(),
+  target: companionTargetSchema.optional(),
+  lastBenchmark: resumeBenchmarkReferenceSchema.optional(),
   sessionVersion: z.enum(["1", "2"]).optional(),
 });
 
@@ -197,13 +220,6 @@ export const companionContinuationInputSchema = z.union([
   z.string().min(40).max(24000),
   companionContextSchema,
 ]);
-
-export const companionTargetSchema = z.object({
-  opportunityId: z.string().min(1).max(240).optional(),
-  opportunityTitle: z.string().min(2).max(300).optional(),
-  role: z.string().min(2).max(200).optional(),
-  industry: z.string().min(2).max(200).optional(),
-});
 
 export const opportunityCompanionRequestSchema = z
   .object({
@@ -444,23 +460,101 @@ export const readinessAssessmentSchema = z.object({
 });
 
 export const resumeBenchmarkSchema = z.object({
+  benchmarkId: z.string(),
+  rubricVersion: z.string(),
   target: z.string(),
+  targetType: z.string(),
+  targetConfidence: z.enum(["high", "medium", "low"]),
+  scoreMeaning: z.string(),
+  overallAlignmentScore: z.number().min(0).max(100),
   atsReadinessScore: z.number().min(0).max(100),
+  parseabilityScore: z.number().min(0).max(100),
+  eligibility: z.object({
+    status: z.enum(["meets", "likely", "unclear", "not_met"]),
+    failures: z.array(z.string()),
+    unknowns: z.array(z.string()),
+  }),
+  requirements: z.array(
+    z.object({
+      id: z.string(),
+      requirement: z.string(),
+      importance: z.enum(["required", "preferred", "instruction", "context"]),
+      category: z.enum([
+        "eligibility",
+        "skill",
+        "experience",
+        "education",
+        "portfolio",
+        "achievement",
+        "instruction",
+        "other",
+      ]),
+      status: z.enum([
+        "confirmed",
+        "inferred",
+        "unverified",
+        "missing",
+        "contradictory",
+        "not_met",
+      ]),
+      evidence: z.array(z.string()),
+      evidenceClaimIds: z.array(z.string()),
+      confidence: z.number().min(0).max(1),
+      score: z.number().min(0).max(100),
+      explanation: z.string(),
+      actions: z.array(z.string()),
+    }),
+  ),
+  dimensions: z.array(
+    z.object({
+      id: z.string(),
+      label: z.string(),
+      score: z.number().min(0).max(100),
+      confidence: z.number().min(0).max(1),
+      explanation: z.string(),
+      requirementIds: z.array(z.string()),
+      evidenceClaimIds: z.array(z.string()),
+      actions: z.array(z.string()),
+    }),
+  ),
   matchedKeywords: z.array(z.string()),
   missingKeywords: z.array(z.string()),
   positioningStrengths: z.array(z.string()),
   concerns: z.array(z.string()),
+  priorityActions: z.array(z.string()),
+  limitations: z.array(z.string()),
   factualIntegrity: z.string(),
 });
 
 export const resumeOptimizationSchema = z.object({
+  benchmarkId: z.string(),
+  rubricVersion: z.string(),
   target: z.string(),
   optimizedHeadline: z.string(),
   professionalSummary: z.string(),
   skillsOrder: z.array(z.string()),
   experienceGuidance: z.array(z.string()),
+  prioritizedChanges: z.array(
+    z.object({
+      priority: z.enum(["critical", "high", "medium", "low"]),
+      section: z.string(),
+      recommendation: z.string(),
+      reason: z.string(),
+      evidenceClaimIds: z.array(z.string()),
+    }),
+  ),
+  sectionRewrites: z.array(
+    z.object({
+      section: z.string(),
+      original: z.string(),
+      suggested: z.string(),
+      evidenceClaimIds: z.array(z.string()),
+      requiresConfirmation: z.boolean(),
+    }),
+  ),
   keywordsToUse: z.array(z.string()),
   unsupportedClaims: z.array(z.string()),
+  verificationChecklist: z.array(z.string()),
   factualIntegrity: z.string(),
 });
 
@@ -509,6 +603,10 @@ export type CompanionContinuationInput = z.infer<
   typeof companionContinuationInputSchema
 >;
 export type Consent = z.infer<typeof consentSchema>;
+export type CompanionTarget = z.infer<typeof companionTargetSchema>;
+export type ResumeBenchmarkReference = z.infer<
+  typeof resumeBenchmarkReferenceSchema
+>;
 export type DocumentReference = z.infer<typeof documentReferenceSchema>;
 export type ProfileEvidence = z.infer<typeof profileEvidenceSchema>;
 export type CompanionConversation = z.infer<typeof companionConversationSchema>;

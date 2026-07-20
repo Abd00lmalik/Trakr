@@ -637,6 +637,9 @@ export function extractProfileFromText(
       field,
       source: "explicit" as const,
       origin,
+      value: profile[field as keyof StructuredUserProfile] as
+        | string
+        | string[],
       evidence: `Extracted from supplied ${origin === "resume" ? "resume text" : "user background"}.`,
     }));
 
@@ -672,6 +675,7 @@ export function extractProfileFromText(
         field,
         source: "inferred",
         origin: "inference",
+        value: value as string | string[],
         evidence: detail,
       });
     }

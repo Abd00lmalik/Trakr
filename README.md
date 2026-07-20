@@ -4,7 +4,7 @@
 
 Trakr is an outcome-first AI Opportunity Companion exposed as an A2MCP-style API service. The product presents three visible services: Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. They share one capability layer and the stable public endpoint, `POST /api/a2mcp/recommend`.
 
-Service 1, Opportunity Finding, is currently production-ready in this repository. It accepts a resume, conversational background, or a free-form opportunity request. The other two services are visible and have additive operations reserved in the contract, but return an honest staged-service response until their separate release gates are complete.
+Service 1, Opportunity Finding, is production-ready in this repository. Service 2, Resume Benchmarking & Optimization, is implemented behind the additive `benchmark` and `optimize` operations and is moving through its independent release gate. Resume Generation remains staged until Service 2 passes local, CI, deployment, and external A2MCP validation.
 
 ## MVP Scope
 
@@ -108,6 +108,41 @@ For Opportunity Finding, the agent can choose a route with `intakeRoute` or let 
 }
 ```
 
+## Resume Benchmarking And Optimization
+
+Benchmarking is target-specific and comes before optimization:
+
+```json
+{
+  "operation": "benchmark",
+  "resumeText": "Synthetic resume text with at least 80 characters...",
+  "consent": {
+    "processPersonalData": true,
+    "retention": "session_only",
+    "source": "explicit"
+  },
+  "target": {
+    "role": "Frontend Engineer Intern",
+    "organization": "Example Labs",
+    "opportunityType": "internship",
+    "description": "The dated target description...",
+    "requirements": [
+      "React and TypeScript are required.",
+      "Students may apply."
+    ],
+    "locale": "Nigeria"
+  }
+}
+```
+
+The response contains an evidence-linked `resumeBenchmark` and an opaque
+continuation reference. Sending `operation: "optimize"` with that continuation
+returns grounded edits only when the target and profile still match the stored
+benchmark. Changed evidence or a changed target triggers a fresh benchmark.
+Unknown target URLs are not scraped automatically; callers should provide a
+dated description or requirements when the URL is not already in verified
+Trakr inventory.
+
 If the request is incomplete, Trakr returns `conversation.state: "needs_more_information"` with the minimum questions the calling agent should ask. When enough context is available, Trakr returns grounded recommendations and an opaque `conversation.continuation` reference that must be sent back unchanged for follow-up requests:
 
 ```json
@@ -137,6 +172,11 @@ Complete legacy structured requests continue to use the original direct recommen
 ## Factual Integrity
 
 Trakr may improve wording, structure, relevance, ordering, and keyword alignment using facts the user supplied. It does not invent jobs, degrees, skills, projects, achievements, metrics, certifications, or eligibility.
+
+Benchmark scores are transparent application-document heuristics. They are not
+hiring predictions and do not claim to reproduce a specific employer's ATS.
+The versioned Service 2 research record is in
+`reports/service2-rubric-research-2026-07-20.md`.
 
 ## Extending Sources
 

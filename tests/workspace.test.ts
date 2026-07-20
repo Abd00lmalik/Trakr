@@ -8,6 +8,7 @@ import {
 } from "../src/lib/resume/parser";
 import { POST as parseResume } from "../src/app/api/profile/parse-resume/route";
 import { GET as getOpenApi } from "../src/app/api/a2mcp/openapi/route";
+import { GET as getA2mcpMetadata } from "../src/app/api/a2mcp/route";
 
 const resumeText =
   "Amina Yusuf is a frontend developer and university student with React, TypeScript, JavaScript, SQL, and open source experience. Built accessible dashboards and API integrations for developer communities. Interested in hackathons, fellowships, remote work, AI, Web3, and grant-funded public goods. Portfolio https://example.com/amina";
@@ -234,4 +235,34 @@ test("OpenAPI documents additive discovery requests and required resume consent"
     /required explicit/i,
   );
   assert.ok(resumeOperation.responses["403"]);
+});
+
+test("A2MCP metadata and OpenAPI expose Service 2 as an additive available capability", async () => {
+  const metadataResponse = await getA2mcpMetadata();
+  const metadata = await metadataResponse.json();
+  const openApiResponse = await getOpenApi();
+  const document = await openApiResponse.json();
+  const requestSchema =
+    document.paths["/api/a2mcp/recommend"].post.requestBody.content[
+      "application/json"
+    ].schema;
+
+  const service = metadata.services.find(
+    (item: { id: string }) =>
+      item.id === "resume_benchmarking_optimization",
+  );
+  assert.equal(service.status, "available");
+  assert.deepEqual(service.operations, ["benchmark", "optimize"]);
+  assert.equal(metadata.submission.pricing, "free");
+  assert.equal(metadata.submission.paymentRequired, false);
+  assert.equal(document.info.version, "0.4.0");
+  assert.ok(requestSchema.properties.target.properties.description);
+  assert.ok(requestSchema.properties.target.properties.requirements);
+  assert.ok(requestSchema.properties.target.properties.url);
+  assert.match(
+    document.paths["/api/a2mcp/recommend"].post.responses["200"].content[
+      "application/json"
+    ].schema.properties.capabilityResult.description,
+    /not hiring predictions/i,
+  );
 });

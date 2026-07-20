@@ -10,6 +10,7 @@ import {
   type CompanionContext,
   type CompanionContinuationInput,
   type CompanionSessionReference,
+  type CompanionTarget,
   type DocumentReference,
   type ProfileEvidence,
   type StructuredUserProfile,
@@ -108,7 +109,7 @@ function compactList(
   return compacted;
 }
 
-function compactProfile(
+export function compactProfileForSession(
   profile: StructuredUserProfile | undefined,
 ): StructuredUserProfile | undefined {
   if (!profile) return undefined;
@@ -170,6 +171,18 @@ function compactProfile(
   };
 }
 
+function compactEvidenceValue(value: ProfileEvidence["value"]) {
+  if (typeof value === "string") return compactText(value, 480);
+  if (Array.isArray(value)) {
+    return compactList(value, {
+      maxItems: 20,
+      maxItemLength: 240,
+      maxTotalLength: 1800,
+    });
+  }
+  return undefined;
+}
+
 function compactEvidence(evidence: ProfileEvidence[]) {
   const seen = new Set<string>();
   const compacted: ProfileEvidence[] = [];
@@ -183,6 +196,7 @@ function compactEvidence(evidence: ProfileEvidence[]) {
     compacted.push({
       claimId: item.claimId,
       field: compactText(item.field, 120) ?? "unknown",
+      value: compactEvidenceValue(item.value),
       source: item.source,
       evidence: compactText(item.evidence, 240),
       origin: item.origin,
@@ -194,6 +208,30 @@ function compactEvidence(evidence: ProfileEvidence[]) {
   }
 
   return compacted.reverse();
+}
+
+export function compactTargetForSession(
+  target: CompanionTarget | undefined,
+): CompanionTarget | undefined {
+  if (!target) return undefined;
+  return {
+    opportunityId: compactText(target.opportunityId, 240),
+    opportunityTitle: compactText(target.opportunityTitle, 300),
+    role: compactText(target.role, 200),
+    industry: compactText(target.industry, 200),
+    organization: compactText(target.organization, 240),
+    opportunityType: target.opportunityType,
+    description: compactText(target.description, 2400),
+    requirements: target.requirements
+      ? compactList(target.requirements, {
+          maxItems: 24,
+          maxItemLength: 320,
+          maxTotalLength: 4200,
+        })
+      : undefined,
+    url: compactText(target.url, 1000),
+    locale: compactText(target.locale, 80),
+  };
 }
 
 function toBase64Url(value: Buffer) {
@@ -211,8 +249,9 @@ function fromBase64Url(value: string) {
 function normalizedContext(context: CompanionContext): CompanionContext {
   return companionContextSchema.parse({
     ...context,
-    profile: compactProfile(context.profile),
+    profile: compactProfileForSession(context.profile),
     profileEvidence: compactEvidence(context.profileEvidence ?? []),
+    target: compactTargetForSession(context.target),
     unansweredQuestions: compactList(context.unansweredQuestions ?? [], {
       maxItems: 12,
       maxItemLength: 500,

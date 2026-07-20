@@ -468,7 +468,7 @@ test("follow-up explanation and readiness use caller-scoped continuation context
   );
 });
 
-test("resume optimization refuses to invent missing experience", async () => {
+test("resume optimization refuses to invent missing experience and benchmarks first", async () => {
   const withoutEvidence = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message:
@@ -487,7 +487,7 @@ test("resume optimization refuses to invent missing experience", async () => {
     /will not invent experience/i,
   );
 
-  const withEvidence = await handleOpportunityCompanionRequest(
+  const benchmarkFirst = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "Optimize my resume for a frontend engineer role.",
       target: {
@@ -513,12 +513,23 @@ test("resume optimization refuses to invent missing experience", async () => {
   );
 
   assert.equal(
-    withEvidence.conversation?.state,
-    "resume_optimization",
+    benchmarkFirst.conversation?.state,
+    "resume_benchmark",
   );
   assert.doesNotThrow(() =>
-    opportunityCompanionResponseSchema.parse(withEvidence),
+    opportunityCompanionResponseSchema.parse(benchmarkFirst),
   );
+  assert.ok(benchmarkFirst.capabilityResult?.resumeBenchmark);
+
+  const withEvidence = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "optimize",
+      message: "Continue with optimization.",
+      continuation: benchmarkFirst.conversation?.continuation,
+    }),
+  );
+
+  assert.equal(withEvidence.conversation?.state, "resume_optimization");
   const optimization =
     withEvidence.capabilityResult?.resumeOptimization;
   assert.ok(optimization);
@@ -530,7 +541,7 @@ test("resume optimization refuses to invent missing experience", async () => {
   );
 });
 
-test("mixed structured and conversational input does not ignore the requested intent", async () => {
+test("mixed structured and conversational optimization benchmarks first", async () => {
   const request = new Request("http://localhost/api/a2mcp/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -557,8 +568,12 @@ test("mixed structured and conversational input does not ignore the requested in
   const body = await response.json();
 
   assert.equal(response.status, 200);
-  assert.equal(body.conversation?.state, "resume_optimization");
-  assert.ok(body.capabilityResult?.resumeOptimization);
+  assert.equal(body.conversation?.state, "resume_benchmark");
+  assert.ok(body.capabilityResult?.resumeBenchmark);
+  assert.equal(
+    body.conversation?.requiredAction,
+    "review_benchmark_before_optimization",
+  );
 });
 
 test("profile and continuation aliases remain compatible at the API boundary", async () => {
