@@ -290,6 +290,39 @@ test("product design profiles do not receive interior design roles", () => {
   assert.equal(graphicScore.hardMismatch, false);
 });
 
+test("research profiles do not receive legal or finance roles from topical employers", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "AI policy researcher",
+      experienceLevel: "mid-level",
+      location: "Uganda",
+      skills: ["qualitative research", "statistics", "academic writing"],
+      interests: ["AI", "Research"],
+      goals: ["Find remote research opportunities"],
+    },
+    filters: { categories: ["remote_job"], remote: true },
+  });
+  const researchRole = opportunity(
+    "research-associate-role",
+    "Research Associate, AI Policy",
+    ["research", "statistics"],
+  );
+  const legalRole = opportunity(
+    "legal-counsel-role",
+    "Legal Counsel, AI Policy",
+    ["legal counsel", "regulatory compliance"],
+  );
+  const financeRole = opportunity(
+    "finance-role",
+    "Financial Analyst, AI Infrastructure",
+    ["financial analysis", "accounting"],
+  );
+
+  assert.equal(scoreOpportunity(researchRole, request).hardMismatch, false);
+  assert.equal(scoreOpportunity(legalRole, request).hardMismatch, true);
+  assert.equal(scoreOpportunity(financeRole, request).hardMismatch, true);
+});
+
 test("post-enhancement consistency prevents negative reasoning and action promotion", () => {
   const strong = opportunity("strong-role", "Frontend Developer", [
     "React",

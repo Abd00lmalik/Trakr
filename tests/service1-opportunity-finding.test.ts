@@ -775,7 +775,12 @@ test("AI prompt context excludes instruction-like resume content", () => {
 test("source registry permits only reviewed automated integrations", () => {
   assert.deepEqual(
     activeAutomatedSources().map((source) => source.id),
-    ["devpost", "remoteok"],
+    [
+      "devpost",
+      "remoteok",
+      "greenhouse-employer-boards",
+      "ashby-employer-boards",
+    ],
   );
   assert.equal(
     opportunitySourceRegistry.find((source) => source.id === "dorahacks")

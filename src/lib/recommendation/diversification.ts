@@ -62,7 +62,9 @@ const interestFacets: Array<{
       "sustainability",
       "renewable energy",
       "carbon",
-      "environment",
+      "environmental science",
+      "environmental policy",
+      "environmental sustainability",
     ],
   },
   {

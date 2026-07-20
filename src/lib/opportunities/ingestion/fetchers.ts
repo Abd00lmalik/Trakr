@@ -3,6 +3,8 @@ import {
   normalizeRemoteOkJob,
 } from "@/lib/opportunities/ingestion/normalizers";
 import { curatedOfficialOpportunities } from "@/lib/opportunities/data/curated-official-opportunities";
+import { fetchAshbyOpportunities } from "@/lib/opportunities/ingestion/ashby";
+import { fetchGreenhouseOpportunities } from "@/lib/opportunities/ingestion/greenhouse";
 import type { Opportunity } from "@/lib/types/opportunities";
 
 async function fetchJson(url: string, init?: RequestInit) {
@@ -83,25 +85,50 @@ export async function fetchStructuredOpportunities() {
       publicName: "RemoteOK API",
       promise: fetchRemoteOkOpportunities(),
     },
+    {
+      sourceName: "Greenhouse employer job boards",
+      publicName: "Greenhouse employer job boards",
+      promise: fetchGreenhouseOpportunities(),
+    },
+    {
+      sourceName: "Ashby employer job boards",
+      publicName: "Ashby employer job boards",
+      promise: fetchAshbyOpportunities(),
+    },
   ];
   const results = await Promise.allSettled(sourceFetches.map((source) => source.promise));
 
-  const opportunities = results.flatMap((result) =>
-    result.status === "fulfilled" ? result.value : [],
-  );
+  const opportunities = results.flatMap((result) => {
+    if (result.status !== "fulfilled") return [];
+    if (Array.isArray(result.value)) return result.value;
+    return result.value.opportunities;
+  });
   const errors = results.flatMap((result) =>
     result.status === "rejected"
-      ? [result.reason instanceof Error ? result.reason.message : "Unknown fetch error"]
-      : [],
+      ? [
+          result.reason instanceof Error
+            ? result.reason.message
+            : "Unknown fetch error",
+        ]
+      : Array.isArray(result.value)
+        ? []
+        : result.value.errors,
   );
   const successfulSourceNames = results.flatMap((result, index) =>
-    result.status === "fulfilled" ? [sourceFetches[index].sourceName] : [],
+    result.status === "fulfilled"
+      ? Array.isArray(result.value)
+        ? [sourceFetches[index].sourceName]
+        : result.value.successfulSourceNames
+      : [],
   );
 
   return {
     opportunities: [...opportunities, ...curatedOfficialOpportunities],
     errors,
-    sources: [...sourceFetches.map((source) => source.publicName), "Official curated source import"],
+    sources: [
+      ...sourceFetches.map((source) => source.publicName),
+      "Official curated source import",
+    ],
     successfulSourceNames: [...successfulSourceNames, "Official curated source"],
   };
 }

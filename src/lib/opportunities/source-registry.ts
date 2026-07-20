@@ -39,6 +39,30 @@ export const opportunitySourceRegistry: OpportunitySourceRegistryEntry[] = [
       "Use only individual listings that survive role-family, eligibility, freshness, and source-quality gates.",
   },
   {
+    id: "greenhouse-employer-boards",
+    name: "Greenhouse employer job boards",
+    access: "active",
+    ingestionMethod:
+      "Documented public Greenhouse Job Board API for a reviewed allowlist of employer-owned boards",
+    officialUrl: "https://developers.greenhouse.io/job-board.html",
+    reliability: "high",
+    maintenanceRisk: "medium",
+    notes:
+      "Only official employer boards are included. Individual canonical job pages are verified before Apply Now; board failures are isolated and stale records are not deactivated unless that board refresh succeeds.",
+  },
+  {
+    id: "ashby-employer-boards",
+    name: "Ashby employer job boards",
+    access: "active",
+    ingestionMethod:
+      "Documented public Ashby Job Posting API for a reviewed allowlist of employer-owned boards",
+    officialUrl: "https://developers.ashbyhq.com/docs/public-job-posting-api",
+    reliability: "high",
+    maintenanceRisk: "medium",
+    notes:
+      "Only listed postings from reviewed official employer boards are included. Published workplace type and locations remain authoritative, each canonical job URL is verified, and board failures are isolated before stale deactivation.",
+  },
+  {
     id: "official-curated",
     name: "Official program directories",
     access: "curated_directory_only",

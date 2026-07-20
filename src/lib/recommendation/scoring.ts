@@ -133,6 +133,23 @@ const domainSignals = {
     "design systems",
     "accessibility testing",
   ],
+  climate: [
+    "climate",
+    "climate tech",
+    "cleantech",
+    "sustainability",
+    "renewable energy",
+    "carbon",
+    "environmental",
+  ],
+  fintech: [
+    "fintech",
+    "financial technology",
+    "payments",
+    "banking",
+    "financial services",
+    "financial inclusion",
+  ],
 };
 
 const roleFamilies = {
@@ -211,6 +228,49 @@ const roleFamilies = {
     "product owner",
     "product operations",
   ],
+  research: [
+    "researcher",
+    "research associate",
+    "research scientist",
+    "research engineer",
+    "scientist",
+    "academic research",
+    "laboratory",
+    "phd",
+  ],
+  legal: [
+    "legal counsel",
+    "counsel",
+    "attorney",
+    "lawyer",
+    "legal operations",
+    "compliance officer",
+  ],
+  finance: [
+    "accountant",
+    "accounting",
+    "financial analyst",
+    "finance analyst",
+    "finance manager",
+    "controller",
+    "tax lead",
+    "treasury analyst",
+  ],
+  policy: [
+    "policy analyst",
+    "public policy",
+    "government affairs",
+    "regulatory policy",
+    "policy researcher",
+  ],
+  people_hr: [
+    "recruiter",
+    "recruiting",
+    "talent acquisition",
+    "human resources",
+    "people partner",
+    "people operations",
+  ],
   founder: [
     "founder",
     "co-founder",
@@ -232,6 +292,7 @@ const roleFamilies = {
   ],
   customer_service: [
     "customer engagement",
+    "customer experience",
     "customer service",
     "customer support",
     "contact center",
@@ -311,6 +372,11 @@ const coreProfessionalFamilies = new Set([
   "design",
   "interior_design",
   "product",
+  "research",
+  "legal",
+  "finance",
+  "policy",
+  "people_hr",
 ]);
 
 const clearlyNontechnicalFamilies = new Set([
@@ -610,8 +676,68 @@ function deadlineScore(deadline: string | null, now = new Date()) {
   return 78;
 }
 
+const africanLocations =
+  /\b(africa|algeria|angola|benin|botswana|burkina faso|burundi|cabo verde|cameroon|central african republic|chad|comoros|congo|cote d ivoire|djibouti|egypt|equatorial guinea|eritrea|eswatini|ethiopia|gabon|gambia|ghana|guinea|guinea bissau|kenya|lesotho|liberia|libya|madagascar|malawi|mali|mauritania|mauritius|morocco|mozambique|namibia|niger|nigeria|rwanda|sao tome|senegal|seychelles|sierra leone|somalia|south africa|south sudan|sudan|tanzania|togo|tunisia|uganda|zambia|zimbabwe)\b/i;
+
+const europeanLocations =
+  /\b(europe|european union|eu|albania|andorra|austria|belarus|belgium|bosnia|bulgaria|croatia|cyprus|czech|denmark|estonia|finland|france|germany|greece|hungary|iceland|ireland|italy|kosovo|latvia|liechtenstein|lithuania|luxembourg|malta|moldova|monaco|montenegro|netherlands|north macedonia|norway|poland|portugal|romania|san marino|serbia|slovakia|slovenia|spain|sweden|switzerland|ukraine|united kingdom|uk)\b/i;
+
+function matchesPublishedLocation(userLocation: string, published: string) {
+  const user = normalize(userLocation);
+  const eligible = normalize(published);
+  const regionListed = (region: string) =>
+    new RegExp(
+      `(?:^|[;|(])\\s*(?:remote\\s*)?\\(?${region}(?:\\b|[,;|)])`,
+      "i",
+    ).test(published);
+  if (
+    /\b(worldwide|global|anywhere)\b/.test(eligible) ||
+    eligible === "remote"
+  ) {
+    return true;
+  }
+  if (/\bnon us\b/.test(eligible) && !/\b(united states|usa|u s)\b/.test(user)) {
+    return true;
+  }
+  if (regionListed("africa") && africanLocations.test(userLocation)) {
+    return true;
+  }
+  if (regionListed("europe") && europeanLocations.test(userLocation)) {
+    return true;
+  }
+
+  const segments = published
+    .split(/[;|]/)
+    .map((segment) =>
+      normalize(segment)
+        .replace(/\b(remote|hybrid|on site)\b/g, " ")
+        .trim(),
+    )
+    .filter((segment) => segment.length >= 3);
+  return segments.some(
+    (segment) => user.includes(segment) || segment.includes(user),
+  );
+}
+
+function publishedLocationMismatch(
+  opportunity: Opportunity,
+  userLocation: string,
+) {
+  const marker = opportunity.eligibility.find((item) =>
+    item.startsWith("Published eligible locations:"),
+  );
+  if (!marker) return false;
+  const published = marker.slice("Published eligible locations:".length).trim();
+  return published.length > 0 && !matchesPublishedLocation(userLocation, published);
+}
+
 function qualityScore(opportunity: Opportunity) {
-  let score = sourceBaseQuality[opportunity.sourceName] ?? 60;
+  let score =
+    sourceBaseQuality[opportunity.sourceName] ??
+    (opportunity.sourceName.startsWith("Greenhouse:") ||
+    opportunity.sourceName.startsWith("Ashby:")
+      ? 82
+      : 60);
 
   if (genericTitlePatterns.some((pattern) => pattern.test(opportunity.title.trim()))) {
     score -= 55;
@@ -683,20 +809,51 @@ function domainFitAssessment(
 ) {
   const profile = profileValues(request.user, request.resumeText);
   const candidate = opportunityDomainValues(opportunity);
+  const targetValues = [
+    ...(request.user?.goals ?? []),
+    ...(request.goals ?? []),
+  ];
+  const requestedDomains = Object.entries(domainSignals)
+    .filter(([, signals]) => includesPhrase(targetValues, signals))
+    .map(([domain]) => domain);
+  const targetSectorDomains = requestedDomains.filter((domain) =>
+    ["ai", "web3", "security", "creator", "founder", "climate", "fintech"].includes(
+      domain,
+    ),
+  );
   const activeDomains = Object.entries(domainSignals)
     .filter(([, signals]) => includesPhrase(profile, signals))
     .map(([domain]) => domain);
 
   if (!activeDomains.length) {
-    return { score: 70, hasMatchedDomain: false };
+    return {
+      score: 70,
+      hasMatchedDomain: false,
+      requestedDomainMismatch: false,
+    };
   }
 
   const matchedDomains = activeDomains.filter((domain) =>
     includesPhrase(candidate, domainSignals[domain as keyof typeof domainSignals]),
   );
+  const matchedRequestedDomains = targetSectorDomains.filter((domain) =>
+    includesPhrase(candidate, domainSignals[domain as keyof typeof domainSignals]),
+  );
+
+  if (targetSectorDomains.length === 1 && !matchedRequestedDomains.length) {
+    return {
+      score: 18,
+      hasMatchedDomain: false,
+      requestedDomainMismatch: true,
+    };
+  }
 
   if (matchedDomains.length) {
-    return { score: 94, hasMatchedDomain: true };
+    return {
+      score: 94,
+      hasMatchedDomain: true,
+      requestedDomainMismatch: false,
+    };
   }
 
   const broadStudentProgram =
@@ -705,10 +862,18 @@ function domainFitAssessment(
     includesPhrase(candidate, ["student", "learning", "education", "developer program"]);
 
   if (broadStudentProgram) {
-    return { score: 58, hasMatchedDomain: false };
+    return {
+      score: 58,
+      hasMatchedDomain: false,
+      requestedDomainMismatch: false,
+    };
   }
 
-  return { score: 18, hasMatchedDomain: false };
+  return {
+    score: 18,
+    hasMatchedDomain: false,
+    requestedDomainMismatch: false,
+  };
 }
 
 function matchingFamilies(
@@ -763,6 +928,11 @@ function hardMismatchAssessment(
           `${rule.label} conflicts with the supplied location.`,
         );
       }
+    }
+    if (publishedLocationMismatch(opportunity, userLocation)) {
+      generalReasons.push(
+        "The supplied location is not included in the employer's published eligible locations.",
+      );
     }
   }
   if (generalReasons.length) {
@@ -948,12 +1118,17 @@ export function scoreOpportunity(
     !meaningfulCapabilityOverlap;
   const mismatch =
     !baseMismatch.hardMismatch &&
-    (lacksDirectoryFit || lacksVerifiedOpportunityFit)
+    (domain.requestedDomainMismatch ||
+      lacksDirectoryFit ||
+      lacksVerifiedOpportunityFit)
       ? {
           hardMismatch: true,
           reasons: [
-            opportunity.verificationStatus === "program_directory"
+            opportunity.verificationStatus === "program_directory" &&
+            lacksDirectoryFit
               ? "The program directory does not match a supported target domain and lacks meaningful capability overlap."
+              : domain.requestedDomainMismatch
+                ? "The opportunity does not match any explicitly requested target domain."
               : "The opportunity does not match a supported target domain and lacks strong capability overlap.",
           ],
         }
