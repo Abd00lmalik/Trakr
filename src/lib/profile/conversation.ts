@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import {
   buildProfileDraftFromBackground,
   extractProfileFromText,
+  inferExperienceLevelFromText,
 } from "@/lib/resume/parser";
 import type {
   CompanionContext,
@@ -152,24 +153,6 @@ function inferPreferredLocation(message: string) {
 
 function locationWasInferredFromDemonym(message: string) {
   return countryDemonyms.some(([pattern]) => pattern.test(message));
-}
-
-function explicitExperienceLevel(
-  message: string,
-): StructuredUserProfile["experienceLevel"] | undefined {
-  const lower = message.toLowerCase();
-  if (/\b(founder|co-founder|startup owner)\b/.test(lower)) return "founder";
-  if (/\b(content creator|creator)\b/.test(lower)) return "creator";
-  if (/\b(senior|staff|principal|lead engineer)\b/.test(lower)) return "senior";
-  if (/\b(student|undergraduate|university student|college student)\b/.test(lower)) {
-    return "student";
-  }
-  if (/\b(mid-level|mid level|[3-6]\+?\s+years?)\b/.test(lower)) return "mid-level";
-  if (/\b(beginner|new to|just starting)\b/.test(lower)) return "beginner";
-  if (/\b(junior|graduate|early[- ]career|1\s+year|2\s+years?)\b/.test(lower)) {
-    return "early-career";
-  }
-  return undefined;
 }
 
 function categoriesFromText(message: string) {
@@ -458,7 +441,11 @@ export function buildConversationalProfile(
         headline: inferHeadline(message),
         bio: message.length >= 40 ? message.slice(0, 480) : undefined,
         location: inferLocation(message),
-        experienceLevel: explicitExperienceLevel(message),
+        experienceLevel:
+          inferExperienceLevelFromText(message) ??
+          (/\b(beginner|new to|just starting)\b/i.test(message)
+            ? "beginner"
+            : undefined),
         skills: skillsFromMessage,
         interests: unique([
           ...(messageProfile?.interests ?? []),
@@ -541,10 +528,15 @@ export function buildConversationalProfile(
     }
   }
 
+  const profilePreferenceText = [
+    ...profile.goals,
+    ...profile.interests,
+  ].join(" ");
   const categories = unique([
     ...(context?.filters?.categories ?? []),
     ...(request.filters.categories ?? []),
     ...categoriesFromText(request.message ?? ""),
+    ...categoriesFromText(profilePreferenceText),
   ]) as OpportunityCategory[];
   const filters: RecommendationFilters = {
     ...(context?.filters ?? {}),
@@ -556,7 +548,9 @@ export function buildConversationalProfile(
       context?.filters?.location,
     remote:
       request.filters.remote ??
-      (/\bremote\b/i.test(request.message ?? "")
+      (/\bremote\b/i.test(
+        `${request.message ?? ""} ${profilePreferenceText}`,
+      )
         ? true
         : context?.filters?.remote),
   };

@@ -123,6 +123,61 @@ Goals: Seeking remote AI and Web3 internships and hackathons.`,
   );
 });
 
+test("resume-derived opportunity preferences become matching filters", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "resume",
+      resumeText: `Amina Fictional
+Computer Science Student
+Location: Lagos, Nigeria
+Skills: React, TypeScript, Python, Git, basic machine learning
+Projects: Built a campus study planner and a Python data-cleaning notebook.
+Education: BSc Computer Science student at Fictional University.
+Goals: Seeking remote AI or software internships.`,
+      consent: {
+        processPersonalData: true,
+        retention: "session_only",
+        source: "explicit",
+      },
+    }),
+  );
+
+  assert.equal(response.conversation?.state, "recommendations");
+  assert.deepEqual(response.querySummary.filtersApplied.categories, [
+    "internship",
+  ]);
+  assert.equal(response.querySummary.filtersApplied.remote, true);
+  assert.ok(
+    response.recommendations.every(
+      (item) => item.opportunity.category === "internship",
+    ),
+  );
+});
+
+test("natural years-of-experience wording clears the experience gate", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "background",
+      message:
+        "I am a fictional product designer based in Portugal with three years of experience. I use Figma, user research, prototyping, and accessibility testing. I want remote fellowships, competitions, or product design roles connected to climate and fintech.",
+    }),
+  );
+
+  assert.equal(
+    response.conversation?.profile.draft.experienceLevel,
+    "mid-level",
+  );
+  assert.notEqual(response.conversation?.state, "needs_more_information");
+  assert.equal(
+    response.conversation?.missingInformation.some(
+      (item) => item.field === "experienceLevel" && item.required,
+    ),
+    false,
+  );
+});
+
 test("minimal student input asks for gates instead of making weak recommendations", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({

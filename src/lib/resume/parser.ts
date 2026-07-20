@@ -132,7 +132,32 @@ function inferInterests(text: string) {
   ].filter(Boolean);
 }
 
-function inferExperienceLevel(
+const experienceNumberWords: Record<string, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+  ten: 10,
+};
+
+function statedYearsOfExperience(text: string) {
+  const match = text
+    .toLowerCase()
+    .match(
+      /\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s+years?(?:\s+of)?\s+(?:professional\s+)?experience\b/,
+    );
+  if (!match) return undefined;
+  return /^\d+$/.test(match[1])
+    ? Number.parseInt(match[1], 10)
+    : experienceNumberWords[match[1]];
+}
+
+export function inferExperienceLevelFromText(
   text: string,
 ): StructuredUserProfile["experienceLevel"] {
   const lower = text.toLowerCase();
@@ -142,10 +167,18 @@ function inferExperienceLevel(
   if (/\b(student|undergraduate|university|college)\b/.test(lower)) {
     return "student";
   }
-  if (/\b(mid-level|mid level|[3-6]\+? years)\b/.test(lower)) {
+  const years = statedYearsOfExperience(lower);
+  if (years !== undefined && years >= 7) return "senior";
+  if (
+    /\b(mid-level|mid level)\b/.test(lower) ||
+    (years !== undefined && years >= 3)
+  ) {
     return "mid-level";
   }
-  if (/\b(intern|internship|junior|graduate|early[- ]career)\b/.test(lower)) {
+  if (
+    /\b(intern|internship|junior|graduate|early[- ]career)\b/.test(lower) ||
+    (years !== undefined && years >= 1)
+  ) {
     return "early-career";
   }
   return undefined;
@@ -361,7 +394,7 @@ export function extractProfileFromText(
     headline: inferHeadline(cleaned, allSkills),
     bio: buildSummary(cleaned),
     location: inferLocation(cleaned),
-    experienceLevel: inferExperienceLevel(cleaned),
+    experienceLevel: inferExperienceLevelFromText(cleaned),
     skills: extractSkills(skillsBlock, cleaned),
     interests: inferInterests(cleaned),
     goals: inferGoals(cleaned),

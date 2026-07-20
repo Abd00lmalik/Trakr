@@ -9,6 +9,7 @@ import {
   rankOpportunities,
   scoreOpportunity,
 } from "../src/lib/recommendation/scoring";
+import { buildRecommendationNarrative } from "../src/lib/recommendation/action-plan";
 import { enforceRecommendationConsistency } from "../src/lib/recommendation/service";
 import {
   opportunitySchema,
@@ -358,5 +359,38 @@ test("post-enhancement consistency prevents negative reasoning and action promot
       /best environment|biggest gap/i.test(note),
     ),
     false,
+  );
+});
+
+test("deterministic recommendation narrative uses the correct action article", () => {
+  const candidate = scoreOpportunity(
+    opportunity("apply-now-role", "Frontend Developer", [
+      "React",
+      "TypeScript",
+    ]),
+    recommendationRequestSchema.parse({
+      user: {
+        headline: "Frontend developer",
+        experienceLevel: "mid-level",
+        location: "Nigeria",
+        skills: ["React", "TypeScript"],
+        interests: ["Frontend"],
+        goals: ["Find a remote job"],
+      },
+      filters: { remote: true },
+    }),
+  );
+  const applyNowCandidate = {
+    ...candidate,
+    action: "Apply Now" as const,
+  };
+
+  assert.match(
+    buildRecommendationNarrative(applyNowCandidate),
+    /is an Apply Now candidate/i,
+  );
+  assert.doesNotMatch(
+    buildRecommendationNarrative(applyNowCandidate),
+    /\ba apply now\b/i,
   );
 });

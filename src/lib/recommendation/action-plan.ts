@@ -8,8 +8,9 @@ export function buildRecommendationNarrative(candidate: ScoredOpportunity): stri
   const gaps = missingRequirements.length
     ? `Main gaps: ${missingRequirements.slice(0, 3).join(", ")}.`
     : "No major required-skill gaps detected.";
+  const actionArticle = action === "Apply Now" ? "an" : "a";
 
-  return `${opportunity.title} is a ${action.toLowerCase()} candidate because ${strengths}. Trakr rated source quality at ${candidate.qualityScore}/100 and personal relevance at ${candidate.relevanceScore}/100. ${gaps}`;
+  return `${opportunity.title} is ${actionArticle} ${action} candidate because ${strengths}. Trakr rated source quality at ${candidate.qualityScore}/100 and personal relevance at ${candidate.relevanceScore}/100. ${gaps}`;
 }
 
 export function buildNextSteps(candidate: ScoredOpportunity) {
