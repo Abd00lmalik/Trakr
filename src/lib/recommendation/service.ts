@@ -147,22 +147,6 @@ function buildDraftResponse(
   };
 }
 
-const negativeFitSignals = [
-  /\bnot (?:a |an )?(?:good |strong )?fit\b/i,
-  /\bpoor fit\b/i,
-  /\bweak match\b/i,
-  /\bunrelated\b/i,
-  /\bdoes not align\b/i,
-  /\bnot currently recommended\b/i,
-  /\bdo not prioritize\b/i,
-];
-
-function actionPriority(action: Recommendation["recommendedAction"]) {
-  if (action === "Apply Now") return 2;
-  if (action === "Prepare First") return 1;
-  return 0;
-}
-
 function buildGroundedAgentNotes(
   response: RecommendationResponse,
   draft: RecommendationResponse,
@@ -198,66 +182,27 @@ export function enforceRecommendationConsistency(
       recommendation.rank,
     ]),
   );
-  const enhancedById = new Map(
-    response.recommendations.map((recommendation) => [
-      recommendation.opportunity.id,
-      recommendation,
-    ]),
-  );
 
   const recommendations = draft.recommendations
     .map((deterministic) => {
-      const recommendation =
-        enhancedById.get(deterministic.opportunity.id) ?? deterministic;
-      const negativeReasoning = negativeFitSignals.some((pattern) =>
-        pattern.test(recommendation.reasoning),
-      );
-      let matchScore = Math.min(
-        recommendation.matchScore,
-        deterministic.matchScore,
-      );
-      let recommendedAction =
-        actionPriority(recommendation.recommendedAction) <=
-        actionPriority(deterministic.recommendedAction)
-          ? recommendation.recommendedAction
-          : deterministic.recommendedAction;
-
-      if (negativeReasoning) {
-        matchScore = Math.min(matchScore, 34);
-        recommendedAction = "Skip";
-      } else if (matchScore < 38) {
-        recommendedAction = "Skip";
-      } else if (
-        recommendedAction === "Apply Now" &&
-        (matchScore < 76 || recommendation.missingRequirements.length > 2)
-      ) {
-        recommendedAction = "Prepare First";
-      }
+      const matchScore = deterministic.matchScore;
+      let recommendedAction = deterministic.recommendedAction;
 
       recommendedAction = enforceApplyNowEligibility(
-        recommendation.opportunity,
+        deterministic.opportunity,
         recommendedAction,
       );
-      if (recommendedAction === "Skip") {
-        matchScore = Math.min(matchScore, 34);
-      }
       const consistentGuidanceAction = guidanceAction(
-        recommendation.opportunity,
+        deterministic.opportunity,
         recommendedAction,
       );
 
       return {
-        ...recommendation,
+        ...deterministic,
         opportunity: deterministic.opportunity,
         matchScore,
-        reasoning: deterministic.reasoning,
-        missingRequirements: deterministic.missingRequirements,
         recommendedAction,
-        nextSteps: deterministic.nextSteps,
-        confidenceScore: deterministic.confidenceScore,
         guidanceAction: consistentGuidanceAction,
-        eligibilityConcerns: deterministic.eligibilityConcerns,
-        provenance: deterministic.provenance,
       };
     })
     .filter((recommendation) => recommendation.matchScore >= 35)

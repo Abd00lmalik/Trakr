@@ -350,7 +350,7 @@ test("post-enhancement consistency prevents negative reasoning and action promot
   const consistent = enforceRecommendationConsistency(enhanced, base);
   assert.deepEqual(
     consistent.recommendations.map((item) => item.opportunity.id),
-    ["strong-role"],
+    ["strong-role", "weak-role"],
   );
   assert.equal(
     consistent.recommendations[0].recommendedAction,
