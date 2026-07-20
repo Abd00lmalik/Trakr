@@ -192,23 +192,23 @@ export function enforceRecommendationConsistency(
   response: RecommendationResponse,
   draft: RecommendationResponse,
 ) {
-  const draftById = new Map(
-    draft.recommendations.map((recommendation) => [
-      recommendation.opportunity.id,
-      recommendation,
-    ]),
-  );
   const draftRankById = new Map(
     draft.recommendations.map((recommendation) => [
       recommendation.opportunity.id,
       recommendation.rank,
     ]),
   );
+  const enhancedById = new Map(
+    response.recommendations.map((recommendation) => [
+      recommendation.opportunity.id,
+      recommendation,
+    ]),
+  );
 
-  const recommendations = response.recommendations
-    .map((recommendation) => {
-      const deterministic =
-        draftById.get(recommendation.opportunity.id) ?? recommendation;
+  const recommendations = draft.recommendations
+    .map((deterministic) => {
+      const recommendation =
+        enhancedById.get(deterministic.opportunity.id) ?? deterministic;
       const negativeReasoning = negativeFitSignals.some((pattern) =>
         pattern.test(recommendation.reasoning),
       );

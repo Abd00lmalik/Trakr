@@ -386,6 +386,18 @@ test("post-enhancement consistency prevents negative reasoning and action promot
     ),
     false,
   );
+
+  const truncated = enforceRecommendationConsistency(
+    {
+      ...enhanced,
+      recommendations: [enhanced.recommendations[0]],
+    },
+    base,
+  );
+  assert.deepEqual(
+    truncated.recommendations.map((item) => item.opportunity.id),
+    ["strong-role", "weak-role"],
+  );
 });
 
 test("deterministic recommendation narrative uses the correct action article", () => {
