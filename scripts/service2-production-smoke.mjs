@@ -439,6 +439,289 @@ await run("S2-PROD-012-structured-errors", async () => {
   };
 });
 
+const corpusCases = [
+  {
+    id: "S2-PROD-013-designer-portfolio",
+    user: {
+      headline: "Product designer",
+      location: "Portugal",
+      experienceLevel: "mid-level",
+      skills: ["Figma", "User research", "Prototyping"],
+      interests: ["Design", "Fintech"],
+      goals: ["Apply for a product design role"],
+      workHistory: ["Designed a fictional fintech onboarding flow."],
+    },
+    target: {
+      role: "Product Designer",
+      opportunityType: "remote_job",
+      description:
+        "Applicants must show product design work and submit a portfolio. Figma experience is required.",
+      requirements: [
+        "Submit a portfolio.",
+        "Figma experience is required.",
+      ],
+    },
+    validate(benchmark) {
+      assert.equal(benchmark.targetType, "remote_job");
+      assert.ok(
+        benchmark.requirements.some(
+          (item) =>
+            /portfolio/i.test(item.requirement) &&
+            item.status !== "confirmed",
+        ),
+      );
+    },
+  },
+  {
+    id: "S2-PROD-014-research-fellowship",
+    user: {
+      headline: "Research assistant",
+      location: "Uganda",
+      experienceLevel: "early-career",
+      skills: ["Research", "Statistics", "Academic writing"],
+      interests: ["Research"],
+      goals: ["Apply for a research fellowship"],
+      education: ["MSc Public Health"],
+      workHistory: ["Supported a fictional survey study."],
+      links: ["https://example.com/fictional-publication"],
+    },
+    target: {
+      role: "Health Research Fellowship",
+      opportunityType: "fellowship",
+      description:
+        "A relevant graduate degree, research methods, and a writing sample are required.",
+      requirements: [
+        "A relevant graduate degree is required.",
+        "Research methods are required.",
+        "Submit a writing sample.",
+      ],
+    },
+    validate(benchmark) {
+      assert.equal(benchmark.targetType, "fellowship");
+      assert.ok(
+        benchmark.requirements.some(
+          (item) => item.category === "instruction",
+        ),
+      );
+    },
+  },
+  {
+    id: "S2-PROD-015-scholarship",
+    user: {
+      headline: "Economics graduate",
+      location: "Ghana",
+      experienceLevel: "early-career",
+      skills: ["Data analysis", "Community leadership"],
+      interests: ["Fintech"],
+      goals: ["Apply for a scholarship"],
+      education: ["BSc Economics"],
+      projects: ["Led a fictional student financial-literacy workshop."],
+    },
+    target: {
+      role: "Public Leadership Scholarship",
+      opportunityType: "scholarship",
+      description:
+        "Applicants need a degree and evidence of leadership and community service.",
+      requirements: [
+        "A degree is required.",
+        "Leadership and community service evidence is required.",
+      ],
+    },
+    validate(benchmark) {
+      assert.equal(benchmark.targetType, "scholarship");
+      assert.ok(benchmark.requirements.length >= 2);
+    },
+  },
+  {
+    id: "S2-PROD-016-climate-grant",
+    user: {
+      headline: "Climate project founder",
+      location: "Nigeria",
+      experienceLevel: "founder",
+      skills: ["Grant writing", "Data analysis"],
+      interests: ["Climate"],
+      goals: ["Apply for grant funding"],
+      projects: [
+        "Piloted a fictional solar-data project with two schools.",
+      ],
+    },
+    target: {
+      role: "Climate Innovation Grant",
+      opportunityType: "grant",
+      description:
+        "Applicants must submit a project proposal, implementation plan, and evidence of climate impact.",
+      requirements: [
+        "Submit a project proposal.",
+        "An implementation plan is required.",
+        "Evidence of climate impact is required.",
+      ],
+    },
+    validate(benchmark) {
+      assert.equal(benchmark.targetType, "grant");
+      assert.ok(
+        benchmark.requirements.some((item) =>
+          /project proposal/i.test(item.requirement),
+        ),
+      );
+    },
+  },
+  {
+    id: "S2-PROD-017-nontechnical-weak-alignment",
+    user: {
+      headline: "Graphic designer",
+      location: "Kenya",
+      experienceLevel: "early-career",
+      skills: ["Figma", "Illustration"],
+      interests: ["Design"],
+      goals: ["Apply for a marketing role"],
+      projects: ["Created a fictional brand identity project."],
+    },
+    target: {
+      role: "Marketing Operations Analyst",
+      opportunityType: "remote_job",
+      description:
+        "The role requires CRM administration, campaign analytics, spreadsheet reporting, and sales operations experience.",
+      requirements: [
+        "CRM administration is required.",
+        "Campaign analytics is required.",
+        "Spreadsheet reporting experience is required.",
+      ],
+    },
+    validate(benchmark) {
+      assert.ok(
+        benchmark.requirements.filter(
+          (item) => item.status === "missing",
+        ).length >= 2,
+      );
+      assert.ok(benchmark.overallAlignmentScore < 70);
+    },
+  },
+  {
+    id: "S2-PROD-018-academic-cv",
+    user: {
+      headline: "Doctoral researcher",
+      location: "Canada",
+      experienceLevel: "early-career",
+      skills: ["Research", "Statistics", "Academic writing"],
+      interests: ["Research"],
+      goals: ["Apply for a postdoctoral fellowship"],
+      education: ["PhD Candidate in Fictional Public Health"],
+      workHistory: ["Conducted a fictional longitudinal study."],
+      projects: ["Presented fictional findings at a university seminar."],
+      links: ["https://example.com/fictional-publication-list"],
+    },
+    target: {
+      role: "Postdoctoral Research Fellowship",
+      opportunityType: "fellowship",
+      description:
+        "Applicants need a doctorate, relevant publications, research methods, and an academic CV.",
+      requirements: [
+        "A doctorate is required.",
+        "Relevant publications are required.",
+        "Research methods are required.",
+        "Submit an academic CV.",
+      ],
+    },
+    validate(benchmark) {
+      assert.equal(benchmark.targetType, "fellowship");
+      assert.ok(
+        benchmark.requirements.some((item) =>
+          /publications/i.test(item.requirement),
+        ),
+      );
+    },
+  },
+  {
+    id: "S2-PROD-019-strong-resume-wrong-target",
+    user: {
+      headline: "Senior software engineer",
+      location: "United Kingdom",
+      experienceLevel: "senior",
+      skills: ["TypeScript", "System design", "Leadership"],
+      interests: ["Software"],
+      goals: ["Apply for a finance role"],
+      education: ["BSc Computer Science"],
+      workHistory: [
+        "Led a fictional platform team and delivered a cloud migration.",
+      ],
+      certifications: ["Fictional Cloud Certification"],
+      links: ["https://example.com/fictional-engineering-portfolio"],
+    },
+    target: {
+      role: "Senior Financial Controller",
+      opportunityType: "remote_job",
+      description:
+        "The role requires professional accounting certification, financial reporting, audit leadership, and regulatory controls.",
+      requirements: [
+        "A professional accounting certification is required.",
+        "Financial reporting experience is required.",
+        "Audit leadership is required.",
+      ],
+    },
+    validate(benchmark) {
+      assert.ok(
+        benchmark.requirements.filter(
+          (item) => item.status === "missing",
+        ).length >= 2,
+      );
+      assert.ok(benchmark.overallAlignmentScore < 70);
+    },
+  },
+  {
+    id: "S2-PROD-020-contradictory-timeline",
+    user: {
+      headline: "Project manager",
+      location: "Nigeria",
+      experienceLevel: "mid-level",
+      skills: ["Project management", "Operations"],
+      interests: ["Startups"],
+      goals: ["Apply for an operations role"],
+      education: ["BSc Business Administration"],
+      workHistory: [
+        "Fictional Operations Manager, 2025-2023, coordinated delivery.",
+      ],
+    },
+    target: {
+      role: "Operations Manager",
+      opportunityType: "remote_job",
+      description:
+        "Applicants need at least three years of operations experience and clear employment dates.",
+      requirements: [
+        "At least three years of operations experience is required.",
+        "Provide clear employment dates.",
+      ],
+    },
+    validate(benchmark) {
+      assert.ok(
+        benchmark.concerns.some((item) =>
+          /timeline appears reversed or contradictory/i.test(item),
+        ),
+      );
+    },
+  },
+];
+
+for (const item of corpusCases) {
+  await run(item.id, async () => {
+    const result = await jsonPost({
+      operation: "benchmark",
+      user: item.user,
+      target: item.target,
+    });
+    assert.equal(result.response.status, 200);
+    assert.equal(result.body.conversation?.state, "resume_benchmark");
+    const benchmark = result.body.capabilityResult?.resumeBenchmark;
+    assert.ok(benchmark);
+    item.validate(benchmark);
+    return {
+      status: result.response.status,
+      targetType: benchmark.targetType,
+      overallAlignmentScore: benchmark.overallAlignmentScore,
+      eligibility: benchmark.eligibility.status,
+    };
+  });
+}
+
 const failed = results.filter((result) => !result.pass);
 console.log(
   JSON.stringify(
