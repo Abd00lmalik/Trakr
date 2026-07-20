@@ -306,6 +306,20 @@ test("post-enhancement consistency prevents negative reasoning and action promot
   };
   const enhanced: RecommendationResponse = {
     ...base,
+    requestId: "gemini-rewritten-request",
+    querySummary: {
+      ...base.querySummary,
+      filtersApplied: {
+        categories: ["remote_job", "remote_job"],
+      },
+    },
+    coverage: {
+      requestedInterests: ["Invented"],
+      interests: [],
+      sourceCount: 99,
+      opportunityTypeCount: 99,
+      notes: ["Invented coverage."],
+    },
     provider: "gemini:test",
     aiStatus: "enhanced",
     agentNotes: [
@@ -315,6 +329,11 @@ test("post-enhancement consistency prevents negative reasoning and action promot
     recommendations: [
       {
         ...base.recommendations[0],
+        opportunity: {
+          ...base.recommendations[0].opportunity,
+          title: "Invented Opportunity Title",
+          canonicalUrl: "https://example.com/invented",
+        },
         recommendedAction: "Apply Now",
         reasoning: "Strong capability alignment with a clear next step.",
       },
@@ -338,6 +357,13 @@ test("post-enhancement consistency prevents negative reasoning and action promot
     "Prepare First",
   );
   assert.equal(consistent.recommendations[0].matchScore, 82);
+  assert.equal(consistent.requestId, base.requestId);
+  assert.deepEqual(consistent.querySummary, base.querySummary);
+  assert.deepEqual(consistent.coverage, base.coverage);
+  assert.deepEqual(
+    consistent.recommendations[0].opportunity,
+    base.recommendations[0].opportunity,
+  );
   assert.equal(
     consistent.recommendations[0].reasoning,
     base.recommendations[0].reasoning,

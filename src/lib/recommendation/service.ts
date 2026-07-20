@@ -248,12 +248,16 @@ export function enforceRecommendationConsistency(
 
       return {
         ...recommendation,
+        opportunity: deterministic.opportunity,
         matchScore,
         reasoning: deterministic.reasoning,
         missingRequirements: deterministic.missingRequirements,
         recommendedAction,
         nextSteps: deterministic.nextSteps,
+        confidenceScore: deterministic.confidenceScore,
         guidanceAction: consistentGuidanceAction,
+        eligibilityConcerns: deterministic.eligibilityConcerns,
+        provenance: deterministic.provenance,
       };
     })
     .filter((recommendation) => recommendation.matchScore >= 35)
@@ -269,9 +273,15 @@ export function enforceRecommendationConsistency(
 
   return {
     ...response,
+    service: draft.service,
+    version: draft.version,
+    requestId: draft.requestId,
+    generatedAt: draft.generatedAt,
+    querySummary: draft.querySummary,
     recommendations,
     actionPlan: buildActionPlan(recommendations),
     learningRoadmap: buildLearningRoadmap(recommendations),
+    coverage: draft.coverage,
     agentNotes: buildGroundedAgentNotes(response, draft),
   };
 }

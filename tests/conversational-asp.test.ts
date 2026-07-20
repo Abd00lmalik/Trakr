@@ -206,7 +206,7 @@ test("natural years-of-experience wording clears the experience gate", async () 
       operation: "discover",
       intakeRoute: "background",
       message:
-        "I am a fictional product designer based in Portugal with three years of experience. I use Figma, user research, prototyping, and accessibility testing. I want remote fellowships, competitions, or product design roles connected to climate and fintech.",
+        "I am a fictional product designer based in Portugal with three years of experience. I use Figma, user research, prototyping, design systems, and accessibility testing. I want remote fellowships, competitions, or product design roles connected to climate and fintech.",
     }),
   );
 
@@ -221,6 +221,24 @@ test("natural years-of-experience wording clears the experience gate", async () 
     ),
     false,
   );
+  assert.equal(response.conversation?.profile.draft.location, "Portugal");
+  assert.ok(
+    response.conversation?.profile.draft.skills.includes("design systems"),
+  );
+  assert.ok(
+    response.conversation?.profile.draft.skills.includes(
+      "accessibility testing",
+    ),
+  );
+  assert.equal(
+    response.conversation?.profile.draft.interests.includes("Research"),
+    false,
+  );
+  assert.deepEqual(response.querySummary.filtersApplied.categories, [
+    "hackathon",
+    "fellowship",
+    "remote_job",
+  ]);
 });
 
 test("domain-specific background honors negated opportunity types and descriptive years", async () => {
@@ -242,11 +260,47 @@ test("domain-specific background honors negated opportunity types and descriptiv
     response.querySummary.filtersApplied.categories?.includes("remote_job"),
     false,
   );
+  assert.equal(response.conversation?.profile.draft.location, "Uganda");
+  assert.ok(
+    response.conversation?.profile.draft.skills.includes(
+      "qualitative interviews",
+    ),
+  );
+  assert.ok(
+    response.conversation?.profile.draft.skills.includes("survey design"),
+  );
+  assert.ok(response.conversation?.profile.draft.skills.includes("Excel"));
+  assert.equal(
+    response.conversation?.profile.draft.interests.includes("Design"),
+    false,
+  );
   assert.deepEqual(response.querySummary.filtersApplied.categories, [
     "grant",
     "scholarship",
     "fellowship",
   ]);
+});
+
+test("new-graduate background preserves location and requested opportunity types", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "background",
+      message:
+        "I am a fictional new computer science graduate in Kenya. I use Python, TypeScript, React, SQL, Git, and basic machine learning. I built a campus scheduling app and a data-cleaning project but have no formal work experience. I want remote internships or entry-level software and AI roles open to applicants in Africa.",
+    }),
+  );
+
+  assert.equal(response.conversation?.profile.draft.location, "Kenya");
+  assert.equal(
+    response.conversation?.profile.draft.interests.includes("Research"),
+    false,
+  );
+  assert.deepEqual(response.querySummary.filtersApplied.categories, [
+    "internship",
+    "remote_job",
+  ]);
+  assert.equal(response.querySummary.filtersApplied.remote, true);
 });
 
 test("minimal student input asks for gates instead of making weak recommendations", async () => {

@@ -69,8 +69,11 @@ const interestAliases: Array<[RegExp, string]> = [
   [/\b(climate|clean ?tech|sustainability|renewable energy)\b/i, "Climate"],
   [/\b(fintech|financial technology|payments?|banking)\b/i, "Fintech"],
   [/\b(cybersecurity|security|infosec)\b/i, "Cybersecurity"],
-  [/\b(product design|ux|ui|figma|design)\b/i, "Design"],
-  [/\b(research|academic|science|scientific)\b/i, "Research"],
+  [
+    /\b(product design|product designer|ux|ui|figma|design systems?|accessibility testing)\b/i,
+    "Design",
+  ],
+  [/\b(research|researcher|academic|phd|laboratory)\b/i, "Research"],
   [/\b(open source|oss)\b/i, "Open source"],
   [/\b(healthcare|health tech|healthtech|medical)\b/i, "Healthcare"],
   [/\b(startups?|entrepreneurship|founder)\b/i, "Startups"],
@@ -139,7 +142,7 @@ function inferLocation(message: string) {
   }
 
   const match = message.match(
-    /\b(?:from|based in|located in|living in|student in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
+    /\b(?:from|based in|located in|living in|student in|graduate in|researcher in|professional in|applicant in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
   );
   return match?.[1]?.trim().replace(/[.;]+$/, "");
 }
@@ -172,8 +175,9 @@ function categoriesFromText(message: string) {
 }
 
 function interestsFromText(message: string) {
+  const interestText = message.replace(/\buser research\b/gi, "");
   return interestAliases
-    .filter(([pattern]) => pattern.test(message))
+    .filter(([pattern]) => pattern.test(interestText))
     .map(([, interest]) => interest);
 }
 
@@ -339,6 +343,36 @@ function explicitSkillText(message: string) {
   return matches.map((match) => match[1]).filter(Boolean).join(", ");
 }
 
+function explicitSkillsFromMessage(message: string) {
+  const stated = explicitSkillText(message);
+  if (!stated) return [];
+  const parsed = buildProfileDraftFromBackground(stated).profile.skills;
+  const entries = stated
+    .split(/,|;|\band\b/gi)
+    .map((entry) =>
+      entry
+        .replace(/^[-*]\s*/, "")
+        .replace(/[.]+$/, "")
+        .trim(),
+    )
+    .filter(
+      (entry) =>
+        entry.length >= 2 &&
+        entry.length <= 80 &&
+        !/^(?:\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s+years?\b/i.test(
+          entry,
+        ) &&
+        !/\b(?:want|seeking|looking for|opportunities?)\b/i.test(entry),
+    );
+  const seen = new Set<string>();
+  return [...parsed, ...entries].filter((entry) => {
+    const key = entry.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function evidenceSentences(message: string, pattern: RegExp) {
   return message
     .split(/(?<=[.!?])\s+/)
@@ -443,7 +477,7 @@ export function buildConversationalProfile(
     : undefined;
   const messageProfile = messageExtraction?.profile;
   const skillsFromMessage = message
-    ? buildProfileDraftFromBackground(explicitSkillText(message)).profile.skills
+    ? explicitSkillsFromMessage(message)
     : [];
   const explicitMessageProfile: StructuredUserProfile | undefined = message
     ? {

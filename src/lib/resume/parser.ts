@@ -179,7 +179,12 @@ function inferSkills(text: string) {
   return knownSkills
     .map((skill) => ({
       skill,
-      index: findSkillIndex(lower, skill),
+      index: findSkillIndex(
+        skill === "Research"
+          ? lower.replace(/\buser research\b/g, "")
+          : lower,
+        skill,
+      ),
     }))
     .filter(({ index }) => index >= 0)
     .sort((left, right) => left.index - right.index)
@@ -187,6 +192,7 @@ function inferSkills(text: string) {
 }
 
 function inferInterests(text: string) {
+  const researchText = text.replace(/\buser research\b/gi, "");
   return [
     hasNonNegatedPhrase(text, ["hackathon", "hackathons"])
       ? "hackathons"
@@ -219,8 +225,21 @@ function inferInterests(text: string) {
     ])
       ? "Fintech"
       : "",
-    hasNonNegatedPhrase(text, ["research", "academic"]) ? "Research" : "",
-    hasNonNegatedPhrase(text, ["design", "figma"]) ? "Design" : "",
+    hasNonNegatedPhrase(researchText, ["research", "researcher", "academic"])
+      ? "Research"
+      : "",
+    hasNonNegatedPhrase(text, [
+      "product design",
+      "product designer",
+      "ux",
+      "ui",
+      "figma",
+      "design system",
+      "design systems",
+      "accessibility testing",
+    ])
+      ? "Design"
+      : "",
     hasNonNegatedPhrase(text, ["cybersecurity", "infosec"])
       ? "Cybersecurity"
       : "",
