@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-07-19T19:58:36.605Z",
+  "generatedAt": "2026-07-20T02:51:45.949Z",
   "evaluationDate": "2026-07-16T12:00:00.000Z",
   "personaCount": 60,
   "catalogSize": 25,
   "metrics": {
     "precisionAt3": 1,
     "precisionAt5": 1,
-    "ndcgAt5": 0.9672372305615642,
-    "recall": 0.8953373015873016,
+    "ndcgAt5": 0.9742385291706018,
+    "recall": 0.9440476190476191,
     "irrelevantResultRate": 0,
     "falseApplyNowRate": 0
   },
@@ -615,7 +615,7 @@
       "archetype": "AI engineer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9828921171931015,
+      "ndcgAt5": 0.9832909166300543,
       "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
@@ -647,6 +647,13 @@
           "score": 48,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "official-ethglobal-events",
+          "title": "ETHGlobal Hackathons and Events",
+          "score": 38,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -791,6 +798,20 @@
           "score": 80,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "official-dorahacks-hackathons",
+          "title": "DoraHacks Hackathons and Bounties",
+          "score": 42,
+          "action": "Prepare First",
+          "relevanceGrade": 1
+        },
+        {
+          "id": "official-ethglobal-events",
+          "title": "ETHGlobal Hackathons and Events",
+          "score": 38,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -872,8 +893,8 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9030970842075382,
-      "recall": 0.8333333333333334,
+      "ndcgAt5": 0.9762940786437024,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -899,16 +920,16 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 78,
+          "id": "remote-frontend-intern",
+          "title": "Remote Frontend Engineering Internship",
+          "score": 76,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
         {
-          "id": "remote-frontend-intern",
-          "title": "Remote Frontend Engineering Internship",
-          "score": 76,
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 64,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -919,8 +940,8 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8777221344374128,
-      "recall": 0.8333333333333334,
+      "ndcgAt5": 0.9505808121311283,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -939,23 +960,16 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-wellfound-startup-jobs",
-          "title": "Wellfound Startup Jobs",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "remote-frontend-intern",
           "title": "Remote Frontend Engineering Internship",
           "score": 76,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 64,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -966,8 +980,8 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8777221344374128,
-      "recall": 0.8333333333333334,
+      "ndcgAt5": 0.9505808121311283,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -986,23 +1000,16 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-wellfound-startup-jobs",
-          "title": "Wellfound Startup Jobs",
-          "score": 79,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "remote-frontend-intern",
           "title": "Remote Frontend Engineering Internship",
           "score": 76,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 64,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1013,8 +1020,8 @@
       "archetype": "Frontend early-career developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8777221344374128,
-      "recall": 0.8333333333333334,
+      "ndcgAt5": 0.9108248814201985,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1033,23 +1040,23 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-wellfound-startup-jobs",
-          "title": "Wellfound Startup Jobs",
-          "score": 79,
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 76,
           "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-mlh-fellowship",
-          "title": "MLH Fellowship",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
+          "relevanceGrade": 1
         },
         {
           "id": "remote-frontend-intern",
           "title": "Remote Frontend Engineering Internship",
           "score": 76,
+          "action": "Prepare First",
+          "relevanceGrade": 3
+        },
+        {
+          "id": "ai-tools-remote-job",
+          "title": "Remote AI Tools Developer",
+          "score": 64,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1087,13 +1094,6 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
           "score": 80,
@@ -1127,13 +1127,6 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-google-summer-of-code",
           "title": "Google Summer of Code",
           "score": 81,
@@ -1154,8 +1147,8 @@
       "archetype": "Open-source student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.8777221344374128,
-      "recall": 0.8333333333333334,
+      "ndcgAt5": 0.9488624617780657,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1188,9 +1181,9 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 81,
+          "id": "official-google-developer-programs",
+          "title": "Google Developer Programs",
+          "score": 79,
           "action": "Prepare First",
           "relevanceGrade": 3
         }
@@ -1228,13 +1221,6 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
           "score": 80,
@@ -1249,7 +1235,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 1,
-      "recall": 0.8333333333333334,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1275,17 +1261,17 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-github-education",
-          "title": "GitHub Education Student Developer Pack",
-          "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "google-student-scholarship",
           "title": "Developer Student Scholarship",
           "score": 80,
           "action": "Apply Now",
+          "relevanceGrade": 2
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 79,
+          "action": "Prepare First",
           "relevanceGrade": 2
         }
       ]
@@ -1391,6 +1377,20 @@
           "score": 86,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "official-ethglobal-events",
+          "title": "ETHGlobal Hackathons and Events",
+          "score": 45,
+          "action": "Prepare First",
+          "relevanceGrade": 1
+        },
+        {
+          "id": "official-solana-grants",
+          "title": "Solana Grants",
+          "score": 44,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -1497,6 +1497,13 @@
           "relevanceGrade": 3
         },
         {
+          "id": "google-student-scholarship",
+          "title": "Developer Student Scholarship",
+          "score": 49,
+          "action": "Prepare First",
+          "relevanceGrade": 2
+        },
+        {
           "id": "official-google-developer-programs",
           "title": "Google Developer Programs",
           "score": 47,
@@ -1554,6 +1561,13 @@
           "score": 84,
           "action": "Prepare First",
           "relevanceGrade": 3
+        },
+        {
+          "id": "official-google-research-student-programs",
+          "title": "Google Research Student Programs",
+          "score": 40,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -1562,8 +1576,8 @@
       "archetype": "Cloud computing student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9908183105074706,
-      "recall": 0.8333333333333334,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1594,13 +1608,6 @@
           "score": 78,
           "action": "Apply Now",
           "relevanceGrade": 2
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
         }
       ]
     },
@@ -1632,13 +1639,6 @@
           "id": "official-github-education",
           "title": "GitHub Education Student Developer Pack",
           "score": 81,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
@@ -1703,8 +1703,8 @@
       "archetype": "Cloud computing student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9250256699929476,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 0.9908183105074706,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1730,18 +1730,18 @@
           "relevanceGrade": 3
         },
         {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "mlh-fellowship-open-source",
           "title": "MLH Open Source Fellowship",
           "score": 64,
           "action": "Prepare First",
           "relevanceGrade": 2
+        },
+        {
+          "id": "official-aws-activate",
+          "title": "AWS Activate",
+          "score": 42,
+          "action": "Prepare First",
+          "relevanceGrade": 3
         }
       ]
     },
@@ -1750,8 +1750,8 @@
       "archetype": "Cloud computing student",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9908183105074706,
-      "recall": 0.7142857142857143,
+      "ndcgAt5": 1,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -1784,11 +1784,11 @@
           "relevanceGrade": 2
         },
         {
-          "id": "official-google-developer-programs",
-          "title": "Google Developer Programs",
-          "score": 78,
+          "id": "mlh-fellowship-open-source",
+          "title": "MLH Open Source Fellowship",
+          "score": 64,
           "action": "Prepare First",
-          "relevanceGrade": 3
+          "relevanceGrade": 2
         }
       ]
     },
@@ -1921,6 +1921,13 @@
           "score": 78,
           "action": "Prepare First",
           "relevanceGrade": 2
+        },
+        {
+          "id": "official-ethglobal-events",
+          "title": "ETHGlobal Hackathons and Events",
+          "score": 44,
+          "action": "Prepare First",
+          "relevanceGrade": 1
         }
       ]
     },
@@ -1963,7 +1970,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 0.9165323715184533,
-      "recall": 0.625,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2010,7 +2017,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 1,
-      "recall": 0.7142857142857143,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2057,7 +2064,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 1,
-      "recall": 0.7142857142857143,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2104,7 +2111,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 1,
-      "recall": 0.7142857142857143,
+      "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2151,7 +2158,7 @@
       "precisionAt3": 1,
       "precisionAt5": 1,
       "ndcgAt5": 1,
-      "recall": 0.7142857142857143,
+      "recall": 0.8333333333333334,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
       "topResults": [
@@ -2217,13 +2224,6 @@
           "relevanceGrade": 3
         },
         {
-          "id": "remote-frontend-intern",
-          "title": "Remote Frontend Engineering Internship",
-          "score": 67,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-google-research-student-programs",
           "title": "Google Research Student Programs",
           "score": 62,
@@ -2253,13 +2253,6 @@
           "id": "ai-tools-remote-job",
           "title": "Remote AI Tools Developer",
           "score": 74,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "remote-frontend-intern",
-          "title": "Remote Frontend Engineering Internship",
-          "score": 67,
           "action": "Prepare First",
           "relevanceGrade": 3
         },
@@ -2297,13 +2290,6 @@
           "relevanceGrade": 3
         },
         {
-          "id": "remote-frontend-intern",
-          "title": "Remote Frontend Engineering Internship",
-          "score": 67,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-google-research-student-programs",
           "title": "Google Research Student Programs",
           "score": 62,
@@ -2337,13 +2323,6 @@
           "relevanceGrade": 3
         },
         {
-          "id": "remote-frontend-intern",
-          "title": "Remote Frontend Engineering Internship",
-          "score": 67,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
           "id": "official-google-research-student-programs",
           "title": "Google Research Student Programs",
           "score": 62,
@@ -2357,7 +2336,7 @@
       "archetype": "Remote full-stack developer",
       "precisionAt3": 1,
       "precisionAt5": 1,
-      "ndcgAt5": 0.9217107771844201,
+      "ndcgAt5": 0.9340764506431116,
       "recall": 1,
       "irrelevantResultRate": 0,
       "falseApplyNowRate": 0,
@@ -2380,13 +2359,6 @@
           "id": "ai-tools-remote-job",
           "title": "Remote AI Tools Developer",
           "score": 74,
-          "action": "Prepare First",
-          "relevanceGrade": 3
-        },
-        {
-          "id": "remote-frontend-intern",
-          "title": "Remote Frontend Engineering Internship",
-          "score": 67,
           "action": "Prepare First",
           "relevanceGrade": 3
         }

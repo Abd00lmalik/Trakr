@@ -158,7 +158,16 @@ function locationWasInferredFromDemonym(message: string) {
 function categoriesFromText(message: string) {
   const lower = message.toLowerCase();
   return categorySignals
-    .filter(({ signals }) => signals.some((signal) => lower.includes(signal)))
+    .filter(({ signals }) =>
+      signals.some((signal) => {
+        const index = lower.indexOf(signal);
+        if (index < 0) return false;
+        const prefix = lower.slice(Math.max(0, index - 64), index);
+        return !/\b(?:not|never|exclude|excluding|without|do not|don't)\b[^.!?]{0,56}$/.test(
+          prefix,
+        );
+      }),
+    )
     .map(({ category }) => category);
 }
 

@@ -149,7 +149,7 @@ function statedYearsOfExperience(text: string) {
   const match = text
     .toLowerCase()
     .match(
-      /\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s+years?(?:\s+of)?\s+(?:professional\s+)?experience\b/,
+      /\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s+years?(?:\s+of)?(?:\s+[a-z-]+){0,4}\s+experience\b/,
     );
   if (!match) return undefined;
   return /^\d+$/.test(match[1])

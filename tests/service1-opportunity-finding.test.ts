@@ -646,6 +646,47 @@ test("matching program directories remain available as grounded exploration resu
   );
 });
 
+test("generic design overlap does not admit an unrelated domain challenge", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Product designer",
+      bio: "Product designer with climate dashboard and fintech onboarding projects.",
+      location: "Portugal",
+      experienceLevel: "mid-level",
+      skills: [
+        "Figma",
+        "User research",
+        "Prototyping",
+        "Design systems",
+        "Accessibility testing",
+      ],
+      interests: ["Climate", "Fintech", "Design"],
+      goals: ["Find product design competitions connected to climate and fintech"],
+    },
+    filters: { categories: ["hackathon"], remote: true },
+  });
+  const genericDesignChallenge = opportunity(
+    "generic-design-ai-challenge",
+    "Global AI Challenge",
+    ["AI", "design", "productivity"],
+    {
+      category: "hackathon",
+      summary:
+        "A general artificial intelligence challenge focused on model productivity.",
+      requiredSkills: ["project delivery", "team communication"],
+      preferredSkills: ["design"],
+    },
+  );
+
+  const result = scoreOpportunity(genericDesignChallenge, request, {
+    now: new Date("2026-07-20T12:00:00.000Z"),
+  });
+
+  assert.equal(result.hardMismatch, true);
+  assert.equal(result.action, "Skip");
+  assert.ok(result.score <= 20);
+});
+
 test("conversation continuation preserves requested opportunity type and remote constraints", async () => {
   const initial = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({

@@ -90,12 +90,15 @@ const interestFacets: Array<{
   {
     name: "Design",
     signals: [
-      "design",
       "product design",
+      "designer",
       "ux",
       "ui",
       "figma",
       "user research",
+      "prototyping",
+      "design systems",
+      "accessibility testing",
     ],
   },
   {

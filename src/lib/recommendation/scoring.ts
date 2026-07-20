@@ -122,7 +122,17 @@ const domainSignals = {
   security: ["cybersecurity", "security", "ctf", "ctfs", "linux", "networking", "bug bounty", "vulnerability"],
   creator: ["creator", "content creator", "video creator", "ambassador", "short-form", "audience growth", "creator economy"],
   founder: ["founder", "co-founder", "startup", "fundraising", "pitching", "accelerator", "venture capital"],
-  design: ["design", "designer", "figma", "ui", "ux", "prototyping", "product design"],
+  design: [
+    "designer",
+    "figma",
+    "ui",
+    "ux",
+    "prototyping",
+    "product design",
+    "user research",
+    "design systems",
+    "accessibility testing",
+  ],
 };
 
 const roleFamilies = {
@@ -473,6 +483,7 @@ function skillScore(opportunity: Opportunity, request: RecommendationRequest) {
   const tags = overlap(profileTokens, opportunity.tags);
   return {
     score: Math.round(required.ratio * 50 + preferred.ratio * 30 + tags.ratio * 20),
+    requiredMatchCount: required.matches.length,
     matches: [
       ...required.matches.map((match) => `Required skill signal: ${match}`),
       ...preferred.matches.map((match) => `Preferred skill signal: ${match}`),
@@ -914,6 +925,8 @@ export function scoreOpportunity(
   const quality = qualityScore(opportunity);
   const value = valueScore(opportunity);
   const domain = domainFitAssessment(opportunity, request);
+  const meaningfulCapabilityOverlap =
+    skill.requiredMatchCount >= 2 || skill.score >= 45;
   const baseMismatch = hardMismatchAssessment(
     opportunity,
     request,
@@ -922,11 +935,11 @@ export function scoreOpportunity(
   const lacksDirectoryFit =
     opportunity.verificationStatus === "program_directory" &&
     !domain.hasMatchedDomain &&
-    skill.score < 25;
+    !meaningfulCapabilityOverlap;
   const lacksVerifiedOpportunityFit =
     opportunity.verificationStatus !== "program_directory" &&
     domain.score < 30 &&
-    skill.score < 25;
+    !meaningfulCapabilityOverlap;
   const mismatch =
     !baseMismatch.hardMismatch &&
     (lacksDirectoryFit || lacksVerifiedOpportunityFit)

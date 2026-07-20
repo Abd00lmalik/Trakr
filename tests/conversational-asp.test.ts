@@ -178,6 +178,32 @@ test("natural years-of-experience wording clears the experience gate", async () 
   );
 });
 
+test("domain-specific background honors negated opportunity types and descriptive years", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "background",
+      message:
+        "I am a fictional public-policy researcher in Uganda with four years of nonprofit research experience. I use qualitative interviews, survey design, Excel, grant writing, and academic writing. I want remote scholarships, fellowships, grants, or research opportunities open to applicants in Africa; I am not seeking software jobs.",
+    }),
+  );
+
+  assert.equal(
+    response.conversation?.profile.draft.experienceLevel,
+    "mid-level",
+  );
+  assert.notEqual(response.conversation?.state, "needs_more_information");
+  assert.equal(
+    response.querySummary.filtersApplied.categories?.includes("remote_job"),
+    false,
+  );
+  assert.deepEqual(response.querySummary.filtersApplied.categories, [
+    "grant",
+    "scholarship",
+    "fellowship",
+  ]);
+});
+
 test("minimal student input asks for gates instead of making weak recommendations", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({

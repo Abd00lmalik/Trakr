@@ -1,6 +1,6 @@
 # Trakr Ranking Evaluation
 
-Generated: 2026-07-19T19:58:36.605Z
+Generated: 2026-07-20T02:51:45.949Z
 
 Evaluation date: 2026-07-16T12:00:00.000Z
 
@@ -16,8 +16,8 @@ Evaluation date: 2026-07-16T12:00:00.000Z
 | --- | ---: |
 | Precision@3 | 100.0% |
 | Precision@5 | 100.0% |
-| NDCG@5 | 96.7% |
-| Recall@5 | 89.5% |
+| NDCG@5 | 97.4% |
+| Recall@5 | 94.4% |
 | Irrelevant result rate | 0.0% |
 | False Apply Now rate | 0.0% |
 
@@ -27,8 +27,8 @@ Evaluation date: 2026-07-16T12:00:00.000Z
 | --- | ---: | ---: | ---: |
 | Precision@3 | 100.0% | 100.0% | 0.0% |
 | Precision@5 | 100.0% | 100.0% | 0.0% |
-| NDCG@5 | 83.3% | 96.7% | 13.4% |
-| Recall@5 | 50.7% | 89.5% | 38.8% |
+| NDCG@5 | 83.3% | 97.4% | 14.1% |
+| Recall@5 | 50.7% | 94.4% | 43.7% |
 | Irrelevant result rate | 0.0% | 0.0% | 0.0% |
 | False Apply Now rate | 0.0% | 0.0% | 0.0% |
 
