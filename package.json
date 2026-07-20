@@ -13,6 +13,7 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "smoke": "node scripts/smoke-test.mjs",
+    "smoke:service2:production": "node scripts/service2-production-smoke.mjs",
     "test:privacy": "tsx --test tests/privacy-logging.test.ts",
     "test:verification": "tsx --test tests/source-verification.test.ts",
     "test:devpost": "tsx --test tests/devpost-normalization.test.ts",

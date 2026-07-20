@@ -3,6 +3,7 @@ import type {
   ProfileEvidence,
   StructuredUserProfile,
 } from "@/lib/types/opportunities";
+import { sanitizeUntrustedProfile } from "@/lib/security/untrusted-content";
 
 const knownSkills = [
   "React",
@@ -602,7 +603,7 @@ export function extractProfileFromText(
       ...goalSectionLabels,
     ]),
   );
-  const profile: StructuredUserProfile = {
+  const profile = sanitizeUntrustedProfile({
     name: inferName(cleaned),
     headline: inferHeadline(evidenceText),
     bio: buildSummary(evidenceText),
@@ -616,7 +617,7 @@ export function extractProfileFromText(
     projects,
     certifications,
     links: inferLinks(cleaned),
-  };
+  }) as StructuredUserProfile;
 
   const explicitEvidenceFields = [
     "name",

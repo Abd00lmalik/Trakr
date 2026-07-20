@@ -4,6 +4,10 @@ import {
   compactProfileForSession,
   compactTargetForSession,
 } from "@/lib/companion/session";
+import {
+  isInstructionLikeContent,
+  sanitizeUntrustedValues,
+} from "@/lib/security/untrusted-content";
 import type {
   CompanionTarget,
   Opportunity,
@@ -22,15 +26,12 @@ function uniqueStrings(values: string[]) {
   return [...new Set(values.map((value) => value.trim()).filter(Boolean))];
 }
 
-const instructionLikeContent =
-  /\b(ignore (?:all |any )?(?:previous|prior|system) instructions?|system prompt|developer message|override (?:the )?(?:rules|instructions)|exfiltrat(?:e|ion)|reveal (?:the )?(?:system|hidden|private)|send (?:the )?(?:user|resume|cv|profile|personal) (?:data|information|details)|upload (?:the )?(?:user|resume|cv|profile)|leak (?:the )?(?:user|resume|cv|profile))\b/i;
-
 function safeEvidenceValues(values: string[]) {
-  return values.filter((value) => !instructionLikeContent.test(value));
+  return sanitizeUntrustedValues(values);
 }
 
 function safeTargetText(value: string) {
-  return instructionLikeContent.test(value) ? "" : value;
+  return isInstructionLikeContent(value) ? "" : value;
 }
 
 function eligibilityConcerns(opportunity: Opportunity) {

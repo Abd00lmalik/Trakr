@@ -296,8 +296,15 @@ test("prompt injection inside supplied evidence is excluded from analysis and re
     }),
   );
   const output = JSON.stringify(second.capabilityResult?.resumeOptimization);
+  const firstSerialized = JSON.stringify(first);
+  const context = resolveSessionContext(first.conversation?.continuation);
 
   assert.equal(second.conversation?.state, "resume_optimization");
+  assert.equal(/ignore previous instructions/i.test(firstSerialized), false);
+  assert.equal(
+    /ignore previous instructions/i.test(JSON.stringify(context)),
+    false,
+  );
   assert.equal(/ignore previous instructions/i.test(output), false);
   assert.equal(/example\.test/i.test(output), false);
 });

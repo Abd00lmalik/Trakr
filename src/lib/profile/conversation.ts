@@ -4,6 +4,10 @@ import {
   extractProfileFromText,
   inferExperienceLevelFromText,
 } from "@/lib/resume/parser";
+import {
+  sanitizeProfileEvidence,
+  sanitizeUntrustedProfile,
+} from "@/lib/security/untrusted-content";
 import type {
   CompanionContext,
   OpportunityCategory,
@@ -515,8 +519,13 @@ export function buildConversationalProfile(
   request: OpportunityCompanionRequest,
 ) {
   const context = contextFromRequest(request);
-  const providedProfile = request.user ?? request.profile;
-  const evidence: ProfileEvidence[] = [...(context?.profileEvidence ?? [])];
+  const contextProfile = sanitizeUntrustedProfile(context?.profile);
+  const providedProfile = sanitizeUntrustedProfile(
+    request.user ?? request.profile,
+  );
+  const evidence: ProfileEvidence[] = sanitizeProfileEvidence([
+    ...(context?.profileEvidence ?? []),
+  ]);
   const message = meaningfulMessage(request.message);
   const resumeExtraction = request.resumeText
     ? extractProfileFromText(request.resumeText, "resume")
@@ -568,7 +577,7 @@ export function buildConversationalProfile(
     : undefined;
 
   const profile = mergeProfiles(
-    context?.profile,
+    contextProfile,
     providedProfile,
     resumeProfile,
     explicitMessageProfile,
@@ -585,7 +594,7 @@ export function buildConversationalProfile(
   );
 
   evidenceFromProvidedProfile(
-    context?.profile,
+    contextProfile,
     evidence,
     "explicit",
     "context",
