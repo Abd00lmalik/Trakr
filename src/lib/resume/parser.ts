@@ -67,6 +67,30 @@ const roleSignals = [
   "startup founder",
 ];
 
+const goalSectionLabels = [
+  "Goal",
+  "Goals",
+  "Objective",
+  "Objectives",
+  "Career Objective",
+];
+
+const recognizedSectionLabels = [
+  "Summary",
+  "Profile",
+  "Skills",
+  "Technical Skills",
+  "Experience",
+  "Work Experience",
+  "Employment",
+  "Projects",
+  "Education",
+  "Certifications",
+  "Location",
+  "Interests",
+  ...goalSectionLabels,
+];
+
 function normalizeWhitespace(text: string) {
   return text
     .replace(/\r\n?/g, "\n")
@@ -74,6 +98,40 @@ function normalizeWhitespace(text: string) {
     .split("\n")
     .map((line) => line.replace(/[ ]{2,}/g, " ").trim())
     .filter(Boolean)
+    .join("\n")
+    .trim();
+}
+
+function escapedAlternatives(values: string[]) {
+  return values
+    .map((value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+}
+
+function withoutAspirationalSections(text: string) {
+  const goalHeadingPattern = new RegExp(
+    `^(?:${escapedAlternatives(goalSectionLabels)})\\s*:?(?:\\s+.*)?$`,
+    "i",
+  );
+  const sectionHeadingPattern = new RegExp(
+    `^(?:${escapedAlternatives(recognizedSectionLabels)})\\s*:?(?:\\s+.*)?$`,
+    "i",
+  );
+  let excluding = false;
+
+  return text
+    .split("\n")
+    .filter((line) => {
+      const trimmed = line.trim();
+      if (goalHeadingPattern.test(trimmed)) {
+        excluding = true;
+        return false;
+      }
+      if (sectionHeadingPattern.test(trimmed)) {
+        excluding = false;
+      }
+      return !excluding;
+    })
     .join("\n")
     .trim();
 }
@@ -86,6 +144,34 @@ function findSkillIndex(text: string, skill: string) {
     `(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`,
   ).exec(text);
   return match ? match.index + match[1].length : -1;
+}
+
+function hasNonNegatedPhrase(text: string, phrases: string[]) {
+  const lower = text.toLowerCase();
+  return phrases.some((phrase) => {
+    const normalizedPhrase = phrase.toLowerCase();
+    let startIndex = 0;
+    while (startIndex < lower.length) {
+      const index = lower.indexOf(normalizedPhrase, startIndex);
+      if (index < 0) return false;
+      const before = lower[index - 1] ?? " ";
+      const after = lower[index + normalizedPhrase.length] ?? " ";
+      const hasShortTokenBoundary =
+        normalizedPhrase.length > 3 ||
+        (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after));
+      const prefix = lower.slice(Math.max(0, index - 64), index);
+      if (
+        hasShortTokenBoundary &&
+        !/\b(?:not|never|exclude|excluding|without|do not|don't|no)\b[^.!?]{0,56}$/.test(
+          prefix,
+        )
+      ) {
+        return true;
+      }
+      startIndex = index + normalizedPhrase.length;
+    }
+    return false;
+  });
 }
 
 function inferSkills(text: string) {
@@ -101,32 +187,44 @@ function inferSkills(text: string) {
 }
 
 function inferInterests(text: string) {
-  const lower = text.toLowerCase();
   return [
-    lower.includes("hackathon") ? "hackathons" : "",
-    lower.includes("grant") ? "grants" : "",
-    lower.includes("scholarship") ? "scholarships" : "",
-    lower.includes("fellowship") ? "fellowships" : "",
-    lower.includes("internship") ? "internships" : "",
-    lower.includes("remote") ? "remote work" : "",
-    lower.includes("web3") || lower.includes("blockchain") ? "web3" : "",
-    /\bai\b/.test(lower) || lower.includes("machine learning") ? "AI" : "",
-    lower.includes("climate") ||
-    lower.includes("sustainability") ||
-    lower.includes("renewable")
+    hasNonNegatedPhrase(text, ["hackathon", "hackathons"])
+      ? "hackathons"
+      : "",
+    hasNonNegatedPhrase(text, ["bounty", "bounties"]) ? "bounties" : "",
+    hasNonNegatedPhrase(text, ["grant", "grants"]) ? "grants" : "",
+    hasNonNegatedPhrase(text, ["scholarship", "scholarships"])
+      ? "scholarships"
+      : "",
+    hasNonNegatedPhrase(text, ["fellowship", "fellowships"])
+      ? "fellowships"
+      : "",
+    hasNonNegatedPhrase(text, ["internship", "internships"])
+      ? "internships"
+      : "",
+    hasNonNegatedPhrase(text, ["remote"]) ? "remote work" : "",
+    hasNonNegatedPhrase(text, ["web3", "blockchain"]) ? "web3" : "",
+    hasNonNegatedPhrase(text, ["ai", "machine learning"]) ? "AI" : "",
+    hasNonNegatedPhrase(text, [
+      "climate",
+      "sustainability",
+      "renewable",
+    ])
       ? "Climate"
       : "",
-    lower.includes("fintech") ||
-    lower.includes("financial technology") ||
-    lower.includes("payments")
+    hasNonNegatedPhrase(text, [
+      "fintech",
+      "financial technology",
+      "payments",
+    ])
       ? "Fintech"
       : "",
-    lower.includes("research") || lower.includes("academic") ? "Research" : "",
-    lower.includes("design") || lower.includes("figma") ? "Design" : "",
-    lower.includes("cybersecurity") || lower.includes("infosec")
+    hasNonNegatedPhrase(text, ["research", "academic"]) ? "Research" : "",
+    hasNonNegatedPhrase(text, ["design", "figma"]) ? "Design" : "",
+    hasNonNegatedPhrase(text, ["cybersecurity", "infosec"])
       ? "Cybersecurity"
       : "",
-    lower.includes("open source") || lower.includes("github")
+    hasNonNegatedPhrase(text, ["open source", "github"])
       ? "Open source"
       : "",
   ].filter(Boolean);
@@ -149,7 +247,7 @@ function statedYearsOfExperience(text: string) {
   const match = text
     .toLowerCase()
     .match(
-      /\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s+years?(?:\s+of)?(?:\s+[a-z-]+){0,4}\s+experience\b/,
+      /\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s+years?(?:(?:\s+of)?(?:\s+[a-z-]+){0,4}\s+experience|\s+(?:working\s+)?(?:in|as)\s+[a-z][^.;\n]{1,60})\b/,
     );
   if (!match) return undefined;
   return /^\d+$/.test(match[1])
@@ -185,16 +283,37 @@ export function inferExperienceLevelFromText(
 }
 
 function inferGoals(text: string) {
-  const lower = text.toLowerCase();
   return [
-    lower.includes("hackathon") ? "Compete in hackathons" : "",
-    lower.includes("grant") || lower.includes("funding")
+    hasNonNegatedPhrase(text, ["hackathon", "hackathons"])
+      ? "Compete in hackathons"
+      : "",
+    hasNonNegatedPhrase(text, ["bounty", "bounties"])
+      ? "Find a Web3 bounty"
+      : "",
+    hasNonNegatedPhrase(text, ["grant", "grants", "funding"])
       ? "Find grant funding"
       : "",
-    lower.includes("fellowship") ? "Join a fellowship" : "",
-    lower.includes("internship") ? "Find an internship" : "",
-    lower.includes("remote") ? "Find remote opportunities" : "",
-    lower.includes("open source") ? "Grow through open source" : "",
+    hasNonNegatedPhrase(text, ["fellowship", "fellowships"])
+      ? "Join a fellowship"
+      : "",
+    hasNonNegatedPhrase(text, ["internship", "internships"])
+      ? "Find an internship"
+      : "",
+    hasNonNegatedPhrase(text, [
+      "job",
+      "jobs",
+      "role",
+      "roles",
+      "employment",
+      "developer opportunities",
+      "career opportunities",
+    ])
+      ? "Find a job"
+      : "",
+    hasNonNegatedPhrase(text, ["remote"]) ? "Find remote opportunities" : "",
+    hasNonNegatedPhrase(text, ["open source"])
+      ? "Grow through open source"
+      : "",
   ].filter(Boolean);
 }
 
@@ -285,6 +404,17 @@ function inferLocation(text: string) {
   ]);
   if (labeled) return labeled.split("\n")[0].trim();
 
+  const contactLineLocation = text
+    .split("\n")
+    .slice(0, 6)
+    .map((line) =>
+      line.match(
+        /^([A-Z][A-Za-z .'-]{1,50},\s*[A-Z][A-Za-z .'-]{1,50})(?=\s*[|•·])/,
+      ),
+    )
+    .find(Boolean)?.[1];
+  if (contactLineLocation) return contactLineLocation.trim();
+
   const match = text.match(
     /\b(?:based in|located in|living in|from|student in)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:and|with|seeking|open|looking)\b|$)/i,
   );
@@ -303,26 +433,59 @@ function inferName(text: string) {
   }
 }
 
-function inferHeadline(text: string, skills: string[]) {
-  const lower = text.toLowerCase();
-  const role = roleSignals.find((signal) => lower.includes(signal));
-  if (role) {
-    return role
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+function inferHeadline(text: string) {
+  const segments = text
+    .split(/\n|(?<=[.!?])\s+/)
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  for (const role of roleSignals) {
+    const escapedRole = role.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const standaloneRole = new RegExp(`^${escapedRole}$`, "i");
+    const currentRole = new RegExp(
+      `\\b(?:i am|i'm|is|currently|work(?:ing)? as|works? as|serve(?:s|d)? as|role\\s*:|headline\\s*:)\\s+(?:an?\\s+)?${escapedRole}\\b`,
+      "i",
+    );
+    if (
+      segments.some(
+        (segment) =>
+          standaloneRole.test(segment) || currentRole.test(segment),
+      )
+    ) {
+      return role
+        .split(" ")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+    }
   }
 
   return undefined;
 }
 
+function redactContactDetails(text: string) {
+  return text
+    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "")
+    .replace(/https?:\/\/[^\s,;]+/gi, "")
+    .replace(/(?:\+?\d[\d\s().-]{7,}\d)/g, "")
+    .replace(/\s*[|•·]\s*$/g, "")
+    .replace(/[ ]{2,}/g, " ")
+    .trim();
+}
+
 function buildSummary(text: string) {
+  const sectionHeadingPattern = new RegExp(
+    `^(?:${escapedAlternatives(recognizedSectionLabels)})\\s*:?$`,
+    "i",
+  );
   const sentences = text
     .split(/(?<=[.!?])\s+|\n+/)
-    .map((sentence) => sentence.trim())
-    .filter((sentence) => sentence.length >= 24);
+    .map(redactContactDetails)
+    .filter(
+      (sentence) =>
+        sentence.length >= 24 && !sectionHeadingPattern.test(sentence),
+    );
   const summary = sentences.slice(0, 3).join(" ");
-  return (summary || text).slice(0, 480);
+  return (summary || redactContactDetails(text)).slice(0, 480);
 }
 
 export type ProfileExtraction = {
@@ -335,7 +498,17 @@ export function extractProfileFromText(
   origin: "resume" | "user" = "resume",
 ): ProfileExtraction {
   const cleaned = normalizeWhitespace(text);
-  const allSkills = inferSkills(cleaned);
+  const evidenceText = withoutAspirationalSections(cleaned);
+  const goalText =
+    goalSectionLabels
+      .map((label) =>
+        extractLabeledBlock(
+          cleaned,
+          label,
+          recognizedSectionLabels.filter((item) => item !== label),
+        ),
+      )
+      .find(Boolean) ?? cleaned;
   const skillsBlock = extractLabeledBlock(cleaned, "Skills", [
     "Summary",
     "Experience",
@@ -343,7 +516,7 @@ export function extractProfileFromText(
     "Education",
     "Certifications",
     "Location",
-    "Goals",
+    ...goalSectionLabels,
   ]);
   const projects = extractEntries(
     extractLabeledBlock(cleaned, "Projects", [
@@ -353,7 +526,7 @@ export function extractProfileFromText(
       "Education",
       "Certifications",
       "Location",
-      "Goals",
+      ...goalSectionLabels,
     ]),
   );
   const workHistory = extractEntries(
@@ -364,7 +537,7 @@ export function extractProfileFromText(
       "Education",
       "Certifications",
       "Location",
-      "Goals",
+      ...goalSectionLabels,
     ]),
   );
   const education = extractEntries(
@@ -375,7 +548,7 @@ export function extractProfileFromText(
       "Projects",
       "Certifications",
       "Location",
-      "Goals",
+      ...goalSectionLabels,
     ]),
   );
   const certifications = extractEntries(
@@ -386,18 +559,18 @@ export function extractProfileFromText(
       "Projects",
       "Education",
       "Location",
-      "Goals",
+      ...goalSectionLabels,
     ]),
   );
   const profile: StructuredUserProfile = {
     name: inferName(cleaned),
-    headline: inferHeadline(cleaned, allSkills),
-    bio: buildSummary(cleaned),
+    headline: inferHeadline(evidenceText),
+    bio: buildSummary(evidenceText),
     location: inferLocation(cleaned),
-    experienceLevel: inferExperienceLevelFromText(cleaned),
-    skills: extractSkills(skillsBlock, cleaned),
+    experienceLevel: inferExperienceLevelFromText(evidenceText),
+    skills: extractSkills(skillsBlock, evidenceText),
     interests: inferInterests(cleaned),
-    goals: inferGoals(cleaned),
+    goals: inferGoals(goalText),
     education,
     workHistory,
     projects,

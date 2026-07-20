@@ -107,6 +107,33 @@ Goals: Seeking remote entry-level software opportunities.`,
   assert.ok(parsed.profile.goals.includes("Find remote opportunities"));
 });
 
+test("resume extraction separates aspirational goals from evidence and redacts contact details", () => {
+  const parsed = extractProfileFromText(
+    `Amina Bello
+Lagos, Nigeria | amina.test@example.invalid
+EDUCATION
+BSc Computer Science student, Fictional University, expected 2027.
+SKILLS
+Python, React, TypeScript, Git, SQL, basic machine learning.
+PROJECTS
+Built a student study-planner with React and TypeScript.
+GOAL
+Seeking remote AI or software engineering internships open to students in Nigeria.`,
+  );
+
+  assert.equal(parsed.profile.headline, undefined);
+  assert.equal(parsed.profile.location, "Lagos, Nigeria");
+  assert.ok(!parsed.profile.bio?.includes("amina.test@example.invalid"));
+  assert.ok(!parsed.profile.skills.includes("AI"));
+  assert.deepEqual(parsed.profile.projects, [
+    "Built a student study-planner with React and TypeScript.",
+  ]);
+  assert.ok(
+    parsed.profile.projects.every((entry) => !/\bgoal\b/i.test(entry)),
+  );
+  assert.ok(parsed.profile.goals.includes("Find an internship"));
+});
+
 test("workspace exposes the outcome-first Opportunity Finding journey", async () => {
   const workspace = await readFile(
     new URL("../src/components/opportunity-workspace.tsx", import.meta.url),

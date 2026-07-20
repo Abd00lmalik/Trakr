@@ -48,7 +48,7 @@ const categorySignals: Array<{
   },
   {
     category: "web3_bounty",
-    signals: ["bounty", "bug bounty", "smart contract security"],
+    signals: ["bounty", "bounties", "bug bounty", "smart contract security"],
   },
 ];
 

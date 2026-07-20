@@ -155,6 +155,51 @@ Goals: Seeking remote AI or software internships.`,
   );
 });
 
+test("career-changer resume preserves location, experience, and all requested opportunity types", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "discover",
+      intakeRoute: "resume",
+      resumeText: `Kofi Mensah
+Accra, Ghana | kofi.test@example.invalid
+BACKGROUND
+Self-taught developer transitioning from customer support into Web3 development.
+SKILLS
+Solidity, TypeScript, React, Hardhat, Foundry, Git, technical writing.
+PROJECTS
+Built and tested two fictional smart contracts and a token-gated React application.
+EXPERIENCE
+Two years in customer support; six months of independent blockchain project work.
+GOAL
+Seeking remote blockchain hackathons, Web3 bounties, and entry-level developer opportunities open from Ghana.`,
+      consent: {
+        processPersonalData: true,
+        retention: "session_only",
+        source: "explicit",
+      },
+    }),
+  );
+
+  assert.equal(response.conversation?.profile.draft.headline, undefined);
+  assert.equal(response.conversation?.profile.draft.location, "Accra, Ghana");
+  assert.equal(
+    response.conversation?.profile.draft.experienceLevel,
+    "early-career",
+  );
+  assert.ok(
+    !response.conversation?.profile.draft.bio?.includes(
+      "kofi.test@example.invalid",
+    ),
+  );
+  assert.deepEqual(response.querySummary.filtersApplied.categories, [
+    "hackathon",
+    "remote_job",
+    "web3_bounty",
+  ]);
+  assert.equal(response.querySummary.filtersApplied.remote, true);
+  assert.notEqual(response.conversation?.state, "needs_more_information");
+});
+
 test("natural years-of-experience wording clears the experience gate", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
