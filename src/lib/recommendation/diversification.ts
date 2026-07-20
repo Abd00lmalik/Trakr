@@ -416,6 +416,13 @@ export function diversifyRankedOpportunities(
       ),
     ).length;
     const target = coverageTarget(interest);
+    const explorationResultCount = selected.filter(
+      (candidate) =>
+        candidate.opportunity.verificationStatus === "program_directory" &&
+        (candidateInterestMatches.get(candidate.opportunity.id) ?? []).includes(
+          interest,
+        ),
+    ).length;
     const status =
       qualifyingCandidateCount === 0
         ? ("no_qualified_matches" as const)
@@ -429,7 +436,9 @@ export function diversifyRankedOpportunities(
           ? qualifyingCandidateCount === 1
             ? "Only one candidate met the current relevance, activity, and quality gates."
             : "Qualifying candidates existed, but stronger constraints limited top-result coverage."
-          : "No current candidate met the relevance, activity, and quality gates. Trakr did not pad the list with weaker results.";
+          : explorationResultCount
+            ? `No verified active listing met the relevance, activity, and quality gates. ${explorationResultCount} selected program director${explorationResultCount === 1 ? "y is" : "ies are"} included only for exploration and must be checked for current openings.`
+            : "No verified active listing met the relevance, activity, and quality gates. Trakr did not pad the list with weaker results.";
     return {
       interest,
       status,

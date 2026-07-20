@@ -636,13 +636,19 @@ test("matching program directories remain available as grounded exploration resu
     assert.equal(directory.verificationStatus, "program_directory");
   }
 
-  const rankedIds = rankOpportunities(
+  const ranked = rankOpportunities(
     matchingDirectories,
     request,
-  ).map((candidate) => candidate.opportunity.id);
+  );
+  const rankedIds = ranked.map((candidate) => candidate.opportunity.id);
   assert.deepEqual(
     new Set(rankedIds),
     new Set(["official-ethglobal-events", "official-dorahacks-hackathons"]),
+  );
+  const diversified = diversifyRankedOpportunities(ranked, request, 10);
+  assert.match(
+    diversified.coverage.interests[0].explanation,
+    /program directories are included only for exploration/i,
   );
 });
 
