@@ -357,6 +357,34 @@ test("research profiles do not receive unrelated employment-like fellowships", (
   );
 });
 
+test("explicit junior targets reject senior roles for mid-level applicants", () => {
+  const request = recommendationRequestSchema.parse({
+    user: {
+      headline: "Product designer",
+      bio: "Three years of experience seeking junior product roles in climate and fintech.",
+      experienceLevel: "mid-level",
+      location: "Portugal",
+      skills: ["Figma", "prototyping", "design systems"],
+      interests: ["Climate", "Fintech", "Design"],
+      goals: ["Find a remote job"],
+    },
+    filters: { categories: ["remote_job"], remote: true },
+  });
+  const seniorRole = opportunity(
+    "senior-product-designer",
+    "Senior Product Designer",
+    ["Figma", "prototyping"],
+  );
+  const juniorRole = opportunity(
+    "junior-product-designer",
+    "Junior Product Designer",
+    ["Figma", "prototyping"],
+  );
+
+  assert.equal(scoreOpportunity(seniorRole, request).hardMismatch, true);
+  assert.equal(scoreOpportunity(juniorRole, request).hardMismatch, false);
+});
+
 test("post-enhancement consistency prevents negative reasoning and action promotion", () => {
   const strong = opportunity("strong-role", "Frontend Developer", [
     "React",

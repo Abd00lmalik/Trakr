@@ -569,6 +569,24 @@ function skillScore(opportunity: Opportunity, request: RecommendationRequest) {
   };
 }
 
+function explicitlyRequestsJuniorScope(request: RecommendationRequest) {
+  const values = [
+    request.user?.bio,
+    ...(request.user?.goals ?? []),
+    ...(request.goals ?? []),
+    request.resumeText,
+  ].filter((value): value is string => Boolean(value));
+
+  return includesPhrase(values, [
+    "junior",
+    "entry-level",
+    "entry level",
+    "early-career",
+    "early career",
+    "graduate role",
+  ]);
+}
+
 function experienceScore(opportunity: Opportunity, request: RecommendationRequest) {
   const level = request.user?.experienceLevel;
   const values = opportunityValues(opportunity);
@@ -576,7 +594,12 @@ function experienceScore(opportunity: Opportunity, request: RecommendationReques
   const isSenior = includesPhrase(titleAndSummary, seniorSignals);
   const isBeginnerFriendly = includesPhrase(values, beginnerSignals);
 
-  if (level === "student" || level === "beginner" || level === "early-career") {
+  if (
+    level === "student" ||
+    level === "beginner" ||
+    level === "early-career" ||
+    explicitlyRequestsJuniorScope(request)
+  ) {
     if (isSenior) {
       return 15;
     }
@@ -960,9 +983,10 @@ function hardMismatchAssessment(
     roleFamilies,
   );
   if (
-    ["student", "beginner", "early-career"].includes(
+    (["student", "beginner", "early-career"].includes(
       request.user?.experienceLevel ?? "",
-    ) &&
+    ) ||
+      explicitlyRequestsJuniorScope(request)) &&
     includesPhrase(
       [opportunity.title, opportunity.summary],
       seniorSignals,

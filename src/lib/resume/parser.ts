@@ -426,6 +426,24 @@ function inferLocation(text: string) {
   ]);
   if (labeled) return labeled.split("\n")[0].trim();
 
+  const standaloneLocation = text
+    .split("\n")
+    .slice(0, 6)
+    .map((line) =>
+      line.match(
+        /^([A-Z][A-Za-z .'-]{1,50},\s*[A-Z][A-Za-z .'-]{1,50})\s*$/,
+      ),
+    )
+    .find(
+      (match) =>
+        match &&
+        !inferSkills(match[1]).length &&
+        !/\b(?:based|located|living|from|student|undergraduate|graduate|designer|developer|researcher|applicant|in)\b/i.test(
+          match[1],
+        ),
+    )?.[1];
+  if (standaloneLocation) return standaloneLocation.trim();
+
   const contactLineLocation = text
     .split("\n")
     .slice(0, 6)

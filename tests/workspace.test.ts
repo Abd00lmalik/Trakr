@@ -134,6 +134,20 @@ Seeking remote AI or software engineering internships open to students in Nigeri
   assert.ok(parsed.profile.goals.includes("Find an internship"));
 });
 
+test("resume extraction preserves a standalone city and country line", () => {
+  const parsed = extractProfileFromText(
+    `KOFI TESTER
+Accra, Ghana
+Email: kofi.test@example.invalid
+Self-taught web developer with two years of project work.
+Skills: Solidity, JavaScript, React, Foundry, Git.
+Projects: Built a token dashboard and contributed documentation to open-source repositories.
+Goal: Find blockchain hackathons, Web3 bounties, and entry-level remote software roles.`,
+  );
+
+  assert.equal(parsed.profile.location, "Accra, Ghana");
+});
+
 test("workspace exposes the outcome-first Opportunity Finding journey", async () => {
   const workspace = await readFile(
     new URL("../src/components/opportunity-workspace.tsx", import.meta.url),
