@@ -6,8 +6,11 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 function isAuthorized(request: Request) {
-  const adminKey = process.env.TRAKR_ADMIN_API_KEY ?? process.env.INGEST_API_KEY;
-  if (!adminKey) {
+  const acceptedKeys = [
+    process.env.TRAKR_ADMIN_API_KEY,
+    process.env.INGEST_API_KEY,
+  ].filter((key): key is string => Boolean(key));
+  if (!acceptedKeys.length) {
     return process.env.NODE_ENV !== "production";
   }
 
@@ -16,7 +19,7 @@ function isAuthorized(request: Request) {
     request.headers.get("x-ingest-api-key") ??
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
 
-  return provided === adminKey;
+  return Boolean(provided && acceptedKeys.includes(provided));
 }
 
 export async function POST(request: Request) {

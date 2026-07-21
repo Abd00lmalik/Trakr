@@ -9,6 +9,7 @@ import {
 import { POST as parseResume } from "../src/app/api/profile/parse-resume/route";
 import { GET as getOpenApi } from "../src/app/api/a2mcp/openapi/route";
 import { GET as getA2mcpMetadata } from "../src/app/api/a2mcp/route";
+import { POST as administerDatabase } from "../src/app/api/admin/database/route";
 
 const resumeText =
   "Amina Yusuf is a frontend developer and university student with React, TypeScript, JavaScript, SQL, and open source experience. Built accessible dashboards and API integrations for developer communities. Interested in hackathons, fellowships, remote work, AI, Web3, and grant-funded public goods. Portfolio https://example.com/amina";
@@ -337,4 +338,48 @@ test("production ingestion migrates and checks inventory metadata readiness", as
   assert.match(database, /column_name = 'inventory_metadata'/);
   assert.match(database, /inventoryMetadataReady/);
   assert.match(health, /database\.inventoryMetadataReady/);
+});
+
+test("database migration accepts either configured operator key", async () => {
+  const priorAdminKey = process.env.TRAKR_ADMIN_API_KEY;
+  const priorIngestKey = process.env.INGEST_API_KEY;
+  const priorDatabaseUrl = process.env.DATABASE_URL;
+  process.env.TRAKR_ADMIN_API_KEY = "admin-only-key";
+  process.env.INGEST_API_KEY = "ingest-only-key";
+  delete process.env.DATABASE_URL;
+
+  try {
+    const authorized = await administerDatabase(
+      new Request("http://localhost/api/admin/database", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-ingest-api-key": "ingest-only-key",
+        },
+        body: '{"seed":false}',
+      }),
+    );
+    const unauthorized = await administerDatabase(
+      new Request("http://localhost/api/admin/database", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-ingest-api-key": "wrong-key",
+        },
+        body: '{"seed":false}',
+      }),
+    );
+
+    assert.equal(authorized.status, 500);
+    assert.equal((await authorized.json()).error, "database_admin_failed");
+    assert.equal(unauthorized.status, 401);
+    assert.equal((await unauthorized.json()).error, "unauthorized");
+  } finally {
+    if (priorAdminKey === undefined) delete process.env.TRAKR_ADMIN_API_KEY;
+    else process.env.TRAKR_ADMIN_API_KEY = priorAdminKey;
+    if (priorIngestKey === undefined) delete process.env.INGEST_API_KEY;
+    else process.env.INGEST_API_KEY = priorIngestKey;
+    if (priorDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = priorDatabaseUrl;
+  }
 });
