@@ -43,7 +43,8 @@ export async function POST(request: Request) {
         database.pgvector &&
         database.schemaReady &&
         database.privacyLoggingReady &&
-        database.sourceVerificationReady,
+        database.sourceVerificationReady &&
+        database.inventoryMetadataReady,
       migration,
       seed,
       database,

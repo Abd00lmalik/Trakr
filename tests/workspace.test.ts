@@ -315,3 +315,26 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
     /not hiring predictions/i,
   );
 });
+
+test("production ingestion migrates and checks inventory metadata readiness", async () => {
+  const [workflow, database, health] = await Promise.all([
+    readFile(
+      new URL("../.github/workflows/ingest.yml", import.meta.url),
+      "utf8",
+    ),
+    readFile(new URL("../src/lib/db.ts", import.meta.url), "utf8"),
+    readFile(
+      new URL("../src/app/api/health/route.ts", import.meta.url),
+      "utf8",
+    ),
+  ]);
+
+  const migrationIndex = workflow.indexOf("/api/admin/database");
+  const ingestionIndex = workflow.indexOf("/api/ingest");
+  assert.ok(migrationIndex >= 0);
+  assert.ok(ingestionIndex > migrationIndex);
+  assert.match(workflow, /"seed":false/);
+  assert.match(database, /column_name = 'inventory_metadata'/);
+  assert.match(database, /inventoryMetadataReady/);
+  assert.match(health, /database\.inventoryMetadataReady/);
+});

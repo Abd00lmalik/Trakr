@@ -27,6 +27,7 @@ export async function checkDatabase() {
       schemaReady: false,
       privacyLoggingReady: false,
       sourceVerificationReady: false,
+      inventoryMetadataReady: false,
     };
   }
 
@@ -75,6 +76,16 @@ export async function checkDatabase() {
            'verification_confidence'
          )`,
     );
+    const inventoryMetadata = await db.query<{ ready: boolean }>(
+      `select exists(
+        select 1
+        from information_schema.columns
+        where table_schema = 'public'
+          and table_name = 'opportunities'
+          and column_name = 'inventory_metadata'
+          and data_type = 'jsonb'
+      ) as ready`,
+    );
 
     return {
       configured: true,
@@ -83,6 +94,7 @@ export async function checkDatabase() {
       schemaReady: schema.rows[0]?.ready ?? false,
       privacyLoggingReady: privacyLogging.rows[0]?.ready ?? false,
       sourceVerificationReady: sourceVerification.rows[0]?.ready ?? false,
+      inventoryMetadataReady: inventoryMetadata.rows[0]?.ready ?? false,
     };
   } catch (error) {
     return {
@@ -92,6 +104,7 @@ export async function checkDatabase() {
       schemaReady: false,
       privacyLoggingReady: false,
       sourceVerificationReady: false,
+      inventoryMetadataReady: false,
       error: error instanceof Error ? error.message : "Unknown database error",
     };
   }

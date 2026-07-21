@@ -13,7 +13,8 @@ export async function GET() {
       database.pgvector &&
       database.schemaReady &&
       database.privacyLoggingReady &&
-      database.sourceVerificationReady);
+      database.sourceVerificationReady &&
+      database.inventoryMetadataReady);
   const status = databaseReady ? "ok" : "degraded";
 
   return NextResponse.json({

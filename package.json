@@ -15,6 +15,7 @@
     "smoke": "node scripts/smoke-test.mjs",
     "smoke:service1:production": "node scripts/service1-production-journeys.mjs",
     "smoke:service2:production": "node scripts/service2-production-smoke.mjs",
+    "smoke:service3:production": "node scripts/service3-production-smoke.mjs",
     "test:privacy": "tsx --test tests/privacy-logging.test.ts",
     "test:verification": "tsx --test tests/source-verification.test.ts",
     "test:inventory-monitoring": "tsx --test tests/inventory-monitoring.test.ts",

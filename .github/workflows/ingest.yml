@@ -9,7 +9,7 @@ jobs:
   ingest:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger ingestion
+      - name: Migrate database
         env:
           TRAKR_SERVICE_URL: ${{ secrets.TRAKR_SERVICE_URL }}
           INGEST_API_KEY: ${{ secrets.INGEST_API_KEY }}
@@ -18,5 +18,15 @@ jobs:
             echo "TRAKR_SERVICE_URL and INGEST_API_KEY secrets are required."
             exit 1
           fi
+          curl -fsS -X POST "$TRAKR_SERVICE_URL/api/admin/database" \
+            -H "Content-Type: application/json" \
+            -H "x-ingest-api-key: $INGEST_API_KEY" \
+            --data '{"seed":false}'
+
+      - name: Trigger ingestion
+        env:
+          TRAKR_SERVICE_URL: ${{ secrets.TRAKR_SERVICE_URL }}
+          INGEST_API_KEY: ${{ secrets.INGEST_API_KEY }}
+        run: |
           curl -fsS -X POST "$TRAKR_SERVICE_URL/api/ingest" \
             -H "x-ingest-api-key: $INGEST_API_KEY"
