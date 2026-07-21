@@ -86,7 +86,7 @@ test("benchmark maps target requirements to supplied evidence", async () => {
   assert.equal(response.conversation?.state, "resume_benchmark");
   const benchmark = response.capabilityResult?.resumeBenchmark;
   assert.ok(benchmark);
-  assert.equal(benchmark.rubricVersion, "resume-rubric-2026-07-20");
+  assert.equal(benchmark.rubricVersion, "resume-rubric-2026-07-21");
   assert.match(benchmark.scoreMeaning, /not hiring predictions/i);
   assert.match(benchmark.scoreMeaning, /not a universal ATS score/i);
   assert.ok(
@@ -144,6 +144,132 @@ test("hard eligibility failures are surfaced and cap the overall score", async (
   assert.ok(benchmark.requirements.some((item) => item.status === "not_met"));
 });
 
+test("explicit negative enrollment evidence overrides positive keyword overlap", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "benchmark",
+      resumeText: `FICTIONAL APPLICANT
+London, United Kingdom
+Frontend developer
+SKILLS
+React, TypeScript
+EDUCATION
+Completed a BSc in Computer Science and is not currently enrolled.
+PROJECTS
+Built a fictional React scheduling tool.`,
+      consent,
+      target: {
+        role: "Frontend Engineering Internship",
+        opportunityType: "internship",
+        description:
+          "Applicants must be currently enrolled in a degree program. React is required.",
+        requirements: [
+          "Applicants must be currently enrolled in a degree program.",
+          "React is required.",
+        ],
+      },
+    }),
+  );
+  const benchmark = response.capabilityResult?.resumeBenchmark;
+
+  assert.ok(benchmark);
+  assert.equal(benchmark.eligibility.status, "not_met");
+  assert.ok(
+    benchmark.requirements.some(
+      (item) =>
+        /currently enrolled/i.test(item.requirement) &&
+        item.status === "not_met" &&
+        item.evidence.some((value) => /not currently enrolled/i.test(value)),
+    ),
+  );
+});
+
+test("numeric experience gates compare supplied years instead of matching the word experience", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "benchmark",
+      user: {
+        headline: "Backend developer",
+        location: "India",
+        experienceLevel: "early-career",
+        skills: ["Node.js", "PostgreSQL"],
+        interests: ["Software"],
+        goals: ["Apply for backend roles"],
+        education: ["Diploma in Software Engineering"],
+        workHistory: [
+          "States 1 year of relevant professional experience.",
+          "Built a fictional Node.js inventory API.",
+        ],
+        projects: [],
+        certifications: [],
+        links: [],
+      },
+      target: {
+        role: "Backend Engineer",
+        description:
+          "Applicants must have at least 5 years of relevant professional experience.",
+        requirements: [
+          "Applicants must have at least 5 years of relevant professional experience.",
+        ],
+      },
+    }),
+  );
+  const benchmark = response.capabilityResult?.resumeBenchmark;
+
+  assert.ok(benchmark);
+  assert.equal(benchmark.eligibility.status, "not_met");
+  assert.ok(
+    benchmark.requirements.some(
+      (item) =>
+        /5 years/i.test(item.requirement) &&
+        item.status === "not_met" &&
+        /states 1/i.test(item.evidence.join(" ")),
+    ),
+  );
+});
+
+test("numeric experience gates preserve contradictory timeline evidence", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "benchmark",
+      user: {
+        headline: "Operations leader",
+        location: "Ghana",
+        experienceLevel: "senior",
+        skills: ["Operations leadership"],
+        interests: ["Operations"],
+        goals: ["Apply for operations leadership"],
+        education: ["BSc Business Administration"],
+        workHistory: [
+          "Employment dates: 2025-2023.",
+          "Employment dates: 2023-2025.",
+        ],
+        projects: ["Managed a fictional operations team"],
+        certifications: [],
+        links: [],
+      },
+      target: {
+        role: "Head of Operations",
+        description:
+          "At least 8 years of operations experience is required.",
+        requirements: [
+          "At least 8 years of operations experience is required.",
+        ],
+      },
+    }),
+  );
+  const benchmark = response.capabilityResult?.resumeBenchmark;
+
+  assert.ok(benchmark);
+  assert.ok(
+    benchmark.requirements.some(
+      (item) =>
+        /8 years of operations experience/i.test(item.requirement) &&
+        item.status === "contradictory",
+    ),
+  );
+});
+
 test("optimize returns a benchmark first and continues with the same trusted session", async () => {
   const first = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
@@ -191,6 +317,23 @@ test("optimize returns a benchmark first and continues with the same trusted ses
   assert.equal(JSON.stringify(optimization).includes("increased revenue"), false);
   assert.equal(JSON.stringify(optimization).includes("10,000"), false);
   assert.ok(optimization.verificationChecklist.some((item) => /metrics only/i.test(item)));
+  for (const rewrite of optimization.sectionRewrites) {
+    const supportingIds: string[] = (first.conversation?.profile.evidence
+      .filter(
+        (item) => {
+          const values =
+            typeof item.value === "string"
+              ? [item.value]
+              : Array.isArray(item.value)
+                ? item.value
+                : [];
+          return values.includes(rewrite.original);
+        },
+      )
+      .map((item) => item.claimId)
+      .filter((claimId): claimId is string => Boolean(claimId)) ?? []);
+    assert.deepEqual(rewrite.evidenceClaimIds, supportingIds);
+  }
 });
 
 test("a changed target invalidates the prior benchmark", async () => {

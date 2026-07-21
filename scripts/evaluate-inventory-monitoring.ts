@@ -47,7 +47,7 @@ async function main() {
   };
   const reportPath = path.resolve(
     "reports",
-    "inventory-monitoring-2026-07-20.json",
+    "inventory-monitoring-2026-07-21.json",
   );
   await writeFile(reportPath, `${JSON.stringify(result, null, 2)}\n`, "utf8");
 

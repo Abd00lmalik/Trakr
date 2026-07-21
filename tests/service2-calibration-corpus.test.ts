@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import {
+  authoritativeOptimizationClaimIds,
   calibrationRoot,
   loadCalibrationCases,
   wilsonInterval,
@@ -131,4 +132,26 @@ test("Wilson interval helper reports bounded calibration uncertainty", () => {
   assert.ok(interval.lower > 0.89);
   assert.ok(interval.upper <= 1);
   assert.deepEqual(wilsonInterval(0, 0), { lower: 0, upper: 0 });
+});
+
+test("fabrication checks use the authoritative synthetic claim ledger", async () => {
+  const cases = await loadCalibrationCases();
+  const policyResearchCase = cases.find((item) => item.caseId === "S2C-0082");
+
+  assert.ok(policyResearchCase);
+  assert.ok(
+    authoritativeOptimizationClaimIds(policyResearchCase).includes(
+      "S2C-0082-CLM-04",
+    ),
+  );
+  assert.equal(
+    authoritativeOptimizationClaimIds(policyResearchCase).some((claimId) =>
+      policyResearchCase.claims.some(
+        (claim) =>
+          claim.claimId === claimId &&
+          claim.category === "untrusted_instruction",
+      ),
+    ),
+    false,
+  );
 });

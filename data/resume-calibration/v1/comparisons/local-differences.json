@@ -1,0 +1,977 @@
+[
+  {
+    "caseId": "S2C-0020",
+    "type": "requirement_status",
+    "requirementId": "S2C-0020-REQ-02",
+    "expected": "unverified",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0021",
+    "type": "requirement_status",
+    "requirementId": "S2C-0021-REQ-02",
+    "expected": "missing",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "confirmed",
+      "missing"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "eligibility_logic_defect",
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "contradiction_detection_defect",
+      "scoring_weight_defect",
+      "recommendation_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0035",
+    "type": "requirement_status",
+    "requirementId": "S2C-0035-REQ-02",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "low",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0045",
+    "type": "requirement_status",
+    "requirementId": "S2C-0045-REQ-01",
+    "expected": "confirmed",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "confirmed",
+      "confirmed",
+      "confirmed"
+    ],
+    "adjudicationSupport": 3,
+    "adjudicationConfidence": "high",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0047",
+    "type": "requirement_status",
+    "requirementId": "S2C-0047-REQ-02",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0050",
+    "type": "requirement_status",
+    "requirementId": "S2C-0050-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0051",
+    "type": "requirement_status",
+    "requirementId": "S2C-0051-REQ-02",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "inferred",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "low",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0054",
+    "type": "requirement_status",
+    "requirementId": "S2C-0054-REQ-01",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "unverified",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "high",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "eligibility_logic_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0059",
+    "type": "requirement_status",
+    "requirementId": "S2C-0059-REQ-02",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0062",
+    "type": "requirement_status",
+    "requirementId": "S2C-0062-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "optimization_fabrication",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0065",
+    "type": "requirement_status",
+    "requirementId": "S2C-0065-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0068",
+    "type": "requirement_status",
+    "requirementId": "S2C-0068-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "recommendation_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0071",
+    "type": "requirement_status",
+    "requirementId": "S2C-0071-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0072",
+    "type": "requirement_status",
+    "requirementId": "S2C-0072-REQ-02",
+    "expected": "confirmed",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "confirmed",
+      "confirmed"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0074",
+    "type": "requirement_status",
+    "requirementId": "S2C-0074-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0085",
+    "type": "requirement_status",
+    "requirementId": "S2C-0085-REQ-02",
+    "expected": "confirmed",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "confirmed",
+      "confirmed",
+      "confirmed"
+    ],
+    "adjudicationSupport": 3,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0095",
+    "type": "requirement_status",
+    "requirementId": "S2C-0095-REQ-03",
+    "expected": "unverified",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0097",
+    "type": "requirement_status",
+    "requirementId": "S2C-0097-REQ-03",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "inferred",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "locale_handling_defect",
+      "eligibility_logic_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0098",
+    "type": "requirement_status",
+    "requirementId": "S2C-0098-REQ-03",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "locale_handling_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0099",
+    "type": "requirement_status",
+    "requirementId": "S2C-0099-REQ-03",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "missing",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "high",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "prompt_injection_defect",
+      "locale_handling_defect",
+      "reviewer_disagreement"
+    ]
+  },
+  {
+    "caseId": "S2C-0101",
+    "type": "requirement_status",
+    "requirementId": "S2C-0101-REQ-03",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "eligibility_logic_defect",
+      "reviewer_disagreement",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0104",
+    "type": "requirement_status",
+    "requirementId": "S2C-0104-REQ-01",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "confirmed",
+      "confirmed",
+      "missing"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0107",
+    "type": "requirement_status",
+    "requirementId": "S2C-0107-REQ-01",
+    "expected": "unverified",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0108",
+    "type": "requirement_status",
+    "requirementId": "S2C-0108-REQ-04",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "unverified",
+      "missing",
+      "missing"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "parsing_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0109",
+    "type": "requirement_status",
+    "requirementId": "S2C-0109-REQ-02",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "unverified",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0110",
+    "type": "requirement_status",
+    "requirementId": "S2C-0110-REQ-02",
+    "expected": "unverified",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0111",
+    "type": "requirement_status",
+    "requirementId": "S2C-0111-REQ-02",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "unverified",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "contradiction_detection_defect",
+      "prompt_injection_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0114",
+    "type": "requirement_status",
+    "requirementId": "S2C-0114-REQ-02",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "unverified",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "recommendation_defect",
+      "target_type_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0120",
+    "type": "requirement_status",
+    "requirementId": "S2C-0120-REQ-04",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "unverified",
+      "missing",
+      "missing"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "contradiction_detection_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0122",
+    "type": "requirement_status",
+    "requirementId": "S2C-0122-REQ-02",
+    "expected": "unverified",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "target_type_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0123",
+    "type": "requirement_status",
+    "requirementId": "S2C-0123-REQ-02",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "inferred",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "prompt_injection_defect",
+      "parsing_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0128",
+    "type": "requirement_status",
+    "requirementId": "S2C-0128-REQ-02",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "target_type_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0130",
+    "type": "requirement_status",
+    "requirementId": "S2C-0130-REQ-02",
+    "expected": "confirmed",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "confirmed",
+      "confirmed",
+      "confirmed"
+    ],
+    "adjudicationSupport": 3,
+    "adjudicationConfidence": "high",
+    "humanReviewQueue": false,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "eligibility_logic_defect"
+    ]
+  },
+  {
+    "caseId": "S2C-0131",
+    "type": "requirement_status",
+    "requirementId": "S2C-0131-REQ-02",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "unverified"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "target_type_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0132",
+    "type": "requirement_status",
+    "requirementId": "S2C-0132-REQ-04",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "unverified",
+      "missing",
+      "missing"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0133",
+    "type": "requirement_status",
+    "requirementId": "S2C-0133-REQ-02",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "confirmed",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "recommendation_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0140",
+    "type": "requirement_status",
+    "requirementId": "S2C-0140-REQ-02",
+    "expected": "confirmed",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "inferred",
+      "confirmed"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "target_type_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0141",
+    "type": "requirement_status",
+    "requirementId": "S2C-0141-REQ-02",
+    "expected": "confirmed",
+    "actual": "inferred",
+    "reviewerVotes": [
+      "inferred",
+      "confirmed",
+      "confirmed"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "eligibility_logic_defect",
+      "recommendation_defect",
+      "contradiction_detection_defect",
+      "scoring_weight_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0143",
+    "type": "requirement_status",
+    "requirementId": "S2C-0143-REQ-02",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "evidence_equivalence_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0144",
+    "type": "requirement_status",
+    "requirementId": "S2C-0144-REQ-04",
+    "expected": "unverified",
+    "actual": "missing",
+    "reviewerVotes": [
+      "unverified",
+      "missing",
+      "missing"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0146",
+    "type": "requirement_status",
+    "requirementId": "S2C-0146-REQ-02",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "evidence_equivalence_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0147",
+    "type": "requirement_status",
+    "requirementId": "S2C-0147-REQ-02",
+    "expected": "inferred",
+    "actual": "confirmed",
+    "reviewerVotes": [
+      "confirmed",
+      "confirmed",
+      "inferred"
+    ],
+    "adjudicationSupport": 1,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "contradiction_detection_defect",
+      "prompt_injection_defect",
+      "evidence_equivalence_defect",
+      "scoring_weight_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0148",
+    "type": "requirement_status",
+    "requirementId": "S2C-0148-REQ-03",
+    "expected": "inferred",
+    "actual": "missing",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "inferred"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "recommendation_defect",
+      "target_type_defect",
+      "evidence_equivalence_defect",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0149",
+    "type": "requirement_status",
+    "requirementId": "S2C-0149-REQ-02",
+    "expected": "missing",
+    "actual": "unverified",
+    "reviewerVotes": [
+      "missing",
+      "inferred",
+      "missing"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "evidence_equivalence_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  },
+  {
+    "caseId": "S2C-0152",
+    "type": "requirement_status",
+    "requirementId": "S2C-0152-REQ-02",
+    "expected": "missing",
+    "actual": "not_met",
+    "reviewerVotes": [
+      "missing",
+      "missing",
+      "unverified"
+    ],
+    "adjudicationSupport": 2,
+    "adjudicationConfidence": "medium",
+    "humanReviewQueue": true,
+    "disagreementClasses": [
+      "reviewer_disagreement",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "evidence_equivalence_defect",
+      "optimization_exaggeration",
+      "genuinely_ambiguous_case"
+    ]
+  }
+]

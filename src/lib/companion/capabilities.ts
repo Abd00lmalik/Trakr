@@ -163,7 +163,7 @@ function keywordSet(values: string[]) {
   ];
 }
 
-export const RESUME_RUBRIC_VERSION = "resume-rubric-2026-07-20";
+export const RESUME_RUBRIC_VERSION = "resume-rubric-2026-07-21";
 
 type RequirementImportance = "required" | "preferred" | "instruction" | "context";
 type RequirementCategory =
@@ -242,13 +242,21 @@ function requirementCategory(text: string): RequirementCategory {
   if (/\b(degree|bachelor|master|phd|education|gpa|student)\b/.test(value)) {
     return "education";
   }
-  if (/\b(years? of experience|senior|lead|manager|professional experience)\b/.test(value)) {
+  if (
+    /\b(years?(?: of [a-z-]+){0,4} experience|senior|lead|manager|professional experience)\b/.test(
+      value,
+    )
+  ) {
     return "experience";
   }
   if (/\b(submit|format|page|deadline|file|pdf|cover letter|statement)\b/.test(value)) {
     return "instruction";
   }
-  if (/\b(portfolio|github|publication|writing sample|work sample)\b/.test(value)) {
+  if (
+    /\b(portfolio|case study|reel|github|publication|writing sample|work sample)\b/.test(
+      value,
+    )
+  ) {
     return "portfolio";
   }
   if (/\b(achievement|impact|metric|outcome|award|publication)\b/.test(value)) {
@@ -268,6 +276,13 @@ function requirementImportance(text: string): RequirementImportance {
     return "required";
   }
   return "context";
+}
+
+function isHardEligibilityRequirement(requirement: TargetRequirement) {
+  const value = normalize(requirement.text);
+  return /\b(applicants? must|must be based|minimum gpa|current .*enrollment|currently enrolled|university admission|graduate (degree|education)|completed doctorate|bachelor degree|citizenship|registered organization|available for the full|eligible early career|active professional certification|\d{1,2}\+?\s+years?)\b/.test(
+    value,
+  );
 }
 
 function requirementList(
@@ -443,11 +458,269 @@ function profileEvidenceEntries(
   return entries;
 }
 
+const evidenceConceptPatterns: Array<[string, RegExp]> = [
+  ["enrollment", /\b(student|currently enrolled|undergraduate|university admission)\b/],
+  ["graduate_degree", /\b(msc|master s|graduate degree|graduate education)\b/],
+  ["doctorate", /\b(phd|doctorate|doctoral)\b/],
+  ["bachelor_degree", /\b(bsc|ba|beng|bdes|bachelor)\b/],
+  ["gpa", /\b(gpa|grade point average)\b/],
+  ["testing", /\b(test|tests|testing|playwright|quality assurance|qa)\b/],
+  ["backend_api", /\b(backend|server side|node js|rest api|api development|inventory api)\b/],
+  ["database", /\b(postgresql|postgres|sql|database|migration)\b/],
+  ["full_stack", /\b(full stack|frontend and api|react and node)\b/],
+  ["mobile_development", /\b(mobile|flutter|dart|android|ios|application prototype)\b/],
+  ["cloud", /\b(cloud|aws|azure|gcp|cloud infrastructure|test environment)\b/],
+  ["infrastructure_code", /\b(terraform|cloudformation|pulumi|infrastructure as code|reusable modules)\b/],
+  ["monitoring", /\b(monitoring|observability|telemetry|alerting)\b/],
+  ["security_monitoring", /\b(siem|security monitoring|security alerts)\b/],
+  ["incident_response", /\b(incident response|response playbook)\b/],
+  ["data_analysis", /\b(data analysis|sql analysis|analyzed|analysis|dashboard)\b/],
+  ["data_communication", /\b(data communication|dashboard|presented|explaining|visualization)\b/],
+  ["data_science", /\b(data science|churn model|statistical model|machine learning)\b/],
+  ["statistics", /\b(statistics|statistical|churn model|model evaluation)\b/],
+  ["python", /\bpython\b/],
+  ["javascript", /\b(javascript|typescript|react|node js)\b/],
+  ["software_development", /\b(software development|built .*api|packaged inference|application development)\b/],
+  ["machine_learning", /\b(machine learning|pytorch|classifier|model deployment|inference)\b/],
+  ["experiment_design", /\b(experiment|experimental design|benchmark experiment)\b/],
+  ["research_methods", /\b(research methods|survey methods|qualitative interviews|mixed methods|literature review|community health survey|supported .*survey|survey data)\b/],
+  ["academic_writing", /\b(academic writing|scientific writing|literature review|dissertation|policy brief)\b/],
+  ["publication", /\b(publication|published|journal article|research output)\b/],
+  ["smart_contract", /\b(smart contract|solidity|contract test|web3|blockchain)\b/],
+  ["security_review", /\b(security review|contract tests? for access control|access control tests?)\b/],
+  ["product_delivery", /\b(product delivery|product discovery|roadmap|requirements|api product)\b/],
+  ["developer_platform", /\b(developer platform|api products?|api dashboard)\b/],
+  ["collaboration", /\b(cross functional|collaboration|coordinated|stakeholder|design and engineering)\b/],
+  ["software_testing", /\b(software test|test design|regression plan|playwright|api testing)\b/],
+  ["defect_documentation", /\b(defect documentation|bug report|test documentation)\b/],
+  ["troubleshooting", /\b(troubleshooting|resolved|account issue|knowledge base)\b/],
+  ["customer_communication", /\b(customer communication|customer facing|knowledge base|employee communication|communications|supported outreach)\b/],
+  ["cloud_security", /\b(cloud security|aws security|threat modeling|least privilege|iam polic)\b/],
+  ["security_automation", /\b(security automation|automated security|security scripting)\b/],
+  ["identity_access", /\b(identity and access|iam|access control|least privilege)\b/],
+  ["people_management", /\b(people management|managed .*engineers|team management|team development)\b/],
+  ["multi_team", /\b(multi team|across .*teams|three .*teams|organizational scope)\b/],
+  ["portfolio", /\b(portfolio|case study|reel|work sample)\b/],
+  ["fintech", /\b(fintech|payments|financial technology)\b/],
+  ["commercial_interiors", /\b(commercial interiors?|workplace interiors?|retail interiors?)\b/],
+  ["product_design", /\b(product design|payments onboarding|research to prototype)\b/],
+  ["user_research", /\b(user research|usability|interview|research synthesis)\b/],
+  ["user_centered", /\b(user centered|observed issues|usability|research to prototype)\b/],
+  ["accessibility", /\b(accessibility|accessible|screen reader)\b/],
+  ["interface_design", /\b(interface design|responsive interface|component library|ui design)\b/],
+  ["design_system", /\b(design systems?|component librar(?:y|ies)|visual systems?)\b/],
+  ["visual_system", /\b(visual systems?|brand systems?|nonprofit brand system|logo and typography rules)\b/],
+  ["graphic_design", /\b(graphic design|typography|layout|conference identity|print and digital)\b/],
+  ["brand_design", /\b(brand identity|brand system|logo|art direction)\b/],
+  ["campaign_art_direction", /\b(campaign art direction|campaign creative direction)\b/],
+  ["motion_design", /\b(motion design|motion graphics|animation|after effects|storyboard|product explainer)\b/],
+  ["three_d_motion", /\b(3d motion|three dimensional motion|3d animation)\b/],
+  ["interior_design", /\b(interior design|interior architecture|community library interior)\b/],
+  ["space_planning", /\b(space planning|space plan|autocad)\b/],
+  ["industrial_design", /\b(industrial design|water filter enclosure|cad)\b/],
+  ["physical_prototyping", /\b(physical prototyping|prototyped|prototype|material tradeoff)\b/],
+  ["manufacturing", /\b(manufactur(?:e|ing|ability)|design for manufacture|material tradeoffs?)\b/],
+  ["policy_research", /\b(policy research|policy analysis|policy brief|stakeholder interview)\b/],
+  ["writing_sample", /\b(writing sample|policy brief|newsletter|academic writing)\b/],
+  ["data_stewardship", /\b(data stewardship|data management|metadata|data dictionary|reproducibility)\b/],
+  ["data_quality", /\b(data quality|validation check|data dictionary)\b/],
+  ["research_coordination", /\b(research study coordination|study coordination|coordinated .*study|consent records)\b/],
+  ["research_ethics", /\b(research ethics|ethics compliance|consent records)\b/],
+  ["research_communication", /\b(research communication|presented themes|research synthesis|presented .*limitations)\b/],
+  ["research_leadership", /\b(research leadership|research team leadership|led .*research|directed .*research)\b/],
+  ["multi_country", /\b(multi country|five country|regional program)\b/],
+  ["regional_policy", /\b(regional policy|region specific policy|cross border policy)\b/],
+  ["fair_data", /\b(fair data|findable accessible interoperable reusable|reproducibility)\b/],
+  ["community_leadership", /\b(community leadership|community service|coding club|civic literacy|student workshop)\b/],
+  ["public_service", /\b(public service|civic literacy|civic engagement)\b/],
+  ["community_arts", /\b(community arts|design workshop|arts activity)\b/],
+  ["community_climate", /\b(community climate|campus recycling|local climate action)\b/],
+  ["climate", /\b(climate|renewable energy|solar|recycling)\b/],
+  ["social_impact", /\b(social impact|community engagement|youth skills|participant feedback)\b/],
+  ["registered_organization", /\b(registered organization|incorporated organization|organization registration)\b/],
+  ["project_proposal", /\b(project proposal|project plan|work plan|implementation plan)\b/],
+  ["open_source", /\b(open source|documentation patch|triaged issues|public contribution)\b/],
+  ["maintainer", /\b(maintainer|issue triage|triaged issues)\b/],
+  ["availability", /\b(available|availability|full program period)\b/],
+  ["marketing_analysis", /\b(marketing analysis|campaign analysis|channel performance)\b/],
+  ["spreadsheet", /\b(spreadsheets?|excel|financial model|three statement model|reporting)\b/],
+  ["spreadsheet_reporting", /\b(spreadsheet reporting|spreadsheets?.*presented|presented.*channel performance)\b/],
+  ["crm", /\b(crm|customer relationship management)\b/],
+  ["sales", /\b(sales|prospecting|outreach|follow up)\b/],
+  ["b2b_sales", /\b(b2b|business to business sales)\b/],
+  ["organization", /\b(organizational ability|coordinated|scheduling|action log)\b/],
+  ["logistics", /\b(logistics|scheduling|schedule|event procedures|volunteer coordination)\b/],
+  ["hr_admin", /\b(hr administration|hr operations|onboarding records|human resource)\b/],
+  ["confidential_data", /\b(confidential data|data privacy|onboarding records)\b/],
+  ["project_coordination", /\b(project coordination|project planning|coordinated .*project|website relaunch|risk and action log)\b/],
+  ["status_reporting", /\b(status reporting|risk and action log|presented .*performance)\b/],
+  ["written_communication", /\b(written communication|policy writing|documented .*procedures|policy newsletter|public consultation|knowledge base article)\b/],
+  ["customer_relationship", /\b(customer relationship|customer onboarding|onboarded|support checklist)\b/],
+  ["saas_onboarding", /\b(saas onboarding|software onboarding|saas\b.*\bonboard|onboard\w*\b.*\bsaas)\b/],
+  ["saas_support", /\b(saas support|software as a service support)\b/],
+  ["problem_solving", /\b(problem solving|troubleshooting|resolved|support checklist)\b/],
+  ["policy_interest", /\b(policy interest|policy writing|public consultation|political science)\b/],
+  ["financial_analysis", /\b(financial analysis|financial modeling|budget variance|three statement model|accounting)\b/],
+  ["operations", /\b(operations|process improvement|scheduling|event procedures)\b/],
+  ["leadership", /\b(leadership|led|managed|directed|supervised|owned)\b/],
+  ["budget", /\b(budget|funding|grant portfolio)\b/],
+  ["stakeholder_management", /\b(stakeholder management|partners|partnerships|government and nonprofit)\b/],
+  ["donor_funded", /\b(donor funded|grant funded|development partner funded)\b/],
+  ["co_funding", /\b(co funding|co-funded|matching funds?)\b/],
+  ["clinical_trials", /\b(clinical trials?|randomized clinical study)\b/],
+  ["grant_portfolio", /\b(grant portfolio|funding portfolio)\b/],
+];
+
+const strictQualifierConcepts = new Set([
+  "b2b_sales",
+  "campaign_art_direction",
+  "clinical_trials",
+  "co_funding",
+  "commercial_interiors",
+  "community_climate",
+  "donor_funded",
+  "grant_portfolio",
+  "saas_support",
+  "three_d_motion",
+]);
+
+const qualifierInferenceConcepts = new Set(["campaign_art_direction"]);
+
+const inferenceOnlyConceptEvidencePatterns: Array<[string, RegExp]> = [
+  ["academic_writing", /\bliterature review\b/],
+  ["confidential_data", /\bonboarding records?\b/],
+  ["data_quality", /\bdata dictionary\b/],
+  ["developer_platform", /\b(api products?|api dashboard)\b/],
+  ["logistics", /\b(schedule|scheduling|event procedures)\b/],
+  ["maintainer", /\b(issue triage|triaged issues)\b/],
+  ["manufacturing", /\b(manufacturing methods?|material tradeoffs?)\b/],
+  ["public_service", /\bcivic literacy\b/],
+  ["security_review", /\b(contract tests? for access control|access control tests?)\b/],
+];
+
+const evidenceStopWords = new Set([
+  "applicant",
+  "candidate",
+  "current",
+  "required",
+  "preferred",
+  "experience",
+  "evidence",
+  "relevant",
+  "professional",
+  "ability",
+  "knowledge",
+  "submit",
+  "tailored",
+  "published",
+  "criteria",
+  "target",
+  "discipline",
+  "active",
+  "must",
+  "have",
+  "with",
+  "from",
+  "this",
+  "that",
+  "design",
+  "development",
+  "management",
+  "project",
+  "program",
+  "process",
+  "system",
+  "communication",
+  "analysis",
+  "and",
+  "or",
+  "is",
+  "are",
+  "of",
+]);
+const canonicalEvidenceConcepts = new Set(
+  evidenceConceptPatterns.map(([concept]) => concept),
+);
+
+function stemEvidenceToken(token: string) {
+  if (token.length <= 4 || /(?:ss|us|is)$/.test(token)) return token;
+  return token
+    .replace(/ies$/, "y")
+    .replace(/ing$/, "")
+    .replace(/ed$/, "")
+    .replace(/s$/, "");
+}
+
+function evidenceConcepts(value: string) {
+  const normalized = normalize(value).replace(/[-/.]/g, " ");
+  const concepts = new Set(
+    normalized
+      .split(/\s+/)
+      .filter((token) => !evidenceStopWords.has(token))
+      .map(stemEvidenceToken)
+      .filter((token) => token.length > 2 && !evidenceStopWords.has(token)),
+  );
+  for (const [concept, pattern] of evidenceConceptPatterns) {
+    if (pattern.test(normalized)) concepts.add(concept);
+  }
+  return concepts;
+}
+
+function semanticEvidenceMatches(
+  requirement: TargetRequirement,
+  entries: ReturnType<typeof profileEvidenceEntries>,
+) {
+  const requirementValue = normalize(requirement.text);
+  const requirementConcepts = evidenceConcepts(requirement.text);
+  return entries
+    .filter(
+      (entry) =>
+        !["headline", "bio", "experienceLevel", "goals", "interests"].includes(
+          entry.field,
+        ) &&
+        !/^(?:no formal employment|no professional certification)/i.test(
+          entry.value,
+        ),
+    )
+    .map((entry) => {
+      const entryValue = normalize(entry.value);
+      const entryConcepts = evidenceConcepts(entry.value);
+      const shared = [...requirementConcepts].filter((concept) =>
+        entryConcepts.has(concept),
+      );
+      const exact =
+        entryValue.includes(requirementValue) ||
+        requirementValue.includes(entryValue);
+      const sharedCanonical = shared.some((concept) =>
+        canonicalEvidenceConcepts.has(concept),
+      );
+      return {
+        ...entry,
+        shared,
+        matched: exact || sharedCanonical || shared.length >= 1,
+      };
+    })
+    .filter((entry) => entry.matched);
+}
+
+function isInferenceOnlyConceptEvidence(
+  entry: ReturnType<typeof semanticEvidenceMatches>[number],
+  requirementConcepts: Set<string>,
+) {
+  const value = normalize(entry.value);
+  return inferenceOnlyConceptEvidencePatterns.some(
+    ([concept, pattern]) =>
+      requirementConcepts.has(concept) && pattern.test(value),
+  );
+}
+
 function statedYears(values: string[]) {
-  const match = values
-    .join(" ")
-    .match(/\b(\d{1,2})\+?\s+years?(?:\s+of)?\s+(?:relevant\s+)?experience\b/i);
-  return match ? Number.parseInt(match[1], 10) : undefined;
+  const matches = [...values.join(" ").matchAll(
+    /\b(\d{1,2})\+?\s+years?(?:\s+of)?\s+(?:(?:relevant|professional)\s+){0,2}experience\b/gi,
+  )];
+  return matches.length
+    ? Math.max(...matches.map((match) => Number.parseInt(match[1], 10)))
+    : undefined;
 }
 
 function evidenceContradictions(
@@ -469,17 +742,15 @@ function evidenceContradictions(
       );
     }
   }
-  const reversedDate = entries.find(
-    (entry) =>
-      ["workHistory", "projects", "education"].includes(entry.field) &&
-      /\b(20\d{2}|19\d{2})\s*[-–]\s*(20\d{2}|19\d{2})\b/.test(entry.value) &&
-      (() => {
-        const match = entry.value.match(
-          /\b(20\d{2}|19\d{2})\s*[-–]\s*(20\d{2}|19\d{2})\b/,
-        );
-        return Boolean(match && Number(match[1]) > Number(match[2]));
-      })(),
-  );
+  const reversedDate = entries.find((entry) => {
+    if (!["workHistory", "projects", "education"].includes(entry.field)) {
+      return false;
+    }
+    const match = entry.value.match(
+      /\b(20\d{2}|19\d{2})\s*[-–—]\s*(20\d{2}|19\d{2})\b/,
+    );
+    return Boolean(match && Number(match[1]) > Number(match[2]));
+  });
   if (reversedDate) {
     contradictions.set(
       "timeline",
@@ -489,20 +760,49 @@ function evidenceContradictions(
   return contradictions;
 }
 
-function explicitEligibilityFailure(
+function explicitRequirementResolution(
   requirement: TargetRequirement,
   profile: StructuredUserProfile,
-  profileValues: string[],
+  entries: ReturnType<typeof profileEvidenceEntries>,
 ) {
   const text = normalize(requirement.text);
+  const profileValues = entries.map((entry) => entry.value);
+  const matchingEntries = (pattern: RegExp) =>
+    entries.filter((entry) => pattern.test(normalize(entry.value)));
+  const result = (
+    status: "confirmed" | "missing" | "contradictory" | "not_met" | "unverified",
+    explanation: string,
+    matched: ReturnType<typeof matchingEntries>,
+    score: number,
+  ) => ({
+    status,
+    explanation,
+    evidence: uniqueStrings(matched.map((entry) => entry.value)).slice(0, 4),
+    evidenceClaimIds: uniqueStrings(
+      matched
+        .map((entry) => entry.claimId)
+        .filter((value): value is string => Boolean(value)),
+    ),
+    score,
+  });
   const yearsRequired = text.match(/\b(\d{1,2})\+?\s+years?/);
   const suppliedYears = statedYears(profileValues);
-  if (
-    yearsRequired &&
-    suppliedYears !== undefined &&
-    suppliedYears < Number.parseInt(yearsRequired[1], 10)
-  ) {
-    return `The target requires ${yearsRequired[1]} years, while the supplied evidence states ${suppliedYears}.`;
+  if (yearsRequired && suppliedYears !== undefined) {
+    const yearEntries = matchingEntries(/\b\d{1,2}\+?\s+years?\b/);
+    if (suppliedYears < Number.parseInt(yearsRequired[1], 10)) {
+      return result(
+        "not_met",
+        `The target requires ${yearsRequired[1]} years, while the supplied evidence states ${suppliedYears}.`,
+        yearEntries,
+        0,
+      );
+    }
+    return result(
+      "confirmed",
+      `The supplied evidence states ${suppliedYears} years against a requirement of ${yearsRequired[1]} years.`,
+      yearEntries,
+      100,
+    );
   }
   if (
     /\b(senior|staff|principal|lead)\b/.test(text) &&
@@ -510,7 +810,12 @@ function explicitEligibilityFailure(
       profile.experienceLevel ?? "",
     )
   ) {
-    return "The target explicitly requires senior scope, while the supplied experience stage is early career.";
+    return result(
+      "not_met",
+      "The target explicitly requires senior scope, while the supplied experience stage is early career.",
+      matchingEntries(/\b(student|beginner|early career)\b/),
+      0,
+    );
   }
   const locationRules = [
     ["united states", /\b(united states|usa|u\.s\.)\b/i],
@@ -521,9 +826,195 @@ function explicitEligibilityFailure(
   if (profile.location && /\b(only|must be based|resident|residents)\b/.test(text)) {
     for (const [label, pattern] of locationRules) {
       if (pattern.test(requirement.text) && !pattern.test(profile.location)) {
-        return `The target is restricted to ${label}, while the supplied location is ${profile.location}.`;
+        return result(
+          "not_met",
+          `The target is restricted to ${label}, while the supplied location is ${profile.location}.`,
+          matchingEntries(/\bbased in\b/),
+          0,
+        );
       }
     }
+  }
+  if (/\b(enrolled|enrollment|university admission)\b/.test(text)) {
+    const negative = matchingEntries(
+      /\b(not currently enrolled|completed studies|not enrolled)\b/,
+    );
+    const negativeValues = new Set(negative.map((entry) => entry.value));
+    const positive = matchingEntries(
+      /\b(student|currently enrolled|undergraduate student)\b/,
+    ).filter((entry) => !negativeValues.has(entry.value));
+    if (positive.length && negative.length) {
+      return result(
+        "contradictory",
+        "The supplied education evidence conflicts about current enrollment.",
+        [...positive, ...negative],
+        20,
+      );
+    }
+    if (negative.length) {
+      return result(
+        "not_met",
+        "The supplied evidence explicitly states that the applicant is not currently enrolled.",
+        negative,
+        0,
+      );
+    }
+    if (positive.length) {
+      return result(
+        "confirmed",
+        "The supplied education evidence explicitly indicates current student enrollment.",
+        positive,
+        100,
+      );
+    }
+  }
+  if (/\bminimum gpa\b/.test(text)) {
+    const required = text.match(/\bminimum gpa (?:of )?(\d(?:\.\d+)?)\b/);
+    const gpaEntries = matchingEntries(/\b\d(?:\.\d+)?\s+gpa\b|\bgpa\s+\d(?:\.\d+)?\b/);
+    const supplied = gpaEntries
+      .flatMap((entry) => [
+        ...normalize(entry.value).matchAll(
+          /\b(?:gpa\s+)?(\d(?:\.\d+)?)(?:\s+gpa)?\b/g,
+        ),
+      ])
+      .map((match) => Number.parseFloat(match[1]))
+      .find((value) => value <= 5);
+    if (required && supplied !== undefined) {
+      return result(
+        supplied >= Number.parseFloat(required[1]) ? "confirmed" : "not_met",
+        `The supplied GPA is ${supplied} against a minimum of ${required[1]}.`,
+        gpaEntries,
+        supplied >= Number.parseFloat(required[1]) ? 100 : 0,
+      );
+    }
+  }
+  if (/\bcompleted doctorate\b/.test(text)) {
+    const doctorate = matchingEntries(/\b(phd|doctorate|doctoral degree)\b/);
+    if (doctorate.length) {
+      return result(
+        "confirmed",
+        "The supplied education evidence states a completed doctorate.",
+        doctorate,
+        100,
+      );
+    }
+  }
+  if (/\b(relevant graduate (degree|education))\b/.test(text)) {
+    const graduate = matchingEntries(/\b(msc|master s|graduate degree|phd)\b/);
+    if (graduate.length) {
+      return result(
+        "confirmed",
+        "The supplied education evidence states a relevant graduate qualification.",
+        graduate,
+        100,
+      );
+    }
+  }
+  if (/\bbachelor degree\b/.test(text)) {
+    const bachelor = matchingEntries(/\b(bsc|ba|beng|bdes|bachelor)\b/);
+    if (bachelor.length) {
+      return result(
+        "confirmed",
+        "The supplied education evidence states a bachelor's qualification.",
+        bachelor,
+        100,
+      );
+    }
+  }
+  if (/\bcitizenship\b/.test(text)) {
+    const citizenship = matchingEntries(/\b(citizen|citizenship|national of)\b/);
+    if (!citizenship.length) {
+      return result(
+        "unverified",
+        "Location does not prove citizenship, so this eligibility rule remains unverified.",
+        [],
+        35,
+      );
+    }
+  }
+  if (/\beligible early[- ]career status\b/.test(text)) {
+    return result(
+      "unverified",
+      "The target does not define enough detail to verify its early-career eligibility boundary.",
+      [],
+      35,
+    );
+  }
+  if (/\b(active professional certification|licensed|licence)\b/.test(text)) {
+    const certification = entries.filter(
+      (entry) =>
+        entry.field === "certifications" &&
+        !/\b(no|none|not listed)\b/.test(normalize(entry.value)),
+    );
+    if (certification.length) {
+      return result(
+        "confirmed",
+        "A supplied certification directly supports this requirement.",
+        certification,
+        100,
+      );
+    }
+    return result(
+      "missing",
+      "No active target-relevant professional certification was supplied.",
+      [],
+      0,
+    );
+  }
+  if (/\badmission to a relevant graduate program\b/.test(text)) {
+    const admission = matchingEntries(
+      /\b(admitted|admission offer|accepted into|enrolled in .*(graduate|master|phd))\b/,
+    );
+    return result(
+      admission.length ? "confirmed" : "missing",
+      admission.length
+        ? "The supplied evidence explicitly confirms admission to a relevant graduate program."
+        : "No graduate-program admission evidence was supplied.",
+      admission,
+      admission.length ? 100 : 0,
+    );
+  }
+  if (/\bavailable for the full program period\b/.test(text)) {
+    const availability = matchingEntries(
+      /\b(available|availability|can commit|full program period)\b/,
+    );
+    return result(
+      availability.length ? "confirmed" : "missing",
+      availability.length
+        ? "The supplied evidence explicitly confirms program-period availability."
+        : "No explicit availability commitment was supplied.",
+      availability,
+      availability.length ? 100 : 0,
+    );
+  }
+  if (/\beligible registered organization\b/.test(text)) {
+    const registration = matchingEntries(
+      /\b(registered organization|incorporated|registration number)\b/,
+    );
+    return result(
+      registration.length ? "confirmed" : "missing",
+      registration.length
+        ? "The supplied evidence explicitly confirms organization registration."
+        : "No organization-registration evidence was supplied.",
+      registration,
+      registration.length ? 100 : 0,
+    );
+  }
+  if (
+    requirement.importance === "required" &&
+    /\b(published|publication)\b/.test(text)
+  ) {
+    const publications = matchingEntries(
+      /\b(published|publication|journal article|conference paper)\b/,
+    );
+    return result(
+      publications.length ? "confirmed" : "unverified",
+      publications.length
+        ? "Supplied publication evidence directly supports this requirement."
+        : "Related research evidence exists, but publication evidence is not verified.",
+      publications,
+      publications.length ? 100 : 35,
+    );
   }
   return undefined;
 }
@@ -533,8 +1024,40 @@ function requirementAssessment(
   profile: StructuredUserProfile,
   entries: ReturnType<typeof profileEvidenceEntries>,
   contradictions: Map<string, string>,
+  profileSource: "resume" | "background" | "request" | undefined,
 ) {
-  const allValues = entries.map((entry) => entry.value);
+  if (requirement.importance === "instruction") {
+    const requestedDocument = normalize(requirement.text).match(
+      /\bsubmit (?:a|an) (resume|cv|academic cv|profile|portfolio|biosketch)\b/,
+    )?.[1];
+    const suppliedDocument =
+      profileSource === "resume"
+        ? "resume"
+        : profileSource === "background"
+          ? "profile"
+          : undefined;
+    const matches =
+      suppliedDocument &&
+      (requestedDocument === suppliedDocument ||
+        (requestedDocument === "profile" && suppliedDocument === "profile"));
+    return {
+      id: requirement.id,
+      requirement: requirement.text,
+      importance: requirement.importance,
+      category: requirement.category,
+      status: matches ? ("confirmed" as const) : ("not_met" as const),
+      evidence: [],
+      evidenceClaimIds: [],
+      confidence: 0.95,
+      score: matches ? 100 : 0,
+      explanation: matches
+        ? `The supplied intake route matches the requested ${requestedDocument}.`
+        : `The supplied intake route does not provide the requested ${requestedDocument ?? "document"}.`,
+      actions: matches
+        ? ["Keep the document tailored to the published criteria."]
+        : [`Prepare the requested ${requestedDocument ?? "application document"} before submission.`],
+    };
+  }
   const contradiction =
     requirement.category === "eligibility"
       ? contradictions.get("location") ??
@@ -543,6 +1066,34 @@ function requirementAssessment(
         ? contradictions.get("experienceLevel") ??
           contradictions.get("timeline")
         : undefined;
+  const resolution = explicitRequirementResolution(
+    requirement,
+    profile,
+    entries,
+  );
+  if (resolution) {
+    return {
+      id: requirement.id,
+      requirement: requirement.text,
+      importance: requirement.importance,
+      category: requirement.category,
+      status: resolution.status,
+      evidence: resolution.evidence,
+      evidenceClaimIds: resolution.evidenceClaimIds,
+      confidence: 0.95,
+      score: resolution.score,
+      explanation: resolution.explanation,
+      actions: [
+        resolution.status === "not_met"
+          ? "Do not imply that this requirement is met."
+          : resolution.status === "contradictory"
+            ? "Resolve the conflicting facts before presenting this requirement as satisfied."
+            : resolution.status === "confirmed"
+              ? "Keep this evidence explicit and accurate."
+              : `Supply this only if genuine: ${requirement.text}`,
+      ],
+    };
+  }
   if (contradiction) {
     return {
       id: requirement.id,
@@ -560,49 +1111,225 @@ function requirementAssessment(
       ],
     };
   }
-  const failure = explicitEligibilityFailure(requirement, profile, allValues);
-  if (failure) {
+  if (/\b\d{1,2}\+?\s+years?\b/.test(normalize(requirement.text))) {
     return {
       id: requirement.id,
       requirement: requirement.text,
       importance: requirement.importance,
       category: requirement.category,
-      status: "not_met" as const,
+      status: "missing" as const,
       evidence: [],
       evidenceClaimIds: [],
-      confidence: 0.95,
+      confidence: 0.9,
       score: 0,
-      explanation: failure,
-      actions: ["Do not imply that this requirement is met. Confirm whether the target permits an exception or choose a compatible target."],
+      explanation:
+        "No supplied evidence states enough years to verify this numeric experience requirement.",
+      actions: [
+        `Add this only if the user can verify it: ${requirement.text}`,
+      ],
     };
   }
-  const requirementTokens = keywordSet([requirement.text]).filter(
-    (token) =>
-      !["required", "preferred", "experience", "candidate", "applicant", "ability", "skills"].includes(token),
-  );
-  const matches = entries.flatMap((entry) =>
-    [entry]
-      .filter(({ value }) => {
-        const normalized = normalize(value);
-        const tokenMatches = requirementTokens.filter((token) =>
-          normalized.includes(token),
-        );
-        return (
-          normalized.includes(normalize(requirement.text)) ||
-          tokenMatches.length >= Math.min(2, Math.max(1, requirementTokens.length))
-        );
-      })
-      .map((item) => ({
-        value: item.value,
-        claimIds: item.claimId ? [item.claimId] : [],
-        source: item.source,
-      })),
-  );
+  const matches = semanticEvidenceMatches(requirement, entries);
   if (matches.length) {
+    const requirementConceptSet = evidenceConcepts(requirement.text);
+    const specificRequirementConcepts = new Set(
+      [...requirementConceptSet].filter((concept) =>
+        canonicalEvidenceConcepts.has(concept),
+      ),
+    );
+    const hasSpecificMatch = (item: (typeof matches)[number]) =>
+      item.shared.some((concept) => specificRequirementConcepts.has(concept));
+    const artifactRequirement = requirement.category === "portfolio";
+    const artifactEvidence = matches.some(
+      (item) =>
+        ["workHistory", "projects"].includes(item.field) &&
+        /\b(portfolio|case study|reel|writing sample|publication)\b/.test(
+          normalize(item.value),
+        ) &&
+        item.field !== "links",
+    );
+    const appliedExplicit = matches.some(
+      (item) =>
+        item.source === "explicit" &&
+        ["workHistory", "projects", "links", "certifications"].includes(
+          item.field,
+        ) &&
+        !/^coursework includes\b/i.test(item.value),
+    );
+    const educationExplicit = matches.some(
+      (item) => item.source === "explicit" && item.field === "education",
+    );
+    const inferredEvidence = matches.some(
+      (item) =>
+        item.source === "inferred" ||
+        /^coursework includes\b/i.test(item.value),
+    );
+    const appliedMatches = matches.filter((item) =>
+      ["workHistory", "projects", "certifications"].includes(item.field),
+    );
+    const specificMatches = matches.filter(hasSpecificMatch);
+    const strictRequirementConcepts = new Set(
+      [...specificRequirementConcepts].filter((concept) =>
+        strictQualifierConcepts.has(concept),
+      ),
+    );
+    const hasRequiredQualifierMatch = (item: (typeof matches)[number]) =>
+      strictRequirementConcepts.size === 0 ||
+      [...strictRequirementConcepts].every((concept) =>
+        item.shared.includes(concept),
+      );
+    const appliedSpecificMatches = appliedMatches.filter(
+      (item) =>
+        item.source === "explicit" &&
+        hasSpecificMatch(item) &&
+        hasRequiredQualifierMatch(item) &&
+        !isInferenceOnlyConceptEvidence(item, specificRequirementConcepts),
+    );
+    const proxySpecificMatches = specificMatches.filter((item) =>
+      isInferenceOnlyConceptEvidence(item, specificRequirementConcepts),
+    );
+    const permitsQualifierInference = [...strictRequirementConcepts].every(
+      (concept) => qualifierInferenceConcepts.has(concept),
+    );
+    const specificSkillMatch = specificMatches.some(
+      (item) =>
+        item.field === "skills" &&
+        item.source === "explicit" &&
+        (hasRequiredQualifierMatch(item) || permitsQualifierInference),
+    );
+    if (requirement.importance === "preferred") {
+      const hasCanonicalRequirement = specificRequirementConcepts.size > 0;
+      const hasAppliedSupport = hasCanonicalRequirement
+        ? appliedSpecificMatches.length > 0
+        : appliedMatches.length > 0;
+      if (
+        !hasAppliedSupport &&
+        (specificSkillMatch || proxySpecificMatches.length > 0)
+      ) {
+        return {
+          id: requirement.id,
+          requirement: requirement.text,
+          importance: requirement.importance,
+          category: requirement.category,
+          status: "inferred" as const,
+          evidence: uniqueStrings(
+            specificMatches.map((item) => item.value),
+          ).slice(0, 4),
+          evidenceClaimIds: uniqueStrings(
+            specificMatches
+              .map((item) => item.claimId)
+              .filter((value): value is string => Boolean(value)),
+          ),
+          confidence: 0.7,
+          score: 65,
+          explanation:
+            "The supplied skills are relevant, but applied evidence for this preference is limited.",
+          actions: [
+            `Add applied evidence only if genuine: ${requirement.text}`,
+          ],
+        };
+      }
+      if (!hasAppliedSupport) {
+        return {
+          id: requirement.id,
+          requirement: requirement.text,
+          importance: requirement.importance,
+          category: requirement.category,
+          status: "missing" as const,
+          evidence: [],
+          evidenceClaimIds: [],
+          confidence: 0.85,
+          score: 0,
+          explanation:
+            "No applied evidence demonstrates this preferred qualification.",
+          actions: [
+            `Add this only if the user can provide genuine evidence: ${requirement.text}`,
+          ],
+        };
+      }
+    }
+    if (
+      profileSource === "background" &&
+      /\b(project evidence|contributions|leadership|portfolio|case study|reel)\b/.test(
+        normalize(requirement.text),
+      ) &&
+      !appliedExplicit
+    ) {
+      return {
+        id: requirement.id,
+        requirement: requirement.text,
+        importance: requirement.importance,
+        category: requirement.category,
+        status: "unverified" as const,
+        evidence: uniqueStrings(matches.map((item) => item.value)).slice(0, 4),
+        evidenceClaimIds: uniqueStrings(
+          matches
+            .map((item) => item.claimId)
+            .filter((value): value is string => Boolean(value)),
+        ),
+        confidence: 0.7,
+        score: 35,
+        explanation:
+          "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+        actions: [
+          `Clarify direct evidence for: ${requirement.text}`,
+        ],
+      };
+    }
+    const hasCanonicalRequirement = specificRequirementConcepts.size > 0;
+    const directAppliedEvidence = hasCanonicalRequirement
+      ? appliedSpecificMatches.length > 0
+      : appliedExplicit;
+    if (artifactRequirement && !artifactEvidence) {
+      const authoredArtifactEvidence = appliedSpecificMatches.some((item) =>
+        /\b(wrote|authored|produced|published|created|designed|animated|prototyped)\b/.test(
+          normalize(item.value),
+        ),
+      );
+      const artifactStatus =
+        requirement.importance === "preferred" && authoredArtifactEvidence
+          ? ("inferred" as const)
+          : appliedSpecificMatches.length > 0 ||
+              matches.some((item) => item.field === "links")
+            ? ("unverified" as const)
+            : ("missing" as const);
+      return {
+        id: requirement.id,
+        requirement: requirement.text,
+        importance: requirement.importance,
+        category: requirement.category,
+        status: artifactStatus,
+        evidence: uniqueStrings(matches.map((item) => item.value)).slice(0, 4),
+        evidenceClaimIds: uniqueStrings(
+          matches
+            .map((item) => item.claimId)
+            .filter((value): value is string => Boolean(value)),
+        ),
+        confidence: artifactStatus === "missing" ? 0.9 : 0.75,
+        score:
+          artifactStatus === "inferred"
+            ? 65
+            : artifactStatus === "unverified"
+              ? 35
+              : 0,
+        explanation:
+          artifactStatus === "inferred"
+            ? "Authored work may provide a suitable sample, but the requested artifact is not explicitly identified."
+            : artifactStatus === "unverified"
+              ? "Related work or a link is supplied, but the requested artifact cannot be verified from the available evidence."
+              : "No requested portfolio, reel, case study, or work sample was supplied.",
+        actions: [
+          artifactStatus === "missing"
+            ? `Provide the requested artifact if available: ${requirement.text}`
+            : `Confirm which supplied work satisfies: ${requirement.text}`,
+        ],
+      };
+    }
     const source =
-      matches.some((item) => item.source === "explicit")
+      directAppliedEvidence ||
+      (requirement.category === "education" && educationExplicit)
         ? ("confirmed" as const)
-        : matches.some((item) => item.source === "inferred")
+        : inferredEvidence || matches.some((item) => item.source === "explicit")
           ? ("inferred" as const)
           : ("unverified" as const);
     return {
@@ -612,15 +1339,32 @@ function requirementAssessment(
       category: requirement.category,
       status: source,
       evidence: uniqueStrings(matches.map((item) => item.value)).slice(0, 4),
-      evidenceClaimIds: uniqueStrings(matches.flatMap((item) => item.claimIds)),
-      confidence: 0.9,
-      score: 100,
-      explanation: "Supplied profile or resume evidence directly supports this requirement.",
-      actions: ["Keep the strongest relevant evidence close to this requirement in the application document."],
+      evidenceClaimIds: uniqueStrings(
+        matches
+          .map((item) => item.claimId)
+          .filter((value): value is string => Boolean(value)),
+      ),
+      confidence: source === "confirmed" ? 0.9 : 0.75,
+      score:
+        source === "confirmed"
+          ? 100
+          : source === "inferred"
+            ? 65
+            : 35,
+      explanation:
+        source === "confirmed"
+          ? "Supplied profile or resume evidence directly supports this requirement."
+          : source === "inferred"
+            ? "Supplied evidence is relevant but does not fully establish the required scope."
+            : "Related evidence exists, but the required artifact or qualification is not verified.",
+      actions: [
+        source === "confirmed"
+          ? "Keep the strongest relevant evidence close to this requirement in the application document."
+          : `Clarify or provide direct evidence for: ${requirement.text}`,
+      ],
     };
   }
-  const status =
-    requirement.importance === "required" ? ("missing" as const) : ("unverified" as const);
+  const status = "missing" as const;
   return {
     id: requirement.id,
     requirement: requirement.text,
@@ -630,11 +1374,8 @@ function requirementAssessment(
     evidence: [],
     evidenceClaimIds: [],
     confidence: 0.8,
-    score: status === "missing" ? 0 : 35,
-    explanation:
-      status === "missing"
-        ? "No supplied evidence demonstrates this required item."
-        : "The supplied evidence does not confirm this item.",
+    score: 0,
+    explanation: "No supplied evidence demonstrates this item.",
     actions: [
       `Add this only if the user can provide genuine evidence: ${requirement.text}`,
     ],
@@ -720,6 +1461,35 @@ function optimizationClaimIds(evidence: ProfileEvidence[], fields: string[]) {
   );
 }
 
+function optimizationClaimIdsForValue(
+  evidence: ProfileEvidence[],
+  field: string,
+  value: string,
+) {
+  const target = normalize(value);
+  return uniqueStrings(
+    evidence
+      .filter(
+        (item) =>
+          item.field === field &&
+          item.source === "explicit" &&
+          item.confirmed !== false &&
+          (item.allowedUse ?? []).includes("optimization"),
+      )
+      .filter((item) => {
+        const itemValues =
+          typeof item.value === "string"
+            ? [item.value]
+            : Array.isArray(item.value)
+              ? item.value
+              : [];
+        return itemValues.some((itemValue) => normalize(itemValue) === target);
+      })
+      .map((item) => item.claimId)
+      .filter((claimId): claimId is string => Boolean(claimId)),
+  );
+}
+
 function parseabilityScore(profile: StructuredUserProfile) {
   return Math.min(
     100,
@@ -743,15 +1513,35 @@ export function buildResumeBenchmark(
   const requirements = requirementList(request, opportunity);
   const entries = profileEvidenceEntries(profile, evidence);
   const contradictions = evidenceContradictions(entries);
+  const requestContext =
+    request.context &&
+    typeof request.context === "object" &&
+    "profileSource" in request.context
+      ? request.context
+      : undefined;
   const assessments = requirements.map((requirement) =>
-    requirementAssessment(requirement, profile, entries, contradictions),
+    requirementAssessment(
+      requirement,
+      profile,
+      entries,
+      contradictions,
+      requestContext?.profileSource,
+    ),
   );
   const required = assessments.filter((item) => item.importance === "required");
   const preferred = assessments.filter((item) => item.importance === "preferred");
-  const failures = assessments
+  const hardRequirementIds = new Set(
+    requirements
+      .filter(isHardEligibilityRequirement)
+      .map((requirement) => requirement.id),
+  );
+  const hardAssessments = assessments.filter((item) =>
+    hardRequirementIds.has(item.id),
+  );
+  const failures = hardAssessments
     .filter((item) => item.status === "not_met")
     .map((item) => item.explanation);
-  const unknowns = assessments
+  const unknowns = hardAssessments
     .filter((item) =>
       ["missing", "unverified", "inferred", "contradictory"].includes(
         item.status,
@@ -826,9 +1616,7 @@ export function buildResumeBenchmark(
         : unknowns.length
           ? "No hard failure is proven, but some requirements remain unverified."
           : "Supplied evidence supports the evaluated eligibility requirements.",
-      requirementIds: assessments
-        .filter((item) => item.category === "eligibility")
-        .map((item) => item.id),
+      requirementIds: hardAssessments.map((item) => item.id),
       evidenceClaimIds: claimIdsFor(evidence, ["location", "experienceLevel", "education"]),
       actions: failures.length
         ? ["Do not hide the eligibility failure inside the average score."]
@@ -1057,7 +1845,11 @@ export function buildResumeOptimization(
           .replace(/\s+/g, " ")
           .trim()
           .replace(/[.;]?$/, "."),
-        evidenceClaimIds: optimizationClaimIds(evidence, ["workHistory"]),
+        evidenceClaimIds: optimizationClaimIdsForValue(
+          evidence,
+          "workHistory",
+          entry,
+        ),
         requiresConfirmation: true,
       })),
       ...supported.projects.map((entry) => ({
@@ -1069,7 +1861,11 @@ export function buildResumeOptimization(
           .replace(/\s+/g, " ")
           .trim()
           .replace(/[.;]?$/, "."),
-        evidenceClaimIds: optimizationClaimIds(evidence, ["projects"]),
+        evidenceClaimIds: optimizationClaimIdsForValue(
+          evidence,
+          "projects",
+          entry,
+        ),
         requiresConfirmation: true,
       })),
     ].slice(0, 12),

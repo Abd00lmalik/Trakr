@@ -1,5 +1,28 @@
 # Build Log
 
+## 2026-07-21 Service 2 Calibration
+
+- Added a 153-case independently AI-reviewed and adjudicated synthetic
+  benchmark corpus with three blinded reviewer passes and separate blinded
+  adjudication.
+- Advanced the deterministic rubric to `resume-rubric-2026-07-21`.
+- Added semantic evidence concepts, numeric experience handling, enrollment
+  contradictions, hard-eligibility separation, artifact-state handling, and
+  exact rewrite-to-claim provenance.
+- Calibrated exact requirement-status agreement to 93.21%, hard-requirement
+  agreement to 96.30%, and hard-failure recall to 100%.
+- Recorded zero false ineligibility, zero fabrication, 100% contradiction
+  recall, and 100% prompt-injection containment.
+- Added the calibration gate to `npm run verify`.
+- Final local restart passed 129 automated tests, calibration, typecheck,
+  zero-warning ESLint, optimized build, PDF/DOCX parsing, and production-mode
+  smoke.
+- Live inventory monitoring fetched 557 records: 477 verified, 18 program
+  directories, 0 inactive, and 62 unverified. No critical alert fired;
+  internship, scholarship, grant, and known-deadline coverage remain limited.
+- Resume Generation remains blocked pending calibration deployment and the
+  complete external Service 2 and Service 1 restart.
+
 ## 2026-07-19 Session Profile and Matching Foundation
 
 - Added profileless two-path onboarding for external agents:

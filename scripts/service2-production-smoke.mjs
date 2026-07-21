@@ -159,7 +159,7 @@ await run("S2-PROD-003-benchmark-resume", async () => {
   assert.ok(result.body.capabilityResult?.resumeBenchmark?.benchmarkId);
   assert.equal(
     result.body.capabilityResult.resumeBenchmark.rubricVersion,
-    "resume-rubric-2026-07-20",
+    "resume-rubric-2026-07-21",
   );
   assert.match(
     result.body.capabilityResult.resumeBenchmark.scoreMeaning,

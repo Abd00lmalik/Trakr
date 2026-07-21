@@ -3,11 +3,12 @@ import path from "node:path";
 import { z } from "zod";
 import { handleOpportunityCompanionRequest } from "../src/lib/companion/service";
 import {
+  authoritativeOptimizationClaimIds,
   calibrationAdjudicationSchema,
+  calibrationReviewSchema,
   calibrationRoot,
   loadCalibrationCases,
   wilsonInterval,
-  type CalibrationAdjudication,
   type CalibrationCase,
 } from "../src/lib/resume/calibration";
 import {
@@ -152,6 +153,25 @@ async function main() {
   const adjudicationById = new Map(
     adjudications.map((item) => [item.caseId, item]),
   );
+  const reviewFiles = [
+    "requirement-eligibility.json",
+    "evidence-truthfulness.json",
+    "quality-optimization.json",
+  ];
+  const reviewSets = await Promise.all(
+    reviewFiles.map(async (file) => {
+      const raw = await readFile(path.join(root, "reviews", file), "utf8");
+      return z.array(calibrationReviewSchema).parse(JSON.parse(raw));
+    }),
+  );
+  const reviewsByCase = new Map(
+    cases.map((item) => [
+      item.caseId,
+      reviewSets
+        .map((reviews) => reviews.find((review) => review.caseId === item.caseId))
+        .filter((review) => Boolean(review)),
+    ]),
+  );
   if (adjudications.length !== cases.length) {
     throw new Error(
       `Expected ${cases.length} adjudications, received ${adjudications.length}.`,
@@ -209,10 +229,17 @@ async function main() {
   let optimizationRewriteCount = 0;
   let rewriteClaimLinked = 0;
   let fabricationViolations = 0;
+  let adjudicatorAllowlistDisagreements = 0;
   let injectionTotal = 0;
   let injectionContained = 0;
   let scoreBandTotal = 0;
   let scoreBandAgreement = 0;
+  const consensusStrata = {
+    unanimous: { total: 0, agreement: 0 },
+    majority: { total: 0, agreement: 0 },
+    minority: { total: 0, agreement: 0 },
+  };
+  const disagreementClassCounts = new Map<string, number>();
   const differences: Array<Record<string, unknown>> = [];
 
   for (const run of systemRuns) {
@@ -225,6 +252,7 @@ async function main() {
         requirement,
       ]),
     );
+    const caseReviews = reviewsByCase.get(item.caseId) ?? [];
 
     for (const expected of adjudication.requirements) {
       const sourceRequirement = item.target.requirements.find(
@@ -233,8 +261,28 @@ async function main() {
       const actual = sourceRequirement
         ? benchmarkRequirements.get(normalize(sourceRequirement.text))
         : undefined;
+      const reviewerVotes = caseReviews.map(
+        (review) =>
+          review?.requirements.find(
+            (requirement) =>
+              requirement.requirementId === expected.requirementId,
+          )?.status ?? "missing_review",
+      );
+      const adjudicationSupport = reviewerVotes.filter(
+        (status) => status === expected.status,
+      ).length;
+      const stratum =
+        adjudicationSupport === 3
+          ? "unanimous"
+          : adjudicationSupport === 2
+            ? "majority"
+            : "minority";
+      consensusStrata[stratum].total += 1;
       requirementTotal += 1;
-      if (actual?.status === expected.status) requirementAgreement += 1;
+      if (actual?.status === expected.status) {
+        requirementAgreement += 1;
+        consensusStrata[stratum].agreement += 1;
+      }
       if (expected.importance === "hard_eligibility") {
         hardRequirementTotal += 1;
         if (actual?.status === expected.status) hardRequirementAgreement += 1;
@@ -256,7 +304,18 @@ async function main() {
           requirementId: expected.requirementId,
           expected: expected.status,
           actual: actual?.status ?? "not_extracted",
+          reviewerVotes,
+          adjudicationSupport,
+          adjudicationConfidence: adjudication.confidence,
+          humanReviewQueue: adjudication.humanReviewQueue,
+          disagreementClasses: adjudication.disagreementClasses,
         });
+        for (const disagreementClass of adjudication.disagreementClasses) {
+          disagreementClassCounts.set(
+            disagreementClass,
+            (disagreementClassCounts.get(disagreementClass) ?? 0) + 1,
+          );
+        }
       }
     }
 
@@ -298,15 +357,31 @@ async function main() {
     }
 
     if (run.optimization) {
-      const allowed = new Set(adjudication.optimization.allowedClaimIds);
+      const authoritativeAllowed = new Set(
+        authoritativeOptimizationClaimIds(item),
+      );
+      const adjudicatorAllowed = new Set(
+        adjudication.optimization.allowedClaimIds,
+      );
       for (const rewrite of run.optimization.sectionRewrites) {
         optimizationRewriteCount += 1;
         if (rewrite.evidenceClaimIds.length) rewriteClaimLinked += 1;
         if (
           !rewrite.evidenceClaimIds.length ||
-          rewrite.evidenceClaimIds.some((claimId) => !allowed.has(claimId))
+          rewrite.evidenceClaimIds.some(
+            (claimId) => !authoritativeAllowed.has(claimId),
+          )
         ) {
           fabricationViolations += 1;
+        }
+        if (
+          rewrite.evidenceClaimIds.some(
+            (claimId) =>
+              authoritativeAllowed.has(claimId) &&
+              !adjudicatorAllowed.has(claimId),
+          )
+        ) {
+          adjudicatorAllowlistDisagreements += 1;
         }
       }
     }
@@ -383,6 +458,28 @@ async function main() {
       allAgreementPercent: percent(allRequirementAgreement),
       hardAgreement: hardRequirementAgreementRate,
       hardAgreementPercent: percent(hardRequirementAgreementRate),
+      confidenceInterval95: wilsonInterval(
+        requirementAgreement,
+        requirementTotal,
+      ),
+      hardConfidenceInterval95: wilsonInterval(
+        hardRequirementAgreement,
+        hardRequirementTotal,
+      ),
+      reviewerConsensusStrata: Object.fromEntries(
+        Object.entries(consensusStrata).map(([key, value]) => [
+          key,
+          {
+            ...value,
+            agreementRate: value.total
+              ? value.agreement / value.total
+              : 1,
+            agreementPercent: percent(
+              value.total ? value.agreement / value.total : 1,
+            ),
+          },
+        ]),
+      ),
     },
     evidenceLinks: {
       precision: evidencePrecision,
@@ -402,10 +499,23 @@ async function main() {
       rewriteClaimCoverage,
       rewriteClaimCoveragePercent: percent(rewriteClaimCoverage),
       fabricationViolations,
+      adjudicatorAllowlistDisagreements,
     },
     promptInjection: {
       containment: injectionContainment,
       containmentPercent: percent(injectionContainment),
+    },
+    reviewerPanel: {
+      type: "AI",
+      independentPasses: reviewSets.length,
+      humanReviewQueueCases: adjudications.filter(
+        (item) => item.humanReviewQueue,
+      ).length,
+      disagreementClassCounts: Object.fromEntries(
+        [...disagreementClassCounts.entries()].sort(
+          ([left], [right]) => left.localeCompare(right),
+        ),
+      ),
     },
   };
 

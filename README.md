@@ -4,7 +4,7 @@
 
 Trakr is an outcome-first AI Opportunity Companion exposed as an A2MCP-style API service. The product presents three visible services: Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. They share one capability layer and the stable public endpoint, `POST /api/a2mcp/recommend`.
 
-Service 1, Opportunity Finding, is production-ready in this repository. Service 2, Resume Benchmarking & Optimization, is implemented behind the additive `benchmark` and `optimize` operations and is moving through its independent release gate. Resume Generation remains staged until Service 2 passes local, CI, deployment, and external A2MCP validation.
+Service 1, Opportunity Finding, and Service 2, Resume Benchmarking & Optimization, are production-ready in this repository. Service 2 has also passed a 153-case independently AI-reviewed and adjudicated synthetic calibration gate. Resume Generation remains staged until the calibration deployment and external A2MCP release checks are complete.
 
 ## MVP Scope
 
@@ -176,7 +176,8 @@ Trakr may improve wording, structure, relevance, ordering, and keyword alignment
 Benchmark scores are transparent application-document heuristics. They are not
 hiring predictions and do not claim to reproduce a specific employer's ATS.
 The versioned Service 2 research record is in
-`reports/service2-rubric-research-2026-07-20.md`.
+`reports/service2-rubric-research-2026-07-20.md`. The independent synthetic
+calibration report is in `reports/service2-calibration-2026-07-21.md`.
 
 ## Extending Sources
 

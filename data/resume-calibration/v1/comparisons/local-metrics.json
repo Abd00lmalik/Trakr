@@ -1,0 +1,104 @@
+{
+  "generatedAt": "2026-07-21T02:18:58.262Z",
+  "rubricVersion": "resume-rubric-2026-07-21",
+  "corpusVersion": "1.0.0",
+  "sampleCounts": {
+    "cases": 153,
+    "requirements": 663,
+    "hardRequirements": 108,
+    "hardFailures": 36,
+    "eligibleOrUncertainCases": 118,
+    "contradictions": 7,
+    "optimizationRewrites": 153,
+    "injectionCases": 13
+  },
+  "hardEligibility": {
+    "recall": 1,
+    "recallPercent": 100,
+    "confidenceInterval95": {
+      "lower": 0.9035781695514236,
+      "upper": 1
+    },
+    "falseIneligibilityRate": 0,
+    "falseIneligibilityPercent": 0
+  },
+  "requirementStatus": {
+    "allAgreement": 0.9321266968325792,
+    "allAgreementPercent": 93.21,
+    "hardAgreement": 0.9629629629629629,
+    "hardAgreementPercent": 96.3,
+    "confidenceInterval95": {
+      "lower": 0.9103845068787719,
+      "upper": 0.9488900194855101
+    },
+    "hardConfidenceInterval95": {
+      "lower": 0.9086169931912852,
+      "upper": 0.9855046931937449
+    },
+    "reviewerConsensusStrata": {
+      "unanimous": {
+        "total": 401,
+        "agreement": 398,
+        "agreementRate": 0.9925187032418953,
+        "agreementPercent": 99.25
+      },
+      "majority": {
+        "total": 128,
+        "agreement": 110,
+        "agreementRate": 0.859375,
+        "agreementPercent": 85.94
+      },
+      "minority": {
+        "total": 134,
+        "agreement": 110,
+        "agreementRate": 0.8208955223880597,
+        "agreementPercent": 82.09
+      }
+    }
+  },
+  "evidenceLinks": {
+    "precision": 0.7798561151079136,
+    "precisionPercent": 77.99,
+    "recall": 0.6975546975546976,
+    "recallPercent": 69.76
+  },
+  "contradictions": {
+    "recall": 1,
+    "recallPercent": 100
+  },
+  "scoreBands": {
+    "agreement": 0.5228758169934641,
+    "agreementPercent": 52.29
+  },
+  "optimization": {
+    "rewriteClaimCoverage": 1,
+    "rewriteClaimCoveragePercent": 100,
+    "fabricationViolations": 0,
+    "adjudicatorAllowlistDisagreements": 1
+  },
+  "promptInjection": {
+    "containment": 1,
+    "containmentPercent": 100
+  },
+  "reviewerPanel": {
+    "type": "AI",
+    "independentPasses": 3,
+    "humanReviewQueueCases": 95,
+    "disagreementClassCounts": {
+      "contradiction_detection_defect": 5,
+      "eligibility_logic_defect": 12,
+      "evidence_equivalence_defect": 23,
+      "evidence_extraction_defect": 34,
+      "genuinely_ambiguous_case": 35,
+      "locale_handling_defect": 3,
+      "optimization_exaggeration": 11,
+      "optimization_fabrication": 1,
+      "parsing_defect": 2,
+      "prompt_injection_defect": 4,
+      "recommendation_defect": 6,
+      "reviewer_disagreement": 45,
+      "scoring_weight_defect": 3,
+      "target_type_defect": 26
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "evaluatedAt": "2026-07-21T02:13:10.720Z",
+  "approvedSourceGroups": [
+    "Devpost API",
+    "RemoteOK API",
+    "Greenhouse employer job boards",
+    "Ashby employer job boards",
+    "Official curated source import"
+  ],
+  "sourceErrors": [],
+  "sourceGroupCounts": {
+    "Devpost API": 9,
+    "RemoteOK API": 49,
+    "Greenhouse employer job boards": 325,
+    "Ashby employer job boards": 156,
+    "Official curated source": 18
+  },
+  "fetchedRecords": 557,
+  "verificationCounts": {
+    "verified": 477,
+    "program_directory": 18,
+    "inactive_listing": 0,
+    "unverified": 62
+  },
+  "monitoring": {
+    "generatedAt": "2026-07-21T02:13:10.720Z",
+    "totalRecords": 557,
+    "activeRecords": 557,
+    "verifiedRecords": 477,
+    "verificationRate": 0.8563734290843806,
+    "duplicateRate": 0,
+    "staleRecordCount": 0,
+    "remoteRecordCount": 216,
+    "africaEvidenceCount": 224,
+    "knownDeadlineCount": 9,
+    "sourceCounts": {
+      "Devpost API": 9,
+      "RemoteOK API": 49,
+      "Greenhouse: Anthropic": 45,
+      "Greenhouse: Scale AI": 45,
+      "Greenhouse: Moniepoint": 45,
+      "Greenhouse: Wave Mobile Money": 45,
+      "Greenhouse: One Ethos": 3,
+      "Greenhouse: Ripple": 45,
+      "Greenhouse: Kiva": 7,
+      "Greenhouse: Stripe": 45,
+      "Greenhouse: OKX": 45,
+      "Ashby: M-KOPA": 40,
+      "Ashby: Prime Intellect": 17,
+      "Ashby: Eloquent AI": 12,
+      "Ashby: Clipboard": 31,
+      "Ashby: Paymentology": 18,
+      "Ashby: Taptap Send": 36,
+      "Ashby: Sylvera": 2,
+      "Official curated source": 18
+    },
+    "sourceGroupCounts": {
+      "Devpost API": 9,
+      "RemoteOK API": 49,
+      "Greenhouse employer job boards": 325,
+      "Ashby employer job boards": 156,
+      "Official curated source": 18
+    },
+    "categoryCounts": {
+      "hackathon": 12,
+      "remote_job": 500,
+      "fellowship": 27,
+      "internship": 9,
+      "web3_bounty": 2,
+      "grant": 4,
+      "scholarship": 3
+    },
+    "alerts": [
+      {
+        "code": "category_shortage",
+        "severity": "warning",
+        "scope": "internship",
+        "message": "internship inventory has 9 records; the monitoring floor is 10."
+      },
+      {
+        "code": "category_shortage",
+        "severity": "warning",
+        "scope": "scholarship",
+        "message": "scholarship inventory has 3 records; the monitoring floor is 5."
+      },
+      {
+        "code": "category_shortage",
+        "severity": "warning",
+        "scope": "grant",
+        "message": "grant inventory has 4 records; the monitoring floor is 5."
+      },
+      {
+        "code": "deadline_confidence_low",
+        "severity": "info",
+        "scope": "deadline",
+        "message": "Fewer than 25% of records have a known deadline; rolling and unknown deadlines require continued verification."
+      }
+    ]
+  },
+  "permissionRequiredSources": [
+    "DoraHacks",
+    "Encode Club"
+  ],
+  "permissionDecision": "No automated ingestion. A documented API, official feed, permission, or partnership remains required."
+}

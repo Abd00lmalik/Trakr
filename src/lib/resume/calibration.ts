@@ -284,6 +284,18 @@ export type CalibrationAdjudication = z.infer<
   typeof calibrationAdjudicationSchema
 >;
 
+export function authoritativeOptimizationClaimIds(item: CalibrationCase) {
+  return item.claims
+    .filter(
+      (claim) =>
+        claim.explicitness === "explicit" &&
+        claim.confirmationStatus === "confirmed" &&
+        claim.optimizationAuthorized &&
+        claim.category !== "untrusted_instruction",
+    )
+    .map((claim) => claim.claimId);
+}
+
 export function calibrationRoot() {
   return path.resolve("data", "resume-calibration", "v1");
 }

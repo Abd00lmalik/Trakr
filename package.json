@@ -30,7 +30,7 @@
     "devpost:compare": "tsx scripts/compare-devpost-normalization.ts",
     "evaluate:ranking": "tsx scripts/evaluate-ranking.ts",
     "evaluate:inventory-monitoring": "tsx scripts/evaluate-inventory-monitoring.ts",
-    "verify": "npm run test:privacy && npm run test:verification && npm run test:inventory-monitoring && npm run test:devpost && npm run test:greenhouse && npm run test:ashby && npm run test:ranking && npm run test:service1 && npm run test:service2 && npm run test:service2:calibration && npm run test:workspace && npm run test:companion && npm run typecheck && npm run lint && npm run build && npm run smoke",
+    "verify": "npm run test:privacy && npm run test:verification && npm run test:inventory-monitoring && npm run test:devpost && npm run test:greenhouse && npm run test:ashby && npm run test:ranking && npm run test:service1 && npm run test:service2 && npm run test:service2:calibration && npm run test:workspace && npm run test:companion && npm run calibration:gate && npm run typecheck && npm run lint && npm run build && npm run smoke",
     "calibration:generate": "tsx scripts/generate-resume-calibration-corpus.ts",
     "calibration:validate-reviews": "tsx scripts/validate-resume-calibration-reviews.ts",
     "calibration:prepare-adjudication": "tsx scripts/prepare-resume-calibration-adjudication.ts",
