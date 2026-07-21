@@ -9,11 +9,12 @@ Public endpoint:
 
 ## Verdict
 
-Local calibration verdict: **GO**.
+Calibration and production verdict: **GO**.
 
-Production deployment verdict: pending the post-commit Railway deployment and
-complete external restart. Service 3 remains blocked until that external gate
-passes.
+The calibrated rubric, cross-domain evidence repair, complete Service 2
+production matrix, all seven Service 1 regression journeys, CI, A2MCP
+metadata, OpenAPI, external availability, and free-access compatibility passed
+on July 21, 2026. Service 3 may begin as a separate milestone.
 
 ## Corpus And Review Panel
 
@@ -93,6 +94,15 @@ requirement and eligibility labels.
 - Reported the one AI-adjudicator allowlist disagreement separately rather
   than misclassifying it as fabrication.
 
+The first production restart on commit `23804af` passed 19 of 20 cases.
+`S2-PROD-019-strong-resume-wrong-target` failed because a fictional cloud
+certification was credited toward a required accounting certification and
+generic software-team leadership was credited toward audit leadership. The
+root cause was cross-domain semantic concepts that were too broad. Commit
+`483f73d` added domain-qualified accounting-certification and audit-leadership
+rules plus regression coverage. The complete local and production sequences
+were then restarted from Test 1.
+
 ## Local Validation
 
 Final local restart:
@@ -106,6 +116,38 @@ Final local restart:
 - Production-mode local smoke passed.
 - Service 1 privacy, inventory, source verification, ranking, continuation,
   legacy compatibility, and contract tests passed.
+
+GitHub Actions run
+`https://github.com/Abd00lmalik/Trakr/actions/runs/29796270302` completed
+successfully for commit `483f73d`.
+
+## Production Validation
+
+- Railway health returned HTTP 200 with database, pgvector, privacy logging,
+  source verification, and AI configuration ready.
+- The complete Service 2 production matrix passed 20 of 20 from Test 1.
+- The complete Service 1 production journey set passed 7 of 7 from Test 1.
+- The repaired financial-controller case reported accounting certification,
+  financial reporting, and audit leadership as missing, with no unrelated
+  evidence attached.
+- Legacy structured discovery remained compatible.
+- Benchmark-to-optimize continuation, consent denial, idempotent replay,
+  idempotency conflict, prompt-injection containment, known and unknown target
+  URLs, malformed JSON, and oversized input behavior passed.
+- A2MCP metadata and OpenAPI remained at additive version `0.4.0`.
+- The public endpoint remained
+  `POST https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`.
+- The Railway-hosted service responded independently of localhost, the local
+  development server, and the local filesystem. Literal physical shutdown of
+  the test computer was not performed.
+
+## OKX And Free Access
+
+An **OKX Agent Payments Protocol** quote against the public POST endpoint
+returned HTTP 200 with no payment challenge, no accepted payment schemes,
+`needsConfirm: false`, and amount zero. No payment was attempted. Agent #5198,
+the service title `Opportunity Matching API`, A2MCP compatibility, and free
+access remain unchanged.
 
 ## Inventory Monitoring
 
@@ -145,6 +187,9 @@ feed, permission, partnership, or similarly reliable access method.
   predictions.
 - Opportunity inventory remains thinner for globally eligible internships,
   scholarships, grants, research funding, climate, and Africa-accessible roles.
+- The protocol probe used integrity-verified `onchainos` CLI v4.2.6. A Windows
+  file lock prevented replacing the running binary with v4.3.0; this did not
+  affect the successful HTTP 200 no-payment result.
 
 ## Artifacts
 
@@ -166,9 +211,8 @@ feed, permission, partnership, or similarly reliable access method.
 
 ## Decision
 
-The calibrated local capability receives **GO**.
+The Service 2 calibration milestone receives **GO** on July 21, 2026.
 
-Service 3 may begin only after this exact rubric is deployed, the complete
-Service 2 production matrix passes from Test 1, all seven Service 1 journeys
-pass, A2MCP metadata and free access remain compatible, and the final report is
-updated with an external **GO**.
+Service 3 may begin as a new, independently gated milestone. This decision does
+not claim human validation, expert consensus, hiring prediction accuracy, or
+agreement with real recruiters or selection committees.
