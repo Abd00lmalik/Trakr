@@ -1,0 +1,2199 @@
+[
+  {
+    "adjudicationId": "S2C-0052-ADJ-AI-V1",
+    "caseId": "S2C-0052",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0052-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0052-CLM-03",
+          "S2C-0052-CLM-04",
+          "S2C-0052-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Usability work and a flow revision are relevant, but no reviewable UX case study is supplied."
+      },
+      {
+        "requirementId": "S2C-0052-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0052-CLM-03",
+          "S2C-0052-CLM-04",
+          "S2C-0052-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Research, usability sessions, and a revision based on observed issues directly support a user-centered process."
+      },
+      {
+        "requirementId": "S2C-0052-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes accessibility evaluation."
+      },
+      {
+        "requirementId": "S2C-0052-REQ-04",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0052-CLM-03",
+          "S2C-0052-CLM-04",
+          "S2C-0052-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant UX evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target provides no separate hard eligibility gate that the record fails."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "adequate",
+      "experienceRelevance": "strong",
+      "accomplishments": "adequate",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "strong",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Confirm whether a reviewable UX case study can be supplied before claiming the required artifact.",
+        "Keep the usability-session and flow-revision evidence explicit in the tailored resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0052-CLM-01",
+        "S2C-0052-CLM-02",
+        "S2C-0052-CLM-03",
+        "S2C-0052-CLM-04",
+        "S2C-0052-CLM-05",
+        "S2C-0052-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The listed UX activities do not establish whether a submitted case study exists.",
+      "acceptedAlternatives": [
+        "Treat the activities as inferred support only after a qualified reviewer can inspect a supplied case study."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The process evidence is direct, while the required case-study artifact remains unverified.",
+    "humanReviewQueue": true
+  },
+  {
+    "adjudicationId": "S2C-0053-ADJ-AI-V1",
+    "caseId": "S2C-0053",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0053-REQ-01",
+        "importance": "required",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes a UX case study."
+      },
+      {
+        "requirementId": "S2C-0053-REQ-02",
+        "importance": "required",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0053-CLM-03",
+          "S2C-0053-CLM-04",
+          "S2C-0053-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Coursework and an ambiguously described project suggest user-centered process exposure but not its full scope."
+      },
+      {
+        "requirementId": "S2C-0053-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes accessibility evaluation."
+      },
+      {
+        "requirementId": "S2C-0053-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a structured profile rather than the required resume."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target states no separate hard eligibility condition."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "weak",
+      "structureReadability": "partial",
+      "machineParseability": "adequate",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Supply a reviewable UX case study.",
+        "Clarify the applicant's individual project contribution and rebuild the submission as a resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0053-CLM-01",
+        "S2C-0053-CLM-02",
+        "S2C-0053-CLM-03",
+        "S2C-0053-CLM-04",
+        "S2C-0053-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0053-CLM-05"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The student-project contribution is ambiguous and no case-study artifact is supplied.",
+      "acceptedAlternatives": [
+        "Reassess process evidence after the project role and any case-study artifact are clarified."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "recommendation_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "Coursework and limited participation support relevance, but neither proves a case study or satisfies the required document format.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0054-ADJ-AI-V1",
+    "caseId": "S2C-0054",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.7333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0054-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0054-CLM-03",
+          "S2C-0054-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "UX skills and usability sessions are relevant, but no reviewable case study is supplied."
+      },
+      {
+        "requirementId": "S2C-0054-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0054-CLM-03",
+          "S2C-0054-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "User-research skills and usability sessions directly support a user-centered process."
+      },
+      {
+        "requirementId": "S2C-0054-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes accessibility evaluation."
+      },
+      {
+        "requirementId": "S2C-0054-REQ-04",
+        "importance": "hard_eligibility",
+        "status": "not_met",
+        "supportingClaimIds": [
+          "S2C-0054-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied record explicitly states one year of relevant professional experience, below the five-year minimum."
+      },
+      {
+        "requirementId": "S2C-0054-REQ-05",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0054-CLM-03",
+          "S2C-0054-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant UX evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "ineligible",
+      "hardFailureRequirementIds": [
+        "S2C-0054-REQ-04"
+      ],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "An explicit supplied fact proves that the published five-year hard gate is not met."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "adequate",
+      "experienceRelevance": "partial",
+      "accomplishments": "partial",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "weak"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Do not present the applicant as eligible while the five-year experience gate remains unmet.",
+        "Confirm a reviewable UX case study before representing it as supplied."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable.",
+        "Do not conceal or rewrite the supplied fact that establishes the hard eligibility failure."
+      ],
+      "optimizeDisposition": "do_not_optimize"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0054-CLM-01",
+        "S2C-0054-CLM-02",
+        "S2C-0054-CLM-03",
+        "S2C-0054-CLM-04"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The required case-study artifact remains unverified, although the hard experience failure is explicit.",
+      "acceptedAlternatives": [
+        "Reassess the artifact requirement only after a case study is supplied."
+      ]
+    },
+    "disagreementClasses": [
+      "eligibility_logic_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "high",
+    "rationale": "The case-study evidence is incomplete, but the explicit one-year claim independently establishes ineligibility.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0055-ADJ-AI-V1",
+    "caseId": "S2C-0055",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.9166666666666666,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0055-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0055-CLM-04",
+          "S2C-0055-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "A component library and responsive states are relevant, but an accessible interface-design portfolio is not established."
+      },
+      {
+        "requirementId": "S2C-0055-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0055-CLM-03",
+          "S2C-0055-CLM-04",
+          "S2C-0055-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Design-system skills, a component library, and responsive states directly support design-system experience."
+      },
+      {
+        "requirementId": "S2C-0055-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes motion prototyping."
+      },
+      {
+        "requirementId": "S2C-0055-REQ-04",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0055-CLM-03",
+          "S2C-0055-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant UI design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target provides no separate hard eligibility gate that the record fails."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "adequate",
+      "experienceRelevance": "strong",
+      "accomplishments": "adequate",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "strong",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Confirm that a reviewable interface-design portfolio is available.",
+        "Retain the component-library and responsive-state evidence without claiming a portfolio that has not been supplied."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0055-CLM-01",
+        "S2C-0055-CLM-02",
+        "S2C-0055-CLM-03",
+        "S2C-0055-CLM-04",
+        "S2C-0055-CLM-05",
+        "S2C-0055-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The project work may support a portfolio, but no reviewable portfolio artifact is supplied.",
+      "acceptedAlternatives": [
+        "A qualified reviewer may reassess the portfolio requirement once the artifact is available."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The required design-system evidence is direct, while the required portfolio remains unverified.",
+    "humanReviewQueue": true
+  },
+  {
+    "adjudicationId": "S2C-0056-ADJ-AI-V1",
+    "caseId": "S2C-0056",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0056-REQ-01",
+        "importance": "required",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes an interface-design portfolio."
+      },
+      {
+        "requirementId": "S2C-0056-REQ-02",
+        "importance": "required",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0056-CLM-03",
+          "S2C-0056-CLM-04",
+          "S2C-0056-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Design-system coursework and an ambiguous project role suggest exposure but not applied experience."
+      },
+      {
+        "requirementId": "S2C-0056-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes motion prototyping."
+      },
+      {
+        "requirementId": "S2C-0056-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a structured profile rather than the required resume."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target states no separate hard eligibility condition."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "weak",
+      "structureReadability": "partial",
+      "machineParseability": "adequate",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Supply a reviewable interface-design portfolio.",
+        "Clarify the individual project contribution and rebuild the submission as a resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0056-CLM-01",
+        "S2C-0056-CLM-02",
+        "S2C-0056-CLM-03",
+        "S2C-0056-CLM-04",
+        "S2C-0056-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0056-CLM-05"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The student-project contribution is ambiguous and cannot establish the portfolio or applied design-system experience.",
+      "acceptedAlternatives": [
+        "Reassess the inferred design-system evidence after the project role is clarified."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "recommendation_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The supplied evidence supports coursework exposure, but the required artifact and resume format are absent.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0057-ADJ-AI-V1",
+    "caseId": "S2C-0057",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8666666666666666,
+      "eligibilityDecision": 1,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0057-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0057-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "A component-library project is relevant, but an accessible interface-design portfolio is not established."
+      },
+      {
+        "requirementId": "S2C-0057-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0057-CLM-03",
+          "S2C-0057-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Design-system skills and the component-library project directly support design-system experience."
+      },
+      {
+        "requirementId": "S2C-0057-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes motion prototyping."
+      },
+      {
+        "requirementId": "S2C-0057-REQ-04",
+        "importance": "hard_eligibility",
+        "status": "not_met",
+        "supportingClaimIds": [
+          "S2C-0057-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The record explicitly says that studies are complete and the applicant is not currently enrolled."
+      },
+      {
+        "requirementId": "S2C-0057-REQ-05",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0057-CLM-03",
+          "S2C-0057-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant UI design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "ineligible",
+      "hardFailureRequirementIds": [
+        "S2C-0057-REQ-04"
+      ],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The record expressly fails the current-enrollment hard gate."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "partial",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "weak"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Do not optimize this application around the current-enrollment hard failure.",
+        "Resolve the contradictory employment dates before using either date range."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable.",
+        "Do not select either conflicting employment date range until it is clarified.",
+        "Do not conceal or rewrite the supplied fact that establishes the hard eligibility failure."
+      ],
+      "optimizeDisposition": "do_not_optimize"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0057-CLM-01",
+        "S2C-0057-CLM-02",
+        "S2C-0057-CLM-03",
+        "S2C-0057-CLM-04"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0057-CLM-06",
+        "S2C-0057-CLM-07"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The employment dates conflict and the portfolio is unverified, while the enrollment failure is explicit.",
+      "acceptedAlternatives": [
+        "Reassess the date-dependent evidence only after the employment timeline is corrected."
+      ]
+    },
+    "disagreementClasses": [
+      "contradiction_detection_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "high",
+    "rationale": "The hard enrollment failure controls eligibility; contradictory dates cannot be used to strengthen the record.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0058-ADJ-AI-V1",
+    "caseId": "S2C-0058",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.9166666666666666,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0058-REQ-01",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0058-CLM-03",
+          "S2C-0058-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Qualitative interviews and coded interview transcripts directly support user-research methods."
+      },
+      {
+        "requirementId": "S2C-0058-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0058-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Presenting themes and limitations directly supports research communication."
+      },
+      {
+        "requirementId": "S2C-0058-REQ-03",
+        "importance": "preferred",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0058-CLM-03"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Interview and survey-design skills suggest mixed-methods capability without establishing a mixed-methods study."
+      },
+      {
+        "requirementId": "S2C-0058-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a resume rather than the required CV."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target provides no separate hard eligibility gate that the record fails."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "strong",
+      "preferredQualificationAlignment": "partial",
+      "evidenceStrength": "strong",
+      "experienceRelevance": "strong",
+      "accomplishments": "adequate",
+      "structureReadability": "partial",
+      "machineParseability": "strong",
+      "terminologyAlignment": "strong",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Rebuild the submission as a research-appropriate CV.",
+        "Keep interview, transcript-coding, and research-communication evidence specific and dated."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not relabel the current submission as the requested document type without rebuilding it."
+      ],
+      "optimizeDisposition": "optimize"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0058-CLM-01",
+        "S2C-0058-CLM-02",
+        "S2C-0058-CLM-03",
+        "S2C-0058-CLM-04",
+        "S2C-0058-CLM-05",
+        "S2C-0058-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": false,
+      "acceptedAlternatives": []
+    },
+    "disagreementClasses": [
+      "target_type_defect",
+      "scoring_weight_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "high",
+    "rationale": "Research methods and communication are directly evidenced, but the supplied resume does not meet the CV instruction.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0059-ADJ-AI-V1",
+    "caseId": "S2C-0059",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.7499999999999999,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0059-REQ-01",
+        "importance": "required",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0059-CLM-03",
+          "S2C-0059-CLM-04",
+          "S2C-0059-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Interview and survey coursework plus limited project participation suggest research-methods exposure."
+      },
+      {
+        "requirementId": "S2C-0059-REQ-02",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0059-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "The ambiguous project participation may be relevant, but no research-communication output is supplied."
+      },
+      {
+        "requirementId": "S2C-0059-REQ-03",
+        "importance": "preferred",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0059-CLM-03",
+          "S2C-0059-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Interview and survey evidence suggests mixed-methods exposure without establishing a mixed-methods study."
+      },
+      {
+        "requirementId": "S2C-0059-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a structured profile rather than the required CV."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target states no separate hard eligibility condition."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "partial",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "weak",
+      "structureReadability": "partial",
+      "machineParseability": "adequate",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Clarify the applicant's research tasks and any communication outputs.",
+        "Rebuild the submission as a research-appropriate CV."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not relabel the current submission as the requested document type without rebuilding it."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0059-CLM-01",
+        "S2C-0059-CLM-02",
+        "S2C-0059-CLM-03",
+        "S2C-0059-CLM-04",
+        "S2C-0059-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0059-CLM-05"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The project role is vague and the supplied record does not identify a research-communication output.",
+      "acceptedAlternatives": [
+        "Reassess research communication after the applicant identifies the exact output and contribution."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "evidence_equivalence_defect",
+      "target_type_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The record supports research exposure but not a defined communication output or the requested CV format.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0060-ADJ-AI-V1",
+    "caseId": "S2C-0060",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.6666666666666666,
+      "eligibilityDecision": 1,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0060-REQ-01",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0060-CLM-03",
+          "S2C-0060-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Qualitative-interview skills and coded transcripts directly support user-research methods."
+      },
+      {
+        "requirementId": "S2C-0060-REQ-02",
+        "importance": "required",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim identifies a research-communication output."
+      },
+      {
+        "requirementId": "S2C-0060-REQ-03",
+        "importance": "preferred",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0060-CLM-03"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Interview and survey-design skills suggest mixed-methods capability without establishing a mixed-methods study."
+      },
+      {
+        "requirementId": "S2C-0060-REQ-04",
+        "importance": "hard_eligibility",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [
+          "S2C-0060-CLM-05"
+        ],
+        "confidence": "medium",
+        "rationale": "No supplied evidence confirms an active professional certification; omission from the record does not prove absence."
+      },
+      {
+        "requirementId": "S2C-0060-REQ-05",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a resume rather than the required CV."
+      }
+    ],
+    "eligibility": {
+      "decision": "uncertain",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [
+        "S2C-0060-REQ-04"
+      ],
+      "confidence": "medium",
+      "rationale": "Active certification is a published hard gate but remains unverified."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "partial",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "adequate",
+      "accomplishments": "partial",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Verify an active professional certification with authoritative documentation before representing the applicant as eligible.",
+        "Supply a research-communication output and rebuild the submission as a CV."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not relabel the current submission as the requested document type without rebuilding it.",
+        "Do not infer certification from location, education, or the omission of a credential."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0060-CLM-01",
+        "S2C-0060-CLM-02",
+        "S2C-0060-CLM-03",
+        "S2C-0060-CLM-04"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The record does not resolve the active-certification hard gate or identify a research-communication output.",
+      "acceptedAlternatives": [
+        "Treat eligibility as uncertain until an active certification is documented."
+      ]
+    },
+    "disagreementClasses": [
+      "eligibility_logic_defect",
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "User-research methods are evidenced, but certification and research communication are unresolved and the document type is wrong.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0061-ADJ-AI-V1",
+    "caseId": "S2C-0061",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.9166666666666666,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0061-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0061-CLM-04",
+          "S2C-0061-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Identity and layout work are relevant, but an accessible graphic-design portfolio is not established."
+      },
+      {
+        "requirementId": "S2C-0061-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0061-CLM-03",
+          "S2C-0061-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Typography and layout skills plus print and digital layouts directly support the requirement."
+      },
+      {
+        "requirementId": "S2C-0061-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes editorial design."
+      },
+      {
+        "requirementId": "S2C-0061-REQ-04",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0061-CLM-03",
+          "S2C-0061-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant graphic-design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target provides no separate hard eligibility gate that the record fails."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "adequate",
+      "experienceRelevance": "strong",
+      "accomplishments": "adequate",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "strong",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Confirm that a reviewable graphic-design portfolio is available.",
+        "Keep typography and print/digital-layout evidence specific in the tailored resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0061-CLM-01",
+        "S2C-0061-CLM-02",
+        "S2C-0061-CLM-03",
+        "S2C-0061-CLM-04",
+        "S2C-0061-CLM-05",
+        "S2C-0061-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The project work may support a portfolio, but no reviewable portfolio artifact is supplied.",
+      "acceptedAlternatives": [
+        "A qualified reviewer may reassess the portfolio requirement once the artifact is available."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "Typography and layout are directly supported, while the separate portfolio requirement remains unverified.",
+    "humanReviewQueue": true
+  },
+  {
+    "adjudicationId": "S2C-0062-ADJ-AI-V1",
+    "caseId": "S2C-0062",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0062-REQ-01",
+        "importance": "required",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [
+          "S2C-0062-CLM-07"
+        ],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes a graphic-design portfolio."
+      },
+      {
+        "requirementId": "S2C-0062-REQ-02",
+        "importance": "required",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0062-CLM-03",
+          "S2C-0062-CLM-04",
+          "S2C-0062-CLM-05"
+        ],
+        "prohibitedClaimIds": [
+          "S2C-0062-CLM-07"
+        ],
+        "confidence": "medium",
+        "rationale": "Typography and layout coursework plus an ambiguous project role suggest exposure but not applied experience."
+      },
+      {
+        "requirementId": "S2C-0062-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [
+          "S2C-0062-CLM-07"
+        ],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes editorial design."
+      },
+      {
+        "requirementId": "S2C-0062-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [
+          "S2C-0062-CLM-07"
+        ],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a structured profile rather than the required resume."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target states no separate hard eligibility condition."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "weak",
+      "structureReadability": "partial",
+      "machineParseability": "adequate",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Supply a reviewable graphic-design portfolio.",
+        "Clarify the individual project contribution and rebuild the submission as a resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable.",
+        "Do not use the unconfirmed, unsupported improvement claim."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0062-CLM-01",
+        "S2C-0062-CLM-02",
+        "S2C-0062-CLM-03",
+        "S2C-0062-CLM-04",
+        "S2C-0062-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0062-CLM-05"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The project role is ambiguous, and the separate improvement claim is unconfirmed and unsupported.",
+      "acceptedAlternatives": [
+        "Reassess the project evidence after the applicant identifies their exact contribution."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "optimization_fabrication",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "Coursework supports limited relevance, but neither a portfolio nor applied ownership is established.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0063-ADJ-AI-V1",
+    "caseId": "S2C-0063",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8666666666666666,
+      "eligibilityDecision": 1,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0063-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0063-CLM-03",
+          "S2C-0063-CLM-04"
+        ],
+        "prohibitedClaimIds": [
+          "S2C-0063-CLM-06"
+        ],
+        "confidence": "medium",
+        "rationale": "Typography and identity work are relevant, but an accessible graphic-design portfolio is not established."
+      },
+      {
+        "requirementId": "S2C-0063-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0063-CLM-03"
+        ],
+        "prohibitedClaimIds": [
+          "S2C-0063-CLM-06"
+        ],
+        "confidence": "high",
+        "rationale": "Typography and layout are explicitly supplied."
+      },
+      {
+        "requirementId": "S2C-0063-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [
+          "S2C-0063-CLM-06"
+        ],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes editorial design."
+      },
+      {
+        "requirementId": "S2C-0063-REQ-04",
+        "importance": "hard_eligibility",
+        "status": "not_met",
+        "supportingClaimIds": [
+          "S2C-0063-CLM-01"
+        ],
+        "prohibitedClaimIds": [
+          "S2C-0063-CLM-06"
+        ],
+        "confidence": "high",
+        "rationale": "The supplied Ghana location conflicts with the United Kingdom base requirement."
+      },
+      {
+        "requirementId": "S2C-0063-REQ-05",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0063-CLM-03",
+          "S2C-0063-CLM-04"
+        ],
+        "prohibitedClaimIds": [
+          "S2C-0063-CLM-06"
+        ],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant graphic-design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "ineligible",
+      "hardFailureRequirementIds": [
+        "S2C-0063-REQ-04"
+      ],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The explicit location claim does not meet the published United Kingdom base requirement."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "partial",
+      "structureReadability": "partial",
+      "machineParseability": "partial",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "weak"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Do not optimize this application around the location-based hard eligibility failure.",
+        "Exclude untrusted instruction-like content from evidence and any rewrite."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable.",
+        "Do not conceal or rewrite the supplied fact that establishes the hard eligibility failure.",
+        "Do not use untrusted instruction-like content as evidence or rewrite material."
+      ],
+      "optimizeDisposition": "do_not_optimize"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0063-CLM-01",
+        "S2C-0063-CLM-02",
+        "S2C-0063-CLM-03",
+        "S2C-0063-CLM-04"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": true,
+    "ambiguity": {
+      "present": true,
+      "reason": "The portfolio is unverified, but the United Kingdom location gate is explicitly not met.",
+      "acceptedAlternatives": [
+        "Reassess the portfolio only if a reviewable artifact is supplied for a different eligible target."
+      ]
+    },
+    "disagreementClasses": [
+      "prompt_injection_defect",
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "high",
+    "rationale": "The untrusted instruction-like claim receives no credit, and the explicit location mismatch establishes ineligibility.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0064-ADJ-AI-V1",
+    "caseId": "S2C-0064",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.9166666666666666,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0064-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0064-CLM-04",
+          "S2C-0064-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Brand-system work is relevant, but an accessible brand-identity portfolio is not established."
+      },
+      {
+        "requirementId": "S2C-0064-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0064-CLM-03",
+          "S2C-0064-CLM-04",
+          "S2C-0064-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Brand-system skills and defined logo and typography rules directly support visual-system development."
+      },
+      {
+        "requirementId": "S2C-0064-REQ-03",
+        "importance": "preferred",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0064-CLM-03"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Art direction is listed, but campaign scope is not demonstrated."
+      },
+      {
+        "requirementId": "S2C-0064-REQ-04",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0064-CLM-03",
+          "S2C-0064-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant brand-design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target provides no separate hard eligibility gate that the record fails."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "partial",
+      "evidenceStrength": "adequate",
+      "experienceRelevance": "strong",
+      "accomplishments": "adequate",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "strong",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Confirm that a reviewable brand-identity portfolio is available.",
+        "Describe the brand-system work without expanding it into unverified campaign leadership."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0064-CLM-01",
+        "S2C-0064-CLM-02",
+        "S2C-0064-CLM-03",
+        "S2C-0064-CLM-04",
+        "S2C-0064-CLM-05",
+        "S2C-0064-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The supplied brand-system work may support a portfolio, but no reviewable portfolio artifact is supplied.",
+      "acceptedAlternatives": [
+        "A qualified reviewer may reassess the portfolio requirement once the artifact is available."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "Visual-system development is directly evidenced, while the portfolio and campaign-specific scope remain unresolved.",
+    "humanReviewQueue": true
+  },
+  {
+    "adjudicationId": "S2C-0065-ADJ-AI-V1",
+    "caseId": "S2C-0065",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.7499999999999999,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0065-REQ-01",
+        "importance": "required",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes a brand-identity portfolio."
+      },
+      {
+        "requirementId": "S2C-0065-REQ-02",
+        "importance": "required",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0065-CLM-03",
+          "S2C-0065-CLM-04",
+          "S2C-0065-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Brand-system coursework and an ambiguous project role suggest exposure but not applied development."
+      },
+      {
+        "requirementId": "S2C-0065-REQ-03",
+        "importance": "preferred",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0065-CLM-03",
+          "S2C-0065-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Art-direction coursework suggests exposure without evidence of campaign execution."
+      },
+      {
+        "requirementId": "S2C-0065-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a structured profile rather than the required resume."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target states no separate hard eligibility condition."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "partial",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "weak",
+      "structureReadability": "partial",
+      "machineParseability": "adequate",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Supply a reviewable brand-identity portfolio.",
+        "Clarify the individual project contribution and rebuild the submission as a resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0065-CLM-01",
+        "S2C-0065-CLM-02",
+        "S2C-0065-CLM-03",
+        "S2C-0065-CLM-04",
+        "S2C-0065-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0065-CLM-05"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The project role is ambiguous and no portfolio artifact is supplied.",
+      "acceptedAlternatives": [
+        "Reassess applied visual-system evidence after the project role is clarified."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The record supports coursework exposure but not a portfolio, applied ownership, or the requested resume format.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0066-ADJ-AI-V1",
+    "caseId": "S2C-0066",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.7333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0066-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0066-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "A brand-system project is relevant, but an accessible brand-identity portfolio is not established."
+      },
+      {
+        "requirementId": "S2C-0066-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0066-CLM-03",
+          "S2C-0066-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "Brand-system skills and the project directly support visual-system development."
+      },
+      {
+        "requirementId": "S2C-0066-REQ-03",
+        "importance": "preferred",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0066-CLM-03"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Art direction is listed, but campaign scope is not demonstrated."
+      },
+      {
+        "requirementId": "S2C-0066-REQ-04",
+        "importance": "hard_eligibility",
+        "status": "not_met",
+        "supportingClaimIds": [
+          "S2C-0066-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied record explicitly states one year of relevant professional experience, below the five-year minimum."
+      },
+      {
+        "requirementId": "S2C-0066-REQ-05",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0066-CLM-03",
+          "S2C-0066-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant brand-design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "ineligible",
+      "hardFailureRequirementIds": [
+        "S2C-0066-REQ-04"
+      ],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "An explicit supplied fact proves that the published five-year hard gate is not met."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "partial",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "partial",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "weak"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Do not present the applicant as eligible while the five-year experience gate remains unmet.",
+        "Resolve the contradictory employment dates before using either date range."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable.",
+        "Do not select either conflicting employment date range until it is clarified.",
+        "Do not conceal or rewrite the supplied fact that establishes the hard eligibility failure."
+      ],
+      "optimizeDisposition": "do_not_optimize"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0066-CLM-01",
+        "S2C-0066-CLM-02",
+        "S2C-0066-CLM-03",
+        "S2C-0066-CLM-04"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0066-CLM-06",
+        "S2C-0066-CLM-07"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The employment dates conflict and the portfolio is unverified, while the hard experience failure is explicit.",
+      "acceptedAlternatives": [
+        "Reassess date-dependent evidence only after the employment timeline is corrected."
+      ]
+    },
+    "disagreementClasses": [
+      "eligibility_logic_defect",
+      "contradiction_detection_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "high",
+    "rationale": "The explicit one-year claim establishes ineligibility; conflicting dates cannot be used to offset that failure.",
+    "humanReviewQueue": false
+  },
+  {
+    "adjudicationId": "S2C-0067-ADJ-AI-V1",
+    "caseId": "S2C-0067",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.9166666666666666,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 0.6666666666666666
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0067-REQ-01",
+        "importance": "required",
+        "status": "unverified",
+        "supportingClaimIds": [
+          "S2C-0067-CLM-04",
+          "S2C-0067-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "Motion work and storyboards are relevant, but an accessible motion-design reel is not established."
+      },
+      {
+        "requirementId": "S2C-0067-REQ-02",
+        "importance": "required",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0067-CLM-03",
+          "S2C-0067-CLM-04",
+          "S2C-0067-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "After Effects, animation, storyboards, and timing studies directly support an animation workflow."
+      },
+      {
+        "requirementId": "S2C-0067-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes 3D motion."
+      },
+      {
+        "requirementId": "S2C-0067-REQ-04",
+        "importance": "instruction",
+        "status": "confirmed",
+        "supportingClaimIds": [
+          "S2C-0067-CLM-03",
+          "S2C-0067-CLM-04"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied resume contains target-relevant motion-design evidence."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target provides no separate hard eligibility gate that the record fails."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "adequate",
+      "experienceRelevance": "strong",
+      "accomplishments": "adequate",
+      "structureReadability": "adequate",
+      "machineParseability": "strong",
+      "terminologyAlignment": "strong",
+      "targetInstructionCompliance": "strong",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Confirm that a reviewable motion-design reel is available.",
+        "Keep the explainer, storyboard, and timing-study evidence explicit without claiming a reel that is not supplied."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0067-CLM-01",
+        "S2C-0067-CLM-02",
+        "S2C-0067-CLM-03",
+        "S2C-0067-CLM-04",
+        "S2C-0067-CLM-05",
+        "S2C-0067-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The listed motion work may support a reel, but no reviewable reel artifact is supplied.",
+      "acceptedAlternatives": [
+        "A qualified reviewer may reassess the reel requirement once the artifact is available."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_equivalence_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The animation workflow is directly supported, while the separately required reel remains unverified.",
+    "humanReviewQueue": true
+  },
+  {
+    "adjudicationId": "S2C-0068-ADJ-AI-V1",
+    "caseId": "S2C-0068",
+    "adjudicatorType": "AI",
+    "blindedToTrakr": true,
+    "reviewerAgreement": {
+      "requirementStatus": 0.8333333333333333,
+      "eligibilityDecision": 0.6666666666666666,
+      "optimizationDisposition": 1
+    },
+    "requirements": [
+      {
+        "requirementId": "S2C-0068-REQ-01",
+        "importance": "required",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes a motion-design reel."
+      },
+      {
+        "requirementId": "S2C-0068-REQ-02",
+        "importance": "required",
+        "status": "inferred",
+        "supportingClaimIds": [
+          "S2C-0068-CLM-03",
+          "S2C-0068-CLM-04",
+          "S2C-0068-CLM-05"
+        ],
+        "prohibitedClaimIds": [],
+        "confidence": "medium",
+        "rationale": "After Effects and storyboarding coursework plus an ambiguous project role suggest workflow exposure."
+      },
+      {
+        "requirementId": "S2C-0068-REQ-03",
+        "importance": "preferred",
+        "status": "missing",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "No supplied claim establishes 3D motion."
+      },
+      {
+        "requirementId": "S2C-0068-REQ-04",
+        "importance": "instruction",
+        "status": "not_met",
+        "supportingClaimIds": [],
+        "prohibitedClaimIds": [],
+        "confidence": "high",
+        "rationale": "The supplied presentation is a structured profile rather than the required resume."
+      }
+    ],
+    "eligibility": {
+      "decision": "eligible",
+      "hardFailureRequirementIds": [],
+      "unknownRequirementIds": [],
+      "confidence": "high",
+      "rationale": "The target states no separate hard eligibility condition."
+    },
+    "dimensionBands": {
+      "requiredQualificationAlignment": "partial",
+      "preferredQualificationAlignment": "weak",
+      "evidenceStrength": "partial",
+      "experienceRelevance": "partial",
+      "accomplishments": "weak",
+      "structureReadability": "partial",
+      "machineParseability": "adequate",
+      "terminologyAlignment": "adequate",
+      "targetInstructionCompliance": "weak",
+      "overallAlignment": "partial"
+    },
+    "recommendations": {
+      "requiredActions": [
+        "Supply a reviewable motion-design reel.",
+        "Clarify the individual project contribution and rebuild the submission as a resume."
+      ],
+      "prohibitedActions": [
+        "Do not invent metrics, employers, credentials, dates, responsibilities, or outcomes.",
+        "Do not inflate seniority, imply missing qualifications, or remove uncertainty.",
+        "Do not convert coursework or participation into professional ownership or leadership.",
+        "Do not claim a portfolio, reel, case study, or writing sample was supplied unless it is accessible and reviewable."
+      ],
+      "optimizeDisposition": "clarify_first"
+    },
+    "optimization": {
+      "allowedClaimIds": [
+        "S2C-0068-CLM-01",
+        "S2C-0068-CLM-02",
+        "S2C-0068-CLM-03",
+        "S2C-0068-CLM-04",
+        "S2C-0068-CLM-06"
+      ],
+      "confirmationRequiredClaimIds": [
+        "S2C-0068-CLM-05"
+      ],
+      "forbiddenTransformations": [
+        "invent_metric",
+        "inflate_seniority",
+        "imply_missing_qualification",
+        "convert_participation_to_leadership",
+        "remove_uncertainty",
+        "invent_employer_or_credential"
+      ]
+    },
+    "injectionDetected": false,
+    "ambiguity": {
+      "present": true,
+      "reason": "The student-project contribution is ambiguous and cannot establish the required reel.",
+      "acceptedAlternatives": [
+        "Reassess workflow evidence after the project role is clarified."
+      ]
+    },
+    "disagreementClasses": [
+      "evidence_extraction_defect",
+      "target_type_defect",
+      "recommendation_defect",
+      "reviewer_disagreement"
+    ],
+    "confidence": "medium",
+    "rationale": "The evidence supports coursework exposure but not a reviewable reel or the required resume format.",
+    "humanReviewQueue": false
+  }
+]
+
