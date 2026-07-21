@@ -17,6 +17,9 @@ Calibration date: July 21, 2026
 - Added qualifier-sensitive rules for B2B, commercial-interior, donor-funded,
   co-funding, community-climate, clinical-trial, 3D-motion, SaaS-support, and
   grant-portfolio evidence.
+- Added strict domain qualification for accounting certifications and audit
+  leadership so unrelated certifications and generic leadership cannot
+  satisfy finance requirements.
 - Distinguished direct evidence, defensible inference, unverified artifacts,
   missing artifacts, contradictions, and proven noncompliance.
 - Limited each optimization rewrite to the exact explicit, confirmed,

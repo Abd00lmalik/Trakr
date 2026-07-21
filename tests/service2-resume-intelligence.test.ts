@@ -270,6 +270,53 @@ test("numeric experience gates preserve contradictory timeline evidence", async 
   );
 });
 
+test("domain-qualified certification and leadership requirements reject adjacent evidence", async () => {
+  const response = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "benchmark",
+      user: {
+        headline: "Senior software engineer",
+        location: "United Kingdom",
+        experienceLevel: "senior",
+        skills: ["TypeScript", "System design", "Leadership"],
+        interests: ["Software"],
+        goals: ["Apply for a finance role"],
+        education: ["BSc Computer Science"],
+        workHistory: [
+          "Led a fictional platform team and delivered a cloud migration.",
+        ],
+        projects: [],
+        certifications: ["Fictional Cloud Certification"],
+        links: [],
+      },
+      target: {
+        role: "Senior Financial Controller",
+        description:
+          "The role requires professional accounting certification, financial reporting, and audit leadership.",
+        requirements: [
+          "A professional accounting certification is required.",
+          "Financial reporting experience is required.",
+          "Audit leadership is required.",
+        ],
+      },
+    }),
+  );
+  const benchmark = response.capabilityResult?.resumeBenchmark;
+
+  assert.ok(benchmark);
+  for (const pattern of [/accounting certification/i, /audit leadership/i]) {
+    assert.ok(
+      benchmark.requirements.some(
+        (item) =>
+          pattern.test(item.requirement) &&
+          item.status === "missing" &&
+          item.evidenceClaimIds.length === 0,
+      ),
+    );
+  }
+  assert.ok(benchmark.overallAlignmentScore < 50);
+});
+
 test("optimize returns a benchmark first and continues with the same trusted session", async () => {
   const first = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({

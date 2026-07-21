@@ -14,12 +14,16 @@
 - Recorded zero false ineligibility, zero fabrication, 100% contradiction
   recall, and 100% prompt-injection containment.
 - Added the calibration gate to `npm run verify`.
-- Final local restart passed 129 automated tests, calibration, typecheck,
+- Final local restart passed 130 automated tests, calibration, typecheck,
   zero-warning ESLint, optimized build, PDF/DOCX parsing, and production-mode
   smoke.
 - Live inventory monitoring fetched 557 records: 477 verified, 18 program
   directories, 0 inactive, and 62 unverified. No critical alert fired;
   internship, scholarship, grant, and known-deadline coverage remain limited.
+- The first production restart found one cross-domain defect: cloud
+  certification and generic software leadership received credit for accounting
+  certification and audit leadership. Added strict finance concepts and a
+  regression; the complete calibration and release sequence must restart.
 - Resume Generation remains blocked pending calibration deployment and the
   complete external Service 2 and Service 1 restart.
 

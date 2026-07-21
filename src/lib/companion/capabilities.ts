@@ -561,6 +561,9 @@ const evidenceConceptPatterns: Array<[string, RegExp]> = [
   ["problem_solving", /\b(problem solving|troubleshooting|resolved|support checklist)\b/],
   ["policy_interest", /\b(policy interest|policy writing|public consultation|political science)\b/],
   ["financial_analysis", /\b(financial analysis|financial modeling|budget variance|three statement model|accounting)\b/],
+  ["financial_reporting", /\b(financial reporting|financial statements?|management accounts)\b/],
+  ["accounting_certification", /\b(accounting certification|certified public accountant|chartered accountant|cpa|acca|aca)\b/],
+  ["audit_leadership", /\b(audit leadership|led .*audit|managed .*audit|audit team)\b/],
   ["operations", /\b(operations|process improvement|scheduling|event procedures)\b/],
   ["leadership", /\b(leadership|led|managed|directed|supervised|owned)\b/],
   ["budget", /\b(budget|funding|grant portfolio)\b/],
@@ -572,6 +575,8 @@ const evidenceConceptPatterns: Array<[string, RegExp]> = [
 ];
 
 const strictQualifierConcepts = new Set([
+  "accounting_certification",
+  "audit_leadership",
   "b2b_sales",
   "campaign_art_direction",
   "clinical_trials",
@@ -1191,6 +1196,7 @@ function requirementAssessment(
     const permitsQualifierInference = [...strictRequirementConcepts].every(
       (concept) => qualifierInferenceConcepts.has(concept),
     );
+    const qualifierMatched = specificMatches.some(hasRequiredQualifierMatch);
     const specificSkillMatch = specificMatches.some(
       (item) =>
         item.field === "skills" &&
@@ -1247,6 +1253,28 @@ function requirementAssessment(
           ],
         };
       }
+    }
+    if (
+      strictRequirementConcepts.size > 0 &&
+      !qualifierMatched &&
+      !permitsQualifierInference
+    ) {
+      return {
+        id: requirement.id,
+        requirement: requirement.text,
+        importance: requirement.importance,
+        category: requirement.category,
+        status: "missing" as const,
+        evidence: [],
+        evidenceClaimIds: [],
+        confidence: 0.9,
+        score: 0,
+        explanation:
+          "The supplied evidence is from an adjacent domain and does not establish this qualified requirement.",
+        actions: [
+          `Add this only if the user can provide target-specific evidence: ${requirement.text}`,
+        ],
+      };
     }
     if (
       profileSource === "background" &&

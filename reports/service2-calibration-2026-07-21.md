@@ -83,6 +83,9 @@ requirement and eligibility labels.
   admission, availability, and organization-registration handling.
 - Separated hard eligibility from document-format noncompliance.
 - Tightened qualifier-heavy and adjacent-role evidence.
+- Rejected cross-domain certification and leadership equivalence after the
+  first production matrix exposed cloud-certification/accounting-certification
+  and software-leadership/audit-leadership confusion.
 - Distinguished missing from claimed-but-unverified application artifacts.
 - Preserved structured-background uncertainty.
 - Linked each optimization rewrite only to its exact authorized source claim.
@@ -94,7 +97,7 @@ requirement and eligibility labels.
 
 Final local restart:
 
-- 129 automated tests passed.
+- 130 automated tests passed.
 - Calibration gate passed.
 - Typecheck passed.
 - ESLint passed with zero warnings.
