@@ -1,0 +1,34 @@
+{
+  "generatedAt": "2026-07-20T19:00:43.099Z",
+  "corpusCases": 153,
+  "reviewerCount": 3,
+  "reviewerModels": [
+    {
+      "role": "requirement_eligibility",
+      "model": "gpt-5.6-sol",
+      "configuration": "high reasoning"
+    },
+    {
+      "role": "evidence_truthfulness",
+      "model": "gpt-5.6-terra",
+      "configuration": "xhigh reasoning"
+    },
+    {
+      "role": "quality_optimization",
+      "model": "gpt-5.5",
+      "configuration": "xhigh reasoning"
+    }
+  ],
+  "exactConsensusCases": 0,
+  "adjudicationRequiredCases": 153,
+  "averageAgreement": {
+    "requirementStatus": 0.8643790849673197,
+    "requirementImportance": 0.9984749455337691,
+    "evidenceLinks": 0.7179738562091503,
+    "eligibilityDecision": 0.81045751633987,
+    "hardFailures": 0.962962962962963,
+    "dimensionBands": 0.8403050108932464,
+    "optimizationDisposition": 0.9368191721132897,
+    "injectionDetection": 1
+  }
+}

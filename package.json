@@ -35,6 +35,7 @@
     "calibration:validate-reviews": "tsx scripts/validate-resume-calibration-reviews.ts",
     "calibration:prepare-adjudication": "tsx scripts/prepare-resume-calibration-adjudication.ts",
     "calibration:validate-adjudications": "tsx scripts/validate-resume-calibration-adjudications.ts",
+    "calibration:merge-adjudications": "tsx scripts/merge-resume-calibration-adjudications.ts",
     "calibration:run": "tsx scripts/run-resume-calibration.ts",
     "calibration:gate": "tsx scripts/run-resume-calibration.ts --gate",
     "db:migrate": "node scripts/db-migrate.mjs",
