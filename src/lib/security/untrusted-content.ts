@@ -33,6 +33,14 @@ export function sanitizeUntrustedProfile(
     education: sanitizeUntrustedValues(profile.education),
     workHistory: sanitizeUntrustedValues(profile.workHistory),
     projects: sanitizeUntrustedValues(profile.projects),
+    research: sanitizeUntrustedValues(profile.research ?? []),
+    publications: sanitizeUntrustedValues(profile.publications ?? []),
+    achievements: sanitizeUntrustedValues(profile.achievements ?? []),
+    awards: sanitizeUntrustedValues(profile.awards ?? []),
+    volunteerExperience: sanitizeUntrustedValues(
+      profile.volunteerExperience ?? [],
+    ),
+    leadership: sanitizeUntrustedValues(profile.leadership ?? []),
     certifications: sanitizeUntrustedValues(profile.certifications),
     links: sanitizeUntrustedValues(profile.links),
   };

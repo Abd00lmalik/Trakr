@@ -55,6 +55,7 @@ create table if not exists opportunities (
   verification_confidence numeric(4,3) not null default 0 check (
     verification_confidence between 0 and 1
   ),
+  inventory_metadata jsonb not null default '{}'::jsonb,
   embedding vector(1536),
   raw_payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
@@ -70,7 +71,8 @@ alter table opportunities
   add column if not exists canonical_url text not null default '',
   add column if not exists publisher_domain text not null default '',
   add column if not exists is_active boolean not null default true,
-  add column if not exists verification_confidence numeric(4,3) not null default 0;
+  add column if not exists verification_confidence numeric(4,3) not null default 0,
+  add column if not exists inventory_metadata jsonb not null default '{}'::jsonb;
 
 update opportunities
 set canonical_url = source_url
@@ -93,6 +95,8 @@ create index if not exists opportunities_active_idx
   on opportunities (is_active, verification_status);
 create index if not exists opportunities_last_seen_idx
   on opportunities (source_name, last_seen_at);
+create index if not exists opportunities_inventory_metadata_idx
+  on opportunities using gin (inventory_metadata);
 create index if not exists opportunities_embedding_idx
   on opportunities using ivfflat (embedding vector_cosine_ops)
   with (lists = 100);

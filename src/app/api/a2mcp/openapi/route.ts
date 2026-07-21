@@ -7,7 +7,7 @@ export async function GET() {
     openapi: "3.1.0",
     info: {
       title: "Trakr A2MCP API",
-      version: "0.4.0",
+      version: "0.5.0",
       description:
         "Trakr is an outcome-first conversational AI Opportunity Companion. Three visible services share one capability layer behind the stable POST /api/a2mcp/recommend endpoint.",
     },
@@ -151,6 +151,40 @@ export async function GET() {
                         },
                         url: { type: "string", format: "uri" },
                         locale: { type: "string" },
+                      },
+                    },
+                    generationPreferences: {
+                      type: "object",
+                      properties: {
+                        documentType: {
+                          type: "string",
+                          enum: [
+                            "private_sector_resume",
+                            "internship_resume",
+                            "academic_cv",
+                            "research_cv",
+                            "biosketch",
+                            "scholarship_cv",
+                            "fellowship_profile",
+                            "grant_profile",
+                            "hackathon_profile",
+                            "technical_project_resume",
+                            "design_portfolio_resume",
+                            "team_member_profile",
+                            "general_professional_profile",
+                          ],
+                        },
+                        locale: { type: "string" },
+                        format: {
+                          type: "string",
+                          enum: ["plain_text", "markdown", "docx_ready"],
+                        },
+                        pageLimit: { type: "integer", minimum: 1, maximum: 20 },
+                        instructions: {
+                          type: "array",
+                          maxItems: 12,
+                          items: { type: "string" },
+                        },
                       },
                     },
                     goals: { type: "array", items: { type: "string" } },
@@ -300,6 +334,7 @@ export async function GET() {
                               "readiness",
                               "resume_benchmark",
                               "resume_optimization",
+                              "resume_generation",
                             ],
                           },
                           service: {
@@ -355,7 +390,52 @@ export async function GET() {
                       capabilityResult: {
                         type: "object",
                         description:
-                          "Grounded explanation, readiness, target-specific benchmark, or evidence-traceable optimization output. Benchmark scores are transparent heuristics, not hiring predictions or a universal ATS score.",
+                          "Grounded explanation, readiness, target-specific benchmark, evidence-traceable optimization, or claim-linked generated document. Benchmark scores are transparent heuristics, not hiring predictions or a universal ATS score.",
+                        properties: {
+                          resumeGeneration: {
+                            type: "object",
+                            description:
+                              "Target-specific generated artifact. Every non-placeholder applicant statement includes supporting evidenceClaimIds; unsupported facts are omitted.",
+                            properties: {
+                              generationId: { type: "string" },
+                              rubricVersion: { type: "string" },
+                              documentType: { type: "string" },
+                              documentTypeReason: { type: "string" },
+                              target: { type: "string" },
+                              locale: { type: "string" },
+                              format: { type: "string" },
+                              pageLimit: {
+                                type: "integer",
+                                nullable: true,
+                                minimum: 1,
+                                maximum: 20,
+                              },
+                              instructions: {
+                                type: "array",
+                                items: { type: "string" },
+                              },
+                              title: { type: "string" },
+                              sections: { type: "array" },
+                              placeholders: {
+                                type: "array",
+                                items: { type: "string" },
+                              },
+                              omittedUnsupportedClaims: {
+                                type: "array",
+                                items: { type: "string" },
+                              },
+                              followUpQuestions: {
+                                type: "array",
+                                items: { type: "string" },
+                              },
+                              verificationChecklist: {
+                                type: "array",
+                                items: { type: "string" },
+                              },
+                              factualIntegrity: { type: "string" },
+                            },
+                          },
+                        },
                       },
                     },
                   },

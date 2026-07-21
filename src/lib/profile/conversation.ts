@@ -103,6 +103,12 @@ const emptyProfile: StructuredUserProfile = {
   education: [],
   workHistory: [],
   projects: [],
+  research: [],
+  publications: [],
+  achievements: [],
+  awards: [],
+  volunteerExperience: [],
+  leadership: [],
   certifications: [],
   links: [],
 };
@@ -130,6 +136,30 @@ function mergeProfiles(
     result.education = unique([...result.education, ...profile.education]);
     result.workHistory = unique([...result.workHistory, ...profile.workHistory]);
     result.projects = unique([...result.projects, ...profile.projects]);
+    result.research = unique([
+      ...(result.research ?? []),
+      ...(profile.research ?? []),
+    ]);
+    result.publications = unique([
+      ...(result.publications ?? []),
+      ...(profile.publications ?? []),
+    ]);
+    result.achievements = unique([
+      ...(result.achievements ?? []),
+      ...(profile.achievements ?? []),
+    ]);
+    result.awards = unique([
+      ...(result.awards ?? []),
+      ...(profile.awards ?? []),
+    ]);
+    result.volunteerExperience = unique([
+      ...(result.volunteerExperience ?? []),
+      ...(profile.volunteerExperience ?? []),
+    ]);
+    result.leadership = unique([
+      ...(result.leadership ?? []),
+      ...(profile.leadership ?? []),
+    ]);
     result.certifications = unique([
       ...result.certifications,
       ...profile.certifications,
@@ -311,7 +341,12 @@ function enrichEvidence(
         (item.source === "unknown"
           ? []
           : item.source === "explicit"
-            ? (["matching", "assessment", "optimization"] as const)
+            ? ([
+                "matching",
+                "assessment",
+                "optimization",
+                "generation",
+              ] as const)
             : (["matching", "assessment"] as const)),
     };
   });
@@ -346,6 +381,12 @@ function evidenceFromProvidedProfile(
     "education",
     "workHistory",
     "projects",
+    "research",
+    "publications",
+    "achievements",
+    "awards",
+    "volunteerExperience",
+    "leadership",
     "certifications",
     "links",
   ] as const) {
@@ -379,6 +420,9 @@ function explicitSkillText(message: string) {
     ...message.matchAll(/\bwith\s+([^.!?]+?)\s+experience\b/gi),
     ...message.matchAll(
       /\b(?:experience|background)\s+(?:using|in)\s+([^.!?]+)/gi,
+    ),
+    ...message.matchAll(
+      /\b(?:i|we)\b[^.!?]{0,160}\b(?:use|used|know|work with)\s+([^.!?]+)/gi,
     ),
   ];
   return matches.map((match) => match[1]).filter(Boolean).join(", ");
@@ -432,6 +476,28 @@ function evidenceSentences(message: string, pattern: RegExp) {
     .split(/(?<=[.!?])\s+/)
     .map((sentence) => sentence.trim())
     .filter((sentence) => pattern.test(sentence))
+    .slice(0, 8);
+}
+
+function educationEvidenceSentences(message: string) {
+  const educationTerms =
+    /\b(studying|study at|student|enrolled|graduated|university|college|degree|bachelor|master|bsc|msc|phd)\b/i;
+  const applicantCentered =
+    /\b(i am|i'm|i study|i studied|i attend|i attended|i enrolled|i graduated|i hold|i earned|my degree|my education)\b/i;
+  const standaloneBackground =
+    /^(?:an?\s+)?(?:current\s+)?(?:student|graduate|bsc|msc|phd|bachelor|master)\b/i;
+  const targetLanguage =
+    /\b(applicants?|candidates?|requires?|requiring|required|preferred|target|role|job|internship|fellowship|scholarship|grant)\b/i;
+  return message
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(
+      (sentence) =>
+        educationTerms.test(sentence) &&
+        (applicantCentered.test(sentence) ||
+          (standaloneBackground.test(sentence) &&
+            !targetLanguage.test(sentence))),
+    )
     .slice(0, 8);
 }
 
@@ -554,9 +620,7 @@ export function buildConversationalProfile(
           ...interestsFromText(message),
         ]),
         goals: messageProfile?.goals ?? [],
-        education: /\b(studying|study at|university|college|degree|bachelor|master|bsc|msc|phd)\b/i.test(message)
-          ? [message.match(/[^.!?]*(?:studying|study at|university|college|degree|bachelor|master|bsc|msc|phd)[^.!?]*/i)?.[0]?.trim() ?? ""].filter(Boolean)
-          : [],
+        education: educationEvidenceSentences(message),
         workHistory: unique([
           ...(messageProfile?.workHistory ?? []),
           ...evidenceSentences(
@@ -571,6 +635,12 @@ export function buildConversationalProfile(
             /\b(built|created|developed|shipped|launched|implemented)\b/i,
           ),
         ]),
+        research: messageProfile?.research ?? [],
+        publications: messageProfile?.publications ?? [],
+        achievements: messageProfile?.achievements ?? [],
+        awards: messageProfile?.awards ?? [],
+        volunteerExperience: messageProfile?.volunteerExperience ?? [],
+        leadership: messageProfile?.leadership ?? [],
         certifications: messageProfile?.certifications ?? [],
         links: messageProfile?.links ?? [],
       }
@@ -588,6 +658,12 @@ export function buildConversationalProfile(
       education: [],
       workHistory: [],
       projects: [],
+      research: [],
+      publications: [],
+      achievements: [],
+      awards: [],
+      volunteerExperience: [],
+      leadership: [],
       certifications: [],
       links: [],
     },
@@ -711,6 +787,7 @@ export function buildContinuationContext(
       | "consent"
       | "filters"
       | "target"
+      | "generationPreferences"
       | "lastBenchmark"
     >
   > = {},
@@ -737,6 +814,8 @@ export function buildContinuationContext(
     consent: updates.consent ?? context?.consent,
     filters: updates.filters ?? context?.filters,
     target: updates.target ?? context?.target,
+    generationPreferences:
+      updates.generationPreferences ?? context?.generationPreferences,
     lastBenchmark: updates.lastBenchmark ?? context?.lastBenchmark,
     sessionVersion: "2",
   };

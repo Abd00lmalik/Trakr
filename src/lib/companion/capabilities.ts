@@ -10,6 +10,7 @@ import {
 } from "@/lib/security/untrusted-content";
 import type {
   CompanionTarget,
+  GeneratedDocumentType,
   Opportunity,
   OpportunityCompanionRequest,
   ProfileEvidence,
@@ -164,6 +165,8 @@ function keywordSet(values: string[]) {
 }
 
 export const RESUME_RUBRIC_VERSION = "resume-rubric-2026-07-21";
+export const RESUME_GENERATION_RUBRIC_VERSION =
+  "resume-generation-rubric-2026-07-21";
 
 type RequirementImportance = "required" | "preferred" | "instruction" | "context";
 type RequirementCategory =
@@ -1919,6 +1922,592 @@ export function buildResumeOptimization(
     ],
     factualIntegrity:
       "Use only claims supported by the verified profile, resume, portfolio, or user-confirmed experience. Do not add unsupported jobs, degrees, projects, metrics, certifications, or skills.",
+  };
+}
+
+function generationValues(
+  profile: StructuredUserProfile,
+  evidence: ProfileEvidence[],
+  field: keyof StructuredUserProfile,
+) {
+  const supplied = evidence
+    .filter(
+      (item) =>
+        item.field === field &&
+        item.source === "explicit" &&
+        item.confirmed !== false &&
+        (item.allowedUse ?? []).includes("generation"),
+    )
+    .flatMap((item) => {
+      const value = item.value ?? profile[field];
+      return typeof value === "string"
+        ? [value]
+        : Array.isArray(value)
+          ? value
+          : [];
+    });
+  return safeEvidenceValues(uniqueStrings(supplied));
+}
+
+function generationClaimIdsForValue(
+  evidence: ProfileEvidence[],
+  field: string,
+  value: string,
+) {
+  const normalized = normalize(value);
+  return uniqueStrings(
+    evidence
+      .filter(
+        (item) =>
+          item.field === field &&
+          item.source === "explicit" &&
+          item.confirmed !== false &&
+          (item.allowedUse ?? []).includes("generation"),
+      )
+      .filter((item) => {
+        const values =
+          typeof item.value === "string"
+            ? [item.value]
+            : Array.isArray(item.value)
+              ? item.value
+              : [];
+        return values.some((candidate) => normalize(candidate) === normalized);
+      })
+      .map((item) => item.claimId)
+      .filter((claimId): claimId is string => Boolean(claimId)),
+  );
+}
+
+function requestedDocumentType(
+  request: OpportunityCompanionRequest,
+  profile: StructuredUserProfile,
+  opportunity: Opportunity | null,
+): {
+  documentType: GeneratedDocumentType;
+  reason: string;
+} {
+  if (request.generationPreferences?.documentType) {
+    return {
+      documentType: request.generationPreferences.documentType,
+      reason:
+        "The caller explicitly selected this document type for the current target.",
+    };
+  }
+  const target = normalize(
+    [
+      opportunity?.title,
+      request.target?.role,
+      request.target?.description,
+      ...(request.target?.requirements ?? []),
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+  const type = opportunity?.category ?? request.target?.opportunityType;
+
+  if (/\b(biosketch|sci?encv|nih biosketch|nsf biosketch)\b/.test(target)) {
+    return {
+      documentType: "biosketch",
+      reason: "The target explicitly requests a biosketch-style artifact.",
+    };
+  }
+  if (type === "scholarship") {
+    return {
+      documentType: "scholarship_cv",
+      reason:
+        "The target is a scholarship, so education, leadership, service, and achievements should be foregrounded.",
+    };
+  }
+  if (type === "grant") {
+    return {
+      documentType: "grant_profile",
+      reason:
+        "The target is a grant or funded program, so relevant expertise, projects, research, and supported outcomes should lead.",
+    };
+  }
+  if (type === "fellowship") {
+    return {
+      documentType: "fellowship_profile",
+      reason:
+        "The target is a fellowship, which calls for a focused profile spanning qualifications, evidence, and purpose-relevant work.",
+    };
+  }
+  if (type === "hackathon" || type === "web3_bounty") {
+    return {
+      documentType: /\bteam\b/.test(target)
+        ? "team_member_profile"
+        : "hackathon_profile",
+      reason:
+        "The target is a competition-style application where projects, skills, repositories, and team contribution matter most.",
+    };
+  }
+  if (type === "internship") {
+    return {
+      documentType: "internship_resume",
+      reason:
+        "The target is an internship, so education, projects, coursework-level evidence, and early experience should be prioritized.",
+    };
+  }
+  if (
+    /\b(academic cv|faculty|lecturer|professor|postdoctoral|postdoc)\b/.test(
+      target,
+    )
+  ) {
+    return {
+      documentType: "academic_cv",
+      reason:
+        "The target is academic and should preserve research, publications, teaching-adjacent work, and complete scholarly evidence.",
+    };
+  }
+  if (
+    /\b(research cv|research fellow|research scientist|research assistant|research role)\b/.test(
+      target,
+    )
+  ) {
+    return {
+      documentType: "research_cv",
+      reason:
+        "The target and supplied evidence are research-oriented, so research activity and publications should be foregrounded.",
+    };
+  }
+  if (
+    /\b(product design|ux|ui|graphic design|brand design|motion design|portfolio)\b/.test(
+      target,
+    )
+  ) {
+    return {
+      documentType: "design_portfolio_resume",
+      reason:
+        "The target is design-oriented and should connect concise experience evidence with portfolio or work-sample links.",
+    };
+  }
+  if (
+    !profile.workHistory.length &&
+    profile.projects.length &&
+    /\b(software|developer|engineering|data|machine learning|cybersecurity|blockchain|web3)\b/.test(
+      target,
+    )
+  ) {
+    return {
+      documentType: "technical_project_resume",
+      reason:
+        "The applicant has stronger project evidence than formal employment for a technical target.",
+    };
+  }
+  return {
+    documentType: "private_sector_resume",
+    reason:
+      "The target is a conventional professional role without a published requirement for a different artifact.",
+  };
+}
+
+function documentSectionOrder(documentType: GeneratedDocumentType) {
+  const common = [
+    "identity",
+    "summary",
+    "skills",
+    "experience",
+    "projects",
+    "education",
+    "research",
+    "publications",
+    "leadership",
+    "volunteer",
+    "achievements",
+    "awards",
+    "certifications",
+    "links",
+  ];
+  const orders: Partial<Record<GeneratedDocumentType, string[]>> = {
+    internship_resume: [
+      "identity",
+      "summary",
+      "education",
+      "skills",
+      "projects",
+      "experience",
+      "leadership",
+      "volunteer",
+      "achievements",
+      "links",
+    ],
+    academic_cv: [
+      "identity",
+      "education",
+      "research",
+      "publications",
+      "experience",
+      "projects",
+      "awards",
+      "leadership",
+      "skills",
+      "certifications",
+      "links",
+    ],
+    research_cv: [
+      "identity",
+      "summary",
+      "research",
+      "publications",
+      "education",
+      "experience",
+      "projects",
+      "skills",
+      "awards",
+      "links",
+    ],
+    scholarship_cv: [
+      "identity",
+      "summary",
+      "education",
+      "leadership",
+      "volunteer",
+      "achievements",
+      "awards",
+      "projects",
+      "skills",
+      "links",
+    ],
+    fellowship_profile: [
+      "identity",
+      "summary",
+      "experience",
+      "research",
+      "projects",
+      "leadership",
+      "volunteer",
+      "achievements",
+      "education",
+      "skills",
+      "links",
+    ],
+    grant_profile: [
+      "identity",
+      "summary",
+      "research",
+      "projects",
+      "experience",
+      "achievements",
+      "leadership",
+      "publications",
+      "education",
+      "skills",
+      "links",
+    ],
+    hackathon_profile: [
+      "identity",
+      "summary",
+      "skills",
+      "projects",
+      "experience",
+      "leadership",
+      "achievements",
+      "links",
+    ],
+    technical_project_resume: [
+      "identity",
+      "summary",
+      "skills",
+      "projects",
+      "education",
+      "experience",
+      "achievements",
+      "links",
+    ],
+    design_portfolio_resume: [
+      "identity",
+      "summary",
+      "links",
+      "experience",
+      "projects",
+      "skills",
+      "education",
+      "achievements",
+    ],
+    team_member_profile: [
+      "identity",
+      "summary",
+      "skills",
+      "projects",
+      "leadership",
+      "experience",
+      "links",
+    ],
+    biosketch: [
+      "identity",
+      "summary",
+      "education",
+      "experience",
+      "research",
+      "publications",
+      "achievements",
+    ],
+  };
+  return orders[documentType] ?? common;
+}
+
+const generationFields: Array<{
+  id: string;
+  heading: string;
+  field: keyof StructuredUserProfile;
+}> = [
+  { id: "experience", heading: "Experience", field: "workHistory" },
+  { id: "projects", heading: "Projects", field: "projects" },
+  { id: "education", heading: "Education", field: "education" },
+  { id: "research", heading: "Research", field: "research" },
+  { id: "publications", heading: "Publications", field: "publications" },
+  { id: "leadership", heading: "Leadership", field: "leadership" },
+  {
+    id: "volunteer",
+    heading: "Volunteer Experience",
+    field: "volunteerExperience",
+  },
+  { id: "achievements", heading: "Achievements", field: "achievements" },
+  { id: "awards", heading: "Awards", field: "awards" },
+  { id: "certifications", heading: "Certifications", field: "certifications" },
+  { id: "links", heading: "Portfolio and Links", field: "links" },
+];
+
+export function buildResumeGeneration(
+  request: OpportunityCompanionRequest,
+  profile: StructuredUserProfile,
+  evidence: ProfileEvidence[],
+  opportunity: Opportunity | null,
+) {
+  const target = resumeTarget(request, opportunity);
+  const selection = requestedDocumentType(request, profile, opportunity);
+  const benchmark = buildResumeBenchmark(request, profile, evidence, opportunity);
+  const name = generationValues(profile, evidence, "name").at(-1);
+  const headline = generationValues(profile, evidence, "headline").at(-1);
+  const location = generationValues(profile, evidence, "location").at(-1);
+  const skills = generationValues(profile, evidence, "skills");
+  const identityItems = [
+    name
+      ? {
+          text: name,
+          evidenceClaimIds: generationClaimIdsForValue(evidence, "name", name),
+          placeholder: false,
+          requiresConfirmation: false,
+        }
+      : {
+          text: "[Confirm full name]",
+          evidenceClaimIds: [],
+          placeholder: true,
+          requiresConfirmation: true,
+        },
+    headline
+      ? {
+          text: headline,
+          evidenceClaimIds: generationClaimIdsForValue(
+            evidence,
+            "headline",
+            headline,
+          ),
+          placeholder: false,
+          requiresConfirmation: false,
+        }
+      : null,
+    location
+      ? {
+          text: location,
+          evidenceClaimIds: generationClaimIdsForValue(
+            evidence,
+            "location",
+            location,
+          ),
+          placeholder: false,
+          requiresConfirmation: false,
+        }
+      : null,
+    {
+      text: "[Confirm preferred contact details]",
+      evidenceClaimIds: [],
+      placeholder: true,
+      requiresConfirmation: true,
+    },
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  const summaryParts = [
+    headline
+      ? {
+          text: headline,
+          field: "headline",
+        }
+      : null,
+    skills.length
+      ? {
+          text: `Supplied skills: ${skills.slice(0, 8).join(", ")}.`,
+          field: "skills",
+        }
+      : null,
+  ].filter((item): item is NonNullable<typeof item> => Boolean(item));
+
+  const sections = [
+    {
+      id: "identity",
+      heading: "Contact",
+      items: identityItems,
+    },
+    ...(summaryParts.length
+      ? [
+          {
+            id: "summary",
+            heading:
+              selection.documentType === "biosketch"
+                ? "Personal Statement Evidence"
+                : "Profile",
+            items: summaryParts.map((item) => ({
+              text: item.text,
+              evidenceClaimIds:
+                item.field === "headline" && headline
+                  ? generationClaimIdsForValue(
+                      evidence,
+                      "headline",
+                      headline,
+                    )
+                  : uniqueStrings(
+                      skills.flatMap((skill) =>
+                        generationClaimIdsForValue(
+                          evidence,
+                          "skills",
+                          skill,
+                        ),
+                      ),
+                    ),
+              placeholder: false,
+              requiresConfirmation: false,
+            })),
+          },
+        ]
+      : []),
+    ...(skills.length
+      ? [
+          {
+            id: "skills",
+            heading: "Skills",
+            items: skills.map((skill) => ({
+              text: skill,
+              evidenceClaimIds: generationClaimIdsForValue(
+                evidence,
+                "skills",
+                skill,
+              ),
+              placeholder: false,
+              requiresConfirmation: false,
+            })),
+          },
+        ]
+      : []),
+    ...generationFields.flatMap(({ id, heading, field }) => {
+      const values = generationValues(profile, evidence, field);
+      return values.length
+        ? [
+            {
+              id,
+              heading,
+              items: values.map((value) => ({
+                text: value,
+                evidenceClaimIds: generationClaimIdsForValue(
+                  evidence,
+                  field,
+                  value,
+                ),
+                placeholder: false,
+                requiresConfirmation: false,
+              })),
+            },
+          ]
+        : [];
+    }),
+  ].sort(
+    (left, right) =>
+      documentSectionOrder(selection.documentType).indexOf(left.id) -
+      documentSectionOrder(selection.documentType).indexOf(right.id),
+  );
+
+  const placeholders = identityItems
+    .filter((item) => item.placeholder)
+    .map((item) => item.text);
+  const questions = uniqueStrings([
+    !name ? "What full name should appear on the document?" : "",
+    "Which email address, phone number, and location should appear in the final document?",
+    !skills.length
+      ? "Which skills can you verify and want included for this target?"
+      : "",
+    selection.documentType === "internship_resume" &&
+    !generationValues(profile, evidence, "education").length
+      ? "What education, coursework, or training can you verify?"
+      : "",
+    ["academic_cv", "research_cv", "biosketch"].includes(
+      selection.documentType,
+    ) && !generationValues(profile, evidence, "research").length
+      ? "What research roles, methods, topics, or contributions can you verify?"
+      : "",
+    ["academic_cv", "research_cv", "biosketch"].includes(
+      selection.documentType,
+    ) && !generationValues(profile, evidence, "publications").length
+      ? "Do you have verified publications, presentations, preprints, or other scholarly outputs?"
+      : "",
+    ["design_portfolio_resume", "technical_project_resume", "hackathon_profile"].includes(
+      selection.documentType,
+    ) && !generationValues(profile, evidence, "links").length
+      ? "Which portfolio, repository, or work-sample links can you verify?"
+      : "",
+    !generationValues(profile, evidence, "achievements").length
+      ? "Are there genuine outcomes or metrics you can verify for the strongest experience or project?"
+      : "",
+  ]);
+
+  const omittedUnsupportedClaims = uniqueStrings([
+    ...benchmark.requirements
+      .filter((item) =>
+        ["missing", "unverified", "not_met", "contradictory"].includes(
+          item.status,
+        ),
+      )
+      .map(
+        (item) =>
+          `Omitted unsupported target requirement: ${item.requirement}`,
+      ),
+    ...benchmark.missingKeywords.map(
+      (keyword) => `Omitted unverified target term: ${keyword}`,
+    ),
+  ]).slice(0, 20);
+
+  return {
+    generationId: `generation_${fingerprint({
+      target,
+      profile: compactProfileForSession(profile),
+      documentType: selection.documentType,
+    })}`,
+    rubricVersion: RESUME_GENERATION_RUBRIC_VERSION,
+    documentType: selection.documentType,
+    documentTypeReason: selection.reason,
+    target,
+    locale:
+      request.generationPreferences?.locale ??
+      request.target?.locale ??
+      profile.location ??
+      "unspecified",
+    format: request.generationPreferences?.format ?? "markdown",
+    pageLimit: request.generationPreferences?.pageLimit ?? null,
+    instructions: safeEvidenceValues(
+      request.generationPreferences?.instructions ?? [],
+    ),
+    title: name ? `${name} - ${target}` : `Application document - ${target}`,
+    sections,
+    placeholders,
+    omittedUnsupportedClaims,
+    followUpQuestions: questions,
+    verificationChecklist: [
+      "Confirm every name, date, title, organization, qualification, link, and location before submission.",
+      "Replace placeholders only with facts the user can verify.",
+      "Add metrics only when the user supplies a real, supportable figure.",
+      "Follow the target's published document type, length, formatting, and submission instructions.",
+      "Do not imply that a missing eligibility rule, skill, publication, award, or result has been met.",
+    ],
+    factualIntegrity:
+      "Every non-placeholder applicant statement is copied or minimally formatted from explicit, confirmed evidence authorized for generation and linked to its claim IDs.",
   };
 }
 

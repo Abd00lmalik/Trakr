@@ -1,10 +1,11 @@
 {
-  "evaluatedAt": "2026-07-21T02:13:10.720Z",
+  "evaluatedAt": "2026-07-21T06:02:35.034Z",
   "approvedSourceGroups": [
     "Devpost API",
     "RemoteOK API",
     "Greenhouse employer job boards",
     "Ashby employer job boards",
+    "Grants.gov API",
     "Official curated source import"
   ],
   "sourceErrors": [],
@@ -12,27 +13,34 @@
     "Devpost API": 9,
     "RemoteOK API": 49,
     "Greenhouse employer job boards": 325,
-    "Ashby employer job boards": 156,
+    "Ashby employer job boards": 155,
+    "Grants.gov API": 38,
     "Official curated source": 18
   },
-  "fetchedRecords": 557,
+  "fetchedRecords": 594,
   "verificationCounts": {
-    "verified": 477,
-    "program_directory": 18,
+    "verified": 511,
+    "program_directory": 24,
     "inactive_listing": 0,
-    "unverified": 62
+    "unverified": 59
   },
   "monitoring": {
-    "generatedAt": "2026-07-21T02:13:10.720Z",
-    "totalRecords": 557,
-    "activeRecords": 557,
-    "verifiedRecords": 477,
-    "verificationRate": 0.8563734290843806,
+    "generatedAt": "2026-07-21T06:02:35.034Z",
+    "totalRecords": 594,
+    "activeRecords": 594,
+    "verifiedRecords": 511,
+    "verificationRate": 0.8602693602693603,
     "duplicateRate": 0,
     "staleRecordCount": 0,
     "remoteRecordCount": 216,
     "africaEvidenceCount": 224,
-    "knownDeadlineCount": 9,
+    "knownDeadlineCount": 37,
+    "exactCurrentDeadlineCount": 35,
+    "actionableRecordCount": 353,
+    "exploreRecordCount": 182,
+    "researchLeadRecordCount": 0,
+    "unknownGeographyCount": 155,
+    "africaAccessibleCount": 129,
     "sourceCounts": {
       "Devpost API": 9,
       "RemoteOK API": 49,
@@ -46,29 +54,1232 @@
       "Greenhouse: Stripe": 45,
       "Greenhouse: OKX": 45,
       "Ashby: M-KOPA": 40,
-      "Ashby: Prime Intellect": 17,
+      "Ashby: Prime Intellect": 16,
       "Ashby: Eloquent AI": 12,
       "Ashby: Clipboard": 31,
       "Ashby: Paymentology": 18,
       "Ashby: Taptap Send": 36,
       "Ashby: Sylvera": 2,
+      "Grants.gov API": 38,
       "Official curated source": 18
     },
     "sourceGroupCounts": {
       "Devpost API": 9,
       "RemoteOK API": 49,
       "Greenhouse employer job boards": 325,
-      "Ashby employer job boards": 156,
+      "Ashby employer job boards": 155,
+      "Grants.gov API": 38,
       "Official curated source": 18
     },
     "categoryCounts": {
       "hackathon": 12,
-      "remote_job": 500,
+      "remote_job": 499,
       "fellowship": 27,
       "internship": 9,
+      "grant": 42,
       "web3_bounty": 2,
-      "grant": 4,
       "scholarship": 3
+    },
+    "opportunityTypeCounts": {
+      "hackathon": 12,
+      "job": 499,
+      "fellowship": 27,
+      "internship": 9,
+      "grant": 42,
+      "bounty": 2,
+      "scholarship": 3
+    },
+    "domainCounts": {
+      "artificial_intelligence": 158,
+      "education": 15,
+      "software_engineering": 95,
+      "open_source": 21,
+      "machine_learning": 20,
+      "design": 6,
+      "health": 46,
+      "finance": 155,
+      "cybersecurity": 5,
+      "social_impact": 14,
+      "research": 92,
+      "public_policy": 1,
+      "fintech": 102,
+      "web3": 8,
+      "climate": 8,
+      "blockchain": 2,
+      "sustainability": 2,
+      "entrepreneurship": 1
+    },
+    "remoteScopeCounts": {
+      "remote_scope_unclear": 155,
+      "remote_country": 71,
+      "hybrid": 50,
+      "remote_region": 22,
+      "onsite": 290,
+      "remote_timezones": 6
+    },
+    "deadlineStateCounts": {
+      "exact_future": 37,
+      "rolling": 499,
+      "requires_confirmation": 58
+    },
+    "recommendationStateCounts": {
+      "explore": 182,
+      "apply_now": 353,
+      "unavailable_or_unverified": 59
+    },
+    "coverageMatrix": [
+      {
+        "segment": "United States",
+        "dimension": "country",
+        "total": 145,
+        "verifiedActive": 105,
+        "applyNow": 87,
+        "exactDeadline": 0,
+        "geographicEvidence": 145,
+        "status": "healthy"
+      },
+      {
+        "segment": "Uganda",
+        "dimension": "country",
+        "total": 52,
+        "verifiedActive": 52,
+        "applyNow": 52,
+        "exactDeadline": 0,
+        "geographicEvidence": 52,
+        "status": "healthy"
+      },
+      {
+        "segment": "United Kingdom",
+        "dimension": "country",
+        "total": 68,
+        "verifiedActive": 64,
+        "applyNow": 52,
+        "exactDeadline": 0,
+        "geographicEvidence": 68,
+        "status": "healthy"
+      },
+      {
+        "segment": "Nigeria",
+        "dimension": "country",
+        "total": 37,
+        "verifiedActive": 36,
+        "applyNow": 35,
+        "exactDeadline": 0,
+        "geographicEvidence": 37,
+        "status": "healthy"
+      },
+      {
+        "segment": "South Africa",
+        "dimension": "country",
+        "total": 33,
+        "verifiedActive": 32,
+        "applyNow": 32,
+        "exactDeadline": 0,
+        "geographicEvidence": 33,
+        "status": "healthy"
+      },
+      {
+        "segment": "Ghana",
+        "dimension": "country",
+        "total": 13,
+        "verifiedActive": 13,
+        "applyNow": 13,
+        "exactDeadline": 0,
+        "geographicEvidence": 13,
+        "status": "healthy"
+      },
+      {
+        "segment": "Canada",
+        "dimension": "country",
+        "total": 21,
+        "verifiedActive": 16,
+        "applyNow": 9,
+        "exactDeadline": 0,
+        "geographicEvidence": 21,
+        "status": "healthy"
+      },
+      {
+        "segment": "Kenya",
+        "dimension": "country",
+        "total": 10,
+        "verifiedActive": 9,
+        "applyNow": 8,
+        "exactDeadline": 0,
+        "geographicEvidence": 10,
+        "status": "healthy"
+      },
+      {
+        "segment": "Portugal",
+        "dimension": "country",
+        "total": 7,
+        "verifiedActive": 7,
+        "applyNow": 7,
+        "exactDeadline": 0,
+        "geographicEvidence": 7,
+        "status": "healthy"
+      },
+      {
+        "segment": "India",
+        "dimension": "country",
+        "total": 6,
+        "verifiedActive": 6,
+        "applyNow": 6,
+        "exactDeadline": 0,
+        "geographicEvidence": 6,
+        "status": "healthy"
+      },
+      {
+        "segment": "Australia",
+        "dimension": "country",
+        "total": 5,
+        "verifiedActive": 3,
+        "applyNow": 3,
+        "exactDeadline": 0,
+        "geographicEvidence": 5,
+        "status": "thin"
+      },
+      {
+        "segment": "France",
+        "dimension": "country",
+        "total": 2,
+        "verifiedActive": 2,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "thin"
+      },
+      {
+        "segment": "finance",
+        "dimension": "domain",
+        "total": 155,
+        "verifiedActive": 149,
+        "applyNow": 124,
+        "exactDeadline": 0,
+        "geographicEvidence": 134,
+        "status": "healthy"
+      },
+      {
+        "segment": "artificial_intelligence",
+        "dimension": "domain",
+        "total": 158,
+        "verifiedActive": 153,
+        "applyNow": 101,
+        "exactDeadline": 12,
+        "geographicEvidence": 126,
+        "status": "healthy"
+      },
+      {
+        "segment": "fintech",
+        "dimension": "domain",
+        "total": 102,
+        "verifiedActive": 99,
+        "applyNow": 75,
+        "exactDeadline": 0,
+        "geographicEvidence": 83,
+        "status": "healthy"
+      },
+      {
+        "segment": "software_engineering",
+        "dimension": "domain",
+        "total": 95,
+        "verifiedActive": 77,
+        "applyNow": 68,
+        "exactDeadline": 0,
+        "geographicEvidence": 84,
+        "status": "healthy"
+      },
+      {
+        "segment": "research",
+        "dimension": "domain",
+        "total": 92,
+        "verifiedActive": 83,
+        "applyNow": 41,
+        "exactDeadline": 18,
+        "geographicEvidence": 59,
+        "status": "healthy"
+      },
+      {
+        "segment": "health",
+        "dimension": "domain",
+        "total": 46,
+        "verifiedActive": 45,
+        "applyNow": 28,
+        "exactDeadline": 2,
+        "geographicEvidence": 30,
+        "status": "healthy"
+      },
+      {
+        "segment": "open_source",
+        "dimension": "domain",
+        "total": 21,
+        "verifiedActive": 17,
+        "applyNow": 14,
+        "exactDeadline": 0,
+        "geographicEvidence": 15,
+        "status": "healthy"
+      },
+      {
+        "segment": "machine_learning",
+        "dimension": "domain",
+        "total": 20,
+        "verifiedActive": 18,
+        "applyNow": 13,
+        "exactDeadline": 0,
+        "geographicEvidence": 16,
+        "status": "healthy"
+      },
+      {
+        "segment": "social_impact",
+        "dimension": "domain",
+        "total": 14,
+        "verifiedActive": 8,
+        "applyNow": 7,
+        "exactDeadline": 0,
+        "geographicEvidence": 13,
+        "status": "healthy"
+      },
+      {
+        "segment": "education",
+        "dimension": "domain",
+        "total": 15,
+        "verifiedActive": 11,
+        "applyNow": 4,
+        "exactDeadline": 1,
+        "geographicEvidence": 4,
+        "status": "thin"
+      },
+      {
+        "segment": "web3",
+        "dimension": "domain",
+        "total": 8,
+        "verifiedActive": 4,
+        "applyNow": 4,
+        "exactDeadline": 0,
+        "geographicEvidence": 6,
+        "status": "thin"
+      },
+      {
+        "segment": "climate",
+        "dimension": "domain",
+        "total": 8,
+        "verifiedActive": 2,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 8,
+        "status": "thin"
+      },
+      {
+        "segment": "design",
+        "dimension": "domain",
+        "total": 6,
+        "verifiedActive": 6,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "thin"
+      },
+      {
+        "segment": "sustainability",
+        "dimension": "domain",
+        "total": 2,
+        "verifiedActive": 2,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "thin"
+      },
+      {
+        "segment": "blockchain",
+        "dimension": "domain",
+        "total": 2,
+        "verifiedActive": 1,
+        "applyNow": 1,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "cybersecurity",
+        "dimension": "domain",
+        "total": 5,
+        "verifiedActive": 3,
+        "applyNow": 1,
+        "exactDeadline": 1,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "public_policy",
+        "dimension": "domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 1,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "entrepreneurship",
+        "dimension": "domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "job",
+        "dimension": "opportunity_type",
+        "total": 499,
+        "verifiedActive": 442,
+        "applyNow": 353,
+        "exactDeadline": 0,
+        "geographicEvidence": 409,
+        "status": "healthy"
+      },
+      {
+        "segment": "bounty",
+        "dimension": "opportunity_type",
+        "total": 2,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "fellowship",
+        "dimension": "opportunity_type",
+        "total": 27,
+        "verifiedActive": 21,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 21,
+        "status": "very_thin"
+      },
+      {
+        "segment": "grant",
+        "dimension": "opportunity_type",
+        "total": 42,
+        "verifiedActive": 30,
+        "applyNow": 0,
+        "exactDeadline": 26,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "hackathon",
+        "dimension": "opportunity_type",
+        "total": 12,
+        "verifiedActive": 9,
+        "applyNow": 0,
+        "exactDeadline": 9,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "internship",
+        "dimension": "opportunity_type",
+        "total": 9,
+        "verifiedActive": 9,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 9,
+        "status": "very_thin"
+      },
+      {
+        "segment": "scholarship",
+        "dimension": "opportunity_type",
+        "total": 3,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "Africa",
+        "dimension": "region",
+        "total": 52,
+        "verifiedActive": 51,
+        "applyNow": 50,
+        "exactDeadline": 0,
+        "geographicEvidence": 52,
+        "status": "healthy"
+      },
+      {
+        "segment": "Europe",
+        "dimension": "region",
+        "total": 14,
+        "verifiedActive": 14,
+        "applyNow": 14,
+        "exactDeadline": 0,
+        "geographicEvidence": 14,
+        "status": "healthy"
+      },
+      {
+        "segment": "Asia-Pacific",
+        "dimension": "region",
+        "total": 9,
+        "verifiedActive": 8,
+        "applyNow": 8,
+        "exactDeadline": 0,
+        "geographicEvidence": 9,
+        "status": "healthy"
+      },
+      {
+        "segment": "Latin America",
+        "dimension": "region",
+        "total": 5,
+        "verifiedActive": 3,
+        "applyNow": 3,
+        "exactDeadline": 0,
+        "geographicEvidence": 5,
+        "status": "thin"
+      },
+      {
+        "segment": "North America",
+        "dimension": "region",
+        "total": 4,
+        "verifiedActive": 2,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 4,
+        "status": "thin"
+      },
+      {
+        "segment": "Middle East",
+        "dimension": "region",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 1,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "onsite",
+        "dimension": "remote_scope",
+        "total": 290,
+        "verifiedActive": 236,
+        "applyNow": 217,
+        "exactDeadline": 0,
+        "geographicEvidence": 290,
+        "status": "healthy"
+      },
+      {
+        "segment": "remote_country",
+        "dimension": "remote_scope",
+        "total": 71,
+        "verifiedActive": 68,
+        "applyNow": 59,
+        "exactDeadline": 0,
+        "geographicEvidence": 71,
+        "status": "healthy"
+      },
+      {
+        "segment": "hybrid",
+        "dimension": "remote_scope",
+        "total": 50,
+        "verifiedActive": 50,
+        "applyNow": 50,
+        "exactDeadline": 0,
+        "geographicEvidence": 50,
+        "status": "healthy"
+      },
+      {
+        "segment": "remote_region",
+        "dimension": "remote_scope",
+        "total": 22,
+        "verifiedActive": 22,
+        "applyNow": 21,
+        "exactDeadline": 0,
+        "geographicEvidence": 22,
+        "status": "healthy"
+      },
+      {
+        "segment": "remote_timezones",
+        "dimension": "remote_scope",
+        "total": 6,
+        "verifiedActive": 6,
+        "applyNow": 6,
+        "exactDeadline": 0,
+        "geographicEvidence": 6,
+        "status": "healthy"
+      },
+      {
+        "segment": "remote_scope_unclear",
+        "dimension": "remote_scope",
+        "total": 155,
+        "verifiedActive": 129,
+        "applyNow": 0,
+        "exactDeadline": 35,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "job:finance",
+        "dimension": "type_domain",
+        "total": 151,
+        "verifiedActive": 145,
+        "applyNow": 124,
+        "exactDeadline": 0,
+        "geographicEvidence": 130,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:artificial_intelligence",
+        "dimension": "type_domain",
+        "total": 118,
+        "verifiedActive": 117,
+        "applyNow": 101,
+        "exactDeadline": 0,
+        "geographicEvidence": 102,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:fintech",
+        "dimension": "type_domain",
+        "total": 97,
+        "verifiedActive": 94,
+        "applyNow": 75,
+        "exactDeadline": 0,
+        "geographicEvidence": 78,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:software_engineering",
+        "dimension": "type_domain",
+        "total": 88,
+        "verifiedActive": 74,
+        "applyNow": 68,
+        "exactDeadline": 0,
+        "geographicEvidence": 82,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:research",
+        "dimension": "type_domain",
+        "total": 44,
+        "verifiedActive": 44,
+        "applyNow": 41,
+        "exactDeadline": 0,
+        "geographicEvidence": 41,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:health",
+        "dimension": "type_domain",
+        "total": 41,
+        "verifiedActive": 41,
+        "applyNow": 28,
+        "exactDeadline": 0,
+        "geographicEvidence": 28,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:open_source",
+        "dimension": "type_domain",
+        "total": 15,
+        "verifiedActive": 15,
+        "applyNow": 14,
+        "exactDeadline": 0,
+        "geographicEvidence": 14,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:machine_learning",
+        "dimension": "type_domain",
+        "total": 16,
+        "verifiedActive": 16,
+        "applyNow": 13,
+        "exactDeadline": 0,
+        "geographicEvidence": 13,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:social_impact",
+        "dimension": "type_domain",
+        "total": 14,
+        "verifiedActive": 8,
+        "applyNow": 7,
+        "exactDeadline": 0,
+        "geographicEvidence": 13,
+        "status": "healthy"
+      },
+      {
+        "segment": "job:education",
+        "dimension": "type_domain",
+        "total": 10,
+        "verifiedActive": 10,
+        "applyNow": 4,
+        "exactDeadline": 0,
+        "geographicEvidence": 4,
+        "status": "thin"
+      },
+      {
+        "segment": "job:web3",
+        "dimension": "type_domain",
+        "total": 6,
+        "verifiedActive": 4,
+        "applyNow": 4,
+        "exactDeadline": 0,
+        "geographicEvidence": 6,
+        "status": "thin"
+      },
+      {
+        "segment": "job:climate",
+        "dimension": "type_domain",
+        "total": 8,
+        "verifiedActive": 2,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 8,
+        "status": "thin"
+      },
+      {
+        "segment": "job:design",
+        "dimension": "type_domain",
+        "total": 6,
+        "verifiedActive": 6,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "thin"
+      },
+      {
+        "segment": "job:sustainability",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 2,
+        "applyNow": 2,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "thin"
+      },
+      {
+        "segment": "job:blockchain",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 1,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "job:cybersecurity",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 2,
+        "applyNow": 1,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "job:public_policy",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 1,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "bounty:cybersecurity",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "bounty:web3",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "fellowship:artificial_intelligence",
+        "dimension": "type_domain",
+        "total": 23,
+        "verifiedActive": 21,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 21,
+        "status": "very_thin"
+      },
+      {
+        "segment": "fellowship:education",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "fellowship:finance",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "fellowship:health",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 2,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "very_thin"
+      },
+      {
+        "segment": "fellowship:machine_learning",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 2,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 3,
+        "status": "very_thin"
+      },
+      {
+        "segment": "fellowship:open_source",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 1,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "fellowship:research",
+        "dimension": "type_domain",
+        "total": 17,
+        "verifiedActive": 15,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 15,
+        "status": "very_thin"
+      },
+      {
+        "segment": "fellowship:software_engineering",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 1,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "grant:artificial_intelligence",
+        "dimension": "type_domain",
+        "total": 4,
+        "verifiedActive": 3,
+        "applyNow": 0,
+        "exactDeadline": 3,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "grant:cybersecurity",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 0,
+        "exactDeadline": 1,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "grant:entrepreneurship",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "grant:health",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 2,
+        "applyNow": 0,
+        "exactDeadline": 2,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "grant:open_source",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "grant:research",
+        "dimension": "type_domain",
+        "total": 27,
+        "verifiedActive": 21,
+        "applyNow": 0,
+        "exactDeadline": 18,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "hackathon:artificial_intelligence",
+        "dimension": "type_domain",
+        "total": 10,
+        "verifiedActive": 9,
+        "applyNow": 0,
+        "exactDeadline": 9,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "hackathon:blockchain",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "hackathon:cybersecurity",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "hackathon:education",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 0,
+        "exactDeadline": 1,
+        "geographicEvidence": 0,
+        "status": "unknown_eligibility"
+      },
+      {
+        "segment": "hackathon:machine_learning",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "hackathon:research",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "hackathon:web3",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "internship:artificial_intelligence",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 3,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 3,
+        "status": "very_thin"
+      },
+      {
+        "segment": "internship:finance",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 3,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 3,
+        "status": "very_thin"
+      },
+      {
+        "segment": "internship:fintech",
+        "dimension": "type_domain",
+        "total": 5,
+        "verifiedActive": 5,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 5,
+        "status": "very_thin"
+      },
+      {
+        "segment": "internship:open_source",
+        "dimension": "type_domain",
+        "total": 1,
+        "verifiedActive": 1,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 1,
+        "status": "very_thin"
+      },
+      {
+        "segment": "internship:research",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 3,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 3,
+        "status": "very_thin"
+      },
+      {
+        "segment": "internship:software_engineering",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 2,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 2,
+        "status": "very_thin"
+      },
+      {
+        "segment": "scholarship:education",
+        "dimension": "type_domain",
+        "total": 2,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      },
+      {
+        "segment": "scholarship:software_engineering",
+        "dimension": "type_domain",
+        "total": 3,
+        "verifiedActive": 0,
+        "applyNow": 0,
+        "exactDeadline": 0,
+        "geographicEvidence": 0,
+        "status": "data_quality_problem"
+      }
+    ],
+    "sourceHealth": {
+      "Devpost API": {
+        "records": 9,
+        "verifiedActive": 9,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:02:51.600Z"
+      },
+      "RemoteOK API": {
+        "records": 49,
+        "verifiedActive": 49,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:02:59.625Z"
+      },
+      "Greenhouse: Anthropic": {
+        "records": 45,
+        "verifiedActive": 45,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:03:09.894Z"
+      },
+      "Greenhouse: Scale AI": {
+        "records": 45,
+        "verifiedActive": 44,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 1,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:03:17.498Z"
+      },
+      "Greenhouse: Moniepoint": {
+        "records": 45,
+        "verifiedActive": 44,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 1,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:03:37.308Z"
+      },
+      "Greenhouse: Wave Mobile Money": {
+        "records": 45,
+        "verifiedActive": 45,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:03:42.801Z"
+      },
+      "Greenhouse: One Ethos": {
+        "records": 3,
+        "verifiedActive": 3,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:03:42.964Z"
+      },
+      "Greenhouse: Ripple": {
+        "records": 45,
+        "verifiedActive": 0,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 45,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:04:39.231Z"
+      },
+      "Greenhouse: Kiva": {
+        "records": 7,
+        "verifiedActive": 0,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 7,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:04:47.868Z"
+      },
+      "Greenhouse: Stripe": {
+        "records": 45,
+        "verifiedActive": 42,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 3,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:12.996Z"
+      },
+      "Greenhouse: OKX": {
+        "records": 45,
+        "verifiedActive": 45,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:19.592Z"
+      },
+      "Ashby: M-KOPA": {
+        "records": 40,
+        "verifiedActive": 40,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:27.015Z"
+      },
+      "Ashby: Prime Intellect": {
+        "records": 16,
+        "verifiedActive": 16,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:29.748Z"
+      },
+      "Ashby: Eloquent AI": {
+        "records": 12,
+        "verifiedActive": 12,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:31.825Z"
+      },
+      "Ashby: Clipboard": {
+        "records": 31,
+        "verifiedActive": 31,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:37.471Z"
+      },
+      "Ashby: Paymentology": {
+        "records": 18,
+        "verifiedActive": 18,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:40.547Z"
+      },
+      "Ashby: Taptap Send": {
+        "records": 36,
+        "verifiedActive": 36,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:47.410Z"
+      },
+      "Ashby: Sylvera": {
+        "records": 2,
+        "verifiedActive": 2,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:48.399Z"
+      },
+      "Grants.gov API": {
+        "records": 38,
+        "verifiedActive": 30,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 2,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:05:56.755Z"
+      },
+      "Official curated source": {
+        "records": 18,
+        "verifiedActive": 0,
+        "stale": 0,
+        "inactive": 0,
+        "unverified": 0,
+        "duplicateRate": 0,
+        "lastSuccessfulVerification": "2026-07-21T06:06:11.200Z"
+      }
     },
     "alerts": [
       {
@@ -84,16 +1295,22 @@
         "message": "scholarship inventory has 3 records; the monitoring floor is 5."
       },
       {
-        "code": "category_shortage",
-        "severity": "warning",
-        "scope": "grant",
-        "message": "grant inventory has 4 records; the monitoring floor is 5."
-      },
-      {
         "code": "deadline_confidence_low",
         "severity": "info",
         "scope": "deadline",
         "message": "Fewer than 25% of records have a known deadline; rolling and unknown deadlines require continued verification."
+      },
+      {
+        "code": "geographic_confidence_low",
+        "severity": "warning",
+        "scope": "geography",
+        "message": "155 records have unknown or low-confidence geographic eligibility."
+      },
+      {
+        "code": "source_concentration_high",
+        "severity": "warning",
+        "scope": "sources",
+        "message": "The largest source group supplies 55% of inventory."
       }
     ]
   },

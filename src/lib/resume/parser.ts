@@ -76,6 +76,20 @@ const goalSectionLabels = [
   "Career Objective",
 ];
 
+const extendedEvidenceSectionLabels = [
+  "Research",
+  "Research Experience",
+  "Publications",
+  "Selected Publications",
+  "Achievements",
+  "Awards",
+  "Honors",
+  "Volunteer Experience",
+  "Volunteering",
+  "Leadership",
+  "Leadership Experience",
+];
+
 const recognizedSectionLabels = [
   "Summary",
   "Profile",
@@ -89,6 +103,7 @@ const recognizedSectionLabels = [
   "Certifications",
   "Location",
   "Interests",
+  ...extendedEvidenceSectionLabels,
   ...goalSectionLabels,
 ];
 
@@ -353,11 +368,14 @@ function inferLinks(text: string) {
 function extractLabeledBlock(text: string, label: string, nextLabels: string[]) {
   const lines = text.split("\n");
   const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const headingPattern = new RegExp(`^${escapedLabel}\\s*:?(?:\\s+(.*))?$`, "i");
+  const headingPattern = new RegExp(
+    `^${escapedLabel}(?:\\s*:\\s*(.*))?$`,
+    "i",
+  );
   const nextHeadingPattern = new RegExp(
     `^(?:${nextLabels
       .map((item) => item.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-      .join("|")})\\s*:?(?:\\s+.*)?$`,
+      .join("|")})(?:\\s*:\\s*.*)?$`,
     "i",
   );
   const startIndex = lines.findIndex((line) => headingPattern.test(line.trim()));
@@ -557,6 +575,7 @@ export function extractProfileFromText(
     "Education",
     "Certifications",
     "Location",
+    ...extendedEvidenceSectionLabels,
     ...goalSectionLabels,
   ]);
   const projects = extractEntries(
@@ -567,6 +586,7 @@ export function extractProfileFromText(
       "Education",
       "Certifications",
       "Location",
+      ...extendedEvidenceSectionLabels,
       ...goalSectionLabels,
     ]),
   );
@@ -578,6 +598,7 @@ export function extractProfileFromText(
       "Education",
       "Certifications",
       "Location",
+      ...extendedEvidenceSectionLabels,
       ...goalSectionLabels,
     ]),
   );
@@ -589,6 +610,7 @@ export function extractProfileFromText(
       "Projects",
       "Certifications",
       "Location",
+      ...extendedEvidenceSectionLabels,
       ...goalSectionLabels,
     ]),
   );
@@ -600,9 +622,38 @@ export function extractProfileFromText(
       "Projects",
       "Education",
       "Location",
+      ...extendedEvidenceSectionLabels,
       ...goalSectionLabels,
     ]),
   );
+  const sectionEntries = (...labels: string[]) =>
+    labels.flatMap((label) =>
+      extractEntries(
+        extractLabeledBlock(
+          cleaned,
+          label,
+          recognizedSectionLabels.filter(
+            (recognized) =>
+              !labels.some(
+                (candidate) =>
+                  candidate.toLowerCase() === recognized.toLowerCase(),
+              ),
+          ),
+        ),
+      ),
+    );
+  const research = sectionEntries("Research", "Research Experience");
+  const publications = sectionEntries(
+    "Publications",
+    "Selected Publications",
+  );
+  const achievements = sectionEntries("Achievements");
+  const awards = sectionEntries("Awards", "Honors");
+  const volunteerExperience = sectionEntries(
+    "Volunteer Experience",
+    "Volunteering",
+  );
+  const leadership = sectionEntries("Leadership", "Leadership Experience");
   const profile = sanitizeUntrustedProfile({
     name: inferName(cleaned),
     headline: inferHeadline(evidenceText),
@@ -615,6 +666,12 @@ export function extractProfileFromText(
     education,
     workHistory,
     projects,
+    research,
+    publications,
+    achievements,
+    awards,
+    volunteerExperience,
+    leadership,
     certifications,
     links: inferLinks(cleaned),
   }) as StructuredUserProfile;
@@ -626,6 +683,12 @@ export function extractProfileFromText(
     "education",
     "workHistory",
     "projects",
+    "research",
+    "publications",
+    "achievements",
+    "awards",
+    "volunteerExperience",
+    "leadership",
     "certifications",
     "links",
   ];

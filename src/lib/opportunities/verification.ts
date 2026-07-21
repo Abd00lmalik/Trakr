@@ -168,6 +168,13 @@ export async function verifyOpportunities(
 }
 
 export function canApplyNow(opportunity: Opportunity) {
+  if (opportunity.recommendationState) {
+    return (
+      opportunity.recommendationState === "apply_now" &&
+      opportunity.verificationStatus === "verified" &&
+      opportunity.isActive
+    );
+  }
   return opportunity.verificationStatus === "verified" && opportunity.isActive;
 }
 

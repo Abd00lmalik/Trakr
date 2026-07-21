@@ -63,6 +63,18 @@ export const opportunitySourceRegistry: OpportunitySourceRegistryEntry[] = [
       "Only listed postings from reviewed official employer boards are included. Published workplace type and locations remain authoritative, each canonical job URL is verified, and board failures are isolated before stale deactivation.",
   },
   {
+    id: "grants-gov",
+    name: "Grants.gov Search2",
+    access: "active",
+    ingestionMethod:
+      "Official documented Search2 JSON API with conservative current-cycle filtering and individual URL verification",
+    officialUrl: "https://www.grants.gov/api/common/search2",
+    reliability: "high",
+    maintenanceRisk: "medium",
+    notes:
+      "Use as a grant and research-funding lead source. Historical, forecasted, expired, and geographically unclear records remain Explore or Research Lead until the official notice confirms a current application route and eligibility.",
+  },
+  {
     id: "official-curated",
     name: "Official program directories",
     access: "curated_directory_only",

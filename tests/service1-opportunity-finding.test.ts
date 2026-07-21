@@ -116,7 +116,7 @@ test("explicit discovery and the third intake route remain conversational", asyn
   );
 });
 
-test("natural resume generation intent routes to the pending service", async () => {
+test("natural resume generation intent routes to target intake", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "Create a new resume for a research fellowship.",
@@ -125,7 +125,11 @@ test("natural resume generation intent routes to the pending service", async () 
 
   assert.equal(response.conversation?.service, "resume_generation");
   assert.equal(response.conversation?.operation, "generate_resume");
-  assert.equal(response.conversation?.state, "service_pending");
+  assert.equal(response.conversation?.state, "needs_more_information");
+  assert.equal(
+    response.conversation?.requiredAction,
+    "provide_generation_evidence",
+  );
 });
 
 test("explicit service operations with structured profiles do not fall through to legacy discovery", async () => {
@@ -150,7 +154,11 @@ test("explicit service operations with structured profiles do not fall through t
 
   assert.equal(response.status, 200);
   assert.equal(body.conversation?.service, "resume_generation");
-  assert.equal(body.conversation?.state, "service_pending");
+  assert.equal(body.conversation?.state, "needs_more_information");
+  assert.equal(
+    body.conversation?.requiredAction,
+    "provide_generation_target",
+  );
   assert.equal(body.operation, "generate_resume");
 });
 
@@ -798,7 +806,13 @@ test("source registry permits only reviewed automated integrations", () => {
       "remoteok",
       "greenhouse-employer-boards",
       "ashby-employer-boards",
+      "grants-gov",
     ],
+  );
+  assert.match(
+    opportunitySourceRegistry.find((source) => source.id === "grants-gov")
+      ?.notes ?? "",
+    /Explore or Research Lead/i,
   );
   assert.equal(
     opportunitySourceRegistry.find((source) => source.id === "dorahacks")

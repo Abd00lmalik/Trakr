@@ -3,6 +3,7 @@ import type {
   RecommendationFilters,
   RecommendationRequest,
 } from "@/lib/types/opportunities";
+import { isGeographicallyActionable } from "@/lib/opportunities/metadata";
 
 export interface OpportunitySource {
   name: string;
@@ -21,6 +22,29 @@ export function applyOpportunityFilters(
       return false;
     }
 
+    if (
+      filters.opportunityTypes?.length &&
+      (!opportunity.opportunityType ||
+        !filters.opportunityTypes.includes(opportunity.opportunityType))
+    ) {
+      return false;
+    }
+
+    if (
+      filters.domains?.length &&
+      !opportunity.domains?.some((domain) => filters.domains?.includes(domain))
+    ) {
+      return false;
+    }
+
+    if (
+      filters.remoteScopes?.length &&
+      (!opportunity.geography ||
+        !filters.remoteScopes.includes(opportunity.geography.remoteScope))
+    ) {
+      return false;
+    }
+
     if (typeof filters.remote === "boolean" && opportunity.remote !== filters.remote) {
       return false;
     }
@@ -28,9 +52,27 @@ export function applyOpportunityFilters(
     if (filters.location) {
       const requestedLocation = filters.location.toLowerCase();
       const candidateLocation = opportunity.location.toLowerCase();
-      if (!candidateLocation.includes(requestedLocation) && !opportunity.remote) {
+      if (
+        !candidateLocation.includes(requestedLocation) &&
+        !isGeographicallyActionable(
+          opportunity,
+          filters.applicantCountry,
+          Boolean(filters.remote),
+        )
+      ) {
         return false;
       }
+    }
+
+    if (
+      filters.applicantCountry &&
+      !isGeographicallyActionable(
+        opportunity,
+        filters.applicantCountry,
+        Boolean(filters.remote),
+      )
+    ) {
+      return false;
     }
 
     if (filters.deadlineAfter && opportunity.deadline) {

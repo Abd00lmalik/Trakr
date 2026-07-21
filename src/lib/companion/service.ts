@@ -4,6 +4,7 @@ import {
   buildOpportunityExplanation,
   buildReadinessAssessment,
   buildResumeBenchmark,
+  buildResumeGeneration,
   buildResumeOptimization,
   isBenchmarkCompatible,
 } from "@/lib/companion/capabilities";
@@ -20,6 +21,7 @@ import {
 import { buildRecommendationNarrative } from "@/lib/recommendation/action-plan";
 import { scoreOpportunity } from "@/lib/recommendation/scoring";
 import { generateRecommendations } from "@/lib/recommendation/service";
+import { sanitizeUntrustedValues } from "@/lib/security/untrusted-content";
 import type {
   CompanionCapabilityResult,
   CompanionContext,
@@ -29,14 +31,16 @@ import type {
   Opportunity,
   OpportunityCompanionRequest,
   OpportunityCompanionResponse,
+  ProfileEvidence,
   RecommendationRequest,
   ServiceOperation,
   StructuredUserProfile,
   UserFacingService,
   ResumeBenchmarkReference,
+  GenerationPreferences,
 } from "@/lib/types/opportunities";
 
-const SERVICE_VERSION = "0.4.0";
+const SERVICE_VERSION = "0.5.0";
 
 function serviceForOperation(operation: ServiceOperation): UserFacingService {
   if (operation === "benchmark" || operation === "optimize") {
@@ -117,6 +121,19 @@ function activeContext(request: OpportunityCompanionRequest) {
   return request.context as CompanionContext | undefined;
 }
 
+function safeGenerationPreferences(
+  preferences: GenerationPreferences | undefined,
+) {
+  if (!preferences) return undefined;
+  return {
+    ...preferences,
+    locale: preferences.locale
+      ? sanitizeUntrustedValues([preferences.locale])[0]
+      : undefined,
+    instructions: sanitizeUntrustedValues(preferences.instructions),
+  };
+}
+
 function normalizedRequest(request: OpportunityCompanionRequest) {
   const suppliedContext = request.context ?? request.continuation;
   const context = resolveSessionContext(suppliedContext);
@@ -145,6 +162,10 @@ function normalizedRequest(request: OpportunityCompanionRequest) {
           ...suppliedTarget,
         }
       : contextTarget,
+    generationPreferences:
+      safeGenerationPreferences(
+        request.generationPreferences ?? context?.generationPreferences,
+      ),
   };
 }
 
@@ -163,6 +184,12 @@ function hasMeaningfulProfile(profile: StructuredUserProfile | undefined) {
       profile.education.length ||
       profile.workHistory.length ||
       profile.projects.length ||
+      (profile.research?.length ?? 0) ||
+      (profile.publications?.length ?? 0) ||
+      (profile.achievements?.length ?? 0) ||
+      (profile.awards?.length ?? 0) ||
+      (profile.volunteerExperience?.length ?? 0) ||
+      (profile.leadership?.length ?? 0) ||
       profile.certifications.length ||
       profile.links.length,
   );
@@ -324,6 +351,7 @@ function conversationFor(
     stage?: string;
     target?: CompanionTarget;
     lastBenchmark?: ResumeBenchmarkReference;
+    generationPreferences?: CompanionContext["generationPreferences"];
     clearProfileFromSession?: boolean;
   } = {},
 ): CompanionConversation {
@@ -364,6 +392,12 @@ function conversationFor(
       },
       filters: built.filters,
       target: options.target ?? request.target ?? context?.target,
+      generationPreferences:
+        safeGenerationPreferences(
+          options.generationPreferences ??
+            request.generationPreferences ??
+            context?.generationPreferences,
+        ),
       lastBenchmark: options.lastBenchmark ?? context?.lastBenchmark,
     },
   );
@@ -545,9 +579,42 @@ function hasResumeEvidence(profile: StructuredUserProfile, resumeText?: string) 
       profile.workHistory.length ||
       profile.projects.length ||
       profile.education.length ||
+      profile.research?.length ||
+      profile.publications?.length ||
+      profile.achievements?.length ||
+      profile.awards?.length ||
+      profile.volunteerExperience?.length ||
+      profile.leadership?.length ||
       profile.certifications.length ||
       profile.links.length,
   );
+}
+
+function hasGenerationEvidence(evidence: ProfileEvidence[]) {
+  const substantiveFields = new Set([
+    "education",
+    "workHistory",
+    "projects",
+    "research",
+    "publications",
+    "achievements",
+    "awards",
+    "volunteerExperience",
+    "leadership",
+    "certifications",
+  ]);
+  return evidence.some((item) => {
+    if (
+      !substantiveFields.has(item.field) ||
+      item.source !== "explicit" ||
+      item.confirmed === false ||
+      !(item.allowedUse ?? []).includes("generation")
+    ) {
+      return false;
+    }
+    if (typeof item.value === "string") return Boolean(item.value.trim());
+    return Array.isArray(item.value) && item.value.some((value) => value.trim());
+  });
 }
 
 function hasUsableTarget(
@@ -718,24 +785,103 @@ export async function handleOpportunityCompanionRequest(
     request.operation === "generate_resume" ||
     intent === "resume_generation"
   ) {
+    const recommendationRequest = toRecommendationRequest(
+      request,
+      built.profile,
+      built.filters,
+    );
+    const targetOpportunity = await findTargetOpportunity(
+      request,
+      recommendationRequest,
+    );
+    const sessionTarget = targetForSession(request.target, targetOpportunity);
+
+    if (!hasUsableTarget(sessionTarget, targetOpportunity)) {
+      const message = request.target?.url
+        ? "I could not resolve that URL to a verified Trakr opportunity. Paste the target description or requirements so I can select and generate the correct application document."
+        : "What opportunity or objective should this document support? Provide the target role, program, requirements, description, or a verified Trakr opportunity.";
+      const conversation = conversationFor(
+        request,
+        built,
+        "resume_generation",
+        "generate_resume",
+        "resume_generation",
+        "needs_more_information",
+        message,
+        [message],
+        targetOpportunity?.id,
+        {
+          requiredAction: "provide_generation_target",
+          target: sessionTarget,
+          generationPreferences: request.generationPreferences,
+          stage: "collecting_generation_target",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+
+    if (!hasGenerationEvidence(built.evidence)) {
+      const message =
+        "Start with the strongest verified evidence for this target: education, one relevant job or project, research, volunteer work, or another concrete contribution. A short natural-language answer is enough; I will ask the next focused question and will not invent missing history.";
+      const conversation = conversationFor(
+        request,
+        built,
+        "resume_generation",
+        "generate_resume",
+        "resume_generation",
+        "needs_more_information",
+        message,
+        [message],
+        targetOpportunity?.id,
+        {
+          requiredAction: "provide_generation_evidence",
+          target: sessionTarget,
+          generationPreferences: request.generationPreferences,
+          stage: "collecting_generation_evidence",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+
+    const capabilityRequest = {
+      ...request,
+      target: sessionTarget,
+      generationPreferences:
+        request.generationPreferences ?? activeContext(request)?.generationPreferences,
+    };
+    const generation = buildResumeGeneration(
+      capabilityRequest,
+      built.profile,
+      built.evidence,
+      targetOpportunity,
+    );
     const conversation = conversationFor(
       request,
       built,
-      intent,
-      operation,
-      service,
-      "service_pending",
-      "Resume Generation remains staged for Service 3. Opportunity Finding and Resume Benchmarking & Optimization are available now, and this request is preserved in the current session.",
+      "resume_generation",
+      "generate_resume",
+      "resume_generation",
+      "resume_generation",
+      `I generated a ${generation.documentType.replaceAll("_", " ")} for the target. Every applicant statement is linked to confirmed evidence; missing facts remain questions, placeholders, or omissions.`,
       [
-        "Keep the service choice and continue with the same session when Resume Generation is enabled.",
+        "Review the evidence-linked sections and placeholders.",
+        "Answer any focused follow-up question before finalizing the document.",
+        "Confirm every fact and target instruction before submission.",
       ],
-      undefined,
+      targetOpportunity?.id,
       {
-        requiredAction: "await_next_capability_release",
-        stage: "service_pending",
+        requiredAction: "review_generated_document",
+        target: sessionTarget,
+        generationPreferences: capabilityRequest.generationPreferences,
+        stage: "generation_complete",
       },
     );
-    return emptyResponse(request, conversation, undefined, built.filters);
+    return emptyResponse(
+      request,
+      conversation,
+      { resumeGeneration: generation },
+      built.filters,
+    );
   }
 
   if (

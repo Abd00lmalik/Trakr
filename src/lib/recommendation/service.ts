@@ -11,6 +11,7 @@ import {
   buildRecommendationNarrative,
 } from "@/lib/recommendation/action-plan";
 import { enforceApplyNowEligibility } from "@/lib/opportunities/verification";
+import { enrichOpportunityMetadata } from "@/lib/opportunities/metadata";
 import { logRecommendationRun } from "@/lib/repositories/recommendation-log";
 import type {
   CompanionGuidanceAction,
@@ -68,6 +69,14 @@ function eligibilityConcerns(candidate: ScoredOpportunity) {
         .map((rule) => `Confirm eligibility: ${rule}`),
     );
   }
+  if (candidate.opportunity.recommendationState === "explore") {
+    concerns.push(
+      "This record is useful for exploration, but current-cycle application or material eligibility evidence still requires confirmation.",
+    );
+  }
+  if (candidate.opportunity.geography?.unknownConditions.length) {
+    concerns.push(...candidate.opportunity.geography.unknownConditions.slice(0, 2));
+  }
   return concerns;
 }
 
@@ -84,14 +93,28 @@ function recommendationProvenance(opportunity: Opportunity) {
       : ageDays <= 7
         ? ("fresh" as const)
         : ("aging" as const);
-  const deadlineConfidence = opportunity.deadline
-    ? opportunity.verificationStatus === "verified"
+  const deadlineConfidence = opportunity.deadlineInfo
+    ? opportunity.deadlineInfo.confidence === "high" &&
+      opportunity.deadlineInfo.currentCycle === "confirmed"
       ? ("high" as const)
-      : ("medium" as const)
-    : ("rolling_or_unknown" as const);
-  const eligibilityConfidence = opportunity.eligibility.length
-    ? ("needs_confirmation" as const)
-    : ("unknown" as const);
+      : opportunity.deadlineInfo.state === "rolling"
+        ? ("rolling_or_unknown" as const)
+        : ("medium" as const)
+    : opportunity.deadline
+      ? opportunity.verificationStatus === "verified"
+        ? ("high" as const)
+        : ("medium" as const)
+      : ("rolling_or_unknown" as const);
+  const eligibilityConfidence = opportunity.geography
+    ? opportunity.geography.confidence === "high"
+      ? ("high" as const)
+      : opportunity.geography.confidence === "unknown" ||
+          opportunity.geography.confidence === "low"
+        ? ("unknown" as const)
+        : ("needs_confirmation" as const)
+    : opportunity.eligibility.length
+      ? ("needs_confirmation" as const)
+      : ("unknown" as const);
 
   return {
     canonicalUrl: opportunity.canonicalUrl,
@@ -244,10 +267,12 @@ export async function generateRecommendations(
         };
   const aiProvider = getAiProvider();
   const source = opportunitySource;
-  const opportunities = await source.fetchOpportunities(
-    groundedRequest,
-    groundedRequest.filters,
-  );
+  const opportunities = (
+    await source.fetchOpportunities(
+      groundedRequest,
+      groundedRequest.filters,
+    )
+  ).map((opportunity) => enrichOpportunityMetadata(opportunity));
   const baseRanked = rankOpportunities(opportunities, groundedRequest);
   const diversified = diversifyRankedOpportunities(
     baseRanked,
@@ -274,6 +299,7 @@ export async function generateRecommendations(
       ),
     ),
     guidanceAction: guidanceAction(candidate.opportunity, candidate.action),
+    recommendationState: candidate.opportunity.recommendationState,
     eligibilityConcerns: eligibilityConcerns(candidate),
     provenance: recommendationProvenance(candidate.opportunity),
   }));

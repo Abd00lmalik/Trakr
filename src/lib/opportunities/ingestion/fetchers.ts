@@ -5,6 +5,7 @@ import {
 import { curatedOfficialOpportunities } from "@/lib/opportunities/data/curated-official-opportunities";
 import { fetchAshbyOpportunities } from "@/lib/opportunities/ingestion/ashby";
 import { fetchGreenhouseOpportunities } from "@/lib/opportunities/ingestion/greenhouse";
+import { fetchGrantsGovOpportunities } from "@/lib/opportunities/ingestion/grants-gov";
 import type { Opportunity } from "@/lib/types/opportunities";
 
 async function fetchJson(url: string, init?: RequestInit) {
@@ -94,6 +95,11 @@ export async function fetchStructuredOpportunities() {
       sourceName: "Ashby employer job boards",
       publicName: "Ashby employer job boards",
       promise: fetchAshbyOpportunities(),
+    },
+    {
+      sourceName: "Grants.gov API",
+      publicName: "Grants.gov API",
+      promise: fetchGrantsGovOpportunities(),
     },
   ];
   const results = await Promise.allSettled(sourceFetches.map((source) => source.promise));

@@ -418,16 +418,40 @@ try {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       operation: "generate_resume",
-      message: "Create a fictional resume for a research fellowship.",
+      user: {
+        name: "Amina Yusuf",
+        headline: "Frontend developer",
+        location: "Lagos, Nigeria",
+        experienceLevel: "early-career",
+        skills: ["React", "TypeScript", "Technical writing"],
+        education: ["BSc Computer Science student at Fictional University"],
+        projects: ["Built a fictional accessible study planner with TypeScript."],
+        goals: ["Apply for a research fellowship."],
+      },
+      target: {
+        role: "Climate Research Fellowship",
+        opportunityType: "fellowship",
+        description:
+          "The fellowship seeks research evidence and a focused profile.",
+        requirements: ["Research evidence is required."],
+      },
+      consent: {
+        processPersonalData: true,
+        retention: "session_only",
+        source: "explicit",
+      },
     }),
   });
   if (
     !pendingService.response.ok ||
     pendingService.body?.conversation?.service !== "resume_generation" ||
-    pendingService.body?.conversation?.state !== "service_pending"
+    pendingService.body?.conversation?.state !== "resume_generation" ||
+    pendingService.body?.conversation?.requiredAction !==
+      "review_generated_document" ||
+    !pendingService.body?.capabilityResult?.resumeGeneration
   ) {
     throw new Error(
-      `Explicit service operation did not preserve staged capability state: ${JSON.stringify(
+      `Explicit service operation did not return the generated capability state: ${JSON.stringify(
         pendingService.body,
       )}`,
     );

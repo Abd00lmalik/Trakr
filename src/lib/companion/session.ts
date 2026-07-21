@@ -151,6 +151,36 @@ export function compactProfileForSession(
       maxItemLength: 480,
       maxTotalLength: 2400,
     }),
+    research: compactList(profile.research ?? [], {
+      maxItems: 12,
+      maxItemLength: 480,
+      maxTotalLength: 2600,
+    }),
+    publications: compactList(profile.publications ?? [], {
+      maxItems: 16,
+      maxItemLength: 480,
+      maxTotalLength: 3200,
+    }),
+    achievements: compactList(profile.achievements ?? [], {
+      maxItems: 12,
+      maxItemLength: 360,
+      maxTotalLength: 2000,
+    }),
+    awards: compactList(profile.awards ?? [], {
+      maxItems: 12,
+      maxItemLength: 360,
+      maxTotalLength: 1800,
+    }),
+    volunteerExperience: compactList(profile.volunteerExperience ?? [], {
+      maxItems: 10,
+      maxItemLength: 480,
+      maxTotalLength: 2200,
+    }),
+    leadership: compactList(profile.leadership ?? [], {
+      maxItems: 10,
+      maxItemLength: 480,
+      maxTotalLength: 2200,
+    }),
     certifications: compactList(profile.certifications, {
       maxItems: 12,
       maxItemLength: 240,
@@ -252,6 +282,7 @@ function normalizedContext(context: CompanionContext): CompanionContext {
     profile: compactProfileForSession(context.profile),
     profileEvidence: compactEvidence(context.profileEvidence ?? []),
     target: compactTargetForSession(context.target),
+    generationPreferences: context.generationPreferences,
     unansweredQuestions: compactList(context.unansweredQuestions ?? [], {
       maxItems: 12,
       maxItemLength: 500,

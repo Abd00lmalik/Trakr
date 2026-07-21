@@ -1,5 +1,6 @@
 import { fetchStructuredOpportunities } from "@/lib/opportunities/ingestion/fetchers";
 import { buildInventoryMonitoringSnapshot } from "@/lib/opportunities/inventory-monitoring";
+import { enrichOpportunityMetadata } from "@/lib/opportunities/metadata";
 import { verifyOpportunities } from "@/lib/opportunities/verification";
 import { storeIngestionBatch } from "@/lib/repositories/opportunity-repository";
 
@@ -15,8 +16,11 @@ export async function ingestOpportunities() {
   } =
     await fetchStructuredOpportunities();
   const lastSeenAt = startedAt.toISOString();
-  const verified = await verifyOpportunities(
+  const verifiedRecords = await verifyOpportunities(
     opportunities.map((opportunity) => ({ ...opportunity, lastSeenAt })),
+  );
+  const verified = verifiedRecords.map((opportunity) =>
+    enrichOpportunityMetadata(opportunity, startedAt),
   );
   const result = await storeIngestionBatch(verified, successfulSourceNames, startedAt);
   const monitoring = buildInventoryMonitoringSnapshot({

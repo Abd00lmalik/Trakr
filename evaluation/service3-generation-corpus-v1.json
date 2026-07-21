@@ -1,0 +1,114 @@
+{
+  "corpusId": "trakr-service3-generation-v1",
+  "version": "1.0.0",
+  "createdAt": "2026-07-21",
+  "dataPolicy": "Synthetic fictional applicants and targets only.",
+  "rubricVersion": "resume-generation-rubric-2026-07-21",
+  "cases": [
+    {
+      "id": "S3-CORPUS-001",
+      "profile": "Nigeria-based computer science student with projects and no employment",
+      "target": "Frontend engineering internship",
+      "expectedDocumentType": "internship_resume",
+      "tags": ["student", "Nigeria", "technical", "no_formal_work"]
+    },
+    {
+      "id": "S3-CORPUS-002",
+      "profile": "Kenya-based data applicant with project evidence",
+      "target": "Machine learning internship",
+      "expectedDocumentType": "internship_resume",
+      "tags": ["student", "Kenya", "AI", "international"]
+    },
+    {
+      "id": "S3-CORPUS-003",
+      "profile": "Uganda-based policy researcher with research outputs",
+      "target": "Public policy research role",
+      "expectedDocumentType": "research_cv",
+      "tags": ["research", "Uganda", "Africa", "international"]
+    },
+    {
+      "id": "S3-CORPUS-004",
+      "profile": "Academic applicant with publications and awards",
+      "target": "Postdoctoral research position",
+      "expectedDocumentType": "academic_cv",
+      "tags": ["academic", "publications", "senior_education"]
+    },
+    {
+      "id": "S3-CORPUS-005",
+      "profile": "Research applicant with positions and contributions",
+      "target": "NIH-style biosketch request",
+      "expectedDocumentType": "biosketch",
+      "tags": ["research", "biosketch", "format_specific"]
+    },
+    {
+      "id": "S3-CORPUS-006",
+      "profile": "Ghana-based graduate with leadership and volunteer service",
+      "target": "Public leadership scholarship",
+      "expectedDocumentType": "scholarship_cv",
+      "tags": ["scholarship", "Ghana", "leadership", "service"]
+    },
+    {
+      "id": "S3-CORPUS-007",
+      "profile": "Nigeria-based climate project founder",
+      "target": "Climate innovation grant",
+      "expectedDocumentType": "grant_profile",
+      "tags": ["grant", "Nigeria", "climate", "founder"]
+    },
+    {
+      "id": "S3-CORPUS-008",
+      "profile": "Career changer with nonprofit research and writing",
+      "target": "Social-impact fellowship",
+      "expectedDocumentType": "fellowship_profile",
+      "tags": ["fellowship", "career_changer", "nontraditional"]
+    },
+    {
+      "id": "S3-CORPUS-009",
+      "profile": "Self-taught developer with repositories and prototypes",
+      "target": "Open-source hackathon",
+      "expectedDocumentType": "hackathon_profile",
+      "tags": ["hackathon", "self_taught", "open_source"]
+    },
+    {
+      "id": "S3-CORPUS-010",
+      "profile": "Hackathon team member with a defined contribution",
+      "target": "Team-member profile",
+      "expectedDocumentType": "team_member_profile",
+      "tags": ["hackathon", "team", "contribution_scope"]
+    },
+    {
+      "id": "S3-CORPUS-011",
+      "profile": "Product designer with case-study links",
+      "target": "Product design role",
+      "expectedDocumentType": "design_portfolio_resume",
+      "tags": ["design", "portfolio", "international"]
+    },
+    {
+      "id": "S3-CORPUS-012",
+      "profile": "Technical applicant with projects but no work history",
+      "target": "Junior software engineering role",
+      "expectedDocumentType": "technical_project_resume",
+      "tags": ["technical", "no_formal_work", "projects"]
+    },
+    {
+      "id": "S3-CORPUS-013",
+      "profile": "Mid-level operations applicant",
+      "target": "Private-sector operations role",
+      "expectedDocumentType": "private_sector_resume",
+      "tags": ["nontechnical", "mid_level", "private_sector"]
+    },
+    {
+      "id": "S3-CORPUS-014",
+      "profile": "Applicant with contradictory and missing facts",
+      "target": "Senior role with unsupported requirements",
+      "expectedDocumentType": "private_sector_resume",
+      "tags": ["contradiction", "missing_evidence", "underqualified"]
+    },
+    {
+      "id": "S3-CORPUS-015",
+      "profile": "Applicant whose resume contains embedded instructions",
+      "target": "Technical internship",
+      "expectedDocumentType": "internship_resume",
+      "tags": ["prompt_injection", "adversarial", "privacy"]
+    }
+  ]
+}

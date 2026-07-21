@@ -1,4 +1,5 @@
 import { getPool } from "@/lib/db";
+import { enrichOpportunityMetadata } from "@/lib/opportunities/metadata";
 import type { Opportunity } from "@/lib/types/opportunities";
 
 type OpportunityRow = {
@@ -27,6 +28,7 @@ type OpportunityRow = {
   publisher_domain: string;
   is_active: boolean;
   verification_confidence: number | string;
+  inventory_metadata: Partial<Opportunity> | null;
 };
 
 function serializeDate(value: Date | string | null) {
@@ -50,7 +52,7 @@ function serializeTimestamp(value: Date | string | null) {
 }
 
 function mapOpportunity(row: OpportunityRow): Opportunity {
-  return {
+  const opportunity: Opportunity = {
     id: row.id,
     title: row.title,
     organization: row.organization,
@@ -76,7 +78,9 @@ function mapOpportunity(row: OpportunityRow): Opportunity {
     publisherDomain: row.publisher_domain,
     isActive: row.is_active,
     verificationConfidence: Number(row.verification_confidence),
+    ...(row.inventory_metadata ?? {}),
   };
+  return enrichOpportunityMetadata(opportunity);
 }
 
 export async function listStoredOpportunities() {
@@ -90,7 +94,8 @@ export async function listStoredOpportunities() {
       location, remote, deadline, required_skills, preferred_skills,
       eligibility, benefits, tags, difficulty, verification_status,
       last_verified_at, last_seen_at, source_status, http_status,
-      canonical_url, publisher_domain, is_active, verification_confidence
+      canonical_url, publisher_domain, is_active, verification_confidence,
+      inventory_metadata
      from opportunities
      where is_active = true
        and (deadline is null or deadline >= current_date)
@@ -122,13 +127,13 @@ export async function storeIngestionBatch(
           eligibility, benefits, tags, difficulty, raw_payload,
           verification_status, last_verified_at, last_seen_at, source_status,
           http_status, canonical_url, publisher_domain, is_active,
-          verification_confidence
+          verification_confidence, inventory_metadata
         ) values (
           $1, $2, $3, $4, $5, $6, $7,
           $8, $9, $10, $11, $12,
           $13, $14, $15, $16, $17::jsonb,
           $18, $19, $20, $21,
-          $22, $23, $24, $25, $26
+          $22, $23, $24, $25, $26, $27::jsonb
         )
         on conflict (id) do update set
           title = excluded.title,
@@ -156,6 +161,7 @@ export async function storeIngestionBatch(
           publisher_domain = excluded.publisher_domain,
           is_active = excluded.is_active,
           verification_confidence = excluded.verification_confidence,
+          inventory_metadata = excluded.inventory_metadata,
           updated_at = now()`,
         [
           opportunity.id,
@@ -184,6 +190,17 @@ export async function storeIngestionBatch(
           opportunity.publisherDomain,
           opportunity.isActive,
           opportunity.verificationConfidence,
+          JSON.stringify({
+            opportunityType: opportunity.opportunityType,
+            secondaryTypes: opportunity.secondaryTypes,
+            domains: opportunity.domains,
+            geography: opportunity.geography,
+            deadlineInfo: opportunity.deadlineInfo,
+            sourceTier: opportunity.sourceTier,
+            sourcePermission: opportunity.sourcePermission,
+            fieldEvidence: opportunity.fieldEvidence,
+            recommendationState: opportunity.recommendationState,
+          }),
         ],
       );
     }

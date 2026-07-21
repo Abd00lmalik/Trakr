@@ -10,6 +10,136 @@ export const opportunityCategorySchema = z.enum([
   "web3_bounty",
 ]);
 
+export const opportunityTypeSchema = z.enum([
+  "job",
+  "internship",
+  "scholarship",
+  "fellowship",
+  "grant",
+  "research_funding",
+  "research_placement",
+  "hackathon",
+  "competition",
+  "bounty",
+  "accelerator",
+  "incubator",
+  "volunteer_program",
+  "academic_program",
+  "training_program",
+]);
+
+export const opportunityDomainSchema = z.enum([
+  "artificial_intelligence",
+  "machine_learning",
+  "climate",
+  "sustainability",
+  "fintech",
+  "finance",
+  "blockchain",
+  "web3",
+  "research",
+  "health",
+  "education",
+  "public_policy",
+  "design",
+  "software_engineering",
+  "entrepreneurship",
+  "cybersecurity",
+  "open_source",
+  "social_impact",
+]);
+
+export const remoteScopeSchema = z.enum([
+  "globally_remote",
+  "remote_country",
+  "remote_region",
+  "remote_timezones",
+  "hybrid",
+  "onsite",
+  "remote_scope_unclear",
+]);
+
+export const deadlineStateSchema = z.enum([
+  "exact_future",
+  "rolling",
+  "recurring",
+  "historical_estimate",
+  "unclear",
+  "requires_confirmation",
+  "passed",
+  "closed",
+]);
+
+export const evidenceConfidenceSchema = z.enum([
+  "high",
+  "medium",
+  "low",
+  "unknown",
+]);
+
+export const opportunitySourceTierSchema = z.enum([
+  "tier_a_structured",
+  "tier_b_official_directory",
+  "tier_c_review_backed",
+  "tier_d_exploration",
+]);
+
+export const sourcePermissionStatusSchema = z.enum([
+  "documented_public_api",
+  "official_feed",
+  "employer_owned_api",
+  "permissioned_partner",
+  "official_directory",
+  "manual_review_only",
+  "permission_required",
+  "not_approved",
+]);
+
+export const opportunityRecommendationStateSchema = z.enum([
+  "apply_now",
+  "explore",
+  "research_lead",
+  "unavailable_or_unverified",
+]);
+
+export const fieldEvidenceSchema = z.object({
+  field: z.string(),
+  value: z.union([z.string(), z.array(z.string())]).optional(),
+  sourceUrl: z.string().url(),
+  sourceName: z.string(),
+  capturedAt: z.string().datetime(),
+  confidence: evidenceConfidenceSchema,
+  basis: z.enum(["published", "structured_source", "inferred", "manual_review"]),
+});
+
+export const geographicEligibilitySchema = z.object({
+  eligibleCountries: z.array(z.string()).default([]),
+  excludedCountries: z.array(z.string()).default([]),
+  eligibleRegions: z.array(z.string()).default([]),
+  applicantResidencyRequirements: z.array(z.string()).default([]),
+  citizenshipRequirements: z.array(z.string()).default([]),
+  workAuthorizationRequirements: z.array(z.string()).default([]),
+  visaSponsorship: z.enum(["offered", "not_offered", "unclear", "not_applicable"]),
+  remoteScope: remoteScopeSchema,
+  travelRequirements: z.array(z.string()).default([]),
+  onsiteRequirements: z.array(z.string()).default([]),
+  timezoneRestrictions: z.array(z.string()).default([]),
+  evidence: z.array(fieldEvidenceSchema).default([]),
+  confidence: evidenceConfidenceSchema,
+  unknownConditions: z.array(z.string()).default([]),
+});
+
+export const deadlineEvidenceSchema = z.object({
+  state: deadlineStateSchema,
+  date: z.string().date().nullable(),
+  timezone: z.string().nullable(),
+  sourceUrl: z.string().url(),
+  verifiedAt: z.string().datetime().nullable(),
+  confidence: evidenceConfidenceSchema,
+  currentCycle: z.enum(["confirmed", "unknown", "not_applicable"]),
+  notes: z.array(z.string()).default([]),
+});
+
 export const recommendationActionSchema = z.enum([
   "Apply Now",
   "Prepare First",
@@ -70,6 +200,12 @@ export const structuredUserProfileSchema = z.object({
   education: z.array(z.string()).default([]),
   workHistory: z.array(z.string()).default([]),
   projects: z.array(z.string()).default([]),
+  research: z.array(z.string()).optional(),
+  publications: z.array(z.string()).optional(),
+  achievements: z.array(z.string()).optional(),
+  awards: z.array(z.string()).optional(),
+  volunteerExperience: z.array(z.string()).optional(),
+  leadership: z.array(z.string()).optional(),
   certifications: z.array(z.string()).default([]),
   links: z.array(z.string().url()).default([]),
 });
@@ -98,8 +234,12 @@ export const profileEvidenceSchema = z.object({
 
 export const recommendationFiltersSchema = z.object({
   categories: z.array(opportunityCategorySchema).optional(),
+  opportunityTypes: z.array(opportunityTypeSchema).optional(),
+  domains: z.array(opportunityDomainSchema).optional(),
   location: z.string().optional(),
   remote: z.boolean().optional(),
+  remoteScopes: z.array(remoteScopeSchema).optional(),
+  applicantCountry: z.string().optional(),
   deadlineAfter: z.string().date().optional(),
   deadlineBefore: z.string().date().optional(),
   limit: z.number().int().min(1).max(20).optional(),
@@ -174,6 +314,30 @@ export const companionTargetSchema = z.object({
   locale: z.string().min(2).max(80).optional(),
 });
 
+export const generatedDocumentTypeSchema = z.enum([
+  "private_sector_resume",
+  "internship_resume",
+  "academic_cv",
+  "research_cv",
+  "biosketch",
+  "scholarship_cv",
+  "fellowship_profile",
+  "grant_profile",
+  "hackathon_profile",
+  "technical_project_resume",
+  "design_portfolio_resume",
+  "team_member_profile",
+  "general_professional_profile",
+]);
+
+export const generationPreferencesSchema = z.object({
+  documentType: generatedDocumentTypeSchema.optional(),
+  locale: z.string().min(2).max(80).optional(),
+  format: z.enum(["plain_text", "markdown", "docx_ready"]).default("markdown"),
+  pageLimit: z.number().int().min(1).max(20).optional(),
+  instructions: z.array(z.string().min(2).max(500)).max(12).default([]),
+});
+
 export const resumeBenchmarkReferenceSchema = z.object({
   benchmarkId: z.string().min(12).max(120),
   rubricVersion: z.string().min(1).max(80),
@@ -205,6 +369,7 @@ export const companionContextSchema = z.object({
   consent: consentSchema.optional(),
   filters: recommendationFiltersSchema.optional(),
   target: companionTargetSchema.optional(),
+  generationPreferences: generationPreferencesSchema.optional(),
   lastBenchmark: resumeBenchmarkReferenceSchema.optional(),
   sessionVersion: z.enum(["1", "2"]).optional(),
 });
@@ -238,6 +403,7 @@ export const opportunityCompanionRequestSchema = z
     context: companionContinuationInputSchema.optional(),
     continuation: companionContinuationInputSchema.optional(),
     target: companionTargetSchema.optional(),
+    generationPreferences: generationPreferencesSchema.optional(),
   })
   .superRefine((value, ctx) => {
     const hasFilters = Object.keys(value.filters).length > 0;
@@ -286,6 +452,15 @@ export const opportunitySchema = z.object({
   publisherDomain: z.string(),
   isActive: z.boolean(),
   verificationConfidence: z.number().min(0).max(1),
+  opportunityType: opportunityTypeSchema.optional(),
+  secondaryTypes: z.array(opportunityTypeSchema).optional(),
+  domains: z.array(opportunityDomainSchema).optional(),
+  geography: geographicEligibilitySchema.optional(),
+  deadlineInfo: deadlineEvidenceSchema.optional(),
+  sourceTier: opportunitySourceTierSchema.optional(),
+  sourcePermission: sourcePermissionStatusSchema.optional(),
+  fieldEvidence: z.array(fieldEvidenceSchema).optional(),
+  recommendationState: opportunityRecommendationStateSchema.optional(),
 });
 
 export const scoredOpportunitySchema = z.object({
@@ -310,6 +485,7 @@ export const recommendationSchema = z.object({
   nextSteps: z.array(z.string()),
   confidenceScore: z.number().min(0).max(100).optional(),
   guidanceAction: companionGuidanceActionSchema.optional(),
+  recommendationState: opportunityRecommendationStateSchema.optional(),
   eligibilityConcerns: z.array(z.string()).optional(),
   provenance: z
     .object({
@@ -373,6 +549,9 @@ export const recommendationResponseSchema = z.object({
       ),
       sourceCount: z.number().int().nonnegative(),
       opportunityTypeCount: z.number().int().nonnegative(),
+      actionableCount: z.number().int().nonnegative().optional(),
+      exploreCount: z.number().int().nonnegative().optional(),
+      researchLeadCount: z.number().int().nonnegative().optional(),
       notes: z.array(z.string()),
     })
     .optional(),
@@ -394,6 +573,7 @@ export const companionStateSchema = z.enum([
   "readiness",
   "resume_benchmark",
   "resume_optimization",
+  "resume_generation",
 ]);
 
 export const companionProfileSchema = z.object({
@@ -558,11 +738,44 @@ export const resumeOptimizationSchema = z.object({
   factualIntegrity: z.string(),
 });
 
+export const generatedDocumentItemSchema = z.object({
+  text: z.string(),
+  evidenceClaimIds: z.array(z.string()),
+  placeholder: z.boolean(),
+  requiresConfirmation: z.boolean(),
+});
+
+export const generatedDocumentSectionSchema = z.object({
+  id: z.string(),
+  heading: z.string(),
+  items: z.array(generatedDocumentItemSchema),
+});
+
+export const resumeGenerationSchema = z.object({
+  generationId: z.string(),
+  rubricVersion: z.string(),
+  documentType: generatedDocumentTypeSchema,
+  documentTypeReason: z.string(),
+  target: z.string(),
+  locale: z.string(),
+  format: z.enum(["plain_text", "markdown", "docx_ready"]),
+  pageLimit: z.number().int().min(1).max(20).nullable(),
+  instructions: z.array(z.string()),
+  title: z.string(),
+  sections: z.array(generatedDocumentSectionSchema),
+  placeholders: z.array(z.string()),
+  omittedUnsupportedClaims: z.array(z.string()),
+  followUpQuestions: z.array(z.string()),
+  verificationChecklist: z.array(z.string()),
+  factualIntegrity: z.string(),
+});
+
 export const companionCapabilityResultSchema = z.object({
   explanation: opportunityExplanationSchema.optional(),
   readiness: readinessAssessmentSchema.optional(),
   resumeBenchmark: resumeBenchmarkSchema.optional(),
   resumeOptimization: resumeOptimizationSchema.optional(),
+  resumeGeneration: resumeGenerationSchema.optional(),
 });
 
 export const opportunityCompanionResponseSchema =
@@ -572,6 +785,23 @@ export const opportunityCompanionResponseSchema =
   });
 
 export type OpportunityCategory = z.infer<typeof opportunityCategorySchema>;
+export type OpportunityType = z.infer<typeof opportunityTypeSchema>;
+export type OpportunityDomain = z.infer<typeof opportunityDomainSchema>;
+export type RemoteScope = z.infer<typeof remoteScopeSchema>;
+export type DeadlineState = z.infer<typeof deadlineStateSchema>;
+export type EvidenceConfidence = z.infer<typeof evidenceConfidenceSchema>;
+export type OpportunitySourceTier = z.infer<typeof opportunitySourceTierSchema>;
+export type SourcePermissionStatus = z.infer<
+  typeof sourcePermissionStatusSchema
+>;
+export type OpportunityRecommendationState = z.infer<
+  typeof opportunityRecommendationStateSchema
+>;
+export type GeographicEligibility = z.infer<
+  typeof geographicEligibilitySchema
+>;
+export type DeadlineEvidence = z.infer<typeof deadlineEvidenceSchema>;
+export type FieldEvidence = z.infer<typeof fieldEvidenceSchema>;
 export type RecommendationAction = z.infer<typeof recommendationActionSchema>;
 export type CompanionGuidanceAction = z.infer<
   typeof companionGuidanceActionSchema
@@ -606,6 +836,12 @@ export type Consent = z.infer<typeof consentSchema>;
 export type CompanionTarget = z.infer<typeof companionTargetSchema>;
 export type ResumeBenchmarkReference = z.infer<
   typeof resumeBenchmarkReferenceSchema
+>;
+export type GenerationPreferences = z.infer<
+  typeof generationPreferencesSchema
+>;
+export type GeneratedDocumentType = z.infer<
+  typeof generatedDocumentTypeSchema
 >;
 export type DocumentReference = z.infer<typeof documentReferenceSchema>;
 export type ProfileEvidence = z.infer<typeof profileEvidenceSchema>;

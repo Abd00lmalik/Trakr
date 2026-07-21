@@ -149,6 +149,48 @@ Goal: Find blockchain hackathons, Web3 bounties, and entry-level remote software
   assert.equal(parsed.profile.location, "Accra, Ghana");
 });
 
+test("resume extraction preserves research, publication, leadership, and service evidence", () => {
+  const parsed = extractProfileFromText(
+    `NORA FICTIONAL
+Research Applicant
+EDUCATION
+MSc Environmental Science, Fictional University
+RESEARCH
+Studied urban heat exposure using a fictional public dataset.
+PUBLICATIONS
+Fictional working paper on community climate adaptation.
+LEADERSHIP
+Coordinated a student research reading group.
+VOLUNTEER EXPERIENCE
+Supported a fictional community air-quality workshop.
+AWARDS
+Fictional University Research Prize.`,
+  );
+
+  assert.deepEqual(parsed.profile.research, [
+    "Studied urban heat exposure using a fictional public dataset.",
+  ]);
+  assert.deepEqual(parsed.profile.publications, [
+    "Fictional working paper on community climate adaptation.",
+  ]);
+  assert.deepEqual(parsed.profile.leadership, [
+    "Coordinated a student research reading group.",
+  ]);
+  assert.deepEqual(parsed.profile.volunteerExperience, [
+    "Supported a fictional community air-quality workshop.",
+  ]);
+  assert.deepEqual(parsed.profile.awards, [
+    "Fictional University Research Prize.",
+  ]);
+  assert.ok(
+    parsed.evidence.some(
+      (item) =>
+        item.field === "publications" &&
+        item.source === "explicit",
+    ),
+  );
+});
+
 test("workspace exposes the outcome-first Opportunity Finding journey", async () => {
   const workspace = await readFile(
     new URL("../src/components/opportunity-workspace.tsx", import.meta.url),
@@ -237,7 +279,7 @@ test("OpenAPI documents additive discovery requests and required resume consent"
   assert.ok(resumeOperation.responses["403"]);
 });
 
-test("A2MCP metadata and OpenAPI expose Service 2 as an additive available capability", async () => {
+test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available capabilities", async () => {
   const metadataResponse = await getA2mcpMetadata();
   const metadata = await metadataResponse.json();
   const openApiResponse = await getOpenApi();
@@ -255,10 +297,17 @@ test("A2MCP metadata and OpenAPI expose Service 2 as an additive available capab
   assert.deepEqual(service.operations, ["benchmark", "optimize"]);
   assert.equal(metadata.submission.pricing, "free");
   assert.equal(metadata.submission.paymentRequired, false);
-  assert.equal(document.info.version, "0.4.0");
+  const generationService = metadata.services.find(
+    (item: { id: string }) => item.id === "resume_generation",
+  );
+  assert.equal(generationService.status, "available");
+  assert.equal(generationService.operation, "generate_resume");
+  assert.ok(generationService.documentTypes.includes("biosketch"));
+  assert.equal(document.info.version, "0.5.0");
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);
+  assert.ok(requestSchema.properties.generationPreferences);
   assert.match(
     document.paths["/api/a2mcp/recommend"].post.responses["200"].content[
       "application/json"

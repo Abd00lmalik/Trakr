@@ -4,7 +4,7 @@
 
 Trakr is an outcome-first AI Opportunity Companion exposed as an A2MCP-style API service. The product presents three visible services: Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. They share one capability layer and the stable public endpoint, `POST /api/a2mcp/recommend`.
 
-Service 1, Opportunity Finding, and Service 2, Resume Benchmarking & Optimization, are production-ready in this repository. Service 2 has also passed a 153-case independently AI-reviewed and adjudicated synthetic calibration gate. Resume Generation remains staged until the calibration deployment and external A2MCP release checks are complete.
+Service 1, Opportunity Finding, and Service 2, Resume Benchmarking & Optimization, are production-ready in this repository. Service 2 has also passed a 153-case independently AI-reviewed and adjudicated synthetic calibration gate. Service 3, Resume Generation, is implemented behind the same additive endpoint and generates target-specific documents only from confirmed, claim-linked evidence.
 
 ## MVP Scope
 
@@ -21,6 +21,8 @@ Service 1, Opportunity Finding, and Service 2, Resume Benchmarking & Optimizatio
 - Encrypted, short-lived caller-carried session references so calling agents can conduct multi-turn journeys without a permanent shared user profile.
 - Evidence ledger fields that distinguish explicit facts, reasonable inferences, and unknown information.
 - Source provenance, deadline confidence, eligibility checks, canonical duplicate filtering, and quality-gated multi-interest coverage.
+- Structured opportunity type, domain, remote scope, geographic eligibility, deadline evidence, source tier, recommendation state, and multidimensional inventory monitoring.
+- Target-specific resume and CV generation with claim IDs, placeholders, omissions, locale/format preferences, and prompt-injection containment.
 
 ## Folder Structure
 
@@ -143,6 +145,45 @@ Unknown target URLs are not scraped automatically; callers should provide a
 dated description or requirements when the URL is not already in verified
 Trakr inventory.
 
+## Resume Generation
+
+Generation is target-first and uses only explicit, confirmed evidence:
+
+```json
+{
+  "operation": "generate_resume",
+  "user": {
+    "name": "Amina Fictional",
+    "headline": "Frontend developer",
+    "skills": ["React", "TypeScript"],
+    "education": ["BSc Computer Science student at Fictional University"],
+    "projects": ["Built an accessible TypeScript study planner."]
+  },
+  "target": {
+    "role": "Frontend Engineering Internship",
+    "opportunityType": "internship",
+    "description": "Students may apply. React and TypeScript are required.",
+    "requirements": ["Current enrollment is required."]
+  },
+  "generationPreferences": {
+    "locale": "Nigeria",
+    "format": "markdown",
+    "pageLimit": 2,
+    "instructions": ["Keep the document concise."]
+  },
+  "consent": {
+    "processPersonalData": true,
+    "retention": "session_only",
+    "source": "explicit"
+  }
+}
+```
+
+Every non-placeholder applicant statement in `resumeGeneration.sections` has
+supporting `evidenceClaimIds`. Missing facts become focused questions,
+placeholders, or `omittedUnsupportedClaims`; target requirements never become
+applicant history.
+
 If the request is incomplete, Trakr returns `conversation.state: "needs_more_information"` with the minimum questions the calling agent should ask. When enough context is available, Trakr returns grounded recommendations and an opaque `conversation.continuation` reference that must be sent back unchanged for follow-up requests:
 
 ```json
@@ -165,7 +206,7 @@ The API returns:
 - `learningRoadmap`: focus areas, resources to find, and practice projects.
 - `agentNotes`: implementation notes for downstream agents.
 - `conversation`: additive state, natural-language guidance, profile provenance, missing information, and continuation context.
-- `capabilityResult`: grounded explanation, readiness, resume benchmark, or resume optimization output when requested.
+- `capabilityResult`: grounded explanation, readiness, resume benchmark, resume optimization, or claim-linked resume generation output when requested.
 
 Complete legacy structured requests continue to use the original direct recommendation flow without conversational interruption. The endpoint remains free and does not require an OKX payment challenge in this phase.
 
@@ -182,6 +223,12 @@ calibration report is in `reports/service2-calibration-2026-07-21.md`.
 ## Extending Sources
 
 Add official APIs or structured feeds by implementing `OpportunitySource` in `src/lib/opportunities/source.ts`, then combine those sources in `src/lib/recommendation/service.ts`. Review and document every candidate in `src/lib/opportunities/source-registry.ts` first. DoraHacks and Encode Club remain directory-only until Trakr has a documented API, feed, partner delivery, or permissioned ingestion agreement; the service does not scrape protected or undocumented interfaces.
+
+Inventory records distinguish `apply_now`, `explore`, `research_lead`, and
+`unavailable_or_unverified`. Remote scope and Africa-related evidence do not
+establish global or country eligibility without published support. The current
+coverage and source-health snapshot is in
+`reports/inventory-monitoring-2026-07-21.json`.
 
 ## Deployment
 

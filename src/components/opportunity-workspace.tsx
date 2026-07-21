@@ -74,14 +74,14 @@ const serviceOptions: Array<{
     label: "Resume Benchmarking & Optimization",
     description: "Compare your evidence with a specific target before rewriting.",
     icon: FileSearch,
-    active: false,
+    active: true,
   },
   {
     id: "resume_generation",
     label: "Resume Generation",
     description: "Create a truthful, target-specific document from verified facts.",
     icon: PenLine,
-    active: false,
+    active: true,
   },
 ];
 
@@ -423,6 +423,140 @@ function RecommendationResults({
   );
 }
 
+function CapabilityResults({
+  response,
+}: {
+  response: OpportunityCompanionResponse;
+}) {
+  const benchmark = response.capabilityResult?.resumeBenchmark;
+  const optimization = response.capabilityResult?.resumeOptimization;
+  const generation = response.capabilityResult?.resumeGeneration;
+  if (!benchmark && !optimization && !generation) return null;
+
+  return (
+    <section className="workspace-section capability-results" aria-labelledby="capability-title">
+      <div className="section-heading">
+        <div>
+          <p className="section-kicker">
+            {generation ? "Resume Generation" : "Resume Benchmarking & Optimization"}
+          </p>
+          <h2 id="capability-title">
+            {generation
+              ? generation.title
+              : optimization
+                ? "Target-specific optimization"
+                : "Diagnostic benchmark"}
+          </h2>
+        </div>
+      </div>
+
+      {benchmark ? (
+        <>
+          <div className="benchmark-summary">
+            <div>
+              <span>Alignment</span>
+              <strong>{benchmark.overallAlignmentScore}%</strong>
+            </div>
+            <div>
+              <span>Document readiness</span>
+              <strong>{benchmark.atsReadinessScore}%</strong>
+            </div>
+            <div>
+              <span>Eligibility</span>
+              <strong>{benchmark.eligibility.status.replaceAll("_", " ")}</strong>
+            </div>
+          </div>
+          <p className="capability-note">{benchmark.scoreMeaning}</p>
+          <div className="capability-list">
+            {benchmark.requirements.slice(0, 10).map((item) => (
+              <article key={item.id}>
+                <div>
+                  <strong>{item.requirement}</strong>
+                  <span>{item.status.replaceAll("_", " ")}</span>
+                </div>
+                <p>{item.explanation}</p>
+              </article>
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {optimization ? (
+        <>
+          <p className="capability-note">{optimization.factualIntegrity}</p>
+          <div className="capability-list">
+            {optimization.prioritizedChanges.map((item, index) => (
+              <article key={`${item.section}-${index}`}>
+                <div>
+                  <strong>{item.section}</strong>
+                  <span>{item.priority}</span>
+                </div>
+                <p>{item.recommendation}</p>
+              </article>
+            ))}
+          </div>
+        </>
+      ) : null}
+
+      {generation ? (
+        <>
+          <div className="generated-meta">
+            <span>{generation.documentType.replaceAll("_", " ")}</span>
+            <span>{generation.locale}</span>
+            <span>{generation.format.replaceAll("_", " ")}</span>
+            {generation.pageLimit ? (
+              <span>{generation.pageLimit} page limit</span>
+            ) : null}
+          </div>
+          <p className="capability-note">{generation.documentTypeReason}</p>
+          <div className="generated-document">
+            {generation.sections.map((section) => (
+              <section key={section.id}>
+                <h3>{section.heading}</h3>
+                <ul>
+                  {section.items.map((item, index) => (
+                    <li className={item.placeholder ? "is-placeholder" : ""} key={`${section.id}-${index}`}>
+                      <span>{item.text}</span>
+                      <small>
+                        {item.placeholder
+                          ? "Confirmation required"
+                          : `${item.evidenceClaimIds.length} evidence link${
+                              item.evidenceClaimIds.length === 1 ? "" : "s"
+                            }`}
+                      </small>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+          {generation.followUpQuestions.length ? (
+            <div className="generation-questions">
+              <h3>Details to confirm</h3>
+              <ol>
+                {generation.followUpQuestions.map((question) => (
+                  <li key={question}>{question}</li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
+          {generation.instructions.length ? (
+            <div className="generation-questions">
+              <h3>Document constraints</h3>
+              <ol>
+                {generation.instructions.map((instruction) => (
+                  <li key={instruction}>{instruction}</li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
+          <p className="capability-note">{generation.factualIntegrity}</p>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
 export function OpportunityWorkspace() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedService, setSelectedService] =
@@ -672,7 +806,9 @@ export function OpportunityWorkspace() {
       setUploadState("complete");
       void submitToAgent({
         displayUser: "Resume uploaded for this session.",
-        operation: "discover",
+        operation: selectedService
+          ? operationForService(selectedService)
+          : "discover",
         intakeRoute: "resume",
         resumeText: parsed.resumeText,
       });
@@ -970,6 +1106,94 @@ export function OpportunityWorkspace() {
             </section>
           ) : null}
 
+          {selectedService &&
+          selectedService !== "opportunity_finding" ? (
+            <section className="workspace-section intake-section" aria-labelledby="resume-service-intake">
+              <div className="section-heading">
+                <div>
+                  <p className="section-kicker">
+                    {selectedService === "resume_generation"
+                      ? "Resume Generation"
+                      : "Resume Benchmarking & Optimization"}
+                  </p>
+                  <h2 id="resume-service-intake">Add existing application evidence</h2>
+                </div>
+              </div>
+              <p className="section-intro">
+                Upload a resume, CV, or text document, or describe verified facts in the message box. Trakr will ask for the target and only the missing evidence that matters.
+              </p>
+              <div className="resume-intake">
+                <div className="consent-row">
+                  <input
+                    id="resume-service-consent"
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(event) => setConsent(event.target.checked)}
+                  />
+                  <label htmlFor="resume-service-consent">
+                    Allow Trakr to process this document for this session only.
+                  </label>
+                </div>
+                <div
+                  className={`upload-zone ${
+                    isDragging ? "is-dragging" : ""
+                  } ${uploadState === "error" ? "has-error" : ""}`}
+                  onDragEnter={(event) => {
+                    event.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    ref={inputRef}
+                    id="resume-service-upload"
+                    type="file"
+                    accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+                    onChange={handleFileInput}
+                    disabled={isWorking || !consent}
+                  />
+                  <label htmlFor="resume-service-upload">
+                    <span className="upload-icon">
+                      {uploadState === "complete" ? (
+                        <CheckCircle2 aria-hidden="true" size={26} />
+                      ) : (
+                        <UploadCloud aria-hidden="true" size={26} />
+                      )}
+                    </span>
+                    <span className="upload-title">
+                      {fileName || "Drop a resume or CV here"}
+                    </span>
+                    <span className="upload-meta">
+                      {uploadState === "complete"
+                        ? "Evidence extracted for this session"
+                        : "PDF, DOCX, or TXT up to 2.5 MB"}
+                    </span>
+                  </label>
+                  {uploadState === "uploading" || uploadState === "parsing" ? (
+                    <div className="upload-progress" aria-live="polite">
+                      <div className="progress-track">
+                        <span style={{ width: `${uploadProgress}%` }} />
+                      </div>
+                      <span>
+                        {uploadState === "parsing"
+                          ? "Extracting evidence..."
+                          : `Uploading ${uploadProgress}%`}
+                      </span>
+                    </div>
+                  ) : null}
+                  {uploadState === "error" ? (
+                    <p className="inline-error" role="alert">
+                      <AlertCircle aria-hidden="true" size={17} />
+                      {uploadError}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </section>
+          ) : null}
+
           {messages.length ? (
             <section className="conversation-section" aria-label="Trakr conversation">
               {messages.map((item, index) => (
@@ -984,6 +1208,12 @@ export function OpportunityWorkspace() {
           ) : null}
 
           {conversation ? <ProfileSummary conversation={conversation} /> : null}
+
+          {response ? (
+            <CapabilityResults
+              response={response as OpportunityCompanionResponse}
+            />
+          ) : null}
 
           {requestError ? (
             <p className="inline-error request-error" role="alert">

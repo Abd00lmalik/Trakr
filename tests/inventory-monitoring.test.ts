@@ -63,6 +63,8 @@ test("inventory monitoring reports healthy source and coverage counts", () => {
   assert.equal(snapshot.duplicateRate, 0);
   assert.equal(snapshot.sourceCounts["Source A"], 6);
   assert.equal(snapshot.categoryCounts.internship, 10);
+  assert.equal(snapshot.africaEvidenceCount, 4);
+  assert.equal(snapshot.africaAccessibleCount, 4);
   assert.equal(
     snapshot.alerts.some((alert) => alert.code === "source_zero_records"),
     false,
@@ -126,4 +128,42 @@ test("inventory monitoring surfaces source, verification, stale, duplicate, and 
   assert.ok(codes.has("africa_coverage_low"));
   assert.ok(codes.has("remote_global_coverage_low"));
   assert.ok(codes.has("deadline_confidence_low"));
+});
+
+test("inventory monitoring detects source-group concentration and only counts confirmed current deadlines", () => {
+  const records = Array.from({ length: 10 }, (_, index) =>
+    opportunity({
+      id: `concentrated-${index}`,
+      canonicalUrl: `https://example.com/concentrated/${index}`,
+      deadlineInfo:
+        index === 0
+          ? {
+              state: "exact_future",
+              date: "2026-12-31",
+              timezone: null,
+              sourceUrl: `https://example.com/concentrated/${index}`,
+              verifiedAt: "2026-07-21T08:00:00.000Z",
+              confidence: "medium",
+              currentCycle: "unknown",
+              notes: [],
+            }
+          : undefined,
+    }),
+  );
+  const snapshot = buildInventoryMonitoringSnapshot({
+    opportunities: records,
+    expectedSources: ["Source A"],
+    sourceGroupCounts: {
+      "Employer job boards": 9,
+      "Official programs": 1,
+    },
+    now: new Date("2026-07-21T10:00:00.000Z"),
+  });
+
+  assert.equal(snapshot.exactCurrentDeadlineCount, 9);
+  assert.ok(
+    snapshot.alerts.some(
+      (alert) => alert.code === "source_concentration_high",
+    ),
+  );
 });
