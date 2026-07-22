@@ -224,6 +224,64 @@ test("internship generation produces an evidence-linked document with placeholde
   assert.match(generation.factualIntegrity, /claim IDs/i);
 });
 
+test("structured and natural contact details render only as confirmed evidence", async () => {
+  const structured = await handleOpportunityCompanionRequest(
+    request(targets.internship, {
+      user: {
+        ...profile,
+        contactEmail: "amina.tester@example.com",
+        contactPhone: "+234 800 000 0000",
+      },
+    }),
+  );
+  const structuredGeneration = structured.capabilityResult?.resumeGeneration;
+  assert.ok(structuredGeneration);
+  const identity =
+    structuredGeneration.sections.find((section) => section.id === "identity")
+      ?.items ?? [];
+  assert.ok(identity.some((item) => item.text === "Amina Tester"));
+  assert.ok(
+    identity.some((item) => item.text === "amina.tester@example.com"),
+  );
+  assert.ok(identity.some((item) => item.text === "+234 800 000 0000"));
+  assert.equal(
+    structuredGeneration.placeholders.includes("[Confirm full name]"),
+    false,
+  );
+  assert.equal(
+    structuredGeneration.placeholders.includes(
+      "[Confirm preferred contact details]",
+    ),
+    false,
+  );
+  for (const item of identity) {
+    assert.ok(item.evidenceClaimIds.length, item.text);
+  }
+  assert.doesNotMatch(
+    structured.conversation?.continuation.token ?? "",
+    /amina|example|234/i,
+  );
+
+  const natural = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      operation: "generate_resume",
+      message:
+        "Generate an internship resume for a Frontend Engineering Internship requiring React and TypeScript. My name is Amina Tester. My email is amina.natural@example.com and my phone is +234 811 111 1111. I am a BSc Computer Science student at Fictional University. I built an accessible TypeScript study planner and use React and TypeScript.",
+    }),
+  );
+  const naturalIdentity =
+    natural.capabilityResult?.resumeGeneration?.sections.find(
+      (section) => section.id === "identity",
+    )?.items ?? [];
+  assert.ok(naturalIdentity.some((item) => item.text === "Amina Tester"));
+  assert.ok(
+    naturalIdentity.some((item) => item.text === "amina.natural@example.com"),
+  );
+  assert.ok(
+    naturalIdentity.some((item) => item.text === "+234 811 111 1111"),
+  );
+});
+
 test("document selection distinguishes research, scholarship, grant, and hackathon targets", async () => {
   const cases = [
     [targets.research, "fellowship_profile"],

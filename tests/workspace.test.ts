@@ -304,11 +304,14 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
   assert.equal(generationService.status, "available");
   assert.equal(generationService.operation, "generate_resume");
   assert.ok(generationService.documentTypes.includes("biosketch"));
-  assert.equal(document.info.version, "0.5.0");
+  assert.equal(document.info.version, "0.6.0");
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);
   assert.ok(requestSchema.properties.generationPreferences);
+  assert.ok(requestSchema.properties.user.properties.name);
+  assert.ok(requestSchema.properties.user.properties.contactEmail);
+  assert.ok(requestSchema.properties.user.properties.contactPhone);
   assert.match(
     document.paths["/api/a2mcp/recommend"].post.responses["200"].content[
       "application/json"
@@ -318,7 +321,7 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
 });
 
 test("production ingestion migrates and checks inventory metadata readiness", async () => {
-  const [workflow, database, health] = await Promise.all([
+  const [workflow, database, health, nextConfig] = await Promise.all([
     readFile(
       new URL("../.github/workflows/ingest.yml", import.meta.url),
       "utf8",
@@ -328,6 +331,7 @@ test("production ingestion migrates and checks inventory metadata readiness", as
       new URL("../src/app/api/health/route.ts", import.meta.url),
       "utf8",
     ),
+    readFile(new URL("../next.config.ts", import.meta.url), "utf8"),
   ]);
 
   const migrationIndex = workflow.indexOf("/api/admin/database");
@@ -338,6 +342,15 @@ test("production ingestion migrates and checks inventory metadata readiness", as
   assert.match(database, /column_name = 'inventory_metadata'/);
   assert.match(database, /inventoryMetadataReady/);
   assert.match(health, /database\.inventoryMetadataReady/);
+  assert.match(database, /artifactStorageReady/);
+  assert.match(health, /database\.artifactStorageReady/);
+  const adminRoute = await readFile(
+    new URL("../src/app/api/admin/database/route.ts", import.meta.url),
+    "utf8",
+  );
+  assert.match(adminRoute, /database\.artifactStorageReady/);
+  assert.match(nextConfig, /serverExternalPackages:\s*\["pdfkit"\]/);
+  assert.match(nextConfig, /pdfkit\/js\/data/);
 });
 
 test("database migration accepts either configured operator key", async () => {

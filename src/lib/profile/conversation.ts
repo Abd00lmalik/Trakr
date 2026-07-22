@@ -125,6 +125,8 @@ function mergeProfiles(
   for (const profile of profiles) {
     if (!profile) continue;
     if (profile.name) result.name = profile.name;
+    if (profile.contactEmail) result.contactEmail = profile.contactEmail;
+    if (profile.contactPhone) result.contactPhone = profile.contactPhone;
     if (profile.headline) result.headline = profile.headline;
     if (profile.bio) result.bio = profile.bio;
     if (profile.location) result.location = profile.location;
@@ -181,6 +183,29 @@ function inferHeadline(message: string) {
   const lower = message.toLowerCase();
   const role = roleSignals.find((signal) => lower.includes(signal));
   return role ? titleCase(role.replace("front-end", "frontend").replace("back-end", "backend")) : undefined;
+}
+
+function inferApplicantName(message: string) {
+  return message
+    .match(
+      /\b(?:my name is|name\s*:)\s*([A-Z][A-Za-z'-]+(?:\s+[A-Z][A-Za-z'-]+){1,4})(?=[.,;]|\s+(?:and|my|i)\b|$)/i,
+    )?.[1]
+    ?.trim();
+}
+
+function inferContactEmail(message: string) {
+  return message
+    .match(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i)?.[0]
+    ?.toLowerCase();
+}
+
+function inferContactPhone(message: string) {
+  return message
+    .match(
+      /\b(?:phone|telephone|mobile|tel)\s*(?:is|:|-)?\s*(\+?[0-9][0-9 ()-]{6,}[0-9])/i,
+    )?.[1]
+    ?.replace(/\s+/g, " ")
+    .trim();
 }
 
 function inferLocation(message: string) {
@@ -371,6 +396,9 @@ function evidenceFromProvidedProfile(
 ) {
   if (!profile) return;
   for (const field of [
+    "name",
+    "contactEmail",
+    "contactPhone",
     "headline",
     "bio",
     "location",
@@ -606,6 +634,9 @@ export function buildConversationalProfile(
     : [];
   const explicitMessageProfile: StructuredUserProfile | undefined = message
     ? {
+        name: inferApplicantName(message),
+        contactEmail: inferContactEmail(message),
+        contactPhone: inferContactPhone(message),
         headline: inferHeadline(message),
         bio: message.length >= 40 ? message.slice(0, 480) : undefined,
         location: inferLocation(message),
@@ -789,6 +820,7 @@ export function buildContinuationContext(
       | "target"
       | "generationPreferences"
       | "lastBenchmark"
+      | "optimizationApproved"
     >
   > = {},
 ): CompanionContext {
@@ -817,6 +849,8 @@ export function buildContinuationContext(
     generationPreferences:
       updates.generationPreferences ?? context?.generationPreferences,
     lastBenchmark: updates.lastBenchmark ?? context?.lastBenchmark,
+    optimizationApproved:
+      updates.optimizationApproved ?? context?.optimizationApproved,
     sessionVersion: "2",
   };
 }

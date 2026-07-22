@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { CompanionSessionError } from "@/lib/companion/session";
 import { handleOpportunityCompanionRequest } from "@/lib/companion/service";
 import { generateRecommendations } from "@/lib/recommendation/service";
+import { parseResumeBuffer } from "@/lib/resume/parser";
 import { beginIdempotentRequest } from "@/lib/security/idempotency";
 import { checkRateLimit, getClientKey } from "@/lib/security/rate-limit";
 import {
@@ -68,6 +69,7 @@ function hasConversationalFields(payload: unknown) {
     "context",
     "continuation",
     "target",
+    "document",
   ].some((field) => Object.prototype.hasOwnProperty.call(record, field));
 }
 
@@ -84,6 +86,72 @@ function normalizePayload(payload: unknown) {
     normalized.context = normalized.continuation;
   }
   return normalized;
+}
+
+async function prepareDocumentPayload(payload: unknown) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const normalized = { ...(payload as Record<string, unknown>) };
+  const document = normalized.document;
+  if (!document || typeof document !== "object" || Array.isArray(document)) {
+    return normalized;
+  }
+  if (normalized.resumeText) {
+    throw new Error(
+      "Provide either resumeText or document, not both in the same request.",
+    );
+  }
+
+  const input = document as Record<string, unknown>;
+  if (input.representation === "text") {
+    normalized.resumeText = input.text;
+    return normalized;
+  }
+  if (input.representation !== "base64") {
+    return normalized;
+  }
+
+  const dataBase64 = typeof input.dataBase64 === "string"
+    ? input.dataBase64
+    : "";
+  if (
+    !dataBase64 ||
+    dataBase64.length % 4 !== 0 ||
+    !/^[A-Za-z0-9+/]+={0,2}$/.test(dataBase64)
+  ) {
+    throw new Error("document.dataBase64 must be canonical base64 content.");
+  }
+  const buffer = Buffer.from(dataBase64, "base64");
+  if (buffer.toString("base64") !== dataBase64) {
+    throw new Error("document.dataBase64 could not be verified.");
+  }
+  normalized.resumeText = await parseResumeBuffer(buffer, {
+    contentType: String(input.mimeType ?? ""),
+    fileName: String(input.fileName ?? ""),
+  });
+  return normalized;
+}
+
+function exposeConversationContract<T extends Record<string, unknown>>(
+  response: T,
+) {
+  const conversation = response.conversation;
+  if (!conversation || typeof conversation !== "object") {
+    return response;
+  }
+  const value = conversation as Record<string, unknown>;
+  return {
+    ...response,
+    stage: value.stage,
+    status: value.status,
+    message: value.message,
+    selectedService: value.service,
+    requiredInputs: value.requiredInputs,
+    nextActions: value.nextActions,
+    continuation: value.continuation,
+  };
 }
 
 export async function POST(request: Request) {
@@ -207,7 +275,7 @@ export async function POST(request: Request) {
   let payload: unknown;
 
   try {
-    payload = JSON.parse(rawBody);
+    payload = rawBody.trim() ? JSON.parse(rawBody) : {};
   } catch {
     return complete(
       {
@@ -221,7 +289,24 @@ export async function POST(request: Request) {
     );
   }
 
-  const normalizedPayload = normalizePayload(payload);
+  let normalizedPayload: unknown;
+  try {
+    normalizedPayload = await prepareDocumentPayload(normalizePayload(payload));
+  } catch (error) {
+    return complete(
+      {
+        error: "invalid_document",
+        code: "invalid_document",
+        message:
+          error instanceof Error
+            ? error.message
+            : "The supplied document could not be processed.",
+        requestId,
+        retryable: false,
+      },
+      400,
+    );
+  }
   const parsed = opportunityCompanionRequestSchema.safeParse(normalizedPayload);
   if (!parsed.success) {
     return complete(
@@ -245,7 +330,7 @@ export async function POST(request: Request) {
     const response = legacyRequest?.success
       ? await generateRecommendations(legacyRequest.data)
       : await handleOpportunityCompanionRequest(parsed.data);
-    return complete({ ...response, requestId });
+    return complete(exposeConversationContract({ ...response, requestId }));
   } catch (error) {
     if (error instanceof CompanionSessionError) {
       return complete(

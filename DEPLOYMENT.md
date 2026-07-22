@@ -19,6 +19,7 @@ RECOMMENDATION_LOG_RETENTION_DAYS=30
 RECOMMENDATION_LOG_HASH_KEY=generate_a_long_random_value
 TRAKR_SESSION_SECRET=generate_a_different_long_random_value
 TRAKR_SESSION_TTL_MINUTES=30
+TRAKR_ARTIFACT_TTL_MINUTES=30
 INGEST_API_KEY=generate_a_long_random_value
 TRAKR_ADMIN_API_KEY=generate_a_long_random_value
 ```
@@ -82,8 +83,8 @@ For the first submission, register Trakr as a free A2MCP service:
 - Interface URL: `https://your-railway-domain/api/a2mcp/recommend`
 - Method: `POST`
 - Pricing: free for Phase 1 validation
-- Input: structured profile, resume text, natural-language background, or caller-scoped continuation context
-- Output: conversational state, ranked opportunities, explanations, readiness analysis, grounded resume intelligence, action plan, and learning roadmap
+- Input: empty bootstrap, explicit service operation, structured profile, resume text, canonical base64 PDF/DOCX/TXT, natural-language request, or caller-scoped continuation
+- Output: server-authoritative conversational state, three-service chooser, ranked opportunities, evidence-linked resume diagnostics, and short-lived DOCX/PDF artifacts
 
 The current service remains free. This capability phase does not add payment requirements or change the registered endpoint.
 
@@ -95,12 +96,14 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - `ai.configured` should be `true` when `GEMINI_API_KEY` is configured.
 - `database.connected`, `database.pgvector`, and `database.schemaReady` should be `true` once Railway Postgres is configured and migrated.
 - `database.sourceVerificationReady` should be `true` after the source verification migration.
+- `database.artifactStorageReady` should be `true` after the resume artifact migration.
 - `POST /api/a2mcp/recommend` should return `HTTP 200` for the free OKX submission path.
 - Leave `TRAKR_API_KEY` unset for public free OKX review unless OKX gives a shared secret or gateway header to enforce.
 - Set `INGEST_API_KEY` before enabling scheduled ingestion.
 - Set `RECOMMENDATION_LOG_HASH_KEY` to enable keyed request correlation without storing raw identifiers or resume content.
 - Set `TRAKR_SESSION_SECRET` to a separate long random value. It encrypts opaque, short-lived caller-carried session references; do not rotate it while active sessions must remain resumable.
 - `TRAKR_SESSION_TTL_MINUTES` is bounded between 5 and 120 minutes and defaults to 30.
+- `TRAKR_ARTIFACT_TTL_MINUTES` is bounded between 5 and 120 minutes and defaults to 30. Download URLs are bearer credentials and must not be logged or forwarded.
 - Set `RECOMMENDATION_LOG_RETENTION_DAYS` between 1 and 365. Expired recommendation analytics are pruned during normal recommendation traffic.
 
 ## Current Railway Deployment

@@ -28,6 +28,7 @@ export async function checkDatabase() {
       privacyLoggingReady: false,
       sourceVerificationReady: false,
       inventoryMetadataReady: false,
+      artifactStorageReady: false,
     };
   }
 
@@ -86,6 +87,14 @@ export async function checkDatabase() {
           and data_type = 'jsonb'
       ) as ready`,
     );
+    const artifactStorage = await db.query<{ ready: boolean }>(
+      `select exists(
+        select 1
+        from information_schema.tables
+        where table_schema = 'public'
+          and table_name = 'resume_artifacts'
+      ) as ready`,
+    );
 
     return {
       configured: true,
@@ -95,6 +104,7 @@ export async function checkDatabase() {
       privacyLoggingReady: privacyLogging.rows[0]?.ready ?? false,
       sourceVerificationReady: sourceVerification.rows[0]?.ready ?? false,
       inventoryMetadataReady: inventoryMetadata.rows[0]?.ready ?? false,
+      artifactStorageReady: artifactStorage.rows[0]?.ready ?? false,
     };
   } catch (error) {
     return {
@@ -105,6 +115,7 @@ export async function checkDatabase() {
       privacyLoggingReady: false,
       sourceVerificationReady: false,
       inventoryMetadataReady: false,
+      artifactStorageReady: false,
       error: error instanceof Error ? error.message : "Unknown database error",
     };
   }

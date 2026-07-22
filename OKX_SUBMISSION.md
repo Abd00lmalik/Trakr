@@ -23,13 +23,25 @@
 
 ## Description
 
-Trakr is a conversational AI Opportunity Companion that helps students, developers, freelancers, creators, and builders discover relevant opportunities and act on them. It accepts structured profiles, resumes, natural-language background, or caller-scoped continuation context and returns profile guidance, ranked opportunities, match explanations, readiness analysis, grounded resume intelligence, action plans, and learning roadmaps.
+Trakr provides three conversational services through one stable A2MCP endpoint: Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. An empty or service-declaration-only request returns a machine-readable chooser. Explicit goals route directly. Trakr accepts structured profiles, extracted resume text, supported PDF/DOCX/TXT representations, natural-language input, or caller-scoped continuation state, and can return short-lived authorized DOCX/PDF artifacts.
 
 ## Why It Fits A2MCP
 
-Trakr exposes a standardized API endpoint that another agent can call with a user profile and filters. The response is structured JSON designed for direct agent consumption. For Phase 1, it returns free `HTTP 200` responses. The paid upgrade path is x402 payment middleware around the recommendation route.
+Trakr exposes a standardized API endpoint that another agent can bootstrap without business parameters. The response declares the current stage, required inputs, machine-readable choices, next actions, and opaque continuation. The current service returns free `HTTP 200` responses without a payment challenge.
 
-## Sample Request
+## Bootstrap Request
+
+```json
+{}
+```
+
+The bootstrap response presents:
+
+1. Find opportunities
+2. Resume Benchmarking & Optimization
+3. Resume Generation
+
+## Legacy Discovery Request
 
 ```json
 {
@@ -60,6 +72,8 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 - `actionPlan`
 - `learningRoadmap`
 - `agentNotes`
+- `stage`, `status`, `requiredInputs`, `nextActions`, and `continuation`
+- short-lived `artifacts` after approved optimization or resume generation
 
 ## Registration Checklist
 
@@ -79,7 +93,8 @@ Trakr exposes a standardized API endpoint that another agent can call with a use
 - Registration transaction: `0x01ca3d9585c76bc5a88357d66b09cb62f7f192cb28f3d956582081e6cf93d240`
 - Official avatar update transaction: `0x80a0843597fcdd25b7925bdbf36e47bb3c1134492781bdcfb4986866d093180d`
 - Owner X Layer address: `0xbe116468bb544723141647608fe98c1bc0471291`
-- Service: Opportunity Matching API
+- Public display title proposed: Trakr Opportunity & Resume Services
+- Legacy service title: Opportunity Matching API
 - Service type: A2MCP
 - Fee: `0 USDT`
 - Endpoint: `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`

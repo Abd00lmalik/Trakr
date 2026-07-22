@@ -2,78 +2,174 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
+const serviceChoices = [
+  { id: "opportunity_finding", value: "discover", number: 1, label: "Find opportunities" },
+  {
+    id: "resume_benchmarking_optimization",
+    value: "benchmark",
+    number: 2,
+    label: "Resume Benchmarking & Optimization",
+  },
+  { id: "resume_generation", value: "generate_resume", number: 3, label: "Resume Generation" },
+];
+
+const choiceSchema = {
+  type: "object",
+  required: ["id", "value", "label"],
+  properties: {
+    id: { type: "string" },
+    value: { type: "string" },
+    number: { type: "integer", minimum: 1 },
+    label: { type: "string" },
+    description: { type: "string" },
+  },
+};
+
+const continuationSchema = {
+  type: "object",
+  description:
+    "Opaque, encrypted, short-lived caller-carried state. Return it unchanged with the next answer. Numeric choices are valid only for the stage that issued this continuation.",
+  required: ["token", "expiresAt", "sessionVersion"],
+  properties: {
+    token: { type: "string", minLength: 40 },
+    expiresAt: { type: "string", format: "date-time" },
+    sessionVersion: { const: "2" },
+  },
+};
+
+const requiredInputSchema = {
+  type: "object",
+  required: ["id", "type", "required", "prompt"],
+  properties: {
+    id: { type: "string" },
+    type: { type: "string", enum: ["enum", "boolean", "text", "document", "object"] },
+    required: { type: "boolean" },
+    prompt: { type: "string" },
+    options: { type: "array", items: choiceSchema },
+    acceptedRepresentations: { type: "array", items: { type: "string" } },
+    acceptedMimeTypes: { type: "array", items: { type: "string" } },
+    maxBytes: { type: "integer", minimum: 1 },
+    fields: { type: "array", items: { type: "string" } },
+  },
+};
+
+const artifactSchema = {
+  type: "object",
+  required: [
+    "id",
+    "type",
+    "format",
+    "filename",
+    "mimeType",
+    "downloadUrl",
+    "expiresAt",
+    "sizeBytes",
+    "sha256",
+    "regenerateAction",
+  ],
+  properties: {
+    id: { type: "string" },
+    type: { type: "string", enum: ["resume", "cv", "application_document"] },
+    format: { type: "string", enum: ["docx", "pdf"] },
+    filename: { type: "string" },
+    mimeType: { type: "string" },
+    downloadUrl: {
+      type: "string",
+      format: "uri",
+      description: "Authorized short-lived bearer URL. Do not log, cache, or forward it.",
+    },
+    expiresAt: { type: "string", format: "date-time" },
+    sizeBytes: { type: "integer", minimum: 0 },
+    sha256: { type: "string" },
+    regenerateAction: { type: "string", enum: ["optimize", "generate_resume"] },
+  },
+};
+
+const structuredProfileSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string", description: "Confirmed heading name for generated documents." },
+    contactEmail: { type: "string", format: "email", description: "Optional user-approved email to include in generated artifacts." },
+    contactPhone: { type: "string", minLength: 5, maxLength: 40, description: "Optional user-approved phone number to include in generated artifacts." },
+    headline: { type: "string" },
+    bio: { type: "string" },
+    location: { type: "string" },
+    timezone: { type: "string" },
+    experienceLevel: {
+      type: "string",
+      enum: ["student", "beginner", "early-career", "mid-level", "senior", "founder", "creator"],
+    },
+    skills: { type: "array", items: { type: "string" } },
+    interests: { type: "array", items: { type: "string" } },
+    goals: { type: "array", items: { type: "string" } },
+    education: { type: "array", items: { type: "string" } },
+    workHistory: { type: "array", items: { type: "string" } },
+    projects: { type: "array", items: { type: "string" } },
+    research: { type: "array", items: { type: "string" } },
+    publications: { type: "array", items: { type: "string" } },
+    achievements: { type: "array", items: { type: "string" } },
+    awards: { type: "array", items: { type: "string" } },
+    volunteerExperience: { type: "array", items: { type: "string" } },
+    leadership: { type: "array", items: { type: "string" } },
+    certifications: { type: "array", items: { type: "string" } },
+    links: { type: "array", items: { type: "string", format: "uri" } },
+  },
+};
+
 export async function GET() {
   return NextResponse.json({
     openapi: "3.1.0",
     info: {
-      title: "Trakr A2MCP API",
-      version: "0.5.0",
+      title: "Trakr Opportunity & Resume Services",
+      version: "0.6.0",
       description:
-        "Trakr is an outcome-first conversational AI Opportunity Companion. Three visible services share one capability layer behind the stable POST /api/a2mcp/recommend endpoint.",
+        "One outcome-first, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request returns HTTP 200 with a machine-readable chooser and never assumes Opportunity Finding. Existing valid legacy recommendation payloads remain compatible.",
     },
     servers: [
       {
-        url: process.env.TRAKR_SERVICE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+        url:
+          process.env.TRAKR_SERVICE_URL ??
+          process.env.NEXT_PUBLIC_APP_URL ??
+          "http://localhost:3000",
       },
     ],
     paths: {
       "/api/a2mcp": {
         get: {
-          summary: "Service metadata",
-          responses: {
-            "200": {
-              description: "A2MCP metadata",
-            },
-          },
+          summary: "Discover Trakr's three A2MCP services and orchestration rules",
+          responses: { "200": { description: "A2MCP service metadata" } },
         },
       },
       "/api/a2mcp/recommend": {
         post: {
-          summary: "Generate opportunity recommendations",
+          summary: "Start or continue a Trakr opportunity or resume workflow",
+          description:
+            "The same endpoint supports start, discover, benchmark, optimize, and generate_resume. Bootstrap requests may have an empty body, {}, operation=start, an empty message, or a service declaration. Optimization requires a compatible benchmark and explicit approval. The service is free and returns no payment challenge.",
           requestBody: {
-            required: true,
+            required: false,
             content: {
               "application/json": {
                 schema: {
                   type: "object",
                   description:
-                    "An empty object opens the service chooser. Operation-only requests such as {\"operation\":\"discover\"} are valid. Legacy requests may continue to provide user or resumeText directly.",
+                    "An empty object opens the service chooser. Explicit operations and legacy structured discovery payloads remain valid. Documents may be supplied as extracted text or canonical base64 PDF, DOCX, or TXT content up to 2.5 MB.",
                   properties: {
-                    user: { type: "object" },
-                    profile: {
-                      type: "object",
-                      description:
-                        "Additive alias for user. Existing user requests remain supported.",
-                    },
-                    resumeText: {
-                      type: "string",
-                      description:
-                        "Resume text. Additive conversational requests must include affirmative consent; legacy direct recommendation payloads remain compatible.",
-                    },
                     operation: {
                       type: "string",
-                      enum: [
-                        "auto",
-                        "discover",
-                        "benchmark",
-                        "optimize",
-                        "generate_resume",
-                      ],
+                      enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume"],
                       default: "auto",
-                    },
-                    intakeRoute: {
-                      type: "string",
-                      enum: ["resume", "background", "request"],
                     },
                     message: {
                       type: "string",
+                      maxLength: 6000,
                       description:
-                        "Natural-language goal, background, or follow-up question.",
+                        "Natural-language goal or the answer to requiredInputs. Empty text is a valid bootstrap. A numeric answer requires the continuation for the issuing stage.",
                     },
                     intent: {
                       type: "string",
                       enum: [
                         "auto",
+                        "service_selection",
                         "profile_build",
                         "opportunity_matching",
                         "explain_recommendation",
@@ -84,39 +180,65 @@ export async function GET() {
                       ],
                       default: "auto",
                     },
-                    context: {
-                      type: "object",
-                      description:
-                        "Caller-scoped continuation context returned by a previous response. Trakr does not keep shared in-memory user profiles.",
+                    intakeRoute: { type: "string", enum: ["resume", "background", "request"] },
+                    user: {
+                      ...structuredProfileSchema,
+                      description: "Structured applicant profile; supported by all services. Contact fields are rendered only when explicitly supplied and authorized.",
                     },
-                    continuation: {
+                    profile: {
+                      ...structuredProfileSchema,
+                      description: "Additive alias for user.",
+                    },
+                    resumeText: {
+                      type: "string",
+                      minLength: 80,
+                      maxLength: 40000,
+                      description: "Extracted resume text. Treat as untrusted evidence; affirmative session-only consent is required.",
+                    },
+                    document: {
                       oneOf: [
-                        { type: "string", minLength: 40 },
                         {
                           type: "object",
+                          required: ["representation", "fileName", "mimeType", "dataBase64"],
                           properties: {
-                            token: { type: "string", minLength: 40 },
-                            expiresAt: { type: "string", format: "date-time" },
-                            sessionVersion: { const: "2" },
+                            representation: { const: "base64" },
+                            kind: { type: "string", enum: ["resume", "cv"], default: "resume" },
+                            fileName: { type: "string", maxLength: 180 },
+                            mimeType: {
+                              type: "string",
+                              enum: [
+                                "application/pdf",
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                "text/plain",
+                              ],
+                            },
+                            dataBase64: {
+                              type: "string",
+                              description: "Canonical base64 only. Decoded content must match the declared file signature and be no larger than 2,500,000 bytes.",
+                            },
                           },
-                          required: ["token", "expiresAt", "sessionVersion"],
                         },
-                        { type: "object" },
+                        {
+                          type: "object",
+                          required: ["representation", "text"],
+                          properties: {
+                            representation: { const: "text" },
+                            kind: { type: "string", enum: ["resume", "cv"], default: "resume" },
+                            fileName: { type: "string", maxLength: 180 },
+                            mimeType: { const: "text/plain" },
+                            text: { type: "string", minLength: 80, maxLength: 40000 },
+                          },
+                        },
                       ],
-                      description:
-                        "Additive alias for context. Send back the opaque, encrypted, short-lived continuation returned by the previous response.",
                     },
                     consent: {
                       type: "object",
+                      required: ["processPersonalData"],
                       properties: {
                         processPersonalData: { type: "boolean" },
-                        retention: { const: "session_only" },
-                        source: {
-                          type: "string",
-                          enum: ["explicit", "implicit_legacy"],
-                        },
+                        retention: { const: "session_only", default: "session_only" },
+                        source: { type: "string", enum: ["explicit", "implicit_legacy"], default: "explicit" },
                       },
-                      required: ["processPersonalData"],
                     },
                     target: {
                       type: "object",
@@ -128,28 +250,15 @@ export async function GET() {
                         organization: { type: "string" },
                         opportunityType: {
                           type: "string",
-                          enum: [
-                            "hackathon",
-                            "grant",
-                            "scholarship",
-                            "fellowship",
-                            "internship",
-                            "remote_job",
-                            "web3_bounty",
-                          ],
+                          enum: ["hackathon", "grant", "scholarship", "fellowship", "internship", "remote_job", "web3_bounty"],
                         },
-                        description: {
+                        description: { type: "string", minLength: 20, maxLength: 12000 },
+                        requirements: { type: "array", maxItems: 50, items: { type: "string", maxLength: 1000 } },
+                        url: {
                           type: "string",
-                          maxLength: 12000,
-                          description:
-                            "Captured target description or dated snapshot text. Unknown URLs are not scraped automatically.",
+                          format: "uri",
+                          description: "Only known Trakr opportunity URLs are resolved. Unknown URLs are not fetched; paste a stable description instead.",
                         },
-                        requirements: {
-                          type: "array",
-                          maxItems: 50,
-                          items: { type: "string", maxLength: 1000 },
-                        },
-                        url: { type: "string", format: "uri" },
                         locale: { type: "string" },
                       },
                     },
@@ -175,17 +284,15 @@ export async function GET() {
                           ],
                         },
                         locale: { type: "string" },
-                        format: {
-                          type: "string",
-                          enum: ["plain_text", "markdown", "docx_ready"],
-                        },
+                        format: { type: "string", enum: ["plain_text", "markdown", "docx_ready"] },
                         pageLimit: { type: "integer", minimum: 1, maximum: 20 },
-                        instructions: {
-                          type: "array",
-                          maxItems: 12,
-                          items: { type: "string" },
-                        },
+                        instructions: { type: "array", maxItems: 12, items: { type: "string" } },
                       },
+                    },
+                    context: continuationSchema,
+                    continuation: {
+                      oneOf: [continuationSchema, { type: "string", minLength: 40 }],
+                      description: "Additive alias for context. Return the prior opaque continuation unchanged.",
                     },
                     goals: { type: "array", items: { type: "string" } },
                     interests: { type: "array", items: { type: "string" } },
@@ -193,271 +300,149 @@ export async function GET() {
                     requestId: { type: "string" },
                   },
                 },
+                examples: {
+                  emptyBootstrap: { summary: "Ambiguous cold start", value: {} },
+                  explicitBootstrap: { summary: "Explicit cold start", value: { operation: "start" } },
+                  serviceDeclaration: {
+                    summary: "Legacy Agent 5198 declaration remains ambiguous",
+                    value: {
+                      message:
+                        "I'd like to use the service provided by Agent 5198. Service title: Opportunity Matching API. Service type: A2MCP.",
+                    },
+                  },
+                  directDiscovery: { value: { message: "Find remote AI internships for a student in Nigeria." } },
+                  directBenchmark: { value: { operation: "benchmark", resumeText: "Synthetic resume text...", target: { role: "Frontend Intern" }, consent: { processPersonalData: true } } },
+                  directGeneration: { value: { operation: "generate_resume", user: { headline: "Student developer" }, target: { role: "Frontend Intern" } } },
+                },
               },
             },
           },
           responses: {
             "200": {
               description:
-                "Ranked recommendations with grounded opportunity records, aiStatus, reasoning, gaps, next steps, action plan, and learning roadmap.",
+                "Conversational state or a completed service result. Bootstrap returns choose_service, status needs_input, all three options, and an opaque continuation. Legacy recommendation fields remain present for compatible clients.",
               content: {
                 "application/json": {
                   schema: {
                     type: "object",
-                    required: [
-                      "service",
-                      "version",
-                      "requestId",
-                      "generatedAt",
-                      "provider",
-                      "aiStatus",
-                      "querySummary",
-                      "recommendations",
-                      "actionPlan",
-                      "learningRoadmap",
-                      "agentNotes",
-                    ],
+                    required: ["service", "version", "requestId", "generatedAt", "provider", "aiStatus", "querySummary", "recommendations", "actionPlan", "learningRoadmap", "agentNotes"],
                     properties: {
                       service: { const: "trakr" },
                       version: { type: "string" },
                       requestId: { type: "string" },
                       generatedAt: { type: "string", format: "date-time" },
                       provider: { type: "string" },
-                      aiStatus: {
-                        type: "string",
-                        enum: ["enhanced", "retrying", "degraded", "fallback"],
+                      aiStatus: { type: "string", enum: ["enhanced", "retrying", "degraded", "fallback"] },
+                      operation: { type: "string", enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume"] },
+                      stage: { type: "string" },
+                      status: { type: "string", enum: ["needs_input", "in_progress", "completed"] },
+                      message: { type: "string" },
+                      selectedService: {
+                        type: ["string", "null"],
+                        enum: [null, "opportunity_finding", "resume_benchmarking_optimization", "resume_generation"],
                       },
-                      recommendations: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            rank: { type: "integer" },
-                            matchScore: { type: "number", minimum: 0, maximum: 100 },
-                            reasoning: { type: "string" },
-                            missingRequirements: {
-                              type: "array",
-                              items: { type: "string" },
-                            },
-                            recommendedAction: {
-                              type: "string",
-                              enum: ["Apply Now", "Prepare First", "Skip"],
-                            },
-                            confidenceScore: {
-                              type: "number",
-                              minimum: 0,
-                              maximum: 100,
-                            },
-                            guidanceAction: {
-                              type: "string",
-                              enum: [
-                                "apply_now",
-                                "prepare_first",
-                                "explore",
-                                "not_currently_recommended",
-                              ],
-                            },
-                            nextSteps: {
-                              type: "array",
-                              items: { type: "string" },
-                            },
-                            opportunity: {
-                              type: "object",
-                              properties: {
-                                verificationStatus: {
-                                  type: "string",
-                                  enum: [
-                                    "verified",
-                                    "program_directory",
-                                    "inactive_listing",
-                                    "unverified",
-                                  ],
-                                },
-                                lastVerifiedAt: {
-                                  type: ["string", "null"],
-                                  format: "date-time",
-                                },
-                                lastSeenAt: {
-                                  type: ["string", "null"],
-                                  format: "date-time",
-                                },
-                                sourceStatus: {
-                                  type: "string",
-                                  enum: [
-                                    "active",
-                                    "redirected",
-                                    "blocked",
-                                    "unreachable",
-                                    "inactive",
-                                    "stale",
-                                    "unverified",
-                                  ],
-                                },
-                                httpStatus: {
-                                  type: ["integer", "null"],
-                                },
-                                canonicalUrl: {
-                                  type: "string",
-                                  format: "uri",
-                                },
-                                publisherDomain: { type: "string" },
-                                isActive: { type: "boolean" },
-                                verificationConfidence: {
-                                  type: "number",
-                                  minimum: 0,
-                                  maximum: 1,
-                                },
-                              },
-                            },
-                          },
-                        },
-                      },
+                      requiredInputs: { type: "array", items: requiredInputSchema },
+                      nextActions: { type: "array", items: { type: "string" } },
+                      continuation: continuationSchema,
+                      artifacts: { type: "array", items: artifactSchema },
+                      querySummary: { type: "object" },
+                      recommendations: { type: "array", items: { type: "object" } },
+                      actionPlan: { type: "object" },
+                      learningRoadmap: { type: "object" },
+                      agentNotes: { type: "array", items: { type: "string" } },
                       conversation: {
                         type: "object",
-                        description:
-                          "Additive conversational state for natural-language and follow-up requests.",
+                        description: "Server-authoritative state. External agents should ask for requiredInputs and submit the user's answer with continuation.",
+                        required: ["state", "intent", "service", "operation", "stage", "status", "message", "requiredInputs", "nextActions", "continuation"],
                         properties: {
-                          state: {
-                            type: "string",
-                            enum: [
-                              "choose_service",
-                              "service_pending",
-                              "consent_required",
-                              "choose_profile_source",
-                              "awaiting_resume",
-                              "collecting_background",
-                              "needs_more_information",
-                              "profile_confirmation",
-                              "ready_to_recommend",
-                              "recommendations",
-                              "explanation",
-                              "readiness",
-                              "resume_benchmark",
-                              "resume_optimization",
-                              "resume_generation",
-                            ],
-                          },
+                          state: { type: "string" },
+                          intent: { type: "string" },
                           service: {
-                            type: "string",
-                            enum: [
-                              "opportunity_finding",
-                              "resume_benchmarking_optimization",
-                              "resume_generation",
-                            ],
+                            type: ["string", "null"],
+                            enum: [null, "opportunity_finding", "resume_benchmarking_optimization", "resume_generation"],
                           },
-                          operation: {
-                            type: "string",
-                            enum: [
-                              "auto",
-                              "discover",
-                              "benchmark",
-                              "optimize",
-                              "generate_resume",
-                            ],
-                          },
-                          profileSource: {
-                            type: "string",
-                            enum: ["resume", "background", "request"],
-                            description:
-                              "The active Opportunity Finding intake route for this response.",
-                          },
+                          operation: { type: "string" },
                           stage: { type: "string" },
+                          status: { type: "string", enum: ["needs_input", "in_progress", "completed"] },
                           message: { type: "string" },
-                          profile: { type: "object" },
-                          missingInformation: {
-                            type: "array",
-                            items: { type: "object" },
-                          },
-                          nextActions: {
-                            type: "array",
-                            items: { type: "string" },
-                          },
-                          continuation: { type: "object" },
                           requiredAction: { type: "string" },
-                          choices: {
-                            type: "array",
-                            items: {
-                              type: "object",
-                              properties: {
-                                id: { type: "string" },
-                                label: { type: "string" },
-                                description: { type: "string" },
-                              },
-                            },
-                          },
+                          requiredInputs: { type: "array", items: requiredInputSchema },
+                          choices: { type: "array", items: choiceSchema },
+                          nextActions: { type: "array", items: { type: "string" } },
+                          continuation: continuationSchema,
+                          profile: { type: "object" },
+                          missingInformation: { type: "array", items: { type: "object" } },
                         },
                       },
                       capabilityResult: {
                         type: "object",
                         description:
-                          "Grounded explanation, readiness, target-specific benchmark, evidence-traceable optimization, or claim-linked generated document. Benchmark scores are transparent heuristics, not hiring predictions or a universal ATS score.",
+                          "Grounded benchmark, evidence-traceable optimization, or claim-linked generated document. Scores are transparent heuristics, not hiring predictions, interview probabilities, or a reproduction of a specific ATS.",
                         properties: {
-                          resumeGeneration: {
-                            type: "object",
-                            description:
-                              "Target-specific generated artifact. Every non-placeholder applicant statement includes supporting evidenceClaimIds; unsupported facts are omitted.",
-                            properties: {
-                              generationId: { type: "string" },
-                              rubricVersion: { type: "string" },
-                              documentType: { type: "string" },
-                              documentTypeReason: { type: "string" },
-                              target: { type: "string" },
-                              locale: { type: "string" },
-                              format: { type: "string" },
-                              pageLimit: {
-                                type: "integer",
-                                nullable: true,
-                                minimum: 1,
-                                maximum: 20,
-                              },
-                              instructions: {
-                                type: "array",
-                                items: { type: "string" },
-                              },
-                              title: { type: "string" },
-                              sections: { type: "array" },
-                              placeholders: {
-                                type: "array",
-                                items: { type: "string" },
-                              },
-                              omittedUnsupportedClaims: {
-                                type: "array",
-                                items: { type: "string" },
-                              },
-                              followUpQuestions: {
-                                type: "array",
-                                items: { type: "string" },
-                              },
-                              verificationChecklist: {
-                                type: "array",
-                                items: { type: "string" },
-                              },
-                              factualIntegrity: { type: "string" },
-                            },
-                          },
+                          resumeBenchmark: { type: "object" },
+                          resumeOptimization: { type: "object" },
+                          resumeGeneration: { type: "object" },
                         },
+                      },
+                    },
+                  },
+                  examples: {
+                    chooser: {
+                      value: {
+                        requestId: "request_example",
+                        operation: "start",
+                        stage: "choose_service",
+                        status: "needs_input",
+                        message:
+                          "Choose a service:\n1. Find opportunities\n2. Resume Benchmarking & Optimization\n3. Resume Generation",
+                        selectedService: null,
+                        requiredInputs: [
+                          { id: "service", type: "enum", required: true, prompt: "Choose a service", options: serviceChoices },
+                        ],
+                        nextActions: ["discover", "benchmark", "generate_resume"],
+                        continuation: { token: "opaque-encrypted-token-at-least-forty-characters", expiresAt: "2026-07-21T12:30:00.000Z", sessionVersion: "2" },
                       },
                     },
                   },
                 },
               },
             },
-            "400": {
-              description: "Structured validation, session, or request error",
-            },
-            "409": {
-              description: "Idempotency key conflict",
-            },
-            "410": {
-              description: "Expired continuation reference",
-            },
+            "400": { description: "Malformed JSON, schema-invalid input, unsafe document, invalid continuation, or unsupported content" },
+            "409": { description: "Idempotency key reused with different request content" },
+            "410": { description: "Expired continuation; start a fresh session" },
             "429": { description: "Rate limit exceeded" },
+            "503": { description: "Required session or artifact persistence is unavailable" },
+          },
+        },
+      },
+      "/api/artifacts/{id}": {
+        get: {
+          summary: "Download an authorized generated DOCX or PDF artifact",
+          description:
+            "Use the complete short-lived downloadUrl returned by optimize or generate_resume. The token is bearer authorization, stored only as a hash, and must not be logged or forwarded. Expired artifacts can be regenerated through their declared operation and trusted session.",
+          parameters: [
+            { name: "id", in: "path", required: true, schema: { type: "string" } },
+            { name: "token", in: "query", required: true, schema: { type: "string" } },
+          ],
+          responses: {
+            "200": {
+              description: "Attachment-only DOCX or PDF response with no-store headers and X-Artifact-SHA256",
+              content: {
+                "application/pdf": { schema: { type: "string", format: "binary" } },
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+                  schema: { type: "string", format: "binary" },
+                },
+              },
+            },
+            "401": { description: "Download token missing" },
+            "404": { description: "Artifact not found or token invalid" },
+            "410": { description: "Artifact expired" },
           },
         },
       },
       "/api/profile/parse-resume": {
         post: {
-          summary: "Parse PDF, DOCX, or TXT resume into text and a draft profile",
+          summary: "Parse a PDF, DOCX, or TXT resume before sending extracted text",
           requestBody: {
             required: true,
             content: {
@@ -466,15 +451,11 @@ export async function GET() {
                   type: "object",
                   required: ["resume", "consent"],
                   properties: {
-                    resume: {
-                      type: "string",
-                      format: "binary",
-                    },
+                    resume: { type: "string", format: "binary" },
                     consent: {
                       type: "string",
                       enum: ["true", "false"],
-                      description:
-                        "Required explicit session-only resume-processing consent. Only the value true permits processing.",
+                      description: "Required explicit session-only resume-processing consent. Only true permits processing.",
                     },
                   },
                 },
@@ -482,54 +463,53 @@ export async function GET() {
             },
           },
           responses: {
-            "200": {
-              description: "Parsed resume text and profile draft",
-            },
-            "400": {
-              description: "Unsupported or missing resume",
-            },
-            "403": {
-              description:
-                "Resume processing consent is absent or not affirmative",
-            },
-            "422": {
-              description: "Resume contains insufficient readable text",
-            },
+            "200": { description: "Parsed resume text and profile draft" },
+            "400": { description: "Unsupported, malformed, oversized, or missing resume" },
+            "403": { description: "Resume-processing consent absent or not affirmative" },
+            "422": { description: "Insufficient readable text" },
           },
         },
       },
       "/api/health": {
         get: {
-          summary: "Runtime health",
-          responses: {
-            "200": {
-              description: "Health and readiness details",
-            },
-          },
+          summary: "Runtime and persistence readiness",
+          responses: { "200": { description: "Database, inventory, and artifact-storage readiness" } },
         },
       },
       "/api/ingest": {
         post: {
-          summary: "Refresh structured opportunity sources",
+          summary: "Refresh approved structured opportunity sources",
           security: [{ ingestApiKey: [] }],
           responses: {
-            "200": {
-              description: "Ingestion completed",
-            },
-            "401": {
-              description: "Missing or invalid ingestion key",
-            },
+            "200": { description: "Ingestion completed" },
+            "401": { description: "Missing or invalid operator key" },
           },
         },
       },
     },
     components: {
       securitySchemes: {
-        ingestApiKey: {
-          type: "apiKey",
-          in: "header",
-          name: "x-ingest-api-key",
-        },
+        ingestApiKey: { type: "apiKey", in: "header", name: "x-ingest-api-key" },
+      },
+    },
+    "x-trakr-orchestration": {
+      routingPriority: [
+        "valid continuation and current stage",
+        "explicit operation",
+        "clear natural-language intent",
+        "legacy structured discovery request",
+        "ambiguous cold start",
+      ],
+      bootstrap: {
+        status: 200,
+        stage: "choose_service",
+        options: serviceChoices,
+      },
+      payment: {
+        pricing: "free",
+        paymentRequired: false,
+        needsConfirm: false,
+        behavior: "HTTP 200 without PAYMENT-REQUIRED, WWW-Authenticate: Payment, or payment attempt",
       },
     },
   });

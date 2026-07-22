@@ -14,7 +14,8 @@ export async function GET() {
       database.schemaReady &&
       database.privacyLoggingReady &&
       database.sourceVerificationReady &&
-      database.inventoryMetadataReady);
+      database.inventoryMetadataReady &&
+      database.artifactStorageReady);
   const status = databaseReady ? "ok" : "degraded";
 
   return NextResponse.json({

@@ -116,6 +116,8 @@ export function compactProfileForSession(
 
   return {
     name: compactText(profile.name, 160),
+    contactEmail: compactText(profile.contactEmail, 254),
+    contactPhone: compactText(profile.contactPhone, 40),
     headline: compactText(profile.headline, 240),
     bio: compactText(profile.bio, 480),
     location: compactText(profile.location, 160),
@@ -282,6 +284,7 @@ function normalizedContext(context: CompanionContext): CompanionContext {
     profile: compactProfileForSession(context.profile),
     profileEvidence: compactEvidence(context.profileEvidence ?? []),
     target: compactTargetForSession(context.target),
+    optimizationApproved: context.optimizationApproved,
     generationPreferences: context.generationPreferences,
     unansweredQuestions: compactList(context.unansweredQuestions ?? [], {
       maxItems: 12,

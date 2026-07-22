@@ -22,6 +22,8 @@ export function sanitizeUntrustedProfile(
     value && !isInstructionLikeContent(value) ? value : undefined;
   return {
     name: scalar(profile.name),
+    contactEmail: scalar(profile.contactEmail),
+    contactPhone: scalar(profile.contactPhone),
     headline: scalar(profile.headline),
     bio: scalar(profile.bio),
     location: scalar(profile.location),

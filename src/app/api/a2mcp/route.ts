@@ -6,16 +6,18 @@ export const runtime = "nodejs";
 export async function GET() {
   return NextResponse.json({
     service: "trakr",
-    version: "0.5.0",
+    displayTitle: "Trakr Opportunity & Resume Services",
+    legacyServiceTitle: "Opportunity Matching API",
+    version: "0.6.0",
     type: "A2MCP",
     description:
-      "Outcome-first AI Opportunity Companion with three user-facing services and one additive A2MCP endpoint.",
+      "One conversational A2MCP endpoint for Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. An empty or ambiguous bootstrap request returns a machine-readable three-service menu.",
     endpoints: {
       recommend: {
         method: "POST",
         path: "/api/a2mcp/recommend",
         description:
-          "Accepts explicit operations, structured profile data, resume text, natural-language requests, or an opaque caller-carried continuation reference. Existing legacy structured recommendation requests remain supported.",
+          "Accepts an empty bootstrap body, operation start, explicit service operations, structured profile data, supported resume representations, natural-language requests, or an opaque caller-carried continuation reference. Existing legacy structured recommendation requests remain supported.",
       },
       health: {
         method: "GET",
@@ -28,6 +30,12 @@ export async function GET() {
       parseResume: {
         method: "POST",
         path: "/api/profile/parse-resume",
+      },
+      artifactDownload: {
+        method: "GET",
+        path: "/api/artifacts/{id}?token={short-lived-token}",
+        description:
+          "Downloads a generated DOCX or PDF through the short-lived bearer URL returned by optimize or generate_resume.",
       },
       ingest: {
         method: "POST",
@@ -82,7 +90,31 @@ export async function GET() {
         ],
       },
     ],
-    operations: ["auto", "discover", "benchmark", "optimize", "generate_resume"],
+    bootstrap: {
+      operation: "start",
+      accepts: [{}, { operation: "start" }, { message: "" }],
+      stage: "choose_service",
+      status: "needs_input",
+      options: [
+        { value: "discover", number: 1, label: "Find opportunities" },
+        {
+          value: "benchmark",
+          number: 2,
+          label: "Resume Benchmarking & Optimization",
+        },
+        { value: "generate_resume", number: 3, label: "Resume Generation" },
+      ],
+      rule:
+        "A service declaration or legacy display title alone is ambiguous and must not route to Opportunity Finding.",
+    },
+    operations: [
+      "start",
+      "auto",
+      "discover",
+      "benchmark",
+      "optimize",
+      "generate_resume",
+    ],
     inputModes: [
       "structured_profile",
       "profile_alias",
@@ -90,7 +122,24 @@ export async function GET() {
       "natural_language",
       "continuation_context",
       "continuation_alias",
+      "base64_pdf_docx_txt",
+      "multipart_resume_parser_then_resume_text",
     ],
+    documentInput: {
+      endpointRepresentations: [
+        "resumeText",
+        "document.representation=text",
+        "document.representation=base64",
+      ],
+      multipartParser: "/api/profile/parse-resume",
+      acceptedMimeTypes: [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "text/plain",
+      ],
+      maxBytes: 2500000,
+      remoteDocumentUrls: "not_supported",
+    },
     conversationalStates: [
       "choose_service",
       "service_pending",
@@ -107,6 +156,19 @@ export async function GET() {
       "resume_optimization",
       "resume_generation",
     ],
+    orchestrationContract: {
+      authority:
+        "The response stage, status, requiredInputs, nextActions, and continuation determine the next valid caller action.",
+      numericChoices:
+        "Numeric aliases are valid only with the continuation for the menu stage that issued them.",
+      priority: [
+        "valid continuation and current stage",
+        "explicit operation",
+        "clear natural-language intent",
+        "legacy structured discovery request",
+        "ambiguous cold start",
+      ],
+    },
     capabilities: [
       "profile building without a resume",
       "session-scoped profile evidence with explicit, inferred, and unknown facts",
@@ -116,6 +178,7 @@ export async function GET() {
       "target-specific resume benchmarking with evidence mapping",
       "grounded resume optimization after a compatible benchmark",
       "target-specific resume and CV generation from confirmed evidence",
+      "real short-lived DOCX and PDF artifacts for successful optimization and generation",
       "artifact selection across professional resumes, internship resumes, academic and research CVs, biosketches, scholarship and fellowship profiles, grant profiles, hackathon profiles, and portfolio-oriented resumes",
     ],
     futureBilling: {
@@ -136,6 +199,7 @@ export async function GET() {
       "unknown profile information remains unknown rather than being invented",
       "resume optimization never fabricates jobs, degrees, projects, metrics, certifications, or skills",
       "resume generation links every non-placeholder applicant statement to confirmed claim IDs",
+      "download tokens are random, stored only as hashes, expire, and never expose local filesystem paths",
       "missing generation facts become focused questions, placeholders, or omissions",
       "conversation continuation context is caller-scoped and not stored as shared user memory",
       "raw AI provider errors are never returned to callers",

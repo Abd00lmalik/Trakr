@@ -34,6 +34,28 @@ async function jsonPost(body, headers = {}) {
   });
 }
 
+async function assertArtifacts(artifacts) {
+  assert.equal(artifacts?.length, 2);
+  assert.deepEqual(
+    artifacts.map((artifact) => artifact.format).sort(),
+    ["docx", "pdf"],
+  );
+  for (const artifact of artifacts) {
+    assert.equal(artifact.regenerateAction, "generate_resume");
+    const response = await fetch(artifact.downloadUrl, { redirect: "error" });
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), artifact.mimeType);
+    assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+    assert.equal(bytes.byteLength, artifact.sizeBytes);
+    if (artifact.format === "pdf") {
+      assert.equal(bytes.subarray(0, 5).toString("ascii"), "%PDF-");
+    } else {
+      assert.equal(bytes.subarray(0, 2).toString("ascii"), "PK");
+    }
+  }
+}
+
 async function run(id, operation) {
   const startedAt = Date.now();
   try {
@@ -118,8 +140,9 @@ await run("S3-PROD-001-health-metadata-openapi", async () => {
   assert.equal(health.body.ok, true);
   assert.equal(health.body.database.connected, true);
   assert.equal(health.body.database.inventoryMetadataReady, true);
+  assert.equal(health.body.database.artifactStorageReady, true);
   assert.equal(metadata.response.status, 200);
-  assert.equal(metadata.body.version, "0.5.0");
+  assert.equal(metadata.body.version, "0.6.0");
   assert.equal(
     metadata.body.services.find((service) => service.id === "resume_generation")
       ?.status,
@@ -129,12 +152,13 @@ await run("S3-PROD-001-health-metadata-openapi", async () => {
   assert.equal(metadata.body.submission.pricing, "free");
   assert.equal(metadata.body.submission.paymentRequired, false);
   assert.equal(openapi.response.status, 200);
-  assert.equal(openapi.body.info.version, "0.5.0");
+  assert.equal(openapi.body.info.version, "0.6.0");
   return {
     status: 200,
     version: metadata.body.version,
     databaseConnected: health.body.database.connected,
     inventoryMetadataReady: health.body.database.inventoryMetadataReady,
+    artifactStorageReady: health.body.database.artifactStorageReady,
   };
 });
 
@@ -233,11 +257,13 @@ BSc Computer Science student at Fictional University.`,
   assert.equal(generation.locale, "Nigeria");
   assert.equal(generation.pageLimit, 2);
   assert.deepEqual(generation.instructions, ["Keep the document concise."]);
+  await assertArtifacts(result.body.artifacts);
   generatedResponse = result.body;
   return {
     status: result.response.status,
     documentType: generation.documentType,
     statements: generation.sections.flatMap((section) => section.items).length,
+    artifacts: result.body.artifacts.length,
   };
 });
 

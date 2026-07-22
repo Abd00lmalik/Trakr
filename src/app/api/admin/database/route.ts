@@ -47,7 +47,8 @@ export async function POST(request: Request) {
         database.schemaReady &&
         database.privacyLoggingReady &&
         database.sourceVerificationReady &&
-        database.inventoryMetadataReady,
+        database.inventoryMetadataReady &&
+        database.artifactStorageReady,
       migration,
       seed,
       database,

@@ -2278,6 +2278,16 @@ export function buildResumeGeneration(
   const selection = requestedDocumentType(request, profile, opportunity);
   const benchmark = buildResumeBenchmark(request, profile, evidence, opportunity);
   const name = generationValues(profile, evidence, "name").at(-1);
+  const contactEmail = generationValues(
+    profile,
+    evidence,
+    "contactEmail",
+  ).at(-1);
+  const contactPhone = generationValues(
+    profile,
+    evidence,
+    "contactPhone",
+  ).at(-1);
   const headline = generationValues(profile, evidence, "headline").at(-1);
   const location = generationValues(profile, evidence, "location").at(-1);
   const skills = generationValues(profile, evidence, "skills");
@@ -2319,12 +2329,38 @@ export function buildResumeGeneration(
           requiresConfirmation: false,
         }
       : null,
-    {
-      text: "[Confirm preferred contact details]",
-      evidenceClaimIds: [],
-      placeholder: true,
-      requiresConfirmation: true,
-    },
+    contactEmail
+      ? {
+          text: contactEmail,
+          evidenceClaimIds: generationClaimIdsForValue(
+            evidence,
+            "contactEmail",
+            contactEmail,
+          ),
+          placeholder: false,
+          requiresConfirmation: false,
+        }
+      : null,
+    contactPhone
+      ? {
+          text: contactPhone,
+          evidenceClaimIds: generationClaimIdsForValue(
+            evidence,
+            "contactPhone",
+            contactPhone,
+          ),
+          placeholder: false,
+          requiresConfirmation: false,
+        }
+      : null,
+    !contactEmail && !contactPhone
+      ? {
+          text: "[Confirm preferred contact details]",
+          evidenceClaimIds: [],
+          placeholder: true,
+          requiresConfirmation: true,
+        }
+      : null,
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   const summaryParts = [
@@ -2430,7 +2466,9 @@ export function buildResumeGeneration(
     .map((item) => item.text);
   const questions = uniqueStrings([
     !name ? "What full name should appear on the document?" : "",
-    "Which email address, phone number, and location should appear in the final document?",
+    !contactEmail && !contactPhone
+      ? "Which email address or phone number should appear in the final document?"
+      : "",
     !skills.length
       ? "Which skills can you verify and want included for this target?"
       : "",

@@ -330,11 +330,11 @@ test("optimize returns a benchmark first and continues with the same trusted ses
   assert.equal(first.conversation?.state, "resume_benchmark");
   assert.equal(
     first.conversation?.requiredAction,
-    "review_benchmark_before_optimization",
+    "confirm_optimization",
   );
   assert.ok(first.capabilityResult?.resumeBenchmark);
   const context = resolveSessionContext(first.conversation?.continuation);
-  assert.equal(context?.stage, "benchmark_complete");
+  assert.equal(context?.stage, "optimize_confirmation");
   assert.equal(context?.target?.role, "Frontend Engineer Intern");
   assert.equal(
     context?.lastBenchmark?.benchmarkId,
@@ -344,7 +344,7 @@ test("optimize returns a benchmark first and continues with the same trusted ses
   const second = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       operation: "optimize",
-      message: "Continue with optimization.",
+      message: "Yes, optimize using only my confirmed information.",
       continuation: first.conversation?.continuation,
     }),
   );
@@ -364,6 +364,12 @@ test("optimize returns a benchmark first and continues with the same trusted ses
   assert.equal(JSON.stringify(optimization).includes("increased revenue"), false);
   assert.equal(JSON.stringify(optimization).includes("10,000"), false);
   assert.ok(optimization.verificationChecklist.some((item) => /metrics only/i.test(item)));
+  assert.equal(second.conversation?.stage, "optimize_completed");
+  assert.equal(second.artifacts?.length, 2);
+  assert.deepEqual(
+    second.artifacts?.map((artifact) => artifact.format).sort(),
+    ["docx", "pdf"],
+  );
   for (const rewrite of optimization.sectionRewrites) {
     const supportingIds: string[] = (first.conversation?.profile.evidence
       .filter(
@@ -409,7 +415,7 @@ test("a changed target invalidates the prior benchmark", async () => {
   assert.equal(changed.conversation?.state, "resume_benchmark");
   assert.equal(
     changed.conversation?.requiredAction,
-    "review_benchmark_before_optimization",
+    "confirm_optimization",
   );
   assert.equal(changed.capabilityResult?.resumeOptimization, undefined);
   assert.equal(changed.capabilityResult?.resumeBenchmark?.target, "Data Analyst");
@@ -572,7 +578,7 @@ test("natural-language optimization requests still benchmark before optimizing",
   assert.equal(response.conversation?.state, "resume_benchmark");
   assert.equal(
     response.conversation?.requiredAction,
-    "review_benchmark_before_optimization",
+    "confirm_optimization",
   );
   assert.equal(response.capabilityResult?.resumeOptimization, undefined);
 });

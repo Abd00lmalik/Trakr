@@ -756,16 +756,60 @@ export function buildProfileDraftFromBackground(text: string) {
   return extractProfileFromText(text, "user");
 }
 
-export async function parseResumeFile(file: File) {
-  const buffer = Buffer.from(await file.arrayBuffer());
-  const contentType = file.type;
-  const lowerName = file.name.toLowerCase();
-
+function validateResumeSignature(
+  buffer: Buffer,
+  contentType: string,
+  lowerName: string,
+) {
   if (buffer.byteLength > 2_500_000) {
     throw new Error("Resume file is too large. Maximum supported size is 2.5 MB.");
   }
 
-  if (contentType === "application/pdf" || lowerName.endsWith(".pdf")) {
+  const isPdf =
+    contentType === "application/pdf" || lowerName.endsWith(".pdf");
+  const isDocx =
+    contentType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    lowerName.endsWith(".docx");
+  const isText = contentType === "text/plain" || lowerName.endsWith(".txt");
+
+  if (isPdf && !buffer.subarray(0, 5).equals(Buffer.from("%PDF-"))) {
+    throw new Error("The supplied PDF does not have a valid PDF signature.");
+  }
+  if (
+    isDocx &&
+    !buffer.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]))
+  ) {
+    throw new Error("The supplied DOCX does not have a valid ZIP document signature.");
+  }
+  if (
+    isText &&
+    buffer.subarray(0, 2).some((value) => value === 0) &&
+    !buffer.subarray(0, 2).equals(Buffer.from([0xff, 0xfe])) &&
+    !buffer.subarray(0, 2).equals(Buffer.from([0xfe, 0xff]))
+  ) {
+    throw new Error("The supplied text document appears to contain binary content.");
+  }
+
+  if (!isPdf && !isDocx && !isText) {
+    throw new Error("Unsupported resume type. Upload a PDF, DOCX, or TXT file.");
+  }
+
+  return { isPdf, isDocx, isText };
+}
+
+export async function parseResumeBuffer(
+  buffer: Buffer,
+  options: {
+    contentType: string;
+    fileName: string;
+  },
+) {
+  const contentType = options.contentType;
+  const lowerName = options.fileName.toLowerCase();
+  const kind = validateResumeSignature(buffer, contentType, lowerName);
+
+  if (kind.isPdf) {
     const { PDFParse } = await import("pdf-parse");
     const parser = new PDFParse({ data: buffer });
     try {
@@ -776,18 +820,21 @@ export async function parseResumeFile(file: File) {
     }
   }
 
-  if (
-    contentType ===
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-    lowerName.endsWith(".docx")
-  ) {
+  if (kind.isDocx) {
     const result = await mammoth.extractRawText({ buffer });
     return normalizeWhitespace(result.value);
   }
 
-  if (contentType === "text/plain" || lowerName.endsWith(".txt")) {
+  if (kind.isText) {
     return normalizeWhitespace(buffer.toString("utf8"));
   }
 
   throw new Error("Unsupported resume type. Upload a PDF, DOCX, or TXT file.");
+}
+
+export async function parseResumeFile(file: File) {
+  return parseResumeBuffer(Buffer.from(await file.arrayBuffer()), {
+    contentType: file.type,
+    fileName: file.name,
+  });
 }

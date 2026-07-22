@@ -37,12 +37,20 @@ test("source choice continues into background collection without requiring a res
         "I want to use Agent #5198, the Opportunity Matching API, through its A2MCP endpoint.",
     }),
   );
-  assert.equal(initial.conversation?.state, "choose_profile_source");
+  assert.equal(initial.conversation?.state, "choose_service");
+
+  const discovery = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "1",
+      continuation: initial.conversation?.continuation,
+    }),
+  );
+  assert.equal(discovery.conversation?.state, "choose_profile_source");
 
   const collecting = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "2",
-      continuation: initial.conversation?.continuation,
+      continuation: discovery.conversation?.continuation,
     }),
   );
   assert.equal(collecting.conversation?.state, "collecting_background");
@@ -65,10 +73,17 @@ test("resume path preserves extracted evidence and continues within the session"
       message: "Use the Opportunity Matching API from Agent #5198.",
     }),
   );
-  const awaitingResume = await handleOpportunityCompanionRequest(
+  assert.equal(initial.conversation?.state, "choose_service");
+  const discovery = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "1",
       continuation: initial.conversation?.continuation,
+    }),
+  );
+  const awaitingResume = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "1",
+      continuation: discovery.conversation?.continuation,
     }),
   );
   assert.equal(awaitingResume.conversation?.state, "awaiting_resume");
@@ -332,18 +347,9 @@ test("minimal student input asks for gates instead of making weak recommendation
     }),
   );
 
-  assert.equal(response.conversation?.state, "needs_more_information");
+  assert.equal(response.conversation?.state, "choose_service");
   assert.equal(response.recommendations.length, 0);
-  assert.ok(
-    response.conversation?.missingInformation.some(
-      (item) => item.field === "skills" && item.required,
-    ),
-  );
-  assert.ok(
-    response.conversation?.missingInformation.some(
-      (item) => item.field === "goals" && item.required,
-    ),
-  );
+  assert.equal(response.conversation?.requiredAction, "select_service");
 });
 
 test("natural-language background builds a grounded profile and recommendations", async () => {
@@ -572,7 +578,7 @@ test("mixed structured and conversational optimization benchmarks first", async 
   assert.ok(body.capabilityResult?.resumeBenchmark);
   assert.equal(
     body.conversation?.requiredAction,
-    "review_benchmark_before_optimization",
+    "confirm_optimization",
   );
 });
 

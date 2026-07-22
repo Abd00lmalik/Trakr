@@ -148,3 +148,25 @@ create index if not exists recommendation_runs_created_at_idx
 
 create index if not exists recommendation_runs_expires_at_idx
   on recommendation_runs (expires_at);
+
+create table if not exists resume_artifacts (
+  id text primary key,
+  token_hash text not null unique,
+  artifact_type text not null check (
+    artifact_type in ('resume', 'cv', 'application_document')
+  ),
+  format text not null check (format in ('docx', 'pdf')),
+  filename text not null,
+  mime_type text not null,
+  content bytea not null,
+  size_bytes integer not null check (size_bytes >= 0),
+  sha256 text not null,
+  regenerate_action text not null check (
+    regenerate_action in ('optimize', 'generate_resume')
+  ),
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists resume_artifacts_expires_at_idx
+  on resume_artifacts (expires_at);

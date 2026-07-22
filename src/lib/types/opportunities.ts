@@ -189,6 +189,8 @@ export const experienceLevelSchema = z.enum([
 
 export const structuredUserProfileSchema = z.object({
   name: z.string().optional(),
+  contactEmail: z.string().email().max(254).optional(),
+  contactPhone: z.string().min(5).max(40).optional(),
   headline: z.string().optional(),
   bio: z.string().optional(),
   location: z.string().optional(),
@@ -266,6 +268,7 @@ export const recommendationRequestSchema = z
 
 export const companionIntentSchema = z.enum([
   "auto",
+  "service_selection",
   "profile_build",
   "opportunity_matching",
   "explain_recommendation",
@@ -276,6 +279,7 @@ export const companionIntentSchema = z.enum([
 ]);
 
 export const serviceOperationSchema = z.enum([
+  "start",
   "auto",
   "discover",
   "benchmark",
@@ -354,6 +358,27 @@ export const documentReferenceSchema = z.object({
   retention: z.literal("session_only"),
 });
 
+export const documentInputSchema = z.discriminatedUnion("representation", [
+  z.object({
+    representation: z.literal("base64"),
+    kind: z.enum(["resume", "cv"]).default("resume"),
+    fileName: z.string().min(1).max(180),
+    mimeType: z.enum([
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "text/plain",
+    ]),
+    dataBase64: z.string().min(4).max(3_500_000),
+  }),
+  z.object({
+    representation: z.literal("text"),
+    kind: z.enum(["resume", "cv"]).default("resume"),
+    fileName: z.string().min(1).max(180).optional(),
+    mimeType: z.literal("text/plain").default("text/plain"),
+    text: z.string().min(80).max(40000),
+  }),
+]);
+
 export const companionContextSchema = z.object({
   profile: structuredUserProfileSchema.optional(),
   profileEvidence: z.array(profileEvidenceSchema).max(80).default([]),
@@ -371,6 +396,7 @@ export const companionContextSchema = z.object({
   target: companionTargetSchema.optional(),
   generationPreferences: generationPreferencesSchema.optional(),
   lastBenchmark: resumeBenchmarkReferenceSchema.optional(),
+  optimizationApproved: z.boolean().optional(),
   sessionVersion: z.enum(["1", "2"]).optional(),
 });
 
@@ -395,7 +421,7 @@ export const opportunityCompanionRequestSchema = z
     interests: z.array(z.string().min(1)).optional(),
     filters: recommendationFiltersSchema.default({}),
     requestId: z.string().optional(),
-    message: z.string().min(1).max(6000).optional(),
+    message: z.string().max(6000).optional(),
     intent: companionIntentSchema.default("auto"),
     operation: serviceOperationSchema.default("auto"),
     intakeRoute: opportunityIntakeRouteSchema.optional(),
@@ -404,6 +430,7 @@ export const opportunityCompanionRequestSchema = z
     continuation: companionContinuationInputSchema.optional(),
     target: companionTargetSchema.optional(),
     generationPreferences: generationPreferencesSchema.optional(),
+    document: documentInputSchema.optional(),
   })
   .superRefine((value, ctx) => {
     const hasFilters = Object.keys(value.filters).length > 0;
@@ -576,6 +603,32 @@ export const companionStateSchema = z.enum([
   "resume_generation",
 ]);
 
+export const companionStatusSchema = z.enum([
+  "needs_input",
+  "in_progress",
+  "completed",
+]);
+
+export const companionChoiceSchema = z.object({
+  id: z.string(),
+  value: z.string(),
+  number: z.number().int().positive().optional(),
+  label: z.string(),
+  description: z.string().optional(),
+});
+
+export const requiredInputSchema = z.object({
+  id: z.string(),
+  type: z.enum(["enum", "boolean", "text", "document", "object"]),
+  required: z.boolean(),
+  prompt: z.string(),
+  options: z.array(companionChoiceSchema).optional(),
+  acceptedRepresentations: z.array(z.string()).optional(),
+  acceptedMimeTypes: z.array(z.string()).optional(),
+  maxBytes: z.number().int().positive().optional(),
+  fields: z.array(z.string()).optional(),
+});
+
 export const companionProfileSchema = z.object({
   draft: structuredUserProfileSchema,
   evidence: z.array(profileEvidenceSchema),
@@ -587,10 +640,11 @@ export const companionProfileSchema = z.object({
 export const companionConversationSchema = z.object({
   state: companionStateSchema,
   intent: companionIntentSchema,
-  service: userFacingServiceSchema,
+  service: userFacingServiceSchema.nullable(),
   operation: serviceOperationSchema,
   profileSource: opportunityIntakeRouteSchema.optional(),
   stage: z.string(),
+  status: companionStatusSchema,
   message: z.string(),
   profile: companionProfileSchema,
   missingInformation: z.array(
@@ -603,15 +657,8 @@ export const companionConversationSchema = z.object({
   nextActions: z.array(z.string()),
   continuation: companionSessionReferenceSchema,
   requiredAction: z.string().optional(),
-  choices: z
-    .array(
-      z.object({
-        id: z.string(),
-        label: z.string(),
-        description: z.string().optional(),
-      }),
-    )
-    .optional(),
+  requiredInputs: z.array(requiredInputSchema).default([]),
+  choices: z.array(companionChoiceSchema).optional(),
 });
 
 export const opportunityExplanationSchema = z.object({
@@ -770,6 +817,19 @@ export const resumeGenerationSchema = z.object({
   factualIntegrity: z.string(),
 });
 
+export const downloadableArtifactSchema = z.object({
+  id: z.string(),
+  type: z.enum(["resume", "cv", "application_document"]),
+  format: z.enum(["docx", "pdf"]),
+  filename: z.string(),
+  mimeType: z.string(),
+  downloadUrl: z.string().url(),
+  expiresAt: z.string().datetime(),
+  sizeBytes: z.number().int().nonnegative(),
+  sha256: z.string(),
+  regenerateAction: z.enum(["optimize", "generate_resume"]),
+});
+
 export const companionCapabilityResultSchema = z.object({
   explanation: opportunityExplanationSchema.optional(),
   readiness: readinessAssessmentSchema.optional(),
@@ -782,6 +842,14 @@ export const opportunityCompanionResponseSchema =
   recommendationResponseSchema.extend({
     conversation: companionConversationSchema.optional(),
     capabilityResult: companionCapabilityResultSchema.optional(),
+    stage: z.string().optional(),
+    status: companionStatusSchema.optional(),
+    message: z.string().optional(),
+    selectedService: userFacingServiceSchema.nullable().optional(),
+    requiredInputs: z.array(requiredInputSchema).optional(),
+    nextActions: z.array(z.string()).optional(),
+    continuation: companionSessionReferenceSchema.optional(),
+    artifacts: z.array(downloadableArtifactSchema).optional(),
   });
 
 export type OpportunityCategory = z.infer<typeof opportunityCategorySchema>;
@@ -840,12 +908,16 @@ export type ResumeBenchmarkReference = z.infer<
 export type GenerationPreferences = z.infer<
   typeof generationPreferencesSchema
 >;
+export type DocumentInput = z.infer<typeof documentInputSchema>;
 export type GeneratedDocumentType = z.infer<
   typeof generatedDocumentTypeSchema
 >;
 export type DocumentReference = z.infer<typeof documentReferenceSchema>;
 export type ProfileEvidence = z.infer<typeof profileEvidenceSchema>;
 export type CompanionConversation = z.infer<typeof companionConversationSchema>;
+export type CompanionChoice = z.infer<typeof companionChoiceSchema>;
+export type RequiredInput = z.infer<typeof requiredInputSchema>;
+export type DownloadableArtifact = z.infer<typeof downloadableArtifactSchema>;
 export type CompanionCapabilityResult = z.infer<
   typeof companionCapabilityResultSchema
 >;

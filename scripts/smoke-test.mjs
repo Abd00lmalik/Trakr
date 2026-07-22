@@ -14,6 +14,10 @@ if (shouldStartServer && !process.env.TRAKR_SESSION_SECRET) {
   process.env.TRAKR_SESSION_SECRET =
     "smoke-test-session-secret-not-for-production";
 }
+if (shouldStartServer) {
+  process.env.TRAKR_ALLOW_IN_MEMORY_ARTIFACTS = "true";
+  process.env.TRAKR_SERVICE_URL = baseUrl;
+}
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -119,13 +123,33 @@ try {
   const health = await waitForHealth();
   const metadata = await requestJson("/api/a2mcp");
 
-  if (!metadata.response.ok || metadata.body?.type !== "A2MCP") {
+  if (
+    !metadata.response.ok ||
+    metadata.body?.type !== "A2MCP" ||
+    metadata.body?.version !== "0.6.0"
+  ) {
     throw new Error("A2MCP metadata endpoint did not return the expected contract.");
   }
 
   const openapi = await requestJson("/api/a2mcp/openapi");
   if (!openapi.response.ok || openapi.body?.openapi !== "3.1.0") {
     throw new Error("OpenAPI endpoint did not return the expected document.");
+  }
+
+  const emptyBootstrap = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+  });
+  if (
+    !emptyBootstrap.response.ok ||
+    emptyBootstrap.body?.stage !== "choose_service" ||
+    emptyBootstrap.body?.status !== "needs_input" ||
+    emptyBootstrap.body?.requiredInputs?.[0]?.options?.length !== 3
+  ) {
+    throw new Error(
+      `Empty bootstrap did not expose the three-service chooser: ${JSON.stringify(
+        emptyBootstrap.body,
+      )}`,
+    );
   }
 
   const resumeText =
@@ -219,7 +243,6 @@ try {
       `Unverified or inactive opportunity received Apply Now: ${unsafeApplyNow.opportunity.title}`,
     );
   }
-
   const rawProviderLeak = JSON.stringify(recommendation.body).match(
     /quota|generativelanguage\.googleapis\.com|GoogleGenerativeAI Error|stack trace/i,
   );
@@ -456,6 +479,20 @@ try {
       )}`,
     );
   }
+  if (pendingService.body?.artifacts?.length !== 2) {
+    throw new Error("Resume generation did not return DOCX and PDF artifacts.");
+  }
+  for (const artifact of pendingService.body.artifacts) {
+    const artifactResponse = await fetch(artifact.downloadUrl);
+    const bytes = Buffer.from(await artifactResponse.arrayBuffer());
+    if (
+      !artifactResponse.ok ||
+      artifactResponse.headers.get("content-type") !== artifact.mimeType ||
+      bytes.byteLength !== artifact.sizeBytes
+    ) {
+      throw new Error(`Generated artifact download failed: ${artifact.filename}`);
+    }
+  }
 
   const replayBody = JSON.stringify({
     operation: "generate_resume",
@@ -501,6 +538,7 @@ try {
         ok: true,
         baseUrl,
         health,
+        bootstrapStage: emptyBootstrap.body.stage,
         parsedResumeTypes: ["pdf", "docx"],
         recommendationCount: recommendation.body.recommendations.length,
         conversationalRecommendationCount:
@@ -518,6 +556,9 @@ try {
           backgroundChoice.body.conversation.state,
         ],
         explicitServiceState: pendingService.body.conversation.state,
+        generatedArtifactFormats: pendingService.body.artifacts.map(
+          (artifact) => artifact.format,
+        ),
         followUpStates: [
           explanation.body.conversation.state,
           readiness.body.conversation.state,

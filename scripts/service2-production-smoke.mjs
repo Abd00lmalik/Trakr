@@ -34,6 +34,32 @@ async function jsonPost(body, headers = {}) {
   });
 }
 
+async function assertArtifacts(artifacts, regenerateAction) {
+  assert.equal(artifacts?.length, 2);
+  assert.deepEqual(
+    artifacts.map((artifact) => artifact.format).sort(),
+    ["docx", "pdf"],
+  );
+  for (const artifact of artifacts) {
+    assert.equal(artifact.regenerateAction, regenerateAction);
+    const response = await fetch(artifact.downloadUrl, { redirect: "error" });
+    const bytes = Buffer.from(await response.arrayBuffer());
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), artifact.mimeType);
+    assert.equal(
+      response.headers.get("content-disposition"),
+      `attachment; filename="${artifact.filename}"`,
+    );
+    assert.equal(response.headers.get("referrer-policy"), "no-referrer");
+    assert.equal(bytes.byteLength, artifact.sizeBytes);
+    if (artifact.format === "pdf") {
+      assert.equal(bytes.subarray(0, 5).toString("ascii"), "%PDF-");
+    } else {
+      assert.equal(bytes.subarray(0, 2).toString("ascii"), "PK");
+    }
+  }
+}
+
 async function run(id, operation) {
   const startedAt = Date.now();
   try {
@@ -100,8 +126,9 @@ await run("S2-PROD-001-health-metadata", async () => {
   assert.equal(health.body.database.connected, true);
   assert.equal(health.body.database.pgvector, true);
   assert.equal(health.body.database.inventoryMetadataReady, true);
+  assert.equal(health.body.database.artifactStorageReady, true);
   assert.equal(metadata.response.status, 200);
-  assert.equal(metadata.body.version, "0.5.0");
+  assert.equal(metadata.body.version, "0.6.0");
   assert.equal(
     metadata.body.services.find(
       (service) => service.id === "resume_benchmarking_optimization",
@@ -111,12 +138,13 @@ await run("S2-PROD-001-health-metadata", async () => {
   assert.equal(metadata.body.submission.pricing, "free");
   assert.equal(metadata.body.submission.paymentRequired, false);
   assert.equal(openapi.response.status, 200);
-  assert.equal(openapi.body.info.version, "0.5.0");
+  assert.equal(openapi.body.info.version, "0.6.0");
   return {
     status: 200,
     version: metadata.body.version,
     databaseConnected: health.body.database.connected,
     inventoryMetadataReady: health.body.database.inventoryMetadataReady,
+    artifactStorageReady: health.body.database.artifactStorageReady,
     aiConfigured: health.body.ai.configured,
   };
 });
@@ -159,6 +187,11 @@ await run("S2-PROD-003-benchmark-resume", async () => {
     "resume_benchmarking_optimization",
   );
   assert.ok(result.body.capabilityResult?.resumeBenchmark?.benchmarkId);
+  assert.equal(result.body.stage, "optimize_confirmation");
+  assert.equal(
+    result.body.conversation?.requiredAction,
+    "confirm_optimization",
+  );
   assert.equal(
     result.body.capabilityResult.resumeBenchmark.rubricVersion,
     "resume-rubric-2026-07-21",
@@ -184,7 +217,7 @@ await run("S2-PROD-004-optimize-continuation", async () => {
   assert.ok(benchmarkResponse?.conversation?.continuation);
   const result = await jsonPost({
     operation: "optimize",
-    message: "Continue with optimization.",
+    message: "Yes, optimize using only my confirmed information.",
     continuation: benchmarkResponse.conversation.continuation,
   });
   assert.equal(result.response.status, 200);
@@ -204,10 +237,12 @@ await run("S2-PROD-004-optimize-continuation", async () => {
         Array.isArray(item.evidenceClaimIds),
     ),
   );
+  await assertArtifacts(result.body.artifacts, "optimize");
   return {
     status: result.response.status,
     rewrites: optimization.sectionRewrites.length,
     unsupportedClaims: optimization.unsupportedClaims.length,
+    artifacts: result.body.artifacts.length,
   };
 });
 
@@ -331,7 +366,7 @@ await run("S2-PROD-008-injection-containment", async () => {
   const second = await jsonPost({
     operation: "optimize",
     continuation: first.body.conversation.continuation,
-    message: "Continue with optimization.",
+    message: "Yes, optimize using only my confirmed information.",
   });
   assert.equal(second.response.status, 200);
   assert.equal(second.body.conversation?.state, "resume_optimization");
@@ -339,6 +374,7 @@ await run("S2-PROD-008-injection-containment", async () => {
     second.body.capabilityResult?.resumeOptimization,
   );
   assert.equal(/ignore previous instructions|resume data/i.test(secondSerialized), false);
+  await assertArtifacts(second.body.artifacts, "optimize");
   return {
     status: second.response.status,
     state: second.body.conversation.state,
