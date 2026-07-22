@@ -11,8 +11,21 @@ concurrency:
 
 jobs:
   production-smoke:
+    name: production-smoke (${{ matrix.suite }})
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: orchestration
+            script: smoke:orchestration:production
+          - suite: service-1
+            script: smoke:service1:production
+          - suite: service-2
+            script: smoke:service2:production
+          - suite: service-3
+            script: smoke:service3:production
     env:
       SMOKE_BASE_URL: https://trakr-production-c70e.up.railway.app
     steps:
@@ -22,7 +35,4 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run smoke:orchestration:production
-      - run: npm run smoke:service1:production
-      - run: npm run smoke:service2:production
-      - run: npm run smoke:service3:production
+      - run: npm run ${{ matrix.script }}
