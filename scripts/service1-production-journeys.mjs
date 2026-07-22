@@ -4,7 +4,7 @@ const baseUrl =
   process.env.SMOKE_BASE_URL ??
   "https://trakr-production-c70e.up.railway.app";
 const endpoint = `${baseUrl}/api/a2mcp/recommend`;
-const today = "2026-07-21";
+const today = new Date().toISOString().slice(0, 10);
 const results = [];
 
 async function post(body) {
