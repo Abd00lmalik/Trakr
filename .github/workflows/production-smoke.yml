@@ -1,0 +1,28 @@
+name: Trakr Production Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: trakr-production-smoke
+  cancel-in-progress: false
+
+jobs:
+  production-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      SMOKE_BASE_URL: https://trakr-production-c70e.up.railway.app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run smoke:orchestration:production
+      - run: npm run smoke:service1:production
+      - run: npm run smoke:service2:production
+      - run: npm run smoke:service3:production
