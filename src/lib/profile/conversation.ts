@@ -277,16 +277,42 @@ function inferNationality(message: string) {
   }
 }
 
+function inferFieldOfStudy(message: string) {
+  return message
+    .match(
+      /\b(?:field|course|subject)\s+of\s+study\s*(?:is|:|-)\s*([^.;\n]{2,120})/i,
+    )?.[1]
+    ?.trim();
+}
+
+function inferCurrentDegreeLevel(message: string) {
+  return message
+    .match(
+      /\b(?:current\s+degree\s+level|current\s+qualification|qualification\s+level)\s*(?:is|:|-)\s*([^.;\n]{2,80})/i,
+    )?.[1]
+    ?.trim();
+}
+
 function inferTargetDegreeLevel(message: string) {
+  const explicit = message
+    .match(
+      /\b(?:target\s+degree\s+level|target\s+qualification(?:\s+level)?)\s*(?:is|:|-)\s*([^.;\n]{2,80})/i,
+    )?.[1]
+    ?.trim();
+  if (explicit) return explicit;
   return message.match(
     /\b(?:target(?:ing)?|seeking|want(?:ing)?|apply(?:ing)? for|fund(?:ing)?|scholarship for)\s+(?:an?\s+)?(PhD|doctorate|master(?:'s)?|MSc|MBA|bachelor(?:'s)?|BSc|diploma|certificate)\b/i,
   )?.[1];
 }
 
 function inferPreferredStudyCountries(message: string) {
-  const match = message.match(
-    /\b(?:study|studying|universities|programmes?|programs?)\s+in\s+([A-Z][A-Za-z ,&'-]{2,120})(?=[.;]|\s+(?:for|starting|beginning|and my)\b|$)/i,
-  )?.[1];
+  const match =
+    message.match(
+      /\bpreferred\s+study\s+countries\s*(?:are|include|:|-)\s*([^.;\n]{2,160})/i,
+    )?.[1] ??
+    message.match(
+      /\b(?:study|studying|universities|programmes?|programs?)\s+in\s+([A-Z][A-Za-z ,&'-]{2,120})(?=[.;]|\s+(?:for|starting|beginning|and my)\b|$)/i,
+    )?.[1];
   if (!match) return [];
   return unique(
     match
@@ -798,8 +824,9 @@ export function buildConversationalProfile(
         ]),
         goals: messageProfile?.goals ?? [],
         education: educationEvidenceSentences(message),
-        fieldOfStudy: messageProfile?.fieldOfStudy,
-        currentDegreeLevel: messageProfile?.currentDegreeLevel,
+        fieldOfStudy: inferFieldOfStudy(message) ?? messageProfile?.fieldOfStudy,
+        currentDegreeLevel:
+          inferCurrentDegreeLevel(message) ?? messageProfile?.currentDegreeLevel,
         targetDegreeLevel: inferTargetDegreeLevel(message),
         currentInstitution: messageProfile?.currentInstitution,
         graduationYear: messageProfile?.graduationYear,

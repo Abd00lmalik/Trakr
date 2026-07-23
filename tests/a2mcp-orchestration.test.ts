@@ -313,6 +313,44 @@ Built a fictional study planner and data dashboard.`;
   );
 });
 
+test("scholarship intake maps explicit required-field labels", async () => {
+  const started = await callRoute({
+    operation: "discover",
+    intakeRoute: "background",
+    message:
+      "I am a mid-level public policy researcher in Uganda with four years of nonprofit research experience. I want scholarships, fellowships, grants, and research opportunities.",
+  });
+  assert.equal(started.body.stage, "discover_missing_information");
+
+  const completed = await callRoute({
+    message:
+      "Field of study: Public policy. Current degree level: Master's degree completed. Target degree level: Doctorate or PhD. Nationality: Ugandan. Country of residence: Uganda. Preferred study countries: United Kingdom and Germany.",
+    continuation: started.body.continuation,
+  });
+
+  assert.equal(completed.body.stage, "discover_completed");
+  assert.equal(
+    completed.body.conversation.profile.draft.fieldOfStudy,
+    "Public policy",
+  );
+  assert.equal(
+    completed.body.conversation.profile.draft.currentDegreeLevel,
+    "Master's degree completed",
+  );
+  assert.equal(
+    completed.body.conversation.profile.draft.targetDegreeLevel,
+    "Doctorate or PhD",
+  );
+  assert.equal(
+    completed.body.conversation.profile.draft.nationality,
+    "Ugandan",
+  );
+  assert.deepEqual(
+    completed.body.conversation.profile.draft.preferredStudyCountries,
+    ["United Kingdom", "Germany"],
+  );
+});
+
 test("learning resources cannot be direct scholarships", () => {
   const expected = new Map([
     ["official-microsoft-learn-student-hub", "learning_resource"],

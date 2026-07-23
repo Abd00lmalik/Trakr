@@ -214,12 +214,15 @@ await run("S1-PROD-RERUN-004-background-designer", async () => {
 });
 
 await run("S1-PROD-RERUN-005-background-researcher", async () => {
-  const response = await completeJourney({
-    operation: "discover",
-    intakeRoute: "background",
-    message:
-      "I am a mid-level public policy researcher in Uganda with four years of nonprofit research experience. My skills include qualitative interviews, survey design, academic writing, Excel, and data analysis. I supported a fictional digital-inclusion study. I want remote scholarships, fellowships, grants, and research opportunities, not software jobs.",
-  });
+  const response = await completeJourney(
+    {
+      operation: "discover",
+      intakeRoute: "background",
+      message:
+        "I am a mid-level public policy researcher in Uganda with four years of nonprofit research experience. My skills include qualitative interviews, survey design, academic writing, Excel, and data analysis. I supported a fictional digital-inclusion study. I want remote scholarships, fellowships, grants, and research opportunities, not software jobs.",
+    },
+    "Field of study: Public policy. Current degree level: Master's degree completed. Target degree level: Doctorate or PhD. Nationality: Ugandan. Country of residence: Uganda. Preferred study countries: United Kingdom and Germany.",
+  );
   const recommendations = auditRecommendations(response.body);
   const categories = response.body.querySummary.filtersApplied.categories ?? [];
   assert.equal(categories.includes("remote_job"), false);
