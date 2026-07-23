@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { POST } from "../src/app/api/a2mcp/recommend/route";
 import { POST as parseResume } from "../src/app/api/profile/parse-resume/route";
-import { handleOpportunityCompanionRequest } from "../src/lib/companion/service";
+import {
+  handleOpportunityCompanionRequest as handleRawOpportunityCompanionRequest,
+} from "../src/lib/companion/service";
 import { resolveSessionContext } from "../src/lib/companion/session";
 import {
   opportunityCompanionRequestSchema,
@@ -40,6 +42,22 @@ const frontendTarget = {
   ],
   locale: "Nigeria",
 };
+
+async function handleOpportunityCompanionRequest(
+  request: Parameters<typeof handleRawOpportunityCompanionRequest>[0],
+) {
+  const response = await handleRawOpportunityCompanionRequest(request);
+  if (response.conversation?.state !== "profile_confirmation") {
+    return response;
+  }
+
+  return handleRawOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Yes, this extracted or supplied profile is accurate.",
+      continuation: response.conversation.continuation,
+    }),
+  );
+}
 
 test("benchmark requests require a sufficiently defined target", async () => {
   const response = await handleOpportunityCompanionRequest(

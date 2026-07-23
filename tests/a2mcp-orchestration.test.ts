@@ -96,6 +96,16 @@ async function callRoute(
   return { response, body: await response.json() };
 }
 
+async function confirmProfile(
+  result: Awaited<ReturnType<typeof callRoute>>,
+) {
+  assert.equal(result.body.stage, "profile_confirmation");
+  return callRoute({
+    message: "Yes, this extracted profile is accurate.",
+    continuation: result.body.continuation,
+  });
+}
+
 function assertChooser(body: Record<string, any>) {
   assert.equal(body.operation, "start");
   assert.equal(body.stage, "choose_service");
@@ -248,24 +258,27 @@ Built a fictional study planner and data dashboard.`;
     consent,
   });
 
-  assert.equal(extracted.body.stage, "discover_missing_information");
+  assert.equal(extracted.body.stage, "profile_confirmation");
   assert.equal(
     extracted.body.conversation.profile.draft.fieldOfStudy,
     "Computer Science",
   );
   assert.equal(extracted.body.recommendations.length, 0);
+
+  const confirmed = await confirmProfile(extracted);
+  assert.equal(confirmed.body.stage, "discover_missing_information");
   assert.ok(
-    extracted.body.requiredInputs.some(
+    confirmed.body.requiredInputs.some(
       (item: { id: string }) => item.id === "nationality",
     ),
   );
   assert.ok(
-    extracted.body.requiredInputs.some(
+    confirmed.body.requiredInputs.some(
       (item: { id: string }) => item.id === "targetDegreeLevel",
     ),
   );
   assert.ok(
-    extracted.body.requiredInputs.some(
+    confirmed.body.requiredInputs.some(
       (item: { id: string }) => item.id === "preferredStudyCountries",
     ),
   );
@@ -273,7 +286,7 @@ Built a fictional study planner and data dashboard.`;
   const matched = await callRoute({
     message:
       "My nationality is Nigerian. I live in Nigeria. I am targeting a Master's degree and I am willing to study in the United Kingdom, Germany, or Canada.",
-    continuation: extracted.body.continuation,
+    continuation: confirmed.body.continuation,
   });
   assert.equal(matched.body.stage, "discover_completed");
   assert.deepEqual(
@@ -343,10 +356,13 @@ test("multipart recommendation upload returns a confirmation continuation withou
   );
   const body = await response.json();
   assert.equal(response.status, 200);
-  assert.equal(body.stage, "discover_completed");
+  assert.equal(body.stage, "profile_confirmation");
   assert.equal(body.profileOrigin, "mixed");
   assert.ok(body.evidenceSources.includes("resume"));
   assert.doesNotMatch(body.continuation.token, /AMINA|React|TypeScript/i);
+
+  const confirmed = await confirmProfile({ response, body });
+  assert.equal(confirmed.body.stage, "discover_completed");
 });
 
 test("OpenAPI fully types visible recommendation links and separated collections", async () => {
@@ -518,13 +534,14 @@ test("TXT, DOCX, and PDF base64 documents are parsed through the public contract
       target,
     });
     assert.equal(result.response.status, 200, document.fileName);
+    const confirmed = await confirmProfile(result);
     assert.equal(
-      result.body.stage,
+      confirmed.body.stage,
       "optimize_confirmation",
       document.fileName,
     );
     assert.ok(
-      result.body.capabilityResult?.resumeBenchmark,
+      confirmed.body.capabilityResult?.resumeBenchmark,
       document.fileName,
     );
   }
@@ -597,14 +614,15 @@ test("benchmarking precedes optimization and explicit decline creates no artifac
     consent,
     target,
   });
-  assert.equal(supplied.body.stage, "optimize_confirmation");
-  assert.equal(supplied.body.conversation?.requiredAction, "confirm_optimization");
-  assert.equal(supplied.body.capabilityResult?.resumeOptimization, undefined);
-  assert.equal(supplied.body.artifacts, undefined);
+  const benchmarked = await confirmProfile(supplied);
+  assert.equal(benchmarked.body.stage, "optimize_confirmation");
+  assert.equal(benchmarked.body.conversation?.requiredAction, "confirm_optimization");
+  assert.equal(benchmarked.body.capabilityResult?.resumeOptimization, undefined);
+  assert.equal(benchmarked.body.artifacts, undefined);
 
   const declined = await callRoute({
     message: "No, finish with the benchmark.",
-    continuation: supplied.body.continuation,
+    continuation: benchmarked.body.continuation,
   });
   assert.equal(declined.body.stage, "benchmark_completed");
   assert.equal(declined.body.status, "completed");
@@ -619,10 +637,11 @@ test("approved optimization creates authorized, evidence-linked DOCX and PDF art
     consent,
     target,
   });
-  assert.equal(supplied.body.stage, "optimize_confirmation");
+  const benchmarked = await confirmProfile(supplied);
+  assert.equal(benchmarked.body.stage, "optimize_confirmation");
   const optimized = await callRoute({
     message: "Yes, optimize using only my confirmed information.",
-    continuation: supplied.body.continuation,
+    continuation: benchmarked.body.continuation,
   });
   assert.equal(optimized.body.stage, "optimize_completed");
   assert.equal(optimized.body.status, "completed");

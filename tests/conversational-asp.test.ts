@@ -107,8 +107,13 @@ Goals: Seeking remote AI and Web3 internships and hackathons.`,
     }),
   );
 
-  assert.equal(response.conversation?.state, "recommendations");
-  const matched = response;
+  assert.equal(response.conversation?.state, "profile_confirmation");
+  const matched = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Yes, the extracted profile is accurate.",
+      continuation: response.conversation?.continuation,
+    }),
+  );
   assert.equal(matched.conversation?.state, "recommendations");
   assert.equal(
     resolveSessionContext(matched.conversation?.continuation)?.profileSource,
@@ -160,8 +165,13 @@ Goals: Seeking remote AI or software internships.`,
     }),
   );
 
-  assert.equal(response.conversation?.state, "recommendations");
-  const matched = response;
+  assert.equal(response.conversation?.state, "profile_confirmation");
+  const matched = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Yes, the extracted profile is accurate.",
+      continuation: response.conversation?.continuation,
+    }),
+  );
   assert.equal(matched.conversation?.state, "recommendations");
   assert.deepEqual(matched.querySummary.filtersApplied.categories, [
     "internship",
@@ -572,10 +582,10 @@ test("mixed structured and conversational optimization benchmarks first", async 
   const body = await response.json();
 
   assert.equal(response.status, 200);
-  assert.equal(body.conversation?.state, "resume_benchmark");
+  assert.equal(body.conversation?.state, "profile_confirmation");
   assert.equal(body.profileOrigin, "mixed");
   assert.equal(body.profileConfirmed, false);
-  assert.equal(body.confirmationRequired, false);
+  assert.equal(body.confirmationRequired, true);
 
   const confirmedResponse = await POST(
     new Request("http://localhost/api/a2mcp/recommend", {
@@ -590,11 +600,11 @@ test("mixed structured and conversational optimization benchmarks first", async 
   const confirmedBody = await confirmedResponse.json();
 
   assert.equal(confirmedResponse.status, 200);
-  assert.equal(confirmedBody.conversation?.state, "resume_optimization");
-  assert.ok(confirmedBody.capabilityResult?.resumeOptimization);
+  assert.equal(confirmedBody.conversation?.state, "resume_benchmark");
+  assert.ok(confirmedBody.capabilityResult?.resumeBenchmark);
   assert.equal(
     confirmedBody.conversation?.requiredAction,
-    "review_optimization",
+    "confirm_optimization",
   );
 });
 

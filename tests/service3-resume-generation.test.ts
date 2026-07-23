@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { POST } from "../src/app/api/a2mcp/recommend/route";
-import { handleOpportunityCompanionRequest } from "../src/lib/companion/service";
+import {
+  handleOpportunityCompanionRequest as handleRawOpportunityCompanionRequest,
+} from "../src/lib/companion/service";
 import { resolveSessionContext } from "../src/lib/companion/session";
 import {
   opportunityCompanionRequestSchema,
@@ -143,6 +145,22 @@ function request(
   });
 }
 
+async function handleOpportunityCompanionRequest(
+  request: Parameters<typeof handleRawOpportunityCompanionRequest>[0],
+) {
+  const response = await handleRawOpportunityCompanionRequest(request);
+  if (response.conversation?.state !== "profile_confirmation") {
+    return response;
+  }
+
+  return handleRawOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Yes, this extracted or supplied profile is accurate.",
+      continuation: response.conversation.continuation,
+    }),
+  );
+}
+
 test("generation requires a target before collecting document evidence", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
@@ -259,7 +277,7 @@ test("structured and natural contact details render only as confirmed evidence",
   }
   assert.doesNotMatch(
     structured.conversation?.continuation.token ?? "",
-    /amina|example|234/i,
+    /Amina Tester|amina\.tester@example\.com|\+234 800 000 0000/i,
   );
 
   const natural = await handleOpportunityCompanionRequest(
@@ -503,6 +521,20 @@ test("A2MCP serves Service 3 with the same public endpoint and no payment flow",
   const body = await response.json();
   assert.equal(response.status, 200);
   assert.equal(body.operation, "generate_resume");
-  assert.equal(body.conversation?.state, "resume_generation");
-  assert.ok(body.capabilityResult?.resumeGeneration);
+  assert.equal(body.conversation?.state, "profile_confirmation");
+
+  const confirmedResponse = await POST(
+    new Request("http://localhost/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Yes, this profile is accurate.",
+        continuation: body.continuation,
+      }),
+    }),
+  );
+  const confirmedBody = await confirmedResponse.json();
+  assert.equal(confirmedResponse.status, 200);
+  assert.equal(confirmedBody.conversation?.state, "resume_generation");
+  assert.ok(confirmedBody.capabilityResult?.resumeGeneration);
 });

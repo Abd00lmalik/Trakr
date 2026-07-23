@@ -468,21 +468,41 @@ try {
   if (
     !pendingService.response.ok ||
     pendingService.body?.conversation?.service !== "resume_generation" ||
-    pendingService.body?.conversation?.state !== "resume_generation" ||
-    pendingService.body?.conversation?.requiredAction !==
-      "review_generated_document" ||
-    !pendingService.body?.capabilityResult?.resumeGeneration
+    pendingService.body?.conversation?.state !== "profile_confirmation" ||
+    pendingService.body?.conversation?.requiredAction !== "review_profile"
   ) {
     throw new Error(
-      `Explicit service operation did not return the generated capability state: ${JSON.stringify(
+      `Explicit service operation did not request profile confirmation: ${JSON.stringify(
         pendingService.body,
       )}`,
     );
   }
-  if (pendingService.body?.artifacts?.length !== 2) {
+  const confirmedService = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: "Yes, this profile is accurate.",
+      continuation: pendingService.body.continuation,
+    }),
+  });
+  if (
+    !confirmedService.response.ok ||
+    confirmedService.body?.conversation?.service !== "resume_generation" ||
+    confirmedService.body?.conversation?.state !== "resume_generation" ||
+    confirmedService.body?.conversation?.requiredAction !==
+      "review_generated_document" ||
+    !confirmedService.body?.capabilityResult?.resumeGeneration
+  ) {
+    throw new Error(
+      `Explicit service operation did not return the generated capability state: ${JSON.stringify(
+        confirmedService.body,
+      )}`,
+    );
+  }
+  if (confirmedService.body?.artifacts?.length !== 2) {
     throw new Error("Resume generation did not return DOCX and PDF artifacts.");
   }
-  for (const artifact of pendingService.body.artifacts) {
+  for (const artifact of confirmedService.body.artifacts) {
     const artifactResponse = await fetch(artifact.downloadUrl);
     const bytes = Buffer.from(await artifactResponse.arrayBuffer());
     if (
@@ -555,8 +575,8 @@ try {
           requestChoice.body.conversation.state,
           backgroundChoice.body.conversation.state,
         ],
-        explicitServiceState: pendingService.body.conversation.state,
-        generatedArtifactFormats: pendingService.body.artifacts.map(
+        explicitServiceState: confirmedService.body.conversation.state,
+        generatedArtifactFormats: confirmedService.body.artifacts.map(
           (artifact) => artifact.format,
         ),
         followUpStates: [

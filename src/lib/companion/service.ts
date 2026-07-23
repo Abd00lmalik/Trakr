@@ -436,7 +436,10 @@ function shouldOfferProfileSource(
 
 function confirmedProfile(request: OpportunityCompanionRequest) {
   const context = activeContext(request);
-  if (context?.profileConfirmed) return true;
+  const hasNewProfileInput = Boolean(
+    request.user || request.profile || request.resumeText || request.document,
+  );
+  if (context?.profileConfirmed && !hasNewProfileInput) return true;
   if (!context?.awaitingProfileConfirmation) return false;
   return /^(yes|correct|confirmed|looks good|that's right|that is right|proceed|continue)\b/i.test(
     request.message?.trim() ?? "",
@@ -1387,23 +1390,16 @@ export async function handleOpportunityCompanionRequest(
     return emptyResponse(request, conversation, undefined, built.filters);
   }
 
+  const hasNewConfirmableProfileInput = Boolean(
+    request.user || request.resumeText || request.document,
+  );
   const requiresProfileConfirmation =
     !profileConfirmedNow &&
-    !activeContext(request)?.profileConfirmed &&
-    !request.resumeText &&
-    !request.document &&
-    !request.target &&
-    request.intakeRoute !== "target" &&
-    request.intakeRoute !== "generate" &&
-    operation !== "benchmark" &&
-    operation !== "optimize" &&
-    operation !== "generate" &&
-    operation !== "generate_resume" &&
-    service !== "resume_generation" &&
-    service !== "resume_benchmarking" &&
-    built.evidence.some((item) => item.origin === "structured_profile") &&
-    !built.evidence.some(
-      (item) => item.origin === "user" || item.origin === "resume",
+    (!activeContext(request)?.profileConfirmed ||
+      hasNewConfirmableProfileInput) &&
+    built.evidence.some(
+      (item) =>
+        item.origin === "structured_profile" || item.origin === "resume",
     );
   if (requiresProfileConfirmation) {
     const suppliedByCaller = built.evidence.some(

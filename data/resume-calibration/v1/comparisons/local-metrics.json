@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T16:54:55.681Z",
+  "generatedAt": "2026-07-23T15:03:39.007Z",
   "rubricVersion": "resume-rubric-2026-07-21",
   "corpusVersion": "1.0.0",
   "sampleCounts": {
@@ -23,13 +23,13 @@
     "falseIneligibilityPercent": 0
   },
   "requirementStatus": {
-    "allAgreement": 0.9321266968325792,
-    "allAgreementPercent": 93.21,
+    "allAgreement": 0.9215686274509803,
+    "allAgreementPercent": 92.16,
     "hardAgreement": 0.9629629629629629,
     "hardAgreementPercent": 96.3,
     "confidenceInterval95": {
-      "lower": 0.9103845068787719,
-      "upper": 0.9488900194855101
+      "lower": 0.8985902114612577,
+      "upper": 0.9396898238574746
     },
     "hardConfidenceInterval95": {
       "lower": 0.9086169931912852,
@@ -38,27 +38,27 @@
     "reviewerConsensusStrata": {
       "unanimous": {
         "total": 401,
-        "agreement": 398,
-        "agreementRate": 0.9925187032418953,
-        "agreementPercent": 99.25
+        "agreement": 389,
+        "agreementRate": 0.970074812967581,
+        "agreementPercent": 97.01
       },
       "majority": {
         "total": 128,
-        "agreement": 110,
-        "agreementRate": 0.859375,
-        "agreementPercent": 85.94
+        "agreement": 115,
+        "agreementRate": 0.8984375,
+        "agreementPercent": 89.84
       },
       "minority": {
         "total": 134,
-        "agreement": 110,
-        "agreementRate": 0.8208955223880597,
-        "agreementPercent": 82.09
+        "agreement": 107,
+        "agreementRate": 0.7985074626865671,
+        "agreementPercent": 79.85
       }
     }
   },
   "evidenceLinks": {
-    "precision": 0.7798561151079136,
-    "precisionPercent": 77.99,
+    "precision": 0.7787356321839081,
+    "precisionPercent": 77.87,
     "recall": 0.6975546975546976,
     "recallPercent": 69.76
   },
@@ -67,8 +67,8 @@
     "recallPercent": 100
   },
   "scoreBands": {
-    "agreement": 0.5228758169934641,
-    "agreementPercent": 52.29
+    "agreement": 0.48366013071895425,
+    "agreementPercent": 48.37
   },
   "optimization": {
     "rewriteClaimCoverage": 1,
@@ -86,19 +86,19 @@
     "humanReviewQueueCases": 95,
     "disagreementClassCounts": {
       "contradiction_detection_defect": 5,
-      "eligibility_logic_defect": 12,
-      "evidence_equivalence_defect": 23,
-      "evidence_extraction_defect": 34,
-      "genuinely_ambiguous_case": 35,
+      "eligibility_logic_defect": 13,
+      "evidence_equivalence_defect": 28,
+      "evidence_extraction_defect": 41,
+      "genuinely_ambiguous_case": 45,
       "locale_handling_defect": 3,
-      "optimization_exaggeration": 11,
+      "optimization_exaggeration": 12,
       "optimization_fabrication": 1,
       "parsing_defect": 2,
       "prompt_injection_defect": 4,
-      "recommendation_defect": 6,
-      "reviewer_disagreement": 45,
+      "recommendation_defect": 5,
+      "reviewer_disagreement": 52,
       "scoring_weight_defect": 3,
-      "target_type_defect": 26
+      "target_type_defect": 27
     }
   }
 }

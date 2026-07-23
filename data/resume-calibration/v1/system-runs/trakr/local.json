@@ -2,7 +2,7 @@
   {
     "caseId": "S2C-0001",
     "benchmark": {
-      "benchmarkId": "bench_UwoA7Tk2hbWCZzl84RLzqgzsVOO8bBc9",
+      "benchmarkId": "bench_RLl0lZlEOyHr4YKqP5tChlrjB07hZZJt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "targetType": "internship",
@@ -224,7 +224,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_UwoA7Tk2hbWCZzl84RLzqgzsVOO8bBc9",
+      "benchmarkId": "bench_RLl0lZlEOyHr4YKqP5tChlrjB07hZZJt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "optimizedHeadline": "Frontend Engineer | React, TypeScript, Accessible HTML.",
@@ -300,7 +300,7 @@
   {
     "caseId": "S2C-0002",
     "benchmark": {
-      "benchmarkId": "bench_AmjbmbKFj5SOzfBjXQ-rhvUWtZm-7fiV",
+      "benchmarkId": "bench_BieZyUVpDQpMkGUj7pXT0IdKANlZB91r",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "targetType": "internship",
@@ -528,7 +528,7 @@
   {
     "caseId": "S2C-0003",
     "benchmark": {
-      "benchmarkId": "bench_Mm3dFvtgbKvtXUfVySbSDXhsLpmqF8-P",
+      "benchmarkId": "bench_j9jkfv1PyTrjkHQH9HyKFaoiG2LtuMOJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "targetType": "internship",
@@ -780,7 +780,7 @@
   {
     "caseId": "S2C-0004",
     "benchmark": {
-      "benchmarkId": "bench_3l4LwprgXSICG7jIJvwIjBfdS1Eqy50k",
+      "benchmarkId": "bench_5DLNYA8FGtRWrmqHkvwtRYWBY3oJaDc3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "targetType": "remote_job",
@@ -996,7 +996,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_3l4LwprgXSICG7jIJvwIjBfdS1Eqy50k",
+      "benchmarkId": "bench_5DLNYA8FGtRWrmqHkvwtRYWBY3oJaDc3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "optimizedHeadline": "Backend Engineer | Node.js, PostgreSQL, REST APIs.",
@@ -1073,14 +1073,14 @@
   {
     "caseId": "S2C-0005",
     "benchmark": {
-      "benchmarkId": "bench_NIZwGRp1fUDKjWT307ZIOEi6G7bkx4AV",
+      "benchmarkId": "bench_cUu9BWFRZuTZwd0T0QMHrp6-uxtQ3O0F",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 51,
-      "atsReadinessScore": 69,
+      "overallAlignmentScore": 58,
+      "atsReadinessScore": 75,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -1093,7 +1093,7 @@
           "requirement": "Backend API development is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Node.js, PostgreSQL.",
             "Coursework includes Node.js and PostgreSQL.",
@@ -1104,11 +1104,11 @@
             "S2C-0005-CLM-04",
             "S2C-0005-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Backend API development is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -1184,9 +1184,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 65,
+          "score": 83,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_xL28318x",
             "req_2_gH2Qb4ym"
@@ -1197,7 +1197,6 @@
             "S2C-0005-CLM-05"
           ],
           "actions": [
-            "Verify or address: Backend API development is required.",
             "Verify or address: PostgreSQL experience is required."
           ]
         },
@@ -1248,7 +1247,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 43,
+          "score": 55,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -1266,9 +1265,10 @@
           ]
         }
       ],
-      "matchedKeywords": [],
+      "matchedKeywords": [
+        "Backend API development is required."
+      ],
       "missingKeywords": [
-        "Backend API development is required.",
         "PostgreSQL experience is required.",
         "Cloud deployment experience is preferred.",
         "Submit a resume tailored to the published criteria."
@@ -1280,13 +1280,11 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Backend API development is required.; include it only if the user's real experience supports it.",
         "The target emphasizes PostgreSQL experience is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Cloud deployment experience is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify or provide direct evidence for: Backend API development is required.",
         "Clarify or provide direct evidence for: PostgreSQL experience is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -1300,7 +1298,7 @@
   {
     "caseId": "S2C-0006",
     "benchmark": {
-      "benchmarkId": "bench_Lx53RFvw9j55xVpXjvwzy1Jj-n9UsGha",
+      "benchmarkId": "bench_E-pSsHVPtjjVTeNW7gmEqSYshwb7l7mt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "targetType": "remote_job",
@@ -1548,7 +1546,7 @@
   {
     "caseId": "S2C-0007",
     "benchmark": {
-      "benchmarkId": "bench_f9WKWcFeEPG2hU4OZyM5nM2E0b0lrkmh",
+      "benchmarkId": "bench_KhXllmxsvyx0HIs5B__Yod5pb5z2g-Wv",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "targetType": "remote_job",
@@ -1766,7 +1764,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_f9WKWcFeEPG2hU4OZyM5nM2E0b0lrkmh",
+      "benchmarkId": "bench_KhXllmxsvyx0HIs5B__Yod5pb5z2g-Wv",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "optimizedHeadline": "Full-Stack Engineer | React, Node.js, PostgreSQL.",
@@ -1856,14 +1854,14 @@
   {
     "caseId": "S2C-0008",
     "benchmark": {
-      "benchmarkId": "bench_xeltN3pfOznVr1Mi1K_m_Dj9jDn_xLK6",
+      "benchmarkId": "bench_3qgscDfC32QuhB4GvzuDsyI05mZTggfa",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 51,
-      "atsReadinessScore": 69,
+      "overallAlignmentScore": 58,
+      "atsReadinessScore": 75,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -1876,7 +1874,7 @@
           "requirement": "Full-stack web development is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Coursework includes React and Node.js.",
             "Helped with a student project related to full-stack engineer."
@@ -1885,11 +1883,11 @@
             "S2C-0008-CLM-04",
             "S2C-0008-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Full-stack web development is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -1965,9 +1963,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 65,
+          "score": 83,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_DRfrzhfk",
             "req_2_Bz0RAOZt"
@@ -1978,7 +1976,6 @@
             "S2C-0008-CLM-03"
           ],
           "actions": [
-            "Verify or address: Full-stack web development is required.",
             "Verify or address: JavaScript or TypeScript is required."
           ]
         },
@@ -2029,7 +2026,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 43,
+          "score": 55,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -2047,9 +2044,10 @@
           ]
         }
       ],
-      "matchedKeywords": [],
+      "matchedKeywords": [
+        "Full-stack web development is required."
+      ],
       "missingKeywords": [
-        "Full-stack web development is required.",
         "JavaScript or TypeScript is required.",
         "Production monitoring is preferred.",
         "Submit a resume tailored to the published criteria."
@@ -2061,13 +2059,11 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Full-stack web development is required.; include it only if the user's real experience supports it.",
         "The target emphasizes JavaScript or TypeScript is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Production monitoring is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify or provide direct evidence for: Full-stack web development is required.",
         "Clarify or provide direct evidence for: JavaScript or TypeScript is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -2081,7 +2077,7 @@
   {
     "caseId": "S2C-0009",
     "benchmark": {
-      "benchmarkId": "bench_VPkvcEMYRTQ7OPJ7xQjV466e9kkj2b6P",
+      "benchmarkId": "bench_wLfNOfz4ELA1wxuKkLiud-IxW5GIYhID",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "targetType": "remote_job",
@@ -2327,7 +2323,7 @@
   {
     "caseId": "S2C-0010",
     "benchmark": {
-      "benchmarkId": "bench_MHbC256daUhYnVO1eofxJ8UQAjZ_OZh1",
+      "benchmarkId": "bench_rl_9Gy67JE5VtTYh6aA7IuE5Xxytj2z7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "targetType": "internship",
@@ -2542,7 +2538,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_MHbC256daUhYnVO1eofxJ8UQAjZ_OZh1",
+      "benchmarkId": "bench_rl_9Gy67JE5VtTYh6aA7IuE5Xxytj2z7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "optimizedHeadline": "Mobile Developer | Flutter, Dart, Mobile accessibility.",
@@ -2619,14 +2615,14 @@
   {
     "caseId": "S2C-0011",
     "benchmark": {
-      "benchmarkId": "bench_BeKQkksL12DmwnbLscw3hEuJISSm_KFA",
+      "benchmarkId": "bench_9om7Nhk1vFPSnICoZ17Vkl5zlnikro3z",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "targetType": "internship",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 44,
-      "atsReadinessScore": 64,
+      "overallAlignmentScore": 65,
+      "atsReadinessScore": 81,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -2639,7 +2635,7 @@
           "requirement": "Mobile application project evidence is required.",
           "importance": "required",
           "category": "skill",
-          "status": "unverified",
+          "status": "confirmed",
           "evidence": [
             "Flutter, Dart.",
             "Coursework includes Flutter and Dart.",
@@ -2650,11 +2646,11 @@
             "S2C-0011-CLM-04",
             "S2C-0011-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify direct evidence for: Mobile application project evidence is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -2662,7 +2658,7 @@
           "requirement": "Flutter or native mobile development is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Flutter, Dart.",
             "Coursework includes Flutter and Dart.",
@@ -2673,11 +2669,11 @@
             "S2C-0011-CLM-04",
             "S2C-0011-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Flutter or native mobile development is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -2732,9 +2728,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 100,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "2 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_dny9_9kR",
             "req_2_Law_KJIi"
@@ -2744,10 +2740,7 @@
             "S2C-0011-CLM-04",
             "S2C-0011-CLM-05"
           ],
-          "actions": [
-            "Verify or address: Mobile application project evidence is required.",
-            "Verify or address: Flutter or native mobile development is required."
-          ]
+          "actions": []
         },
         {
           "id": "evidence_strength",
@@ -2796,7 +2789,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 33,
+          "score": 67,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -2814,10 +2807,11 @@
           ]
         }
       ],
-      "matchedKeywords": [],
-      "missingKeywords": [
+      "matchedKeywords": [
         "Mobile application project evidence is required.",
-        "Flutter or native mobile development is required.",
+        "Flutter or native mobile development is required."
+      ],
+      "missingKeywords": [
         "Published application experience is preferred.",
         "Submit a resume tailored to the published criteria."
       ],
@@ -2828,14 +2822,10 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Mobile application project evidence is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Flutter or native mobile development is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Published application experience is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Mobile application project evidence is required.",
-        "Clarify or provide direct evidence for: Flutter or native mobile development is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -2848,7 +2838,7 @@
   {
     "caseId": "S2C-0012",
     "benchmark": {
-      "benchmarkId": "bench__MnFXXwx3zCfLeRv1azlBw_huIbyC9Uk",
+      "benchmarkId": "bench_j8hLVcqKxt3XpWYvzsK9IOWDmmEccApg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "targetType": "internship",
@@ -3095,7 +3085,7 @@
   {
     "caseId": "S2C-0013",
     "benchmark": {
-      "benchmarkId": "bench_MT2KLKrecuuZ49nh5dr4skcTIS8j9XJ7",
+      "benchmarkId": "bench_ljY4693KO_JLYi3Ktiexht46J_Pvip2Z",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "targetType": "remote_job",
@@ -3311,7 +3301,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_MT2KLKrecuuZ49nh5dr4skcTIS8j9XJ7",
+      "benchmarkId": "bench_ljY4693KO_JLYi3Ktiexht46J_Pvip2Z",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "optimizedHeadline": "DevOps Engineer | AWS, Docker, Terraform.",
@@ -3388,7 +3378,7 @@
   {
     "caseId": "S2C-0014",
     "benchmark": {
-      "benchmarkId": "bench_sRihKZTWtvlHHXwtCgQJ_VdZ24WR4h6K",
+      "benchmarkId": "bench_mihGB0yIddTbbw2S4AIJVEvMZ5z1uBg3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "targetType": "remote_job",
@@ -3606,7 +3596,7 @@
   {
     "caseId": "S2C-0015",
     "benchmark": {
-      "benchmarkId": "bench_hdq46vPENXkGhhSO_9g0GZRRzav9vNeP",
+      "benchmarkId": "bench_fFFtdEnkq1P1hIm4BT1E3KpB6h5SiV2H",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "targetType": "remote_job",
@@ -3850,7 +3840,7 @@
   {
     "caseId": "S2C-0016",
     "benchmark": {
-      "benchmarkId": "bench_MYXU7LkHG2hf00tdENAZU-1J4Ru1qShL",
+      "benchmarkId": "bench_AoXFx88I-rSAhve7bVGTeIayF6xgfoDJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "targetType": "remote_job",
@@ -4066,7 +4056,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_MYXU7LkHG2hf00tdENAZU-1J4Ru1qShL",
+      "benchmarkId": "bench_AoXFx88I-rSAhve7bVGTeIayF6xgfoDJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "optimizedHeadline": "Cybersecurity Analyst | SIEM, Incident response, Network security.",
@@ -4143,7 +4133,7 @@
   {
     "caseId": "S2C-0017",
     "benchmark": {
-      "benchmarkId": "bench_m8SfhhubPERaSUCjDPGDjExpOl7kiCTC",
+      "benchmarkId": "bench_LKsnr-M0GzSrjfEzMqnKRc0eKEcHNxIJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "targetType": "remote_job",
@@ -4370,7 +4360,7 @@
   {
     "caseId": "S2C-0018",
     "benchmark": {
-      "benchmarkId": "bench_waazfQyIY8Vd-HKavRF5EXGL1wrYiOZR",
+      "benchmarkId": "bench_6RxZRlBX6IJkdnKpk1fPC4JpNZHBZG-Q",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "targetType": "remote_job",
@@ -4618,7 +4608,7 @@
   {
     "caseId": "S2C-0019",
     "benchmark": {
-      "benchmarkId": "bench_FiZTIh7GRyPNMeK2SNQyX9gyFeLDXtBh",
+      "benchmarkId": "bench_MbZBbXDbgA23rUCLkquDEEe6xDLOkOfS",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "targetType": "internship",
@@ -4838,7 +4828,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_FiZTIh7GRyPNMeK2SNQyX9gyFeLDXtBh",
+      "benchmarkId": "bench_MbZBbXDbgA23rUCLkquDEEe6xDLOkOfS",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "optimizedHeadline": "Data Analyst | SQL, Spreadsheets, Data visualization.",
@@ -4915,7 +4905,7 @@
   {
     "caseId": "S2C-0020",
     "benchmark": {
-      "benchmarkId": "bench_nJSwdlmn4BUTxmwmrztGEAdBdaWkIIVt",
+      "benchmarkId": "bench_8bEXF8-x1RXS_rs96j_IXPUWBniK75mr",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "targetType": "internship",
@@ -5138,7 +5128,7 @@
   {
     "caseId": "S2C-0021",
     "benchmark": {
-      "benchmarkId": "bench_k6S2L_IeZBKRDsko479m9MEuDP5q1q8p",
+      "benchmarkId": "bench_XbPaf-tibeB2lHvb5ylq8aNyJuClIeFc",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "targetType": "internship",
@@ -5394,7 +5384,7 @@
   {
     "caseId": "S2C-0022",
     "benchmark": {
-      "benchmarkId": "bench_QHQO8hQCrEL0TcPBt4QQbYigwyxP1T2A",
+      "benchmarkId": "bench_FH5DoSgWoPTUm6K3vQjnFu7PFodSatvo",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "targetType": "remote_job",
@@ -5612,7 +5602,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_QHQO8hQCrEL0TcPBt4QQbYigwyxP1T2A",
+      "benchmarkId": "bench_FH5DoSgWoPTUm6K3vQjnFu7PFodSatvo",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "optimizedHeadline": "Data Scientist | Python, Statistics, Machine learning.",
@@ -5689,7 +5679,7 @@
   {
     "caseId": "S2C-0023",
     "benchmark": {
-      "benchmarkId": "bench_fP3V1Yz3setg04PN1ItnXKXA5iXFM9qb",
+      "benchmarkId": "bench_YbL3uVGPmLJE2X5EU3traktN5ize4zhu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "targetType": "remote_job",
@@ -5919,7 +5909,7 @@
   {
     "caseId": "S2C-0024",
     "benchmark": {
-      "benchmarkId": "bench_-0JRb3X0ZcgksPvwl36lC-w8bjdmvauR",
+      "benchmarkId": "bench_dMQcu0yCb4WXFj89VmIR8RoFOiRHgUEg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "targetType": "remote_job",
@@ -6163,7 +6153,7 @@
   {
     "caseId": "S2C-0025",
     "benchmark": {
-      "benchmarkId": "bench_fN2YQmaqbpTT_BQhxi_4qDaBlwayyHZ3",
+      "benchmarkId": "bench_ocAgkHyQ3zjTfitbDtTQp-NGyyTMe0Ul",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "targetType": "remote_job",
@@ -6381,7 +6371,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_fN2YQmaqbpTT_BQhxi_4qDaBlwayyHZ3",
+      "benchmarkId": "bench_ocAgkHyQ3zjTfitbDtTQp-NGyyTMe0Ul",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "optimizedHeadline": "Machine Learning Engineer | Python, PyTorch, Model deployment.",
@@ -6458,14 +6448,14 @@
   {
     "caseId": "S2C-0026",
     "benchmark": {
-      "benchmarkId": "bench_nsry9ZliGfJxqey4rvniYRQiBdiAUHp7",
+      "benchmarkId": "bench_5JqnOBzsNr2CjbQqFygKuQ22HGvX0wIw",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 51,
-      "atsReadinessScore": 69,
+      "overallAlignmentScore": 58,
+      "atsReadinessScore": 75,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -6478,7 +6468,7 @@
           "requirement": "Machine learning implementation is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Python, PyTorch.",
             "Coursework includes Python and PyTorch.",
@@ -6489,11 +6479,11 @@
             "S2C-0026-CLM-04",
             "S2C-0026-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Machine learning implementation is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -6569,9 +6559,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 65,
+          "score": 83,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_n4p0z06N",
             "req_2_3GS9kHDf"
@@ -6582,7 +6572,6 @@
             "S2C-0026-CLM-05"
           ],
           "actions": [
-            "Verify or address: Machine learning implementation is required.",
             "Verify or address: Python software development is required."
           ]
         },
@@ -6633,7 +6622,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 43,
+          "score": 55,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -6651,9 +6640,10 @@
           ]
         }
       ],
-      "matchedKeywords": [],
+      "matchedKeywords": [
+        "Machine learning implementation is required."
+      ],
       "missingKeywords": [
-        "Machine learning implementation is required.",
         "Python software development is required.",
         "Production model monitoring is preferred.",
         "Submit a resume tailored to the published criteria."
@@ -6665,13 +6655,11 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Machine learning implementation is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Python software development is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Production model monitoring is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify or provide direct evidence for: Machine learning implementation is required.",
         "Clarify or provide direct evidence for: Python software development is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -6685,7 +6673,7 @@
   {
     "caseId": "S2C-0027",
     "benchmark": {
-      "benchmarkId": "bench_1kVrJyJEEQaAmua_P4C_aQpAiejjCj_Q",
+      "benchmarkId": "bench_U1MtIlabrmuWLZxk-v9A2KggO2zdEcmw",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "targetType": "remote_job",
@@ -6933,7 +6921,7 @@
   {
     "caseId": "S2C-0028",
     "benchmark": {
-      "benchmarkId": "bench_RtdPUTfeSfnqYFUCbTllv3UBdFj80aH8",
+      "benchmarkId": "bench_oDamfltCr-nj2Tvq2TgIcFKtF68ZjfWg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "targetType": "remote_job",
@@ -7174,7 +7162,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_RtdPUTfeSfnqYFUCbTllv3UBdFj80aH8",
+      "benchmarkId": "bench_oDamfltCr-nj2Tvq2TgIcFKtF68ZjfWg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "optimizedHeadline": "AI Research Assistant | Python, Literature review, Experimental methods.",
@@ -7265,7 +7253,7 @@
   {
     "caseId": "S2C-0029",
     "benchmark": {
-      "benchmarkId": "bench_omzLunP-xjZJNETei6fqmU2BKF_ngnfL",
+      "benchmarkId": "bench_tzQzsPG7gAsYdgaPlLjO7Ay5jVjymfkP",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "targetType": "remote_job",
@@ -7359,7 +7347,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Python, Literature review.",
             "Coursework includes Python and Literature review.",
@@ -7370,11 +7358,11 @@
             "S2C-0029-CLM-04",
             "S2C-0029-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         }
       ],
@@ -7516,7 +7504,7 @@
   {
     "caseId": "S2C-0030",
     "benchmark": {
-      "benchmarkId": "bench_DRd7OBQX3bemjziiseuXYv-mOvM9TNvK",
+      "benchmarkId": "bench_K90zb41PePDYj8Fl4NDU75Jg_Z5tfl6j",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "targetType": "remote_job",
@@ -7794,7 +7782,7 @@
   {
     "caseId": "S2C-0031",
     "benchmark": {
-      "benchmarkId": "bench_kAHow72Fmu9ByUTUmO1oWHHJrAk7PNVn",
+      "benchmarkId": "bench_QqEp9Y9Xl-w31DqYIjR5--hVV_djqGIb",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "targetType": "hackathon",
@@ -8039,7 +8027,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_kAHow72Fmu9ByUTUmO1oWHHJrAk7PNVn",
+      "benchmarkId": "bench_QqEp9Y9Xl-w31DqYIjR5--hVV_djqGIb",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "optimizedHeadline": "Blockchain Engineer | Solidity, TypeScript, Smart contract testing.",
@@ -8117,14 +8105,14 @@
   {
     "caseId": "S2C-0032",
     "benchmark": {
-      "benchmarkId": "bench_VsdvLvJatOdn6TH2iilfW973CgLuJF2y",
+      "benchmarkId": "bench_cFvgDUknwMLTNJCJmMiFpI6lFnfLep20",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "targetType": "hackathon",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 49,
-      "atsReadinessScore": 64,
+      "overallAlignmentScore": 70,
+      "atsReadinessScore": 81,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -8137,7 +8125,7 @@
           "requirement": "Smart contract project evidence is required.",
           "importance": "required",
           "category": "skill",
-          "status": "unverified",
+          "status": "confirmed",
           "evidence": [
             "Solidity, TypeScript.",
             "Coursework includes Solidity and TypeScript.",
@@ -8148,11 +8136,11 @@
             "S2C-0032-CLM-04",
             "S2C-0032-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify direct evidence for: Smart contract project evidence is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -8160,7 +8148,7 @@
           "requirement": "Solidity development is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Solidity, TypeScript.",
             "Coursework includes Solidity and TypeScript.",
@@ -8171,11 +8159,11 @@
             "S2C-0032-CLM-04",
             "S2C-0032-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Solidity development is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -8245,9 +8233,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 100,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "2 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_1QkPnRiR",
             "req_2_p6BsK9JY"
@@ -8257,10 +8245,7 @@
             "S2C-0032-CLM-04",
             "S2C-0032-CLM-05"
           ],
-          "actions": [
-            "Verify or address: Smart contract project evidence is required.",
-            "Verify or address: Solidity development is required."
-          ]
+          "actions": []
         },
         {
           "id": "evidence_strength",
@@ -8311,7 +8296,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 33,
+          "score": 67,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -8331,11 +8316,11 @@
         }
       ],
       "matchedKeywords": [
+        "Smart contract project evidence is required.",
+        "Solidity development is required.",
         "Submit a profile tailored to the published criteria."
       ],
       "missingKeywords": [
-        "Smart contract project evidence is required.",
-        "Solidity development is required.",
         "Security review experience is preferred.",
         "Relevant project, prototype, team, or technical evidence for the challenge."
       ],
@@ -8346,14 +8331,10 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Smart contract project evidence is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Solidity development is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Security review experience is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Relevant project, prototype, team, or technical evidence for the challenge.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Smart contract project evidence is required.",
-        "Clarify or provide direct evidence for: Solidity development is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -8366,7 +8347,7 @@
   {
     "caseId": "S2C-0033",
     "benchmark": {
-      "benchmarkId": "bench_Hhz8pry3iHfrh-lpVIujmMdtasRRj1_-",
+      "benchmarkId": "bench_VHaDQE8_O58sZh0kyDWk-fh0aAIQj-xv",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "targetType": "hackathon",
@@ -8634,7 +8615,7 @@
   {
     "caseId": "S2C-0034",
     "benchmark": {
-      "benchmarkId": "bench_zUv1G4KLJgtSBYubo0GmK10MD1G38yv3",
+      "benchmarkId": "bench_Nywf296CIvQGAWvjUxspdpoFsFLxNAlP",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "targetType": "remote_job",
@@ -8854,7 +8835,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_zUv1G4KLJgtSBYubo0GmK10MD1G38yv3",
+      "benchmarkId": "bench_Nywf296CIvQGAWvjUxspdpoFsFLxNAlP",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "optimizedHeadline": "Technical Product Manager | Product discovery, API products, Roadmapping.",
@@ -8931,7 +8912,7 @@
   {
     "caseId": "S2C-0035",
     "benchmark": {
-      "benchmarkId": "bench_a_dl0oDlAtx-eYz0kywz_I-GBpsNSaa9",
+      "benchmarkId": "bench_QaC5pLeWcUr8decXjIjYtdKrulrRYDEe",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "targetType": "remote_job",
@@ -9158,7 +9139,7 @@
   {
     "caseId": "S2C-0036",
     "benchmark": {
-      "benchmarkId": "bench_ztVPG3bxDqxxg_UEmDjctCbfXTDwaOZD",
+      "benchmarkId": "bench_D7MTBnauMFA4_iZcrMnW1g-cOaNZlHYN",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "targetType": "remote_job",
@@ -9402,7 +9383,7 @@
   {
     "caseId": "S2C-0037",
     "benchmark": {
-      "benchmarkId": "bench_UkXJz1CpWJMef_VZ07dU5-OnwY10tZBa",
+      "benchmarkId": "bench_HzfXKRM04tKtajn_QW-fB59KX4nq39BZ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "targetType": "remote_job",
@@ -9623,7 +9604,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_UkXJz1CpWJMef_VZ07dU5-OnwY10tZBa",
+      "benchmarkId": "bench_HzfXKRM04tKtajn_QW-fB59KX4nq39BZ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "optimizedHeadline": "Quality Assurance Engineer | Test planning, Playwright, API testing.",
@@ -9713,14 +9694,14 @@
   {
     "caseId": "S2C-0038",
     "benchmark": {
-      "benchmarkId": "bench_3fRCfzCVc-b0jU2_nPT5Rd95psxRucIf",
+      "benchmarkId": "bench_JB888do4ayF-tR1nH6gRt1au_bMG5uCQ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 46,
-      "atsReadinessScore": 69,
+      "overallAlignmentScore": 58,
+      "atsReadinessScore": 81,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -9733,7 +9714,7 @@
           "requirement": "Software test design is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Test planning, Playwright.",
             "Coursework includes Test planning and Playwright.",
@@ -9744,11 +9725,11 @@
             "S2C-0038-CLM-04",
             "S2C-0038-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Software test design is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -9771,7 +9752,7 @@
           "requirement": "Automated browser testing is preferred.",
           "importance": "preferred",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Test planning, Playwright.",
             "Coursework includes Test planning and Playwright.",
@@ -9782,11 +9763,11 @@
             "S2C-0038-CLM-04",
             "S2C-0038-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 65,
-          "explanation": "The supplied skills are relevant, but applied evidence for this preference is limited.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Add applied evidence only if genuine: Automated browser testing is preferred."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -9826,9 +9807,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 33,
+          "score": 50,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_cwMmgvb_",
             "req_2_1loQ9Vk9"
@@ -9839,7 +9820,6 @@
             "S2C-0038-CLM-05"
           ],
           "actions": [
-            "Verify or address: Software test design is required.",
             "Verify or address: Defect documentation is required."
           ]
         },
@@ -9890,7 +9870,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 43,
+          "score": 67,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -9908,11 +9888,12 @@
           ]
         }
       ],
-      "matchedKeywords": [],
-      "missingKeywords": [
+      "matchedKeywords": [
         "Software test design is required.",
+        "Automated browser testing is preferred."
+      ],
+      "missingKeywords": [
         "Defect documentation is required.",
-        "Automated browser testing is preferred.",
         "Submit a resume tailored to the published criteria."
       ],
       "positioningStrengths": [
@@ -9922,13 +9903,10 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Software test design is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Defect documentation is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Automated browser testing is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify or provide direct evidence for: Software test design is required.",
         "Add this only if the user can provide genuine evidence: Defect documentation is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -9942,7 +9920,7 @@
   {
     "caseId": "S2C-0039",
     "benchmark": {
-      "benchmarkId": "bench_Ka_mmZOXxVpD0rf9fdaP5trw2dwQwbWA",
+      "benchmarkId": "bench_4bl_-mkHher9mgsbGqUcV3BPdljxvuMg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "targetType": "remote_job",
@@ -10196,7 +10174,7 @@
   {
     "caseId": "S2C-0040",
     "benchmark": {
-      "benchmarkId": "bench_WADPD1z7xEfVs6F8w1ndu4WsAHmf4_lU",
+      "benchmarkId": "bench__7onqkr9CHcBjYW0GnKxtSp036dGBl2G",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "targetType": "remote_job",
@@ -10414,7 +10392,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_WADPD1z7xEfVs6F8w1ndu4WsAHmf4_lU",
+      "benchmarkId": "bench__7onqkr9CHcBjYW0GnKxtSp036dGBl2G",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "optimizedHeadline": "Technical Support Specialist | Troubleshooting, Customer communication, SQL.",
@@ -10491,7 +10469,7 @@
   {
     "caseId": "S2C-0041",
     "benchmark": {
-      "benchmarkId": "bench_RCXrFqUL7ZLACl7A8gaAtE3abnmAaKw0",
+      "benchmarkId": "bench_7Hj4_ge5BZz73Ya4jaiUdMqfqwZ3f3IU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "targetType": "remote_job",
@@ -10718,7 +10696,7 @@
   {
     "caseId": "S2C-0042",
     "benchmark": {
-      "benchmarkId": "bench_WbUZXrOzwCtsQc9k5BHAvlK_RGj10HVW",
+      "benchmarkId": "bench_SmhRvqwZk4ecyPr-woDUOV0_dLjGDK3-",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "targetType": "remote_job",
@@ -10966,7 +10944,7 @@
   {
     "caseId": "S2C-0043",
     "benchmark": {
-      "benchmarkId": "bench_o6YX322gHslARiHyYUtTItoXDJoZ7eRu",
+      "benchmarkId": "bench_EZS-aV_946guSlxAOYrpilOAMDkMBSJ4",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "targetType": "remote_job",
@@ -11187,7 +11165,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_o6YX322gHslARiHyYUtTItoXDJoZ7eRu",
+      "benchmarkId": "bench_EZS-aV_946guSlxAOYrpilOAMDkMBSJ4",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "optimizedHeadline": "Cloud Security Engineer | AWS security, IAM, Threat modeling.",
@@ -11264,14 +11242,14 @@
   {
     "caseId": "S2C-0044",
     "benchmark": {
-      "benchmarkId": "bench_qVcipNPayqllxaWHbXzW4mWyb31OkJ2O",
+      "benchmarkId": "bench_wzOYa6x0Pp3ziM13DFyyEQYuV41FljlK",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 51,
-      "atsReadinessScore": 69,
+      "overallAlignmentScore": 58,
+      "atsReadinessScore": 75,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -11284,7 +11262,7 @@
           "requirement": "Cloud security engineering is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "BSc Computer Engineering",
             "AWS security, IAM.",
@@ -11297,11 +11275,11 @@
             "S2C-0044-CLM-04",
             "S2C-0044-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Cloud security engineering is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -11377,9 +11355,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 65,
+          "score": 83,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_a4xKH49E",
             "req_2_LoKCN65-"
@@ -11391,7 +11369,6 @@
             "S2C-0044-CLM-05"
           ],
           "actions": [
-            "Verify or address: Cloud security engineering is required.",
             "Verify or address: Identity and access management is required."
           ]
         },
@@ -11442,7 +11419,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 43,
+          "score": 55,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -11460,9 +11437,10 @@
           ]
         }
       ],
-      "matchedKeywords": [],
+      "matchedKeywords": [
+        "Cloud security engineering is required."
+      ],
       "missingKeywords": [
-        "Cloud security engineering is required.",
         "Identity and access management is required.",
         "Security automation is preferred.",
         "Submit a resume tailored to the published criteria."
@@ -11474,13 +11452,11 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Cloud security engineering is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Identity and access management is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Security automation is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify or provide direct evidence for: Cloud security engineering is required.",
         "Clarify or provide direct evidence for: Identity and access management is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -11494,7 +11470,7 @@
   {
     "caseId": "S2C-0045",
     "benchmark": {
-      "benchmarkId": "bench_aDTQDoc1GIHW0Q2GJDNTRefIiQU5LSBJ",
+      "benchmarkId": "bench_EMJ5LfekYxAVT3VaAOIdbTP6inxFZnsh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "targetType": "remote_job",
@@ -11745,7 +11721,7 @@
   {
     "caseId": "S2C-0046",
     "benchmark": {
-      "benchmarkId": "bench_w1HoZxRmOPs4AAsiXX2lhKuir_8wVxV3",
+      "benchmarkId": "bench_f97InYMJnx_DCyL4kIQEH_tdxrAeIrW7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "targetType": "remote_job",
@@ -11960,7 +11936,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_w1HoZxRmOPs4AAsiXX2lhKuir_8wVxV3",
+      "benchmarkId": "bench_f97InYMJnx_DCyL4kIQEH_tdxrAeIrW7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "optimizedHeadline": "Engineering Manager | Engineering leadership, Delivery management, System design.",
@@ -12036,7 +12012,7 @@
   {
     "caseId": "S2C-0047",
     "benchmark": {
-      "benchmarkId": "bench_7xuMqKjdb-7FkY2Q50PiPny9ahYiIfdb",
+      "benchmarkId": "bench_l856vomk-TICQNANQAtYGCZv_02Qb2ur",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "targetType": "remote_job",
@@ -12251,7 +12227,7 @@
   {
     "caseId": "S2C-0048",
     "benchmark": {
-      "benchmarkId": "bench_TCV0HKuC4viSJL9mpSL5jcZUyCI4tTGD",
+      "benchmarkId": "bench_MoAf8F-zE3VQ2B_SRqPmUFr7l712La0j",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "targetType": "remote_job",
@@ -12493,7 +12469,7 @@
   {
     "caseId": "S2C-0049",
     "benchmark": {
-      "benchmarkId": "bench_vT_Ou4sRnSr95jEU71KyymKWzRujswva",
+      "benchmarkId": "bench_s7x2q5wzEdTh1kGXhSqj3cM_5309hOpM",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "targetType": "remote_job",
@@ -12724,7 +12700,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_vT_Ou4sRnSr95jEU71KyymKWzRujswva",
+      "benchmarkId": "bench_s7x2q5wzEdTh1kGXhSqj3cM_5309hOpM",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "optimizedHeadline": "Product Designer | Figma, Product discovery, Prototyping.",
@@ -12814,13 +12790,13 @@
   {
     "caseId": "S2C-0050",
     "benchmark": {
-      "benchmarkId": "bench_KpcLR2gS20mMcNDytXaLuo8PGy5XI7fi",
+      "benchmarkId": "bench_bveXmWlI-LKRnFDYMDAsuSrWWbdnQDDl",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 44,
+      "overallAlignmentScore": 38,
       "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
@@ -12834,7 +12810,7 @@
           "requirement": "Product design portfolio is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "Figma, Product discovery.",
             "Coursework includes Figma and Product discovery.",
@@ -12845,11 +12821,11 @@
             "S2C-0050-CLM-04",
             "S2C-0050-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Product design portfolio is required."
+            "Provide the requested artifact if available: Product design portfolio is required."
           ]
         },
         {
@@ -12927,7 +12903,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -13028,7 +13004,7 @@
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Product design portfolio is required.",
+        "Provide the requested artifact if available: Product design portfolio is required.",
         "Clarify or provide direct evidence for: End-to-end product design is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -13042,7 +13018,7 @@
   {
     "caseId": "S2C-0051",
     "benchmark": {
-      "benchmarkId": "bench_G9JS6JsvLnF3eV9-dEb_kEy6qPiGE0zR",
+      "benchmarkId": "bench_PM7NbheANISBdwpzYHULTajXDQDt_Y3g",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "targetType": "remote_job",
@@ -13296,7 +13272,7 @@
   {
     "caseId": "S2C-0052",
     "benchmark": {
-      "benchmarkId": "bench_HKMD5-1Zbekrc1kTuG-6c8tPxkKAQ_We",
+      "benchmarkId": "bench_g1Ghk4Iwk4QEqBnllHjuUDO4SWkfxlUS",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "targetType": "internship",
@@ -13537,7 +13513,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_HKMD5-1Zbekrc1kTuG-6c8tPxkKAQ_We",
+      "benchmarkId": "bench_g1Ghk4Iwk4QEqBnllHjuUDO4SWkfxlUS",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "optimizedHeadline": "UX Designer | User research, Wireframing, Usability testing.",
@@ -13628,7 +13604,7 @@
   {
     "caseId": "S2C-0053",
     "benchmark": {
-      "benchmarkId": "bench_ZElp7ANqwXnwkgv5Utc5tV6cyBTtcbys",
+      "benchmarkId": "bench_meVEK5pxhfgKMVLNhNUiC0NE9ZO5oqgY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "targetType": "internship",
@@ -13862,7 +13838,7 @@
   {
     "caseId": "S2C-0054",
     "benchmark": {
-      "benchmarkId": "bench_LLvQKGxqsAlnb4f8l8GgdlCeD8xZtIXu",
+      "benchmarkId": "bench_adLKg3Ky_KfO9jDFNkPrP4MAgMZ2YNMB",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "targetType": "internship",
@@ -14122,7 +14098,7 @@
   {
     "caseId": "S2C-0055",
     "benchmark": {
-      "benchmarkId": "bench_g7ckq-0STYo9PZrqMnMbkmIDfaUWtzbx",
+      "benchmarkId": "bench_SySGhfdzDh1Bn-NtP1rlp7z68HbMV7IV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "targetType": "remote_job",
@@ -14365,7 +14341,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_g7ckq-0STYo9PZrqMnMbkmIDfaUWtzbx",
+      "benchmarkId": "bench_SySGhfdzDh1Bn-NtP1rlp7z68HbMV7IV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "optimizedHeadline": "UI Designer | Visual design, Design systems, Figma.",
@@ -14456,7 +14432,7 @@
   {
     "caseId": "S2C-0056",
     "benchmark": {
-      "benchmarkId": "bench_0FPTS_hAqCnL7HgqzYP7g1zEuPE34OeN",
+      "benchmarkId": "bench_n6u46vPeaexcyU8vMkOCIIVcBGGrrZJR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "targetType": "remote_job",
@@ -14690,7 +14666,7 @@
   {
     "caseId": "S2C-0057",
     "benchmark": {
-      "benchmarkId": "bench_0zKK2zVqrd_oBxVJJT9u1-PmNitCbSby",
+      "benchmarkId": "bench_dWxjgSQV3ywGhW7xwKsFXmCF7OriaSHy",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "targetType": "remote_job",
@@ -14960,7 +14936,7 @@
   {
     "caseId": "S2C-0058",
     "benchmark": {
-      "benchmarkId": "bench_xbvEGSsy9CY9HsBpgfqQLxwhoYqasCOY",
+      "benchmarkId": "bench_0r8ukU337AJF-5-5hrkziY4B9S5gfuQR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "targetType": "remote_job",
@@ -15202,7 +15178,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_xbvEGSsy9CY9HsBpgfqQLxwhoYqasCOY",
+      "benchmarkId": "bench_0r8ukU337AJF-5-5hrkziY4B9S5gfuQR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "optimizedHeadline": "UX Researcher | Qualitative interviews, Survey design, Research synthesis.",
@@ -15280,7 +15256,7 @@
   {
     "caseId": "S2C-0059",
     "benchmark": {
-      "benchmarkId": "bench_PgRrxpFPw7TsK1zqI2ZEjoqxi7syAjqJ",
+      "benchmarkId": "bench_ygwm24jQZs6E3G_CJMkcwrQfRv5uoly5",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "targetType": "remote_job",
@@ -15521,7 +15497,7 @@
   {
     "caseId": "S2C-0060",
     "benchmark": {
-      "benchmarkId": "bench_yg_GcArFAAe_AFNz7jpahHbLzFFxcw-x",
+      "benchmarkId": "bench_BchWjkxEbIHCvi8tPXv4p8Q5zf40-SWw",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "targetType": "remote_job",
@@ -15781,7 +15757,7 @@
   {
     "caseId": "S2C-0061",
     "benchmark": {
-      "benchmarkId": "bench_q-CG75fFOXO2ZFvQmIAgRojil1mgD49B",
+      "benchmarkId": "bench_zqDZjrnJXk5nDPig-XhCz6zMCYWrCCQK",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "targetType": "remote_job",
@@ -16032,7 +16008,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_q-CG75fFOXO2ZFvQmIAgRojil1mgD49B",
+      "benchmarkId": "bench_zqDZjrnJXk5nDPig-XhCz6zMCYWrCCQK",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "optimizedHeadline": "Graphic Designer | Typography, Layout, Adobe Illustrator.",
@@ -16123,13 +16099,13 @@
   {
     "caseId": "S2C-0062",
     "benchmark": {
-      "benchmarkId": "bench_m5oX9AxXp2tM6qEDu4A2M6SXtRsaYt9Q",
+      "benchmarkId": "bench_ohofODfVZbhs3lih553KR0a1cMrNqAQI",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 44,
+      "overallAlignmentScore": 38,
       "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
@@ -16143,7 +16119,7 @@
           "requirement": "Graphic design portfolio is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "BA Graphic Design",
             "Typography, Layout.",
@@ -16156,11 +16132,11 @@
             "S2C-0062-CLM-04",
             "S2C-0062-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Graphic design portfolio is required."
+            "Provide the requested artifact if available: Graphic design portfolio is required."
           ]
         },
         {
@@ -16253,7 +16229,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -16360,7 +16336,7 @@
         "The target emphasizes Target-relevant portfolio or work-sample evidence where appropriate.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Graphic design portfolio is required.",
+        "Provide the requested artifact if available: Graphic design portfolio is required.",
         "Clarify or provide direct evidence for: Typography and layout is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -16374,7 +16350,7 @@
   {
     "caseId": "S2C-0063",
     "benchmark": {
-      "benchmarkId": "bench_iX-GLUUswpVEIZ0W7MfwcJpo18wWQZmQ",
+      "benchmarkId": "bench_0U8Ps1pYTrnMGK4E0bISP1qwfeUkoO-C",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "targetType": "remote_job",
@@ -16645,7 +16621,7 @@
   {
     "caseId": "S2C-0064",
     "benchmark": {
-      "benchmarkId": "bench_ahuRsp7cZDoKz8m0m8xL3cysokfpAt45",
+      "benchmarkId": "bench_LOzUTmiNW3GuGrIzixkgW7WrY8uR29sA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "targetType": "remote_job",
@@ -16882,7 +16858,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_ahuRsp7cZDoKz8m0m8xL3cysokfpAt45",
+      "benchmarkId": "bench_LOzUTmiNW3GuGrIzixkgW7WrY8uR29sA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "optimizedHeadline": "Brand Designer | Brand systems, Art direction, Illustration.",
@@ -16972,13 +16948,13 @@
   {
     "caseId": "S2C-0065",
     "benchmark": {
-      "benchmarkId": "bench_SJ0w9aU-LdNA9VGBcLRRIrKVJl5_krui",
+      "benchmarkId": "bench_J7WzRSTrexAl9mmk4oRsVlIDh_3-Qzaa",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 54,
+      "overallAlignmentScore": 48,
       "atsReadinessScore": 80,
       "parseabilityScore": 95,
       "eligibility": {
@@ -16992,7 +16968,7 @@
           "requirement": "Brand identity portfolio is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "Brand systems, Art direction.",
             "Coursework includes Brand systems and Art direction.",
@@ -17003,11 +16979,11 @@
             "S2C-0065-CLM-04",
             "S2C-0065-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Brand identity portfolio is required."
+            "Provide the requested artifact if available: Brand identity portfolio is required."
           ]
         },
         {
@@ -17091,7 +17067,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -17193,7 +17169,7 @@
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Brand identity portfolio is required.",
+        "Provide the requested artifact if available: Brand identity portfolio is required.",
         "Clarify or provide direct evidence for: Visual-system development is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -17207,7 +17183,7 @@
   {
     "caseId": "S2C-0066",
     "benchmark": {
-      "benchmarkId": "bench_BhI9ABqKuaJxnuIyKgbMdW5GTCCEv6qf",
+      "benchmarkId": "bench_KnkOobfnFiuZvqdwOrQVI6x6FdTE3PGS",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "targetType": "remote_job",
@@ -17471,7 +17447,7 @@
   {
     "caseId": "S2C-0067",
     "benchmark": {
-      "benchmarkId": "bench_9IrGjLR-zckoztmG1cnC5EsQqDN5KQnr",
+      "benchmarkId": "bench_8ImBSHkPnOD7xuAtFJtuwpdmexWKoxVt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "targetType": "remote_job",
@@ -17697,7 +17673,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_9IrGjLR-zckoztmG1cnC5EsQqDN5KQnr",
+      "benchmarkId": "bench_8ImBSHkPnOD7xuAtFJtuwpdmexWKoxVt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "optimizedHeadline": "Motion Designer | After Effects, Storyboarding, Motion graphics.",
@@ -17787,13 +17763,13 @@
   {
     "caseId": "S2C-0068",
     "benchmark": {
-      "benchmarkId": "bench_ydwsPfNuxgfub3FuyBoETICTta-tgT2E",
+      "benchmarkId": "bench_jdfZ0E0GVmwQzQzKRj_6CLbv5_MzdBi5",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 44,
+      "overallAlignmentScore": 38,
       "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
@@ -17807,7 +17783,7 @@
           "requirement": "Motion design reel is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "Diploma in Animation",
             "After Effects, Storyboarding.",
@@ -17820,11 +17796,11 @@
             "S2C-0068-CLM-04",
             "S2C-0068-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Motion design reel is required."
+            "Provide the requested artifact if available: Motion design reel is required."
           ]
         },
         {
@@ -17902,7 +17878,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -18004,7 +17980,7 @@
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Motion design reel is required.",
+        "Provide the requested artifact if available: Motion design reel is required.",
         "Clarify or provide direct evidence for: Animation workflow is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -18018,7 +17994,7 @@
   {
     "caseId": "S2C-0069",
     "benchmark": {
-      "benchmarkId": "bench_R3sceYbnH9ZHIP-0ATAjwlXljzVmVg1J",
+      "benchmarkId": "bench_sHaaXad_KfKyx0AQa7aFa3QGtzK5CZ6G",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "targetType": "remote_job",
@@ -18272,7 +18248,7 @@
   {
     "caseId": "S2C-0070",
     "benchmark": {
-      "benchmarkId": "bench_iPy7oG3yWJqrrKBXoqLR9DrBGdUNLOAO",
+      "benchmarkId": "bench_Me10ZxaQILifCBBv8kJFQ25VGj9OlYGf",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "targetType": "remote_job",
@@ -18495,7 +18471,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_iPy7oG3yWJqrrKBXoqLR9DrBGdUNLOAO",
+      "benchmarkId": "bench_Me10ZxaQILifCBBv8kJFQ25VGj9OlYGf",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "optimizedHeadline": "Interior Designer | Space planning, AutoCAD, Materials specification.",
@@ -18585,13 +18561,13 @@
   {
     "caseId": "S2C-0071",
     "benchmark": {
-      "benchmarkId": "bench_ShPaUQBtxd0YKhyoYgojO7GObLdJhE4E",
+      "benchmarkId": "bench_esEjJSI3qOFJ6czm0k5HecBXkHvaBp2H",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 44,
+      "overallAlignmentScore": 38,
       "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
@@ -18605,7 +18581,7 @@
           "requirement": "Interior design portfolio is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "BSc Interior Architecture",
             "Helped with a student project related to interior designer."
@@ -18614,11 +18590,11 @@
             "S2C-0071-CLM-02",
             "S2C-0071-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Interior design portfolio is required."
+            "Provide the requested artifact if available: Interior design portfolio is required."
           ]
         },
         {
@@ -18694,7 +18670,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -18796,7 +18772,7 @@
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Interior design portfolio is required.",
+        "Provide the requested artifact if available: Interior design portfolio is required.",
         "Clarify or provide direct evidence for: Space-planning experience is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -18810,7 +18786,7 @@
   {
     "caseId": "S2C-0072",
     "benchmark": {
-      "benchmarkId": "bench_F9VJi07w_be2c2a-4luc34md9b2lgp1E",
+      "benchmarkId": "bench_r5wiseqIvZMFhHbaZNitpM6Xm7swkuPs",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "targetType": "remote_job",
@@ -19055,7 +19031,7 @@
   {
     "caseId": "S2C-0073",
     "benchmark": {
-      "benchmarkId": "bench_pflRSn-9KrbOdL710HAFwZQ4qqZ7w4rF",
+      "benchmarkId": "bench_7WYYLLJv_3lbtvcOz7d0GByJ_-uPZXRO",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "targetType": "remote_job",
@@ -19285,7 +19261,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_pflRSn-9KrbOdL710HAFwZQ4qqZ7w4rF",
+      "benchmarkId": "bench_7WYYLLJv_3lbtvcOz7d0GByJ_-uPZXRO",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "optimizedHeadline": "Industrial Designer | CAD, Prototyping, Manufacturing methods.",
@@ -19375,13 +19351,13 @@
   {
     "caseId": "S2C-0074",
     "benchmark": {
-      "benchmarkId": "bench_lxqR7Y8YHVveDbQsWyQGIG2XChq4uVNN",
+      "benchmarkId": "bench_9_Sqc80qVIymojfew3Rms3LNtH8-17LM",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 44,
+      "overallAlignmentScore": 38,
       "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
@@ -19395,7 +19371,7 @@
           "requirement": "Industrial design portfolio is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "BDes Industrial Design",
             "CAD, Prototyping.",
@@ -19408,11 +19384,11 @@
             "S2C-0074-CLM-04",
             "S2C-0074-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Industrial design portfolio is required."
+            "Provide the requested artifact if available: Industrial design portfolio is required."
           ]
         },
         {
@@ -19488,7 +19464,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 50,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -19590,7 +19566,7 @@
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Industrial design portfolio is required.",
+        "Provide the requested artifact if available: Industrial design portfolio is required.",
         "Clarify or provide direct evidence for: Physical prototyping is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -19604,7 +19580,7 @@
   {
     "caseId": "S2C-0075",
     "benchmark": {
-      "benchmarkId": "bench_RaMBasTbk3W0DNrjrwZrxoON3swMeVyw",
+      "benchmarkId": "bench_nwN1FfmmMik1ORJKxkxEFA26I3i4f3XX",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "targetType": "remote_job",
@@ -19862,7 +19838,7 @@
   {
     "caseId": "S2C-0076",
     "benchmark": {
-      "benchmarkId": "bench_atoV7F9vqrI8tDfv4vNdnSN8YCo6BPzT",
+      "benchmarkId": "bench_r_cjj5pKCDvu8jHATYq3-fYUtU5FkGzg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "targetType": "remote_job",
@@ -20104,7 +20080,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_atoV7F9vqrI8tDfv4vNdnSN8YCo6BPzT",
+      "benchmarkId": "bench_r_cjj5pKCDvu8jHATYq3-fYUtU5FkGzg",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "optimizedHeadline": "Public Health Research Assistant | Survey methods, Statistics, Research ethics.",
@@ -20182,7 +20158,7 @@
   {
     "caseId": "S2C-0077",
     "benchmark": {
-      "benchmarkId": "bench_tB6h7aLN3Zj5wx1rVChcxUGv7ipgBhSU",
+      "benchmarkId": "bench_7hg1Of-EP-DOuCMsk1sdqRX6AGN0iZZi",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "targetType": "remote_job",
@@ -20274,7 +20250,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Survey methods, Statistics.",
             "Coursework includes Survey methods and Statistics.",
@@ -20285,11 +20261,11 @@
             "S2C-0077-CLM-04",
             "S2C-0077-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         }
       ],
@@ -20434,7 +20410,7 @@
   {
     "caseId": "S2C-0078",
     "benchmark": {
-      "benchmarkId": "bench_058R_yKSK1yWj9gAzakTxGuT6CSqsaYW",
+      "benchmarkId": "bench_CFpMt6E7CQXVZLeFyXI51hWPyyXjGKlL",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "targetType": "remote_job",
@@ -20702,7 +20678,7 @@
   {
     "caseId": "S2C-0079",
     "benchmark": {
-      "benchmarkId": "bench_9pjUN0mlzyLmhPJ5lCC7Z6QXGXK3tuUW",
+      "benchmarkId": "bench_wb4T8dW3QZpdDsgYeGIV3iaSZ2r38L0i",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "targetType": "fellowship",
@@ -20958,7 +20934,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_9pjUN0mlzyLmhPJ5lCC7Z6QXGXK3tuUW",
+      "benchmarkId": "bench_wb4T8dW3QZpdDsgYeGIV3iaSZ2r38L0i",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "optimizedHeadline": "Postdoctoral Fellow | Experimental design, Scientific writing, Statistics.",
@@ -21037,7 +21013,7 @@
   {
     "caseId": "S2C-0080",
     "benchmark": {
-      "benchmarkId": "bench_b8lM_GFrFe_yY-977j_FaWV1jfcx1wAO",
+      "benchmarkId": "bench_QzJSGS_jW7qXZsYhChclXQpQBXe1NOql",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "targetType": "fellowship",
@@ -21292,7 +21268,7 @@
   {
     "caseId": "S2C-0081",
     "benchmark": {
-      "benchmarkId": "bench_Q3GSyFPDUc9G4HoT9G3ZikyXrLlwNfdr",
+      "benchmarkId": "bench_bPA426zu298pkrg9jxhKcK3MPI6cG7-z",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "targetType": "fellowship",
@@ -21579,7 +21555,7 @@
   {
     "caseId": "S2C-0082",
     "benchmark": {
-      "benchmarkId": "bench_tDlINmkWEB-G2JkcciolIjVmIyD_BoNh",
+      "benchmarkId": "bench_URq9xyUUQZLScCa-3090vc2mfJ9bRLsm",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "targetType": "remote_job",
@@ -21801,7 +21777,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_tDlINmkWEB-G2JkcciolIjVmIyD_BoNh",
+      "benchmarkId": "bench_URq9xyUUQZLScCa-3090vc2mfJ9bRLsm",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "optimizedHeadline": "Policy Researcher | Policy analysis, Qualitative research, Writing.",
@@ -21891,7 +21867,7 @@
   {
     "caseId": "S2C-0083",
     "benchmark": {
-      "benchmarkId": "bench_inGdf49vw_7n3LnQksDYyNaV4GcfUlQ8",
+      "benchmarkId": "bench_yBPPqjTy6hXF3AbX55DA6qbF-uRhFA1m",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "targetType": "remote_job",
@@ -22114,7 +22090,7 @@
   {
     "caseId": "S2C-0084",
     "benchmark": {
-      "benchmarkId": "bench_qjV0VG7JiC3rPlV8Unq1W18EulVcwpCy",
+      "benchmarkId": "bench_-guKXNoMeEqklx95tarqex3SiaherAjw",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "targetType": "remote_job",
@@ -22365,7 +22341,7 @@
   {
     "caseId": "S2C-0085",
     "benchmark": {
-      "benchmarkId": "bench_iCyP2Uul1T7jtWEbJBDz2hrOcjfDIFlj",
+      "benchmarkId": "bench_wZ-cT_FKMRWytkvdONis_aTu3q4ebjiY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "targetType": "remote_job",
@@ -22610,7 +22586,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_iCyP2Uul1T7jtWEbJBDz2hrOcjfDIFlj",
+      "benchmarkId": "bench_wZ-cT_FKMRWytkvdONis_aTu3q4ebjiY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "optimizedHeadline": "Research Data Manager | Research data management, Metadata, Reproducibility.",
@@ -22701,7 +22677,7 @@
   {
     "caseId": "S2C-0086",
     "benchmark": {
-      "benchmarkId": "bench_LNkschdtUdw-Zdwtug-BpwX3EJh3sn1D",
+      "benchmarkId": "bench_9LBOD7QxgA6rmHTjhtXqDmTkG8XFZXlG",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "targetType": "remote_job",
@@ -22797,7 +22773,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Research data management, Metadata.",
             "Coursework includes Research data management and Metadata.",
@@ -22808,11 +22784,11 @@
             "S2C-0086-CLM-04",
             "S2C-0086-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         }
       ],
@@ -22955,7 +22931,7 @@
   {
     "caseId": "S2C-0087",
     "benchmark": {
-      "benchmarkId": "bench_-UseI4ya5dzPOksQ1HQlFNPtPNKurY4s",
+      "benchmarkId": "bench_A5Jy6EmT0YfohR1gKXH4qSF4gKxaJkjL",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "targetType": "remote_job",
@@ -23227,7 +23203,7 @@
   {
     "caseId": "S2C-0088",
     "benchmark": {
-      "benchmarkId": "bench_KsJG4vOg4KvbouXbP0kqi4QFCFnO4rht",
+      "benchmarkId": "bench_HwgxWaIRTUJxxhZ1gP4OL-fU-StLLW19",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "targetType": "remote_job",
@@ -23467,7 +23443,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_KsJG4vOg4KvbouXbP0kqi4QFCFnO4rht",
+      "benchmarkId": "bench_HwgxWaIRTUJxxhZ1gP4OL-fU-StLLW19",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "optimizedHeadline": "Clinical Research Coordinator | Study coordination, Research ethics, Participant communication.",
@@ -23545,7 +23521,7 @@
   {
     "caseId": "S2C-0089",
     "benchmark": {
-      "benchmarkId": "bench_fQ6_W5ELH2bO6hMml6xIoujv92z4zAXU",
+      "benchmarkId": "bench_C4jG0xf3Us5DcpkuJr5wff1ujK5rSR0g",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "targetType": "remote_job",
@@ -23639,7 +23615,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Study coordination, Research ethics.",
             "Coursework includes Study coordination and Research ethics.",
@@ -23650,11 +23626,11 @@
             "S2C-0089-CLM-04",
             "S2C-0089-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         }
       ],
@@ -23797,7 +23773,7 @@
   {
     "caseId": "S2C-0090",
     "benchmark": {
-      "benchmarkId": "bench_RlFIQKwA-u0_WY3Wk0-VMXb_tv6_czlJ",
+      "benchmarkId": "bench_LjzwDzX3PdgyxDkftwMXMoB0chZsiaK2",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "targetType": "remote_job",
@@ -24067,7 +24043,7 @@
   {
     "caseId": "S2C-0091",
     "benchmark": {
-      "benchmarkId": "bench_iOwDZqEisMUjeIwIBnAtLtDMhYCGcMb8",
+      "benchmarkId": "bench_yqkxZrAOtJtQn_bCBZYdX8PjUKui0Cbk",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "targetType": "remote_job",
@@ -24338,7 +24314,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_iOwDZqEisMUjeIwIBnAtLtDMhYCGcMb8",
+      "benchmarkId": "bench_yqkxZrAOtJtQn_bCBZYdX8PjUKui0Cbk",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "optimizedHeadline": "Research Program Lead | Research leadership, Program strategy, Grant management.",
@@ -24417,14 +24393,14 @@
   {
     "caseId": "S2C-0092",
     "benchmark": {
-      "benchmarkId": "bench_VZhCdVwSpkMq6GfLp8h-Knr4VbDLDH8w",
+      "benchmarkId": "bench_ZsEL6yYwARCXgBw7DElXtz2Rk_lC0VPX",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 32,
-      "atsReadinessScore": 57,
+      "overallAlignmentScore": 38,
+      "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "unclear",
@@ -24454,7 +24430,7 @@
           "requirement": "Research-team leadership is required.",
           "importance": "required",
           "category": "skill",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Research leadership, Program strategy.",
             "Coursework includes Research leadership and Program strategy.",
@@ -24465,11 +24441,11 @@
             "S2C-0092-CLM-04",
             "S2C-0092-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Research-team leadership is required."
+            "Clarify or provide direct evidence for: Research-team leadership is required."
           ]
         },
         {
@@ -24507,7 +24483,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Research leadership, Program strategy.",
             "Coursework includes Research leadership and Program strategy.",
@@ -24518,11 +24494,11 @@
             "S2C-0092-CLM-04",
             "S2C-0092-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         },
         {
@@ -24570,7 +24546,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 18,
+          "score": 33,
           "confidence": 0.85,
           "explanation": "0 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -24636,7 +24612,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 18,
+          "score": 33,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -24678,7 +24654,7 @@
       ],
       "priorityActions": [
         "Add this only if the user can verify it: At least 8 years of relevant experience is required.",
-        "Clarify direct evidence for: Research-team leadership is required.",
+        "Clarify or provide direct evidence for: Research-team leadership is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -24691,7 +24667,7 @@
   {
     "caseId": "S2C-0093",
     "benchmark": {
-      "benchmarkId": "bench_D4pDfMU8YMHhHg4aD4KrfpafD5CNgkEm",
+      "benchmarkId": "bench_luFAm5IDAgpkK2mRjkkPTvjBnNvkZlLb",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "targetType": "remote_job",
@@ -24992,7 +24968,7 @@
   {
     "caseId": "S2C-0094",
     "benchmark": {
-      "benchmarkId": "bench_vnYEjp9rE44rg5L4oKh2gmxMT-zcio40",
+      "benchmarkId": "bench_GCXgH4DvrHb7Vtfm4q9om_s665kOQFnN",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "targetType": "scholarship",
@@ -25235,7 +25211,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_vnYEjp9rE44rg5L4oKh2gmxMT-zcio40",
+      "benchmarkId": "bench_GCXgH4DvrHb7Vtfm4q9om_s665kOQFnN",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "optimizedHeadline": "STEM Leadership Scholar | Academic achievement, Community leadership, STEM.",
@@ -25313,14 +25289,14 @@
   {
     "caseId": "S2C-0095",
     "benchmark": {
-      "benchmarkId": "bench_FmFj1aBlzE_WueSmoEmmtFwRI5JRXG7y",
+      "benchmarkId": "bench_jTgdZS6Z3M6KPdl0Qx-VqFrzFNmbplqo",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "targetType": "scholarship",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 56,
-      "atsReadinessScore": 89,
+      "overallAlignmentScore": 61,
+      "atsReadinessScore": 98,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "unclear",
@@ -25371,7 +25347,7 @@
           "requirement": "Community-service leadership is preferred.",
           "importance": "preferred",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Academic achievement, Community leadership.",
             "Coursework includes Academic achievement and Community leadership.",
@@ -25382,11 +25358,11 @@
             "S2C-0095-CLM-04",
             "S2C-0095-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 65,
-          "explanation": "The supplied skills are relevant, but applied evidence for this preference is limited.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Add applied evidence only if genuine: Community-service leadership is preferred."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -25409,7 +25385,7 @@
           "requirement": "Evidence connected to the published academic, leadership, service, or mission criteria.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "confirmed",
           "evidence": [
             "Academic achievement, Community leadership.",
             "Coursework includes Academic achievement and Community leadership.",
@@ -25420,11 +25396,11 @@
             "S2C-0095-CLM-04",
             "S2C-0095-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify direct evidence for: Evidence connected to the published academic, leadership, service, or mission criteria."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         }
       ],
@@ -25514,7 +25490,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 83,
+          "score": 100,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -25532,13 +25508,13 @@
         }
       ],
       "matchedKeywords": [
-        "Current undergraduate enrollment is required."
+        "Current undergraduate enrollment is required.",
+        "Community-service leadership is preferred.",
+        "Evidence connected to the published academic, leadership, service, or mission criteria."
       ],
       "missingKeywords": [
         "Minimum GPA of 3.5 is required.",
-        "Community-service leadership is preferred.",
-        "Submit a cv tailored to the published criteria.",
-        "Evidence connected to the published academic, leadership, service, or mission criteria."
+        "Submit a cv tailored to the published criteria."
       ],
       "positioningStrengths": [
         "Clear current positioning: Career changer targeting STEM Leadership Scholar.",
@@ -25548,9 +25524,7 @@
       "concerns": [
         "No portfolio or public proof link was provided.",
         "The target emphasizes Minimum GPA of 3.5 is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Community-service leadership is preferred.; include it only if the user's real experience supports it.",
-        "The target emphasizes Submit a cv tailored to the published criteria.; include it only if the user's real experience supports it.",
-        "The target emphasizes Evidence connected to the published academic, leadership, service, or mission criteria.; include it only if the user's real experience supports it."
+        "The target emphasizes Submit a cv tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
         "Add this only if the user can provide genuine evidence: Minimum GPA of 3.5 is required.",
@@ -25566,7 +25540,7 @@
   {
     "caseId": "S2C-0096",
     "benchmark": {
-      "benchmarkId": "bench_8hFG0Cn1kDlBGhyCQUYkEJ68fWXqOP8S",
+      "benchmarkId": "bench_CxHaT14pkW8tEMpWmxIp8sAKQLBpJbSV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "targetType": "scholarship",
@@ -25830,7 +25804,7 @@
   {
     "caseId": "S2C-0097",
     "benchmark": {
-      "benchmarkId": "bench_am-VbwMYz-X0m4lUsEM_b4Fkms9A5onB",
+      "benchmarkId": "bench_JIWrgamLTU5hZVPKQrvZn3jDGEc9RAZE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "targetType": "scholarship",
@@ -26070,7 +26044,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_am-VbwMYz-X0m4lUsEM_b4Fkms9A5onB",
+      "benchmarkId": "bench_JIWrgamLTU5hZVPKQrvZn3jDGEc9RAZE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "optimizedHeadline": "Global Public Policy Scholar | Policy analysis, Leadership, Community service.",
@@ -26161,7 +26135,7 @@
   {
     "caseId": "S2C-0098",
     "benchmark": {
-      "benchmarkId": "bench_L_CxC6-amNoVuBZhXXnZ0YKxMy0PGZVP",
+      "benchmarkId": "bench_gWIQLUmRp9JYLdgTDJnXLfZT_GDOzCUV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "targetType": "scholarship",
@@ -26400,7 +26374,7 @@
   {
     "caseId": "S2C-0099",
     "benchmark": {
-      "benchmarkId": "bench_IRx-FFclRxxZbIrsjbhaD0HsuNeqskzs",
+      "benchmarkId": "bench_6PAfrzNZOogPb0any78IwOnRVE3alh4b",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "targetType": "scholarship",
@@ -26668,7 +26642,7 @@
   {
     "caseId": "S2C-0100",
     "benchmark": {
-      "benchmarkId": "bench_7MBvLZXChaVcw7OrKIO3VKTnXISA9EiX",
+      "benchmarkId": "bench_htQ3WjaVywNJLbB4j4soMgrbiD0nV82V",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "targetType": "scholarship",
@@ -26914,7 +26888,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_7MBvLZXChaVcw7OrKIO3VKTnXISA9EiX",
+      "benchmarkId": "bench_htQ3WjaVywNJLbB4j4soMgrbiD0nV82V",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "optimizedHeadline": "Graduate Climate Scholar | Climate analysis, Academic writing, Leadership.",
@@ -27005,14 +26979,14 @@
   {
     "caseId": "S2C-0101",
     "benchmark": {
-      "benchmarkId": "bench_M5d2Ht38jHcPYKanGo1HWDIlczd0WSe0",
+      "benchmarkId": "bench_mA4alrhvePymf9cg4dXYQqVZidSN0X3c",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "targetType": "scholarship",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 37,
-      "atsReadinessScore": 59,
+      "overallAlignmentScore": 44,
+      "atsReadinessScore": 64,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -27040,7 +27014,7 @@
           "requirement": "Climate-focused academic evidence is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Climate analysis, Academic writing.",
             "Coursework includes Climate analysis and Academic writing.",
@@ -27051,11 +27025,11 @@
             "S2C-0101-CLM-04",
             "S2C-0101-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Climate-focused academic evidence is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -27131,9 +27105,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 33,
+          "score": 50,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_IqOyv-G_",
             "req_2_FFEPKRr6"
@@ -27144,8 +27118,7 @@
             "S2C-0101-CLM-05"
           ],
           "actions": [
-            "Verify or address: Admission to a relevant graduate program is required.",
-            "Verify or address: Climate-focused academic evidence is required."
+            "Verify or address: Admission to a relevant graduate program is required."
           ]
         },
         {
@@ -27195,7 +27168,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 22,
+          "score": 33,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -27213,10 +27186,11 @@
           ]
         }
       ],
-      "matchedKeywords": [],
+      "matchedKeywords": [
+        "Climate-focused academic evidence is required."
+      ],
       "missingKeywords": [
         "Admission to a relevant graduate program is required.",
-        "Climate-focused academic evidence is required.",
         "Community climate action is preferred.",
         "Submit a cv tailored to the published criteria.",
         "Evidence connected to the published academic, leadership, service, or mission criteria."
@@ -27229,14 +27203,12 @@
       "concerns": [
         "No portfolio or public proof link was provided.",
         "The target emphasizes Admission to a relevant graduate program is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Climate-focused academic evidence is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Community climate action is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a cv tailored to the published criteria.; include it only if the user's real experience supports it.",
         "The target emphasizes Evidence connected to the published academic, leadership, service, or mission criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
         "Supply this only if genuine: Admission to a relevant graduate program is required.",
-        "Clarify or provide direct evidence for: Climate-focused academic evidence is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -27249,7 +27221,7 @@
   {
     "caseId": "S2C-0102",
     "benchmark": {
-      "benchmarkId": "bench_EcrjuRKtwpUhKuUmzdchiKLdAWDSdtNA",
+      "benchmarkId": "bench_AtBoHxHsQ0uCLMx_lrATzGmdU7fGrB4O",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "targetType": "scholarship",
@@ -27521,7 +27493,7 @@
   {
     "caseId": "S2C-0103",
     "benchmark": {
-      "benchmarkId": "bench_Std6PVnPzPQnvL57u7ohy4cOwvsfiwyz",
+      "benchmarkId": "bench_pOS9gy6Omd9UctE-8lA0qKdU4SXz09Y_",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "targetType": "scholarship",
@@ -27794,7 +27766,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_Std6PVnPzPQnvL57u7ohy4cOwvsfiwyz",
+      "benchmarkId": "bench_pOS9gy6Omd9UctE-8lA0qKdU4SXz09Y_",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "optimizedHeadline": "Creative Industries Scholar | Creative practice, Portfolio presentation, Community engagement.",
@@ -27873,13 +27845,13 @@
   {
     "caseId": "S2C-0104",
     "benchmark": {
-      "benchmarkId": "bench_lJipA2tCrHschtSLs85MSKyebZSnB17K",
+      "benchmarkId": "bench_uogp2MvF8eYAR6jev80YcwZKhFEhn9bl",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "targetType": "scholarship",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 52,
+      "overallAlignmentScore": 46,
       "atsReadinessScore": 73,
       "parseabilityScore": 95,
       "eligibility": {
@@ -27893,7 +27865,7 @@
           "requirement": "Creative portfolio is required.",
           "importance": "required",
           "category": "portfolio",
-          "status": "unverified",
+          "status": "missing",
           "evidence": [
             "Creative practice, Portfolio presentation.",
             "Coursework includes Creative practice and Portfolio presentation.",
@@ -27904,11 +27876,11 @@
             "S2C-0104-CLM-04",
             "S2C-0104-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 0,
+          "explanation": "No requested portfolio, reel, case study, or work sample was supplied.",
           "actions": [
-            "Clarify direct evidence for: Creative portfolio is required."
+            "Provide the requested artifact if available: Creative portfolio is required."
           ]
         },
         {
@@ -28022,7 +27994,7 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 68,
+          "score": 50,
           "confidence": 0.85,
           "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
@@ -28127,7 +28099,7 @@
         "The target emphasizes Evidence connected to the published academic, leadership, service, or mission criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Creative portfolio is required.",
+        "Provide the requested artifact if available: Creative portfolio is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -28140,7 +28112,7 @@
   {
     "caseId": "S2C-0105",
     "benchmark": {
-      "benchmarkId": "bench_1dQhBh2oEozCuXPYPo8yjRDPp0CLh1wG",
+      "benchmarkId": "bench_CtGdb18W_loONpUgu9qh32zg6Kv-YDkQ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "targetType": "scholarship",
@@ -28433,7 +28405,7 @@
   {
     "caseId": "S2C-0106",
     "benchmark": {
-      "benchmarkId": "bench_R8l7wgtXBz7BD-egzjxPKSND3ltUzZSY",
+      "benchmarkId": "bench_2ouG-m7w5kNjTcnVkwZOqB0-OHoiXpKB",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "targetType": "fellowship",
@@ -28682,7 +28654,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_R8l7wgtXBz7BD-egzjxPKSND3ltUzZSY",
+      "benchmarkId": "bench_2ouG-m7w5kNjTcnVkwZOqB0-OHoiXpKB",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "optimizedHeadline": "Social Innovation Fellow | Program design, Community engagement, Impact measurement.",
@@ -28774,7 +28746,7 @@
   {
     "caseId": "S2C-0107",
     "benchmark": {
-      "benchmarkId": "bench_yh2p-jMm7pDvOQBdIcPHAboCb4gY_xBs",
+      "benchmarkId": "bench_Ea61l40kbvZqnNGUiqC8EgGzQuqIcCbH",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "targetType": "fellowship",
@@ -29029,7 +29001,7 @@
   {
     "caseId": "S2C-0108",
     "benchmark": {
-      "benchmarkId": "bench_T11KAb9Pmy43KNzMR91VwXm4VkhiThJu",
+      "benchmarkId": "bench_LkQrbg2QzbLjD4MYSt0TSPXiMKOD6s2w",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "targetType": "fellowship",
@@ -29299,7 +29271,7 @@
   {
     "caseId": "S2C-0109",
     "benchmark": {
-      "benchmarkId": "bench_usaZm0wBUlybpxxlGzQN0rCFOW99BnQX",
+      "benchmarkId": "bench_mbF26LCgKNjdnALudMyTaLqai5wj2Giz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "targetType": "grant",
@@ -29538,7 +29510,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_usaZm0wBUlybpxxlGzQN0rCFOW99BnQX",
+      "benchmarkId": "bench_mbF26LCgKNjdnALudMyTaLqai5wj2Giz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "optimizedHeadline": "Climate Innovation Grant Applicant | Climate innovation, Project planning, Budgeting.",
@@ -29629,13 +29601,13 @@
   {
     "caseId": "S2C-0110",
     "benchmark": {
-      "benchmarkId": "bench_uEQFWwXMtfxD-DuuusysaQWAvZWiIqud",
+      "benchmarkId": "bench_e5ajAtRo4pND3PqYSg1FHyeX0n5kv6dJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "targetType": "grant",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 40,
+      "overallAlignmentScore": 46,
       "atsReadinessScore": 48,
       "parseabilityScore": 95,
       "eligibility": {
@@ -29666,7 +29638,7 @@
           "requirement": "Climate-impact project proposal is required.",
           "importance": "required",
           "category": "achievement",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "BEng Renewable Energy",
             "Climate innovation, Project planning.",
@@ -29679,11 +29651,11 @@
             "S2C-0110-CLM-04",
             "S2C-0110-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Climate-impact project proposal is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -29755,9 +29727,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 33,
+          "score": 50,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_kZDFYN3V",
             "req_2_T7Sd0Rz6"
@@ -29769,8 +29741,7 @@
             "S2C-0110-CLM-05"
           ],
           "actions": [
-            "Verify or address: Eligible registered organization is required.",
-            "Verify or address: Climate-impact project proposal is required."
+            "Verify or address: Eligible registered organization is required."
           ]
         },
         {
@@ -29837,11 +29808,11 @@
         }
       ],
       "matchedKeywords": [
+        "Climate-impact project proposal is required.",
         "Submit a profile tailored to the published criteria."
       ],
       "missingKeywords": [
         "Eligible registered organization is required.",
-        "Climate-impact project proposal is required.",
         "Co-funding evidence is preferred.",
         "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
       ],
@@ -29853,13 +29824,11 @@
       "concerns": [
         "No portfolio or public proof link was provided.",
         "The target emphasizes Eligible registered organization is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Climate-impact project proposal is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Co-funding evidence is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
         "Supply this only if genuine: Eligible registered organization is required.",
-        "Clarify or provide direct evidence for: Climate-impact project proposal is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -29872,7 +29841,7 @@
   {
     "caseId": "S2C-0111",
     "benchmark": {
-      "benchmarkId": "bench_0PY3S6C4duGb_pgml_Zb-cKeVqQJBeN_",
+      "benchmarkId": "bench_fNWOFuNPOktgthIaPr-A6x0OfUhG7Nst",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "targetType": "grant",
@@ -30144,7 +30113,7 @@
   {
     "caseId": "S2C-0112",
     "benchmark": {
-      "benchmarkId": "bench_VEe043Qm7xTWIr3e6S9N2qGUytuHIu9K",
+      "benchmarkId": "bench_7hexIPrItUzZOsjAGIiPyjKNsrekJ9r-",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "targetType": "fellowship",
@@ -30402,7 +30371,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_VEe043Qm7xTWIr3e6S9N2qGUytuHIu9K",
+      "benchmarkId": "bench_7hexIPrItUzZOsjAGIiPyjKNsrekJ9r-",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "optimizedHeadline": "Research Fellowship Applicant | Research methods, Academic writing, Statistics.",
@@ -30481,7 +30450,7 @@
   {
     "caseId": "S2C-0113",
     "benchmark": {
-      "benchmarkId": "bench_kCrJG-y_O8VB0VgvRCBJ6UUu1XC4K48N",
+      "benchmarkId": "bench_dhQjSxuaEINfMhSzqFHpNxRoqsmE9zeW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "targetType": "fellowship",
@@ -30573,7 +30542,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Research methods, Academic writing.",
             "Coursework includes Research methods and Academic writing.",
@@ -30584,11 +30553,11 @@
             "S2C-0113-CLM-04",
             "S2C-0113-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         },
         {
@@ -30751,7 +30720,7 @@
   {
     "caseId": "S2C-0114",
     "benchmark": {
-      "benchmarkId": "bench_pd4zZG98STYibNhd6Mit3aYnfnX7xD9q",
+      "benchmarkId": "bench_6e59w69CMPEWptgPUL1EDG03DwxlFpZB",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "targetType": "fellowship",
@@ -31038,7 +31007,7 @@
   {
     "caseId": "S2C-0115",
     "benchmark": {
-      "benchmarkId": "bench_T9U4xBpvaiNXxidVw4VjPMoC9hIXoRcE",
+      "benchmarkId": "bench_qqCZByOphbWHk2MzGEIJkYDPLWlbXmP_",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "targetType": "fellowship",
@@ -31293,7 +31262,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_T9U4xBpvaiNXxidVw4VjPMoC9hIXoRcE",
+      "benchmarkId": "bench_qqCZByOphbWHk2MzGEIJkYDPLWlbXmP_",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "optimizedHeadline": "Open Source Maintainer Fellow | Open source, Git, Community support.",
@@ -31385,14 +31354,14 @@
   {
     "caseId": "S2C-0116",
     "benchmark": {
-      "benchmarkId": "bench_v7bSCUfXyur2Gt3akT6RmEgwgJL-GoAv",
+      "benchmarkId": "bench_PzV1MhG3BVuPZn87eOyarn1nnWS6yNJA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "targetType": "fellowship",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 37,
-      "atsReadinessScore": 57,
+      "overallAlignmentScore": 66,
+      "atsReadinessScore": 98,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "unclear",
@@ -31407,7 +31376,7 @@
           "requirement": "Public open-source contributions is required.",
           "importance": "required",
           "category": "skill",
-          "status": "unverified",
+          "status": "confirmed",
           "evidence": [
             "Open source, Git.",
             "Coursework includes Open source and Git.",
@@ -31418,11 +31387,11 @@
             "S2C-0116-CLM-04",
             "S2C-0116-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify direct evidence for: Public open-source contributions is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -31445,14 +31414,18 @@
           "requirement": "Maintainer experience is preferred.",
           "importance": "preferred",
           "category": "skill",
-          "status": "missing",
-          "evidence": [],
-          "evidenceClaimIds": [],
-          "confidence": 0.85,
-          "score": 0,
-          "explanation": "No applied evidence demonstrates this preferred qualification.",
+          "status": "confirmed",
+          "evidence": [
+            "Helped with a student project related to open source maintainer fellow."
+          ],
+          "evidenceClaimIds": [
+            "S2C-0116-CLM-05"
+          ],
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Add this only if the user can provide genuine evidence: Maintainer experience is preferred."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -31524,9 +31497,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 18,
+          "score": 50,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_lcl3FfBF",
             "req_2_WuB3bS9e"
@@ -31537,7 +31510,6 @@
             "S2C-0116-CLM-05"
           ],
           "actions": [
-            "Verify or address: Public open-source contributions is required.",
             "Verify or address: Available for the full program period is required."
           ]
         },
@@ -31588,7 +31560,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 18,
+          "score": 100,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -31606,12 +31578,12 @@
         }
       ],
       "matchedKeywords": [
+        "Public open-source contributions is required.",
+        "Maintainer experience is preferred.",
         "Submit a profile tailored to the published criteria."
       ],
       "missingKeywords": [
-        "Public open-source contributions is required.",
         "Available for the full program period is required.",
-        "Maintainer experience is preferred.",
         "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
         "Evidence connected to the published academic, leadership, service, or mission criteria."
       ],
@@ -31622,14 +31594,11 @@
       ],
       "concerns": [
         "No portfolio or public proof link was provided.",
-        "The target emphasizes Public open-source contributions is required.; include it only if the user's real experience supports it.",
         "The target emphasizes Available for the full program period is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Maintainer experience is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.; include it only if the user's real experience supports it.",
         "The target emphasizes Evidence connected to the published academic, leadership, service, or mission criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
-        "Clarify direct evidence for: Public open-source contributions is required.",
         "Supply this only if genuine: Available for the full program period is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
@@ -31643,7 +31612,7 @@
   {
     "caseId": "S2C-0117",
     "benchmark": {
-      "benchmarkId": "bench_NEIiGlfOyVG0jPyqZmbmoay4IYyvMtIY",
+      "benchmarkId": "bench_xWbNwx6yOSxrYWMUsZW_EOJ-shHP_odI",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "targetType": "fellowship",
@@ -31921,7 +31890,7 @@
   {
     "caseId": "S2C-0118",
     "benchmark": {
-      "benchmarkId": "bench_QPqUVnq1SOCW0s5zUrepwSW5wbDVqm_0",
+      "benchmarkId": "bench_z_KSdOq5B5bpDOC0hZA9-ktiz9yhhVQx",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "targetType": "internship",
@@ -32142,7 +32111,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_QPqUVnq1SOCW0s5zUrepwSW5wbDVqm_0",
+      "benchmarkId": "bench_z_KSdOq5B5bpDOC0hZA9-ktiz9yhhVQx",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "optimizedHeadline": "Marketing Analyst | Campaign analysis, Spreadsheets, Writing.",
@@ -32219,7 +32188,7 @@
   {
     "caseId": "S2C-0119",
     "benchmark": {
-      "benchmarkId": "bench_LHG96uSJIwV76w-f4zUZUJ3vqekctidc",
+      "benchmarkId": "bench_A-9xb5B-VvsB2FOd3xRD4geihJqn-DjA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "targetType": "internship",
@@ -32449,7 +32418,7 @@
   {
     "caseId": "S2C-0120",
     "benchmark": {
-      "benchmarkId": "bench_3Y22HsX-vlAHK2ZFH3cqf5v_08jHaGDp",
+      "benchmarkId": "bench_PMnnMeUY5CzveGsi1jww1a9-s59_7keW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "targetType": "internship",
@@ -32700,7 +32669,7 @@
   {
     "caseId": "S2C-0121",
     "benchmark": {
-      "benchmarkId": "bench_kFDYK-bRTqk00GlCF0DmGgedisY4J8gz",
+      "benchmarkId": "bench_F38QjhWeEYkFGKYgsldhwf1nnvtqhHlx",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "targetType": "remote_job",
@@ -32915,7 +32884,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_kFDYK-bRTqk00GlCF0DmGgedisY4J8gz",
+      "benchmarkId": "bench_F38QjhWeEYkFGKYgsldhwf1nnvtqhHlx",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "optimizedHeadline": "Sales Development Representative | Prospecting, Customer communication, CRM.",
@@ -32992,14 +32961,14 @@
   {
     "caseId": "S2C-0122",
     "benchmark": {
-      "benchmarkId": "bench_5UypVujsFfRRKWSFp9Bn9kLol6dcpUzo",
+      "benchmarkId": "bench_HHA7TzI3pIdniSRZrSOOdPt1G0iiGfCt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "targetType": "remote_job",
       "targetConfidence": "high",
       "scoreMeaning": "Scores are transparent application-document heuristics, not hiring predictions and not a universal ATS score.",
-      "overallAlignmentScore": 51,
-      "atsReadinessScore": 69,
+      "overallAlignmentScore": 58,
+      "atsReadinessScore": 75,
       "parseabilityScore": 95,
       "eligibility": {
         "status": "meets",
@@ -33033,7 +33002,7 @@
           "requirement": "Organized follow-up is required.",
           "importance": "required",
           "category": "skill",
-          "status": "inferred",
+          "status": "confirmed",
           "evidence": [
             "Prospecting, Customer communication.",
             "Coursework includes Prospecting and Customer communication.",
@@ -33044,11 +33013,11 @@
             "S2C-0122-CLM-04",
             "S2C-0122-CLM-05"
           ],
-          "confidence": 0.75,
-          "score": 65,
-          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
+          "confidence": 0.9,
+          "score": 100,
+          "explanation": "Supplied profile or resume evidence directly supports this requirement.",
           "actions": [
-            "Clarify or provide direct evidence for: Organized follow-up is required."
+            "Keep the strongest relevant evidence close to this requirement in the application document."
           ]
         },
         {
@@ -33103,9 +33072,9 @@
         {
           "id": "required_alignment",
           "label": "Required qualification alignment",
-          "score": 65,
+          "score": 83,
           "confidence": 0.85,
-          "explanation": "0 of 2 required items have supplied supporting evidence.",
+          "explanation": "1 of 2 required items have supplied supporting evidence.",
           "requirementIds": [
             "req_1_csiFnjg_",
             "req_2_B7P-7TPM"
@@ -33116,8 +33085,7 @@
             "S2C-0122-CLM-05"
           ],
           "actions": [
-            "Verify or address: Customer-facing communication is required.",
-            "Verify or address: Organized follow-up is required."
+            "Verify or address: Customer-facing communication is required."
           ]
         },
         {
@@ -33169,7 +33137,7 @@
         {
           "id": "terminology",
           "label": "Target terminology alignment",
-          "score": 43,
+          "score": 55,
           "confidence": 0.8,
           "explanation": "Checks whether supported target terminology appears in supplied evidence without keyword stuffing.",
           "requirementIds": [
@@ -33188,10 +33156,11 @@
           ]
         }
       ],
-      "matchedKeywords": [],
+      "matchedKeywords": [
+        "Organized follow-up is required."
+      ],
       "missingKeywords": [
         "Customer-facing communication is required.",
-        "Organized follow-up is required.",
         "B2B sales experience is preferred.",
         "Submit a resume tailored to the published criteria."
       ],
@@ -33203,13 +33172,11 @@
       "concerns": [
         "No portfolio or public proof link was provided.",
         "The target emphasizes Customer-facing communication is required.; include it only if the user's real experience supports it.",
-        "The target emphasizes Organized follow-up is required.; include it only if the user's real experience supports it.",
         "The target emphasizes B2B sales experience is preferred.; include it only if the user's real experience supports it.",
         "The target emphasizes Submit a resume tailored to the published criteria.; include it only if the user's real experience supports it."
       ],
       "priorityActions": [
         "Clarify or provide direct evidence for: Customer-facing communication is required.",
-        "Clarify or provide direct evidence for: Organized follow-up is required.",
         "Move the strongest target-relevant evidence earlier in the document."
       ],
       "limitations": [
@@ -33222,7 +33189,7 @@
   {
     "caseId": "S2C-0123",
     "benchmark": {
-      "benchmarkId": "bench_DtgbQFy1Mila_6mSqwuBO7cfGwodzS4t",
+      "benchmarkId": "bench_prI6SeJrZUAbUs2ZjfkwxsQAsF59NnHQ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "targetType": "remote_job",
@@ -33469,7 +33436,7 @@
   {
     "caseId": "S2C-0124",
     "benchmark": {
-      "benchmarkId": "bench_2dWTCoqsvvSqcmXAXufiFYXfkiJ8W_Uj",
+      "benchmarkId": "bench_DHFsmcrPtNaqw_-0hsevrZjxMF2VGnnn",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "targetType": "remote_job",
@@ -33690,7 +33657,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_2dWTCoqsvvSqcmXAXufiFYXfkiJ8W_Uj",
+      "benchmarkId": "bench_DHFsmcrPtNaqw_-0hsevrZjxMF2VGnnn",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "optimizedHeadline": "Financial Analyst | Financial modeling, Excel, Accounting.",
@@ -33767,7 +33734,7 @@
   {
     "caseId": "S2C-0125",
     "benchmark": {
-      "benchmarkId": "bench_dW8HSRgH_F6dugvHlPhuWXFIbuV_I5cG",
+      "benchmarkId": "bench_xnjmMdAfQLzR7qLArrijFaNULdCeXj4s",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "targetType": "remote_job",
@@ -33997,7 +33964,7 @@
   {
     "caseId": "S2C-0126",
     "benchmark": {
-      "benchmarkId": "bench_RRYZBeQu6XQJScBq5X0SYrOSB8-sQcRo",
+      "benchmarkId": "bench_KoypJs31_GqjEJ-2HZr1YEsyCO4W9ctJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "targetType": "remote_job",
@@ -34247,7 +34214,7 @@
   {
     "caseId": "S2C-0127",
     "benchmark": {
-      "benchmarkId": "bench_nynk2dHOPBBMzIlg6KgHOBRCMbc3p0SA",
+      "benchmarkId": "bench_IBz6sUkHI6HbIArCyNoDiCrPgSyYnY4a",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "targetType": "internship",
@@ -34469,7 +34436,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_nynk2dHOPBBMzIlg6KgHOBRCMbc3p0SA",
+      "benchmarkId": "bench_IBz6sUkHI6HbIArCyNoDiCrPgSyYnY4a",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "optimizedHeadline": "Operations Coordinator | Operations, Scheduling, Process documentation.",
@@ -34546,7 +34513,7 @@
   {
     "caseId": "S2C-0128",
     "benchmark": {
-      "benchmarkId": "bench_gzJ1JVCb6faMxWPWHUeGww55gxmoZS5W",
+      "benchmarkId": "bench_qevpxAusg9ntbOidJdT_-CIUephIAVmN",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "targetType": "internship",
@@ -34770,7 +34737,7 @@
   {
     "caseId": "S2C-0129",
     "benchmark": {
-      "benchmarkId": "bench_qGrlmCnCEA9HCWpxXlnV-hWr-4jJCIBz",
+      "benchmarkId": "bench_CO3wB4rFyXtC0XjIy4ue67Vwf07LWtN4",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "targetType": "internship",
@@ -35028,7 +34995,7 @@
   {
     "caseId": "S2C-0130",
     "benchmark": {
-      "benchmarkId": "bench_PNIdk7VHWqMSAoZEGH35tvDPo75wg4Nk",
+      "benchmarkId": "bench_nXGRYruQfUo0UJ7dRr4RRrOc8wrbMkZE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "targetType": "remote_job",
@@ -35250,7 +35217,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_PNIdk7VHWqMSAoZEGH35tvDPo75wg4Nk",
+      "benchmarkId": "bench_nXGRYruQfUo0UJ7dRr4RRrOc8wrbMkZE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "optimizedHeadline": "Human Resources Associate | HR operations, Employee communication, Data privacy.",
@@ -35340,7 +35307,7 @@
   {
     "caseId": "S2C-0131",
     "benchmark": {
-      "benchmarkId": "bench_hjIhPl-Q781BFheFvqSvBueRvstWj2j3",
+      "benchmarkId": "bench_ruzyirebkAIljZWy2mYlUdySWJG47VkG",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "targetType": "remote_job",
@@ -35561,7 +35528,7 @@
   {
     "caseId": "S2C-0132",
     "benchmark": {
-      "benchmarkId": "bench_WHBQTHd88hOUf2WytH0W8qgqhok_vPri",
+      "benchmarkId": "bench_YR1nhTkN7YncvbwTeo1_SdrCLyfmxcxs",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "targetType": "remote_job",
@@ -35806,7 +35773,7 @@
   {
     "caseId": "S2C-0133",
     "benchmark": {
-      "benchmarkId": "bench_PmrzD90XjgapkmS9jpPPwlHHuVHeqh5H",
+      "benchmarkId": "bench_gwMjn9sAIMfTxy94xNkRdYkxFlltwvqR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "targetType": "remote_job",
@@ -36022,7 +35989,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_PmrzD90XjgapkmS9jpPPwlHHuVHeqh5H",
+      "benchmarkId": "bench_gwMjn9sAIMfTxy94xNkRdYkxFlltwvqR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "optimizedHeadline": "Project Coordinator | Project planning, Stakeholder communication, Risk tracking.",
@@ -36099,7 +36066,7 @@
   {
     "caseId": "S2C-0134",
     "benchmark": {
-      "benchmarkId": "bench_5kVFgMCGgSH4hhN8AUFw3RGI0ItdR7ZI",
+      "benchmarkId": "bench_bcazPJ9jnbS-lbiQxBoOn-0eq9w9wlem",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "targetType": "remote_job",
@@ -36317,7 +36284,7 @@
   {
     "caseId": "S2C-0135",
     "benchmark": {
-      "benchmarkId": "bench_J0V2c_x1h4GI0sGrQYMwVgXAMpNZXygs",
+      "benchmarkId": "bench_mLIZTvLGs_e0kNko2hWnItDO7CZgSAEi",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "targetType": "remote_job",
@@ -36561,7 +36528,7 @@
   {
     "caseId": "S2C-0136",
     "benchmark": {
-      "benchmarkId": "bench_aM7n29rNFAb4n-_iNXM1tjU9EK9t0Ae3",
+      "benchmarkId": "bench_EH-D-LIMctldbI81p8I2tkcdeGqHS9ZU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "targetType": "remote_job",
@@ -36783,7 +36750,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_aM7n29rNFAb4n-_iNXM1tjU9EK9t0Ae3",
+      "benchmarkId": "bench_EH-D-LIMctldbI81p8I2tkcdeGqHS9ZU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "optimizedHeadline": "Customer Success Specialist | Customer onboarding, Problem solving, SaaS.",
@@ -36860,7 +36827,7 @@
   {
     "caseId": "S2C-0137",
     "benchmark": {
-      "benchmarkId": "bench_3C7tw0wvK0keI9BJ7gxdkAKWtXO77so0",
+      "benchmarkId": "bench_2uZozi2i4pKpJoceH4ymjlZHMhOJy2yP",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "targetType": "remote_job",
@@ -37090,7 +37057,7 @@
   {
     "caseId": "S2C-0138",
     "benchmark": {
-      "benchmarkId": "bench_dNYP6nZ0-jrfFsv9b0g766kk1BYr10-7",
+      "benchmarkId": "bench_HZSd8VLFmEBwK_9pf22rrB3zKE7pjm2R",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "targetType": "remote_job",
@@ -37344,7 +37311,7 @@
   {
     "caseId": "S2C-0139",
     "benchmark": {
-      "benchmarkId": "bench_ZVRpyN0Gx2_ebp4HEM3_EmDCjgwGEmT9",
+      "benchmarkId": "bench_H0E0lyM-7O2TlT3LXWIdMk06GdUg4kxn",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "targetType": "internship",
@@ -37572,7 +37539,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_ZVRpyN0Gx2_ebp4HEM3_EmDCjgwGEmT9",
+      "benchmarkId": "bench_H0E0lyM-7O2TlT3LXWIdMk06GdUg4kxn",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "optimizedHeadline": "Policy Communications Intern | Policy writing, Communications, Research.",
@@ -37649,7 +37616,7 @@
   {
     "caseId": "S2C-0140",
     "benchmark": {
-      "benchmarkId": "bench_Rwd4vFr1cErVbhZbmyUiDeumbpLfBDVE",
+      "benchmarkId": "bench_L72t71J9_mO7njezBwEmWAoYHnbvGntF",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "targetType": "internship",
@@ -37878,7 +37845,7 @@
   {
     "caseId": "S2C-0141",
     "benchmark": {
-      "benchmarkId": "bench_FD-tjk_mfstpiy8hQdd4GgyM6y6L7yIo",
+      "benchmarkId": "bench_IgsNv7PL4RwBvcCIwYiXoyRuEY3Rvx9e",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "targetType": "internship",
@@ -38137,7 +38104,7 @@
   {
     "caseId": "S2C-0142",
     "benchmark": {
-      "benchmarkId": "bench_wvwXTyGzQ7Em7sBM9jf7YOAP526JAe79",
+      "benchmarkId": "bench_MhtoFd0peje1AGVlXgZhwp_X48LRu_DC",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "targetType": "remote_job",
@@ -38376,7 +38343,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_wvwXTyGzQ7Em7sBM9jf7YOAP526JAe79",
+      "benchmarkId": "bench_MhtoFd0peje1AGVlXgZhwp_X48LRu_DC",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "optimizedHeadline": "Director of Product | Product leadership, Strategy, Team development.",
@@ -38454,7 +38421,7 @@
   {
     "caseId": "S2C-0143",
     "benchmark": {
-      "benchmarkId": "bench_f1xyomURjBQj1uyyM5fJ6fw8dWIo7iko",
+      "benchmarkId": "bench_vTTufzwsUOKQ6p3dZC9o2r_dAUPnBVU4",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "targetType": "remote_job",
@@ -38697,7 +38664,7 @@
   {
     "caseId": "S2C-0144",
     "benchmark": {
-      "benchmarkId": "bench_bsmTXccf1GURr_e3tv4e0dIQX2Q-esqd",
+      "benchmarkId": "bench_9ngump5F0Nn5c43uiG-S3AhPdMBTicdT",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "targetType": "remote_job",
@@ -38957,7 +38924,7 @@
   {
     "caseId": "S2C-0145",
     "benchmark": {
-      "benchmarkId": "bench_nBTmwvvccuLtaGnpYlN_NHRXvbx2iY_C",
+      "benchmarkId": "bench_3q5wB9Pu5BdQ39fVr3bIwyAc3vVYgBtG",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "targetType": "remote_job",
@@ -39199,7 +39166,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_nBTmwvvccuLtaGnpYlN_NHRXvbx2iY_C",
+      "benchmarkId": "bench_3q5wB9Pu5BdQ39fVr3bIwyAc3vVYgBtG",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "optimizedHeadline": "Head of Operations | Operations leadership, Process improvement, Budget ownership.",
@@ -39277,7 +39244,7 @@
   {
     "caseId": "S2C-0146",
     "benchmark": {
-      "benchmarkId": "bench_iJSaw2_cVKhGzdIOmji8xwwJG87WfC5h",
+      "benchmarkId": "bench_l3wbFyOYusnRQqhta3A0q36d8LwkqG4i",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "targetType": "remote_job",
@@ -39521,7 +39488,7 @@
   {
     "caseId": "S2C-0147",
     "benchmark": {
-      "benchmarkId": "bench_Mg5QmI-tqbDdbu2SP-0zqVpmF2mdZfGc",
+      "benchmarkId": "bench_782tTRErM2KLwdXHfMt0LRZI2_TxHkgj",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "targetType": "remote_job",
@@ -39795,7 +39762,7 @@
   {
     "caseId": "S2C-0148",
     "benchmark": {
-      "benchmarkId": "bench_7s0Mn0JR3how3D0MqvLWXStk8ZAJ1Adr",
+      "benchmarkId": "bench_R9FmbUK3662HR5oA78IHjVRjPGEiEoIl",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "targetType": "remote_job",
@@ -40053,7 +40020,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_7s0Mn0JR3how3D0MqvLWXStk8ZAJ1Adr",
+      "benchmarkId": "bench_R9FmbUK3662HR5oA78IHjVRjPGEiEoIl",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "optimizedHeadline": "Research Director | Research strategy, Team leadership, Funding.",
@@ -40145,7 +40112,7 @@
   {
     "caseId": "S2C-0149",
     "benchmark": {
-      "benchmarkId": "bench_qK61nOsa0OD8XhWpVmF5kdRrheKVpagV",
+      "benchmarkId": "bench_g17TffQjzrxTT1g2ZogS2rhv_5HgZP7o",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "targetType": "remote_job",
@@ -40227,7 +40194,7 @@
           "requirement": "Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate.",
           "importance": "context",
           "category": "other",
-          "status": "unverified",
+          "status": "inferred",
           "evidence": [
             "Research strategy, Team leadership.",
             "Coursework includes Research strategy and Team leadership.",
@@ -40238,11 +40205,11 @@
             "S2C-0149-CLM-04",
             "S2C-0149-CLM-05"
           ],
-          "confidence": 0.7,
-          "score": 35,
-          "explanation": "Related background evidence exists, but ownership, scope, or the required artifact is not verified.",
+          "confidence": 0.75,
+          "score": 65,
+          "explanation": "Supplied evidence is relevant but does not fully establish the required scope.",
           "actions": [
-            "Clarify direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
+            "Clarify or provide direct evidence for: Relevant research methods, outputs, publications, writing, or funded-project evidence where appropriate."
           ]
         },
         {
@@ -40403,7 +40370,7 @@
   {
     "caseId": "S2C-0150",
     "benchmark": {
-      "benchmarkId": "bench_uczFm_40AZ6LZNHbCZfVi3F_GscSnmMR",
+      "benchmarkId": "bench_1xGAieARzDtZrsiesZxOsdkqmfs3HMCT",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "targetType": "remote_job",
@@ -40692,7 +40659,7 @@
   {
     "caseId": "S2C-0151",
     "benchmark": {
-      "benchmarkId": "bench_vZCzg5d6_TEfdQZCZF6kWz34R9spiLfu",
+      "benchmarkId": "bench_8m0bk7E2X43PfHy-XpyPalisrHWTEhhW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "targetType": "remote_job",
@@ -40928,7 +40895,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_vZCzg5d6_TEfdQZCZF6kWz34R9spiLfu",
+      "benchmarkId": "bench_8m0bk7E2X43PfHy-XpyPalisrHWTEhhW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "optimizedHeadline": "Program Director | Program strategy, Partnerships, Monitoring and evaluation.",
@@ -41006,7 +40973,7 @@
   {
     "caseId": "S2C-0152",
     "benchmark": {
-      "benchmarkId": "bench_wp3ly4nTa6LitjN9BQWrtMujf8vz_8SY",
+      "benchmarkId": "bench_miVQ1mA5_ah3qXKubqZC5lEwsRRjZ-0K",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "targetType": "remote_job",
@@ -41243,7 +41210,7 @@
   {
     "caseId": "S2C-0153",
     "benchmark": {
-      "benchmarkId": "bench_3xFeqXd7MFbSef9-8NATsLM-IBS4CyAv",
+      "benchmarkId": "bench_uuOhPcDU6J4oz-U0tYSBRRjvKuLTS0t4",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "targetType": "remote_job",

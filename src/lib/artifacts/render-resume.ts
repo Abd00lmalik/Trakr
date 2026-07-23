@@ -288,8 +288,8 @@ export function assertRenderableEvidence(
     evidence
       .filter(
         (item) =>
-          item.source === "explicit" &&
-          item.confirmed !== false &&
+          item.source !== "unknown" &&
+          item.confirmed === true &&
           (item.allowedUse ?? []).includes("generation"),
       )
       .map((item) => item.claimId)

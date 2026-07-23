@@ -418,6 +418,7 @@ function profileEvidenceEntries(
     value: string;
     claimId?: string;
     source: ProfileEvidence["source"];
+    confirmed: boolean;
   }> = [];
   const profileFields = [
     "headline",
@@ -454,6 +455,7 @@ function profileEvidenceEntries(
         value,
         claimId: item.claimId,
         source: item.source,
+        confirmed: item.confirmed === true,
       });
     }
   }
@@ -739,7 +741,9 @@ function evidenceContradictions(
     const values = uniqueStrings(
       entries
         .filter(
-          (entry) => entry.field === field && entry.source === "explicit",
+          (entry) =>
+            entry.field === field &&
+            (entry.source === "explicit" || entry.confirmed),
         )
         .map((entry) => entry.value),
     );
@@ -1158,14 +1162,16 @@ function requirementAssessment(
     );
     const appliedExplicit = matches.some(
       (item) =>
-        item.source === "explicit" &&
+        (item.source === "explicit" || item.confirmed) &&
         ["workHistory", "projects", "links", "certifications"].includes(
           item.field,
         ) &&
         !/^coursework includes\b/i.test(item.value),
     );
     const educationExplicit = matches.some(
-      (item) => item.source === "explicit" && item.field === "education",
+      (item) =>
+        (item.source === "explicit" || item.confirmed) &&
+        item.field === "education",
     );
     const inferredEvidence = matches.some(
       (item) =>
@@ -1188,7 +1194,7 @@ function requirementAssessment(
       );
     const appliedSpecificMatches = appliedMatches.filter(
       (item) =>
-        item.source === "explicit" &&
+        (item.source === "explicit" || item.confirmed) &&
         hasSpecificMatch(item) &&
         hasRequiredQualifierMatch(item) &&
         !isInferenceOnlyConceptEvidence(item, specificRequirementConcepts),
@@ -1203,7 +1209,7 @@ function requirementAssessment(
     const specificSkillMatch = specificMatches.some(
       (item) =>
         item.field === "skills" &&
-        item.source === "explicit" &&
+        (item.source === "explicit" || item.confirmed) &&
         (hasRequiredQualifierMatch(item) || permitsQualifierInference),
     );
     if (requirement.importance === "preferred") {
@@ -1360,7 +1366,10 @@ function requirementAssessment(
       directAppliedEvidence ||
       (requirement.category === "education" && educationExplicit)
         ? ("confirmed" as const)
-        : inferredEvidence || matches.some((item) => item.source === "explicit")
+        : inferredEvidence ||
+            matches.some(
+              (item) => item.source === "explicit" || item.confirmed,
+            )
           ? ("inferred" as const)
           : ("unverified" as const);
     return {
@@ -1437,8 +1446,8 @@ function optimizationValues(
     .filter(
       (item) =>
         item.field === field &&
-        item.source === "explicit" &&
-        item.confirmed !== false &&
+        item.source !== "unknown" &&
+        item.confirmed === true &&
         (item.allowedUse ?? []).includes("optimization"),
     )
     .flatMap((item) => {
@@ -1483,8 +1492,8 @@ function optimizationClaimIds(evidence: ProfileEvidence[], fields: string[]) {
       .filter(
         (item) =>
           fields.includes(item.field) &&
-          item.source === "explicit" &&
-          item.confirmed !== false &&
+          item.source !== "unknown" &&
+          item.confirmed === true &&
           (item.allowedUse ?? []).includes("optimization"),
       )
       .map((item) => item.claimId)
@@ -1503,8 +1512,8 @@ function optimizationClaimIdsForValue(
       .filter(
         (item) =>
           item.field === field &&
-          item.source === "explicit" &&
-          item.confirmed !== false &&
+          item.source !== "unknown" &&
+          item.confirmed === true &&
           (item.allowedUse ?? []).includes("optimization"),
       )
       .filter((item) => {
@@ -1934,8 +1943,8 @@ function generationValues(
     .filter(
       (item) =>
         item.field === field &&
-        item.source === "explicit" &&
-        item.confirmed !== false &&
+        item.source !== "unknown" &&
+        item.confirmed === true &&
         (item.allowedUse ?? []).includes("generation"),
     )
     .flatMap((item) => {
@@ -1960,8 +1969,8 @@ function generationClaimIdsForValue(
       .filter(
         (item) =>
           item.field === field &&
-          item.source === "explicit" &&
-          item.confirmed !== false &&
+          item.source !== "unknown" &&
+          item.confirmed === true &&
           (item.allowedUse ?? []).includes("generation"),
       )
       .filter((item) => {
