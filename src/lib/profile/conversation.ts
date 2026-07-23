@@ -966,6 +966,15 @@ export function buildConversationalProfile(
       )
         ? true
         : context?.filters?.remote),
+    applicantCountry:
+      request.filters.applicantCountry ??
+      profile.countryOfResidence ??
+      profile.location ??
+      context?.filters?.applicantCountry,
+    applicantNationality:
+      request.filters.applicantNationality ??
+      profile.nationality ??
+      context?.filters?.applicantNationality,
   };
 
   if (

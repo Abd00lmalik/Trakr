@@ -302,6 +302,13 @@ Built a fictional study planner and data dashboard.`;
       (item: { officialUrl?: string }) => Boolean(item.officialUrl),
     ),
   );
+  assert.equal(
+    matched.body.directOpportunities.some(
+      (item: { opportunity: { title: string } }) =>
+        item.opportunity.title === "Rhodes Scholarship for Southern Africa 2027",
+    ),
+    false,
+  );
   for (const item of matched.body.directOpportunities) {
     assert.match(matched.body.message, new RegExp(item.officialUrl));
   }

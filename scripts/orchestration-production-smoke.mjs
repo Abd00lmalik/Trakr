@@ -28,6 +28,18 @@ async function post(body, headers = {}) {
   });
 }
 
+async function confirmProfile(result) {
+  if (result.body?.stage !== "profile_confirmation") return result;
+  return post({
+    message: "Yes, this extracted or supplied profile is accurate.",
+    continuation: result.body.continuation,
+  });
+}
+
+async function postWithProfileConfirmation(body, headers = {}) {
+  return confirmProfile(await post(body, headers));
+}
+
 async function run(id, operation) {
   const startedAt = Date.now();
   try {
@@ -276,7 +288,7 @@ await run("ORCH-PROD-010-clear-natural-routing", async () => {
 
 let benchmark;
 await run("ORCH-PROD-011-benchmark-before-optimize", async () => {
-  const result = await post({
+  const result = await postWithProfileConfirmation({
     operation: "optimize",
     resumeText,
     consent,
@@ -305,7 +317,7 @@ await run("ORCH-PROD-012-approved-optimization-artifacts", async () => {
 });
 
 await run("ORCH-PROD-013-generation-artifacts", async () => {
-  const result = await post({
+  const result = await postWithProfileConfirmation({
     operation: "generate_resume",
     user: {
       name: "Amina Fictional",

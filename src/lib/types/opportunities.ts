@@ -268,6 +268,7 @@ export const recommendationFiltersSchema = z.object({
   remote: z.boolean().optional(),
   remoteScopes: z.array(remoteScopeSchema).optional(),
   applicantCountry: z.string().optional(),
+  applicantNationality: z.string().optional(),
   deadlineAfter: z.string().date().optional(),
   deadlineBefore: z.string().date().optional(),
   limit: z.number().int().min(1).max(20).optional(),

@@ -77,6 +77,62 @@ test("published Africa eligibility can support an African applicant without impl
   assert.equal(isGeographicallyActionable(enriched, "Canada", true), false);
 });
 
+test("specific country eligibility overrides a broader regional discovery tag", () => {
+  const enriched = enrichOpportunityMetadata(
+    opportunity({
+      category: "scholarship",
+      opportunityType: "scholarship",
+      location: "Oxford, United Kingdom",
+      remote: false,
+      deadline: "2026-08-03",
+      geography: {
+        eligibleCountries: [
+          "South Africa",
+          "Botswana",
+          "Lesotho",
+          "Malawi",
+          "Namibia",
+          "Eswatini",
+        ],
+        excludedCountries: [],
+        eligibleRegions: ["Africa"],
+        applicantResidencyRequirements: [],
+        citizenshipRequirements: [
+          "Citizen or legal permanent resident of an eligible country.",
+        ],
+        workAuthorizationRequirements: [],
+        visaSponsorship: "not_applicable",
+        remoteScope: "onsite",
+        travelRequirements: [],
+        onsiteRequirements: [],
+        timezoneRestrictions: [],
+        evidence: [],
+        confidence: "high",
+        unknownConditions: [],
+      },
+    }),
+    new Date("2026-07-23T12:00:00.000Z"),
+  );
+
+  assert.equal(
+    isGeographicallyActionable(enriched, "Nigeria", false, "Nigerian"),
+    false,
+  );
+  assert.equal(
+    isGeographicallyActionable(
+      enriched,
+      "Cape Town, South Africa",
+      false,
+      "Nigerian",
+    ),
+    true,
+  );
+  assert.equal(
+    isGeographicallyActionable(enriched, "Nigeria", false, "South African"),
+    true,
+  );
+});
+
 test("published country restrictions apply even when the user did not request remote-only work", () => {
   const enriched = enrichOpportunityMetadata(
     opportunity({

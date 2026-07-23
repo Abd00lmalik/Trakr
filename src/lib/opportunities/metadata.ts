@@ -29,6 +29,35 @@ const countrySignals: Array<[RegExp, string]> = [
   [/\bportugal\b/i, "Portugal"],
 ];
 
+const applicantCountrySignals: Array<[RegExp, string]> = [
+  ...countrySignals,
+  [/\bnigerian\b/i, "Nigeria"],
+  [/\bghanaian\b/i, "Ghana"],
+  [/\bkenyan\b/i, "Kenya"],
+  [/\bugandan\b/i, "Uganda"],
+  [/\brwandan\b/i, "Rwanda"],
+  [/\bsouth african\b/i, "South Africa"],
+  [/\bbotswanan\b/i, "Botswana"],
+  [/\b(?:mosotho|basotho)\b/i, "Lesotho"],
+  [/\bmalawian\b/i, "Malawi"],
+  [/\bnamibian\b/i, "Namibia"],
+  [/\b(?:swazi|eswatini)\b/i, "Eswatini"],
+  [/\bbeninese\b/i, "Benin"],
+  [/\bburkinab[eé]\b/i, "Burkina Faso"],
+  [/\b(?:cape verdean|cabo verdean)\b/i, "Cabo Verde"],
+  [/\bgambian\b/i, "Gambia"],
+  [/\bguinean\b/i, "Guinea"],
+  [/\b(?:ivorian|cote d['’]ivoire)\b/i, "Cote d'Ivoire"],
+  [/\bliberian\b/i, "Liberia"],
+  [/\bmalian\b/i, "Mali"],
+  [/\bmauritanian\b/i, "Mauritania"],
+  [/\bnigerien\b/i, "Niger"],
+  [/\bsenegalese\b/i, "Senegal"],
+  [/\bsierra leonean\b/i, "Sierra Leone"],
+  [/\b(?:sao tomean|santomean)\b/i, "Sao Tome and Principe"],
+  [/\btogolese\b/i, "Togo"],
+];
+
 const regionSignals: Array<[RegExp, string]> = [
   [/\bafrica|african union\b/i, "Africa"],
   [/\beurope|european union|\beu\b/i, "Europe"],
@@ -524,6 +553,7 @@ export function isGeographicallyActionable(
   opportunity: Opportunity,
   applicantCountry: string | undefined,
   remoteOnly: boolean,
+  applicantNationality?: string,
 ) {
   const geography = opportunity.geography;
   if (!geography) return !remoteOnly;
@@ -534,30 +564,61 @@ export function isGeographicallyActionable(
   ) {
     return false;
   }
-  if (geography.remoteScope === "globally_remote") return true;
-  if (!applicantCountry) {
-    return remoteOnly
-      ? geography.remoteScope !== "remote_scope_unclear"
-      : true;
-  }
-  const applicant = applicantCountry.toLowerCase();
   if (
-    geography.excludedCountries.some(
-      (country) => country.toLowerCase() === applicant,
-    )
-  ) {
-    return false;
-  }
-  if (
-    geography.eligibleCountries.some(
-      (country) => country.toLowerCase() === applicant,
-    )
+    geography.remoteScope === "globally_remote" &&
+    !geography.eligibleCountries.length &&
+    !geography.eligibleRegions.length &&
+    !geography.citizenshipRequirements.length
   ) {
     return true;
   }
+  if (!applicantCountry && !applicantNationality) {
+    return remoteOnly
+      ? geography.remoteScope !== "remote_scope_unclear"
+      : !(
+          geography.eligibleCountries.length ||
+          geography.eligibleRegions.length
+        );
+  }
+  const normalizeApplicantCountry = (value: string | undefined) => {
+    if (!value) return undefined;
+    const matched = applicantCountrySignals.find(([pattern]) =>
+      pattern.test(value),
+    )?.[1];
+    return (matched ?? value)
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  };
+  const residence = normalizeApplicantCountry(applicantCountry);
+  const nationality = normalizeApplicantCountry(applicantNationality);
+  const citizenshipRule = geography.citizenshipRequirements.join(" ");
+  const permitsPermanentResidence =
+    /\bpermanent\s+residen(?:t|cy)\b/i.test(citizenshipRule);
+  const applicantIdentities = geography.citizenshipRequirements.length
+    ? [nationality, ...(permitsPermanentResidence ? [residence] : [])]
+    : [residence ?? nationality];
+  const identities = new Set(applicantIdentities.filter(Boolean));
+  const excludedCountries = geography.excludedCountries.map(
+    normalizeApplicantCountry,
+  );
+  if (
+    excludedCountries.some((country) => country && identities.has(country))
+  ) {
+    return false;
+  }
+  if (geography.eligibleCountries.length) {
+    return geography.eligibleCountries
+      .map(normalizeApplicantCountry)
+      .some((country) => country && identities.has(country));
+  }
+  const regionalApplicant = residence ?? nationality;
   if (
     geography.eligibleRegions.includes("Africa") &&
-    africanCountries.has(applicant)
+    regionalApplicant &&
+    africanCountries.has(regionalApplicant)
   ) {
     return true;
   }

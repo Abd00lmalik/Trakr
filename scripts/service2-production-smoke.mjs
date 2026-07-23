@@ -34,6 +34,18 @@ async function jsonPost(body, headers = {}) {
   });
 }
 
+async function confirmProfile(result) {
+  if (result.body?.stage !== "profile_confirmation") return result;
+  return jsonPost({
+    message: "Yes, this extracted or supplied profile is accurate.",
+    continuation: result.body.continuation,
+  });
+}
+
+async function postWithProfileConfirmation(body, headers = {}) {
+  return confirmProfile(await jsonPost(body, headers));
+}
+
 async function assertArtifacts(artifacts, regenerateAction) {
   assert.equal(artifacts?.length, 2);
   assert.deepEqual(
@@ -174,7 +186,7 @@ await run("S2-PROD-002-legacy-service1", async () => {
 });
 
 await run("S2-PROD-003-benchmark-resume", async () => {
-  const result = await jsonPost({
+  const result = await postWithProfileConfirmation({
     operation: "benchmark",
     resumeText: resume,
     consent,
@@ -247,7 +259,7 @@ await run("S2-PROD-004-optimize-continuation", async () => {
 });
 
 await run("S2-PROD-005-natural-routing", async () => {
-  const result = await jsonPost({
+  const result = await postWithProfileConfirmation({
     resumeText: resume,
     consent,
     message:
@@ -267,7 +279,7 @@ await run("S2-PROD-005-natural-routing", async () => {
 });
 
 await run("S2-PROD-006-known-target-url", async () => {
-  const result = await jsonPost({
+  const result = await postWithProfileConfirmation({
     operation: "benchmark",
     user: {
       headline: "Web3 builder",
@@ -296,7 +308,7 @@ await run("S2-PROD-006-known-target-url", async () => {
 });
 
 await run("S2-PROD-007-hard-eligibility", async () => {
-  const result = await jsonPost({
+  const result = await postWithProfileConfirmation({
     operation: "benchmark",
     user: {
       headline: "Junior frontend developer",
@@ -331,7 +343,7 @@ await run("S2-PROD-007-hard-eligibility", async () => {
 });
 
 await run("S2-PROD-008-injection-containment", async () => {
-  const first = await jsonPost({
+  const first = await postWithProfileConfirmation({
     operation: "optimize",
     user: {
       headline: "Frontend developer",
@@ -382,7 +394,7 @@ await run("S2-PROD-008-injection-containment", async () => {
 });
 
 await run("S2-PROD-009-unknown-url", async () => {
-  const result = await jsonPost({
+  const result = await postWithProfileConfirmation({
     operation: "benchmark",
     resumeText: resume,
     consent,
@@ -741,7 +753,7 @@ const corpusCases = [
 
 for (const item of corpusCases) {
   await run(item.id, async () => {
-    const result = await jsonPost({
+    const result = await postWithProfileConfirmation({
       operation: "benchmark",
       user: item.user,
       target: item.target,

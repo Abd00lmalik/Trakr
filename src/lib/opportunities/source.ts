@@ -73,6 +73,7 @@ export function applyOpportunityFilters(
           opportunity,
           filters.applicantCountry,
           Boolean(filters.remote),
+          filters.applicantNationality,
         )
       ) {
         return false;
@@ -85,6 +86,7 @@ export function applyOpportunityFilters(
         opportunity,
         filters.applicantCountry,
         Boolean(filters.remote),
+        filters.applicantNationality,
       )
     ) {
       return false;
