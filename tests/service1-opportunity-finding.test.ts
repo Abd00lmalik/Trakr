@@ -12,6 +12,7 @@ import {
 } from "../src/lib/opportunities/source-registry";
 import { curatedOfficialOpportunities } from "../src/lib/opportunities/data/curated-official-opportunities";
 import { diversifyRankedOpportunities } from "../src/lib/recommendation/diversification";
+import { eligibilitySummary } from "../src/lib/recommendation/service";
 import {
   buildProfileText,
   rankOpportunities,
@@ -63,6 +64,20 @@ function opportunity(
     ...overrides,
   });
 }
+
+test("visible eligibility summaries remove markup and remain concise", () => {
+  const summary = eligibilitySummary(
+    opportunity("rendering-fixture", "Rendering Fixture", ["software"], {
+      eligibility: [
+        `Published location: Remote &lt;p&gt;${"Long employer boilerplate ".repeat(30)}&lt;/p&gt;`,
+      ],
+    }),
+  );
+
+  assert.equal(/&lt;|&gt;|<p>|<\/p>/.test(summary), false);
+  assert.ok(summary.length <= 240);
+  assert.match(summary, /Published location: Remote/);
+});
 
 function scored(
   item: Opportunity,

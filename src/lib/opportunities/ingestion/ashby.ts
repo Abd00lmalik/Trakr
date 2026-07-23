@@ -85,6 +85,8 @@ const instructionLikeContent =
 
 function cleanText(value: unknown) {
   return String(value ?? "")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<[^>]+>/g, " ")

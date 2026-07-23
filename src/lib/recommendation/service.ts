@@ -136,9 +136,32 @@ function recommendationProvenance(opportunity: Opportunity) {
   };
 }
 
-function eligibilitySummary(opportunity: Opportunity) {
-  if (opportunity.eligibility.length) {
-    return opportunity.eligibility.slice(0, 2).join(" ");
+function visiblePlainText(value: string) {
+  const cleaned = value
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (cleaned.length <= 240) return cleaned;
+  const shortened = cleaned.slice(0, 237);
+  const lastSpace = shortened.lastIndexOf(" ");
+  return `${shortened.slice(0, Math.max(lastSpace, 160)).trim()}...`;
+}
+
+export function eligibilitySummary(opportunity: Opportunity) {
+  const summaries = opportunity.eligibility
+    .map(visiblePlainText)
+    .filter(Boolean)
+    .slice(0, 2);
+  if (summaries.length) {
+    return summaries.join(" ");
   }
   return "The official source does not publish enough eligibility detail in Trakr's current record.";
 }
