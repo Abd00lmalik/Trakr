@@ -321,13 +321,38 @@ try {
       }),
     },
   );
+  const conversationalRecommendations =
+    conversationalRecommendation.body?.recommendations;
+  const conversationalCoverage =
+    conversationalRecommendation.body?.categoryCoverage;
+  const requestedCoverageCategories = [
+    "hackathon",
+    "grant",
+    "fellowship",
+    "internship",
+  ];
+  const coveredCategories = new Set(
+    Array.isArray(conversationalCoverage)
+      ? conversationalCoverage.map((item) => item.category)
+      : [],
+  );
+  const hasCompleteCategoryCoverage = requestedCoverageCategories.every(
+    (category) => coveredCategories.has(category),
+  );
+  const hasHonestEmptyInventoryMessage =
+    conversationalRecommendations?.length > 0 ||
+    /no verified direct matches in Trakr's current inventory/i.test(
+      conversationalRecommendation.body?.message ?? "",
+    );
   if (
     !conversationalRecommendation.response.ok ||
     conversationalRecommendation.body?.conversation?.state !==
       "recommendations" ||
-    !Array.isArray(conversationalRecommendation.body?.recommendations) ||
-    conversationalRecommendation.body.recommendations.length === 0 ||
-    conversationalRecommendation.body.recommendations.length > 10
+    !Array.isArray(conversationalRecommendations) ||
+    conversationalRecommendations.length > 10 ||
+    !Array.isArray(conversationalCoverage) ||
+    !hasCompleteCategoryCoverage ||
+    !hasHonestEmptyInventoryMessage
   ) {
     throw new Error(
       `Natural-language recommendation journey failed: ${JSON.stringify(
@@ -394,14 +419,35 @@ try {
     );
   }
 
+  const explanationSeed = await requestJson("/api/a2mcp/recommend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message:
+        "I am a Nigerian computer science student living in Nigeria. My skills are academic writing, research, leadership, community service, Python, and data analysis. I led a fictional campus service project. Field of study: Computer Science. Current degree level: BSc student. Target degree level: Master's degree. Nationality: Nigerian. Preferred study countries: United Kingdom. I want scholarships.",
+    }),
+  });
+  const explanationContinuation =
+    explanationSeed.body?.conversation?.continuation;
   const topOpportunityId =
-    conversationalRecommendation.body.recommendations[0].opportunity.id;
+    explanationSeed.body?.recommendations?.[0]?.opportunity?.id;
+  if (
+    !explanationSeed.response.ok ||
+    explanationSeed.body?.conversation?.state !== "recommendations" ||
+    typeof topOpportunityId !== "string" ||
+    !topOpportunityId ||
+    typeof explanationContinuation?.token !== "string"
+  ) {
+    throw new Error(
+      `Explanation seed journey failed: ${JSON.stringify(explanationSeed.body)}`,
+    );
+  }
   const explanation = await requestJson("/api/a2mcp/recommend", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       message: "Why did you recommend this?",
-      continuation,
+      continuation: explanationContinuation,
     }),
   });
   if (
@@ -422,7 +468,7 @@ try {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       message: "What am I missing for this opportunity?",
-      context: continuation,
+      context: explanationContinuation,
     }),
   });
   if (

@@ -64,7 +64,7 @@ test("source choice continues into background collection without requiring a res
     }),
   );
   assert.equal(matched.conversation?.state, "recommendations");
-  assert.ok(matched.recommendations.length > 0);
+  assert.ok(matched.categoryCoverage?.length);
 });
 
 test("resume path preserves extracted evidence and continues within the session", async () => {
@@ -384,8 +384,8 @@ test("natural-language background builds a grounded profile and recommendations"
     response.conversation?.profile.draft.skills.slice(0, 4),
     ["React", "TypeScript", "Python", "Solidity"],
   );
-  assert.ok(response.recommendations.length > 0);
   assert.ok(response.recommendations.length <= 10);
+  assert.ok(response.categoryCoverage?.length);
   assert.ok(
     response.recommendations.every(
       (item) =>
@@ -438,7 +438,7 @@ test("follow-up explanation and readiness use caller-scoped continuation context
   const initial = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message:
-        "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity skills. I want remote AI and Web3 hackathons and grants.",
+        "I am a Nigerian computer science student living in Nigeria. My skills are academic writing, research, leadership, community service, Python, and data analysis. I led a fictional campus service project. Field of study: Computer Science. Current degree level: BSc student. Target degree level: Master's degree. Nationality: Nigerian. Preferred study countries: United Kingdom. I want scholarships.",
     }),
   );
   const context = initial.conversation?.continuation;
@@ -639,7 +639,7 @@ test("profile and continuation aliases remain compatible at the API boundary", a
   const initial = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message:
-        "I am a Nigerian student with React, TypeScript, Python, and Solidity skills looking for remote AI and Web3 opportunities.",
+        "I am a Nigerian computer science student living in Nigeria. My skills are academic writing, research, leadership, community service, Python, and data analysis. I led a fictional campus service project. Field of study: Computer Science. Current degree level: BSc student. Target degree level: Master's degree. Nationality: Nigerian. Preferred study countries: United Kingdom. I want scholarships.",
     }),
   );
   const continuationAlias = await POST(
