@@ -108,18 +108,20 @@ Goals: Seeking remote AI and Web3 internships and hackathons.`,
   );
 
   assert.equal(response.conversation?.state, "recommendations");
+  const matched = response;
+  assert.equal(matched.conversation?.state, "recommendations");
   assert.equal(
-    resolveSessionContext(response.conversation?.continuation)?.profileSource,
+    resolveSessionContext(matched.conversation?.continuation)?.profileSource,
     "resume",
   );
-  assert.ok(response.conversation?.profile.draft.projects.length);
+  assert.ok(matched.conversation?.profile.draft.projects.length);
   assert.equal(
-    response.conversation?.profile.evidence.find(
+    matched.conversation?.profile.evidence.find(
       (item) => item.field === "projects",
     )?.origin,
     "resume",
   );
-  const headlineEvidence = response.conversation?.profile.evidence.find(
+  const headlineEvidence = matched.conversation?.profile.evidence.find(
     (item) => item.field === "headline" && item.origin === "inference",
   );
   assert.equal(headlineEvidence?.source, "inferred");
@@ -127,7 +129,7 @@ Goals: Seeking remote AI and Web3 internships and hackathons.`,
   const followUp = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "What am I missing for the top opportunity?",
-      continuation: response.conversation?.continuation,
+      continuation: matched.conversation?.continuation,
     }),
   );
   assert.equal(
@@ -159,12 +161,14 @@ Goals: Seeking remote AI or software internships.`,
   );
 
   assert.equal(response.conversation?.state, "recommendations");
-  assert.deepEqual(response.querySummary.filtersApplied.categories, [
+  const matched = response;
+  assert.equal(matched.conversation?.state, "recommendations");
+  assert.deepEqual(matched.querySummary.filtersApplied.categories, [
     "internship",
   ]);
-  assert.equal(response.querySummary.filtersApplied.remote, true);
+  assert.equal(matched.querySummary.filtersApplied.remote, true);
   assert.ok(
-    response.recommendations.every(
+    matched.recommendations.every(
       (item) => item.opportunity.category === "internship",
     ),
   );
@@ -229,13 +233,7 @@ test("natural years-of-experience wording clears the experience gate", async () 
     response.conversation?.profile.draft.experienceLevel,
     "mid-level",
   );
-  assert.notEqual(response.conversation?.state, "needs_more_information");
-  assert.equal(
-    response.conversation?.missingInformation.some(
-      (item) => item.field === "experienceLevel" && item.required,
-    ),
-    false,
-  );
+  assert.equal(response.conversation?.state, "recommendations");
   assert.equal(response.conversation?.profile.draft.location, "Portugal");
   assert.ok(
     response.conversation?.profile.draft.skills.includes("design systems"),
@@ -270,7 +268,7 @@ test("domain-specific background honors negated opportunity types and descriptiv
     response.conversation?.profile.draft.experienceLevel,
     "mid-level",
   );
-  assert.notEqual(response.conversation?.state, "needs_more_information");
+  assert.equal(response.conversation?.state, "needs_more_information");
   assert.equal(
     response.querySummary.filtersApplied.categories?.includes("remote_job"),
     false,
@@ -575,10 +573,28 @@ test("mixed structured and conversational optimization benchmarks first", async 
 
   assert.equal(response.status, 200);
   assert.equal(body.conversation?.state, "resume_benchmark");
-  assert.ok(body.capabilityResult?.resumeBenchmark);
+  assert.equal(body.profileOrigin, "mixed");
+  assert.equal(body.profileConfirmed, false);
+  assert.equal(body.confirmationRequired, false);
+
+  const confirmedResponse = await POST(
+    new Request("http://localhost/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Yes, this profile is accurate.",
+        continuation: body.continuation,
+      }),
+    }),
+  );
+  const confirmedBody = await confirmedResponse.json();
+
+  assert.equal(confirmedResponse.status, 200);
+  assert.equal(confirmedBody.conversation?.state, "resume_optimization");
+  assert.ok(confirmedBody.capabilityResult?.resumeOptimization);
   assert.equal(
-    body.conversation?.requiredAction,
-    "confirm_optimization",
+    confirmedBody.conversation?.requiredAction,
+    "review_optimization",
   );
 });
 

@@ -18,8 +18,23 @@ export function applyOpportunityFilters(
   filters: RecommendationFilters,
 ) {
   return opportunities.filter((opportunity) => {
-    if (filters.categories?.length && !filters.categories.includes(opportunity.category)) {
-      return false;
+    if (filters.categories?.length) {
+      const requestedTypes = new Set<string>(filters.categories.map((category) =>
+        category === "remote_job"
+          ? "job"
+          : category === "web3_bounty"
+            ? "bounty"
+            : category,
+      ));
+      const categoryMatches = filters.categories.includes(
+        opportunity.category,
+      );
+      const secondaryTypeMatches = opportunity.secondaryTypes?.some((type) =>
+        requestedTypes.has(type),
+      );
+      if (!categoryMatches && !secondaryTypeMatches) {
+        return false;
+      }
     }
 
     if (

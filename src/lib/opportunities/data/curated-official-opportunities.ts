@@ -11,14 +11,236 @@ type CuratedOpportunity = Omit<
   | "publisherDomain"
   | "isActive"
   | "verificationConfidence"
->;
+> & {
+  curationKind?: "verified_direct";
+};
 
 const curatedOfficialCatalog: CuratedOpportunity[] = [
+  {
+    id: "rhodes-west-africa-2027",
+    title: "Rhodes Scholarship for West Africa 2027",
+    organization: "Rhodes Trust",
+    category: "scholarship",
+    opportunityType: "scholarship",
+    curationKind: "verified_direct",
+    summary:
+      "Current Rhodes Scholarship call for eligible West African citizens seeking full-time postgraduate study at the University of Oxford beginning in October 2027.",
+    sourceName: "Rhodes Trust official call",
+    sourceUrl:
+      "https://www.rhodeshouse.ox.ac.uk/scholarships/applications/west-africa/",
+    location: "Oxford, United Kingdom",
+    remote: false,
+    deadline: "2026-08-27",
+    requiredSkills: [
+      "academic excellence",
+      "leadership",
+      "community contribution",
+    ],
+    preferredSkills: ["postgraduate study plan", "English proficiency"],
+    eligibility: [
+      "Citizenship is limited to the West Africa constituency countries listed in the official 2027 call.",
+      "Applicants must satisfy the published age, academic, English-language, and Oxford course requirements.",
+      "Applications close at 23:59 GMT on 27 August 2026.",
+    ],
+    benefits: [
+      "Funded postgraduate study at the University of Oxford",
+      "Rhodes Scholar community and development programme",
+    ],
+    tags: [
+      "scholarship",
+      "postgraduate",
+      "West Africa",
+      "Oxford",
+      "leadership",
+    ],
+    difficulty: "high",
+    geography: {
+      eligibleCountries: [
+        "Benin",
+        "Burkina Faso",
+        "Cabo Verde",
+        "Gambia",
+        "Ghana",
+        "Guinea",
+        "Guinea-Bissau",
+        "Cote d'Ivoire",
+        "Liberia",
+        "Mali",
+        "Mauritania",
+        "Niger",
+        "Nigeria",
+        "Saint Helena, Ascension and Tristan da Cunha",
+        "Senegal",
+        "Sierra Leone",
+        "Sao Tome and Principe",
+        "Togo",
+      ],
+      excludedCountries: [],
+      eligibleRegions: ["Africa"],
+      applicantResidencyRequirements: [],
+      citizenshipRequirements: [
+        "Citizen of a country listed in the official West Africa constituency.",
+      ],
+      workAuthorizationRequirements: [],
+      visaSponsorship: "not_applicable",
+      remoteScope: "onsite",
+      travelRequirements: ["Study in Oxford from October 2027."],
+      onsiteRequirements: ["Full-time postgraduate study at Oxford."],
+      timezoneRestrictions: [],
+      evidence: [],
+      confidence: "high",
+      unknownConditions: [],
+    },
+    deadlineInfo: {
+      state: "exact_future",
+      date: "2026-08-27",
+      timezone: "GMT",
+      sourceUrl:
+        "https://www.rhodeshouse.ox.ac.uk/media/sjypp0gf/west-africa-information-for-candidates-document-2027-final.pdf",
+      verifiedAt: "2026-07-22T00:00:00.000Z",
+      confidence: "high",
+      currentCycle: "confirmed",
+      notes: ["Applications opened on 1 June 2026 for October 2027 entry."],
+    },
+    sourceTier: "tier_b_official_directory",
+    sourcePermission: "manual_review_only",
+    recommendationState: "apply_now",
+  },
+  {
+    id: "rhodes-southern-africa-2027",
+    title: "Rhodes Scholarship for Southern Africa 2027",
+    organization: "Rhodes Trust",
+    category: "scholarship",
+    opportunityType: "scholarship",
+    curationKind: "verified_direct",
+    summary:
+      "Current Rhodes Scholarship call for eligible Southern African citizens or permanent residents seeking full-time postgraduate study at the University of Oxford beginning in October 2027.",
+    sourceName: "Rhodes Trust official call",
+    sourceUrl:
+      "https://www.rhodeshouse.ox.ac.uk/scholarships/applications/southern-africa/",
+    location: "Oxford, United Kingdom",
+    remote: false,
+    deadline: "2026-08-03",
+    requiredSkills: [
+      "academic excellence",
+      "leadership",
+      "community contribution",
+    ],
+    preferredSkills: ["postgraduate study plan", "English proficiency"],
+    eligibility: [
+      "Applicants must be citizens or legal permanent residents of South Africa, Botswana, Lesotho, Malawi, Namibia, or eSwatini; the official call also describes consideration for refugees or asylum seekers in South Africa.",
+      "Applicants must satisfy the published residency, age, academic, English-language, and Oxford course requirements.",
+      "Applications close at 23:59 SAST on 3 August 2026.",
+    ],
+    benefits: [
+      "Funded postgraduate study at the University of Oxford",
+      "Rhodes Scholar community and development programme",
+    ],
+    tags: [
+      "scholarship",
+      "postgraduate",
+      "Southern Africa",
+      "Oxford",
+      "leadership",
+    ],
+    difficulty: "high",
+    geography: {
+      eligibleCountries: [
+        "South Africa",
+        "Botswana",
+        "Lesotho",
+        "Malawi",
+        "Namibia",
+        "Eswatini",
+      ],
+      excludedCountries: [],
+      eligibleRegions: ["Africa"],
+      applicantResidencyRequirements: [
+        "Resident in an eligible country for at least five of the last ten years.",
+      ],
+      citizenshipRequirements: [
+        "Citizen or legal permanent resident of an eligible Southern Africa constituency country.",
+      ],
+      workAuthorizationRequirements: [],
+      visaSponsorship: "not_applicable",
+      remoteScope: "onsite",
+      travelRequirements: ["Study in Oxford from October 2027."],
+      onsiteRequirements: ["Full-time postgraduate study at Oxford."],
+      timezoneRestrictions: [],
+      evidence: [],
+      confidence: "high",
+      unknownConditions: [],
+    },
+    deadlineInfo: {
+      state: "exact_future",
+      date: "2026-08-03",
+      timezone: "SAST",
+      sourceUrl:
+        "https://www.rhodeshouse.ox.ac.uk/media/y4plyclm/southern-africa-information-for-candidates-document-2027-final.pdf",
+      verifiedAt: "2026-07-22T00:00:00.000Z",
+      confidence: "high",
+      currentCycle: "confirmed",
+      notes: ["Applications opened on 1 June 2026 for October 2027 entry."],
+    },
+    sourceTier: "tier_b_official_directory",
+    sourcePermission: "manual_review_only",
+    recommendationState: "apply_now",
+  },
+  {
+    id: "official-daad-scholarship-database",
+    title: "DAAD Scholarship Database",
+    organization: "German Academic Exchange Service",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["scholarship", "research_funding"],
+    summary:
+      "Official DAAD directory of scholarship programmes for international students and researchers. Individual calls have their own eligibility, deadlines, and application routes.",
+    sourceName: "Official curated source",
+    sourceUrl:
+      "https://www2.daad.de/deutschland/stipendium/datenbank/en/21148-scholarship-database/",
+    location: "Germany and partner countries",
+    remote: false,
+    deadline: null,
+    requiredSkills: ["programme-specific academic requirements"],
+    preferredSkills: ["research plan", "academic record"],
+    eligibility: [
+      "Use the database filters and each individual official call to verify country, degree, field, and deadline requirements.",
+    ],
+    benefits: ["Scholarship and research-funding discovery"],
+    tags: ["scholarship directory", "research funding", "international study"],
+    difficulty: "medium",
+  },
+  {
+    id: "official-erasmus-mundus-catalogue",
+    title: "Erasmus Mundus Joint Masters Catalogue",
+    organization: "European Commission",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["scholarship", "academic_program"],
+    summary:
+      "Official Erasmus Mundus programme directory. Students apply to individual consortia, and some programmes offer full scholarships to top-ranked applicants worldwide.",
+    sourceName: "Official curated source",
+    sourceUrl:
+      "https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters",
+    location: "Europe and partner institutions",
+    remote: false,
+    deadline: null,
+    requiredSkills: ["programme-specific academic requirements"],
+    preferredSkills: ["international study readiness"],
+    eligibility: [
+      "Check each consortium's current call for course, degree, nationality, language, scholarship, and deadline rules.",
+    ],
+    benefits: ["Joint master's programme and scholarship discovery"],
+    tags: ["scholarship directory", "masters", "international study"],
+    difficulty: "high",
+  },
   {
     id: "official-ethglobal-events",
     title: "ETHGlobal Hackathons and Events",
     organization: "ETHGlobal",
-    category: "hackathon",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["hackathon"],
     summary:
       "Official ETHGlobal event directory for Ethereum and Web3 builders seeking hackathons, sponsor tracks, mentorship, prizes, and project-launch momentum.",
     sourceName: "Official curated source",
@@ -37,7 +259,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-dorahacks-hackathons",
     title: "DoraHacks Hackathons and Bounties",
     organization: "DoraHacks",
-    category: "web3_bounty",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["hackathon", "bounty", "grant"],
     summary:
       "Official DoraHacks discovery page for Web3 hackathons, grant rounds, bounty campaigns, and ecosystem builder programs across multiple chains.",
     sourceName: "Official curated source",
@@ -56,7 +280,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-gitcoin-grants",
     title: "Gitcoin Grants",
     organization: "Gitcoin",
-    category: "grant",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["grant"],
     summary:
       "Official Gitcoin grants ecosystem for open-source, public-goods, community, and impact-oriented projects seeking non-dilutive funding.",
     sourceName: "Official curated source",
@@ -113,7 +339,8 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-google-developer-programs",
     title: "Google Developer Programs",
     organization: "Google for Developers",
-    category: "scholarship",
+    category: "developer_program",
+    opportunityType: "developer_program",
     summary:
       "Official Google developer community and learning hub for students and early-career builders seeking communities, education paths, and developer programs.",
     sourceName: "Official curated source",
@@ -125,14 +352,16 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     preferredSkills: ["web development", "Android", "cloud basics", "AI"],
     eligibility: ["Review each Google developer program for current eligibility, region, and application timing."],
     benefits: ["Learning support", "Community access", "Developer education", "Portfolio guidance"],
-    tags: ["scholarship", "student", "developer education", "community", "learning"],
+    tags: ["student", "developer education", "community", "learning"],
     difficulty: "low",
   },
   {
     id: "official-wellfound-startup-jobs",
     title: "Wellfound Startup Jobs",
     organization: "Wellfound",
-    category: "remote_job",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["job", "internship"],
     summary:
       "Official Wellfound startup job board for candidates looking for startup roles, internships, remote jobs, and early-stage company opportunities.",
     sourceName: "Official curated source",
@@ -151,7 +380,8 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-microsoft-learn-student-hub",
     title: "Microsoft Learn Student Hub",
     organization: "Microsoft Learn",
-    category: "scholarship",
+    category: "learning_resource",
+    opportunityType: "learning_resource",
     summary:
       "Official Microsoft student learning hub for cloud, AI, developer tooling, certifications, events, and student-oriented technical growth.",
     sourceName: "Official curated source",
@@ -163,14 +393,16 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     preferredSkills: ["cloud basics", "AI", "GitHub", "Azure"],
     eligibility: ["Review the official Microsoft program pages for current student benefits and requirements."],
     benefits: ["Learning paths", "Student resources", "Cloud education", "Certification preparation"],
-    tags: ["student", "scholarship", "cloud", "developer program", "learning"],
+    tags: ["student", "cloud", "developer program", "learning"],
     difficulty: "low",
   },
   {
     id: "official-aws-activate",
     title: "AWS Activate",
     organization: "Amazon Web Services",
-    category: "grant",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["accelerator"],
     summary:
       "Official AWS Activate program for startups seeking cloud credits, technical resources, startup support, and infrastructure guidance.",
     sourceName: "Official curated source",
@@ -208,7 +440,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-kaggle-competitions",
     title: "Kaggle Competitions",
     organization: "Kaggle",
-    category: "hackathon",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["competition"],
     summary:
       "Official Kaggle competition directory for data scientists and AI engineers to practice machine learning, benchmark models, join research-style challenges, and build public portfolio proof.",
     sourceName: "Official curated source",
@@ -227,7 +461,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-google-research-student-programs",
     title: "Google Research Student Programs",
     organization: "Google Research",
-    category: "fellowship",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["fellowship", "research_placement"],
     summary:
       "Official Google Research student programs hub for students and early researchers exploring research internships, PhD fellowships, mentorship, and academic pathways in AI and computing.",
     sourceName: "Official curated source",
@@ -246,7 +482,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-hackerone-bug-bounty",
     title: "HackerOne Bug Bounty Programs",
     organization: "HackerOne",
-    category: "web3_bounty",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["bounty"],
     summary:
       "Official HackerOne program directory for security learners and professionals seeking bug bounty practice, vulnerability disclosure programs, and paid security research opportunities.",
     sourceName: "Official curated source",
@@ -265,7 +503,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-ctftime-events",
     title: "CTFtime Competitions",
     organization: "CTFtime",
-    category: "hackathon",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["competition"],
     summary:
       "Official CTFtime event calendar for cybersecurity students who want current capture-the-flag competitions, team practice, rankings, and hands-on security challenges.",
     sourceName: "Official curated source",
@@ -284,7 +524,8 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-youtube-creators",
     title: "YouTube Creator Programs",
     organization: "YouTube Creators",
-    category: "fellowship",
+    category: "learning_resource",
+    opportunityType: "learning_resource",
     summary:
       "Official YouTube Creators hub for creator education, community updates, monetization guidance, and program pathways for video creators building sustainable audiences.",
     sourceName: "Official curated source",
@@ -303,7 +544,8 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-tiktok-creator-academy",
     title: "TikTok Creator Academy",
     organization: "TikTok",
-    category: "fellowship",
+    category: "learning_resource",
+    opportunityType: "learning_resource",
     summary:
       "Official TikTok Creator Academy learning hub for creators seeking platform education, content strategy, monetization guidance, and audience-building resources.",
     sourceName: "Official curated source",
@@ -322,7 +564,9 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-y-combinator-apply",
     title: "Y Combinator Startup Accelerator",
     organization: "Y Combinator",
-    category: "grant",
+    category: "official_directory",
+    opportunityType: "official_directory",
+    secondaryTypes: ["accelerator"],
     summary:
       "Official Y Combinator application page for startup founders seeking accelerator funding, founder mentorship, investor access, and a structured company-building program.",
     sourceName: "Official curated source",
@@ -341,7 +585,8 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     id: "official-github-education",
     title: "GitHub Education Student Developer Pack",
     organization: "GitHub Education",
-    category: "scholarship",
+    category: "student_benefit",
+    opportunityType: "student_benefit",
     summary:
       "Official GitHub Education program for students seeking developer tools, learning benefits, cloud credits, and student-friendly resources to support portfolio projects.",
     sourceName: "Official curated source",
@@ -353,22 +598,28 @@ const curatedOfficialCatalog: CuratedOpportunity[] = [
     preferredSkills: ["Git", "open source", "web development", "cloud basics"],
     eligibility: ["Review GitHub Education's current student verification requirements and included partner offers."],
     benefits: ["Developer tools", "Cloud credits", "Learning resources", "Portfolio support"],
-    tags: ["student", "scholarship", "developer program", "open source", "tools"],
+    tags: ["student", "developer program", "open source", "tools"],
     difficulty: "low",
   },
 ];
 
-export const curatedOfficialOpportunities: Opportunity[] = curatedOfficialCatalog.map(
-  (opportunity) => ({
-    ...opportunity,
-    verificationStatus: "program_directory",
-    lastVerifiedAt: null,
-    lastSeenAt: null,
-    sourceStatus: "unverified",
-    httpStatus: null,
-    canonicalUrl: opportunity.sourceUrl,
-    publisherDomain: new URL(opportunity.sourceUrl).hostname.replace(/^www\./, ""),
-    isActive: true,
-    verificationConfidence: 0,
-  }),
-);
+export const curatedOfficialOpportunities: Opportunity[] =
+  curatedOfficialCatalog.map((opportunity) => {
+    const { curationKind, ...record } = opportunity;
+    const verifiedDirect = curationKind === "verified_direct";
+    return {
+      ...record,
+      verificationStatus: verifiedDirect ? "verified" : "program_directory",
+      lastVerifiedAt: verifiedDirect ? "2026-07-22T00:00:00.000Z" : null,
+      lastSeenAt: verifiedDirect ? "2026-07-22T00:00:00.000Z" : null,
+      sourceStatus: verifiedDirect ? "active" : "unverified",
+      httpStatus: verifiedDirect ? 200 : null,
+      canonicalUrl: opportunity.sourceUrl,
+      publisherDomain: new URL(opportunity.sourceUrl).hostname.replace(
+        /^www\./,
+        "",
+      ),
+      isActive: true,
+      verificationConfidence: verifiedDirect ? 1 : 0,
+    };
+  });

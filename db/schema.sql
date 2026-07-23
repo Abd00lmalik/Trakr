@@ -12,7 +12,12 @@ create table if not exists opportunities (
       'fellowship',
       'internship',
       'remote_job',
-      'web3_bounty'
+      'web3_bounty',
+      'learning_resource',
+      'student_benefit',
+      'developer_program',
+      'official_directory',
+      'research_lead'
     )
   ),
   summary text not null,
@@ -73,6 +78,71 @@ alter table opportunities
   add column if not exists is_active boolean not null default true,
   add column if not exists verification_confidence numeric(4,3) not null default 0,
   add column if not exists inventory_metadata jsonb not null default '{}'::jsonb;
+
+alter table opportunities
+  drop constraint if exists opportunities_category_check;
+
+alter table opportunities
+  add constraint opportunities_category_check check (
+    category in (
+      'hackathon',
+      'grant',
+      'scholarship',
+      'fellowship',
+      'internship',
+      'remote_job',
+      'web3_bounty',
+      'learning_resource',
+      'student_benefit',
+      'developer_program',
+      'official_directory',
+      'research_lead'
+    )
+  );
+
+update opportunities
+set category = case id
+      when 'official-google-developer-programs' then 'developer_program'
+      when 'official-microsoft-learn-student-hub' then 'learning_resource'
+      when 'official-github-education' then 'student_benefit'
+      when 'official-ethglobal-events' then 'official_directory'
+      when 'official-dorahacks-hackathons' then 'official_directory'
+      when 'official-gitcoin-grants' then 'official_directory'
+      when 'official-wellfound-startup-jobs' then 'official_directory'
+      when 'official-aws-activate' then 'official_directory'
+      when 'official-kaggle-competitions' then 'official_directory'
+      when 'official-google-research-student-programs' then 'official_directory'
+      when 'official-hackerone-bug-bounty' then 'official_directory'
+      when 'official-ctftime-events' then 'official_directory'
+      when 'official-youtube-creators' then 'learning_resource'
+      when 'official-tiktok-creator-academy' then 'learning_resource'
+      when 'official-y-combinator-apply' then 'official_directory'
+      when 'google-student-scholarship' then 'developer_program'
+      else category
+    end,
+    deadline = case
+      when id = 'google-student-scholarship' then null
+      else deadline
+    end,
+    updated_at = now()
+where id in (
+  'official-google-developer-programs',
+  'official-microsoft-learn-student-hub',
+  'official-github-education',
+  'official-ethglobal-events',
+  'official-dorahacks-hackathons',
+  'official-gitcoin-grants',
+  'official-wellfound-startup-jobs',
+  'official-aws-activate',
+  'official-kaggle-competitions',
+  'official-google-research-student-programs',
+  'official-hackerone-bug-bounty',
+  'official-ctftime-events',
+  'official-youtube-creators',
+  'official-tiktok-creator-academy',
+  'official-y-combinator-apply',
+  'google-student-scholarship'
+);
 
 update opportunities
 set canonical_url = source_url

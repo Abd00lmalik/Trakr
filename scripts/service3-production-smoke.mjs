@@ -142,7 +142,7 @@ await run("S3-PROD-001-health-metadata-openapi", async () => {
   assert.equal(health.body.database.inventoryMetadataReady, true);
   assert.equal(health.body.database.artifactStorageReady, true);
   assert.equal(metadata.response.status, 200);
-  assert.equal(metadata.body.version, "0.6.0");
+  assert.equal(metadata.body.version, "0.7.0");
   assert.equal(
     metadata.body.services.find((service) => service.id === "resume_generation")
       ?.status,
@@ -152,7 +152,7 @@ await run("S3-PROD-001-health-metadata-openapi", async () => {
   assert.equal(metadata.body.submission.pricing, "free");
   assert.equal(metadata.body.submission.paymentRequired, false);
   assert.equal(openapi.response.status, 200);
-  assert.equal(openapi.body.info.version, "0.6.0");
+  assert.equal(openapi.body.info.version, "0.7.0");
   return {
     status: 200,
     version: metadata.body.version,

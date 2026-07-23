@@ -10,6 +10,7 @@ import {
   opportunityCompanionRequestSchema,
   recommendationRequestSchema,
 } from "@/lib/types/opportunities";
+import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 
 export const runtime = "nodejs";
 
@@ -18,9 +19,11 @@ const responseHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "Content-Type, Authorization, X-Trakr-Api-Key, Idempotency-Key, X-Request-Id",
-  "Access-Control-Expose-Headers": "X-Request-Id, X-Idempotency-Status",
+  "Access-Control-Expose-Headers":
+    "X-Request-Id, X-Idempotency-Status, X-Trakr-Version",
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
+  "X-Trakr-Version": TRAKR_SERVICE_VERSION,
 };
 
 export async function OPTIONS() {
@@ -142,6 +145,34 @@ function exposeConversationContract<T extends Record<string, unknown>>(
     return response;
   }
   const value = conversation as Record<string, unknown>;
+  const profile =
+    value.profile && typeof value.profile === "object"
+      ? (value.profile as Record<string, unknown>)
+      : undefined;
+  const evidence = Array.isArray(profile?.evidence)
+    ? (profile.evidence as Array<Record<string, unknown>>)
+    : [];
+  const origins = [
+    ...new Set(
+      evidence
+        .map((item) => item.origin)
+        .filter((origin): origin is string => typeof origin === "string"),
+    ),
+  ];
+  const profileOrigin =
+    origins.length === 0
+      ? "none"
+      : origins.length > 1
+        ? "mixed"
+        : origins[0] === "resume"
+          ? "resume"
+          : origins[0] === "user"
+            ? "user_message"
+            : origins[0] === "structured_profile"
+              ? "caller_structured"
+              : origins[0] === "context"
+                ? "continuation"
+                : "mixed";
   return {
     ...response,
     stage: value.stage,
@@ -151,13 +182,108 @@ function exposeConversationContract<T extends Record<string, unknown>>(
     requiredInputs: value.requiredInputs,
     nextActions: value.nextActions,
     continuation: value.continuation,
+    callerInstructions: {
+      relayMessage: true,
+      doNotInferMissingInputs: true,
+      sendContinuationUnchanged: true,
+      doNotGenerateAProfile: true,
+      surfaceOfficialUrls: true,
+    },
+    profileOrigin,
+    profileConfirmed: profile?.confirmed === true,
+    evidenceSources: origins,
+    inferredFields: evidence
+      .filter((item) => item.source === "inferred")
+      .map((item) => String(item.field)),
+    confirmationRequired:
+      value.state === "profile_confirmation" ||
+      value.requiredAction === "review_profile",
+  };
+}
+
+async function readRequestPayload(request: Request) {
+  const contentType = request.headers.get("content-type") ?? "";
+  if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
+    const rawBody = await request.text();
+    return {
+      rawBody,
+      payload: rawBody.trim() ? JSON.parse(rawBody) : {},
+    };
+  }
+
+  const formData = await request.formData();
+  const file = formData.get("resume");
+  if (!(file instanceof File)) {
+    throw new Error("Multipart requests must include a resume file.");
+  }
+  if (formData.get("consent") !== "true") {
+    throw new Error(
+      "Affirmative session-only resume-processing consent is required.",
+    );
+  }
+  const resumeText = await parseResumeBuffer(
+    Buffer.from(await file.arrayBuffer()),
+    {
+      contentType: file.type,
+      fileName: file.name,
+    },
+  );
+  const parseJsonField = (name: string) => {
+    const value = formData.get(name);
+    if (typeof value !== "string" || !value.trim()) return undefined;
+    return JSON.parse(value);
+  };
+  const operation = formData.get("operation");
+  const intakeRoute = formData.get("intakeRoute");
+  const message = formData.get("message");
+  const continuation = formData.get("continuation");
+  const payload = {
+    operation:
+      typeof operation === "string" && operation
+        ? operation
+        : "discover",
+    intakeRoute:
+      typeof intakeRoute === "string" && intakeRoute
+        ? intakeRoute
+        : undefined,
+    message: typeof message === "string" && message ? message : undefined,
+    continuation:
+      typeof continuation === "string" && continuation
+        ? continuation
+        : undefined,
+    target: parseJsonField("target"),
+    filters: parseJsonField("filters"),
+    generationPreferences: parseJsonField("generationPreferences"),
+    resumeText,
+    consent: {
+      processPersonalData: true,
+      retention: "session_only",
+      source: "explicit",
+    },
+  };
+  return {
+    rawBody: JSON.stringify({
+      multipart: true,
+      fileName: file.name,
+      fileSize: file.size,
+      operation: payload.operation,
+      intakeRoute: payload.intakeRoute,
+      message: payload.message,
+      continuation: payload.continuation,
+      target: payload.target,
+      filters: payload.filters,
+    }),
+    payload,
   };
 }
 
 export async function POST(request: Request) {
   const requestId =
     request.headers.get("x-request-id")?.slice(0, 160) || nanoid();
-  const requestHeaders = { "X-Request-Id": requestId };
+  const requestHeaders = {
+    "X-Request-Id": requestId,
+    "X-Trakr-Version": TRAKR_SERVICE_VERSION,
+  };
 
   if (!isAuthorized(request)) {
     return json(
@@ -175,14 +301,23 @@ export async function POST(request: Request) {
 
   const clientKey = getClientKey(request);
   let rawBody: string;
+  let payload: unknown;
   try {
-    rawBody = await request.text();
-  } catch {
+    const parsedRequest = await readRequestPayload(request);
+    rawBody = parsedRequest.rawBody;
+    payload = parsedRequest.payload;
+  } catch (error) {
+    const invalidJson = error instanceof SyntaxError;
     return json(
       {
-        error: "invalid_request_body",
-        code: "invalid_request_body",
-        message: "The request body could not be read.",
+        error: invalidJson ? "invalid_json" : "invalid_request_body",
+        code: invalidJson ? "invalid_json" : "invalid_request_body",
+        message:
+          error instanceof SyntaxError
+            ? "Request body must be valid JSON."
+            : error instanceof Error
+              ? error.message
+              : "The request body could not be read.",
         requestId,
         retryable: false,
       },
@@ -269,23 +404,6 @@ export async function POST(request: Request) {
         resetAt: new Date(rateLimit.resetAt).toISOString(),
       },
       429,
-    );
-  }
-
-  let payload: unknown;
-
-  try {
-    payload = rawBody.trim() ? JSON.parse(rawBody) : {};
-  } catch {
-    return complete(
-      {
-        error: "invalid_json",
-        code: "invalid_json",
-        message: "Request body must be valid JSON.",
-        requestId,
-        retryable: false,
-      },
-      400,
     );
   }
 

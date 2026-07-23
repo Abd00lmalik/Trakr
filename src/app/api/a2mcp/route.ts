@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { opportunitySourceRegistry } from "@/lib/opportunities/source-registry";
+import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 
 export const runtime = "nodejs";
 
@@ -8,7 +9,7 @@ export async function GET() {
     service: "trakr",
     displayTitle: "Trakr Opportunity & Resume Services",
     legacyServiceTitle: "Opportunity Matching API",
-    version: "0.6.0",
+    version: TRAKR_SERVICE_VERSION,
     type: "A2MCP",
     description:
       "One conversational A2MCP endpoint for Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. An empty or ambiguous bootstrap request returns a machine-readable three-service menu.",
@@ -51,6 +52,11 @@ export async function GET() {
       "internship",
       "remote_job",
       "web3_bounty",
+      "learning_resource",
+      "student_benefit",
+      "developer_program",
+      "official_directory",
+      "research_lead",
     ],
     actions: ["Apply Now", "Prepare First", "Skip"],
     aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
@@ -123,13 +129,15 @@ export async function GET() {
       "continuation_context",
       "continuation_alias",
       "base64_pdf_docx_txt",
-      "multipart_resume_parser_then_resume_text",
+      "multipart_resume_direct_to_recommend",
+      "multipart_resume_parser_then_resume_text_legacy",
     ],
     documentInput: {
       endpointRepresentations: [
         "resumeText",
         "document.representation=text",
         "document.representation=base64",
+        "multipart/form-data directly to /api/a2mcp/recommend",
       ],
       multipartParser: "/api/profile/parse-resume",
       acceptedMimeTypes: [
@@ -161,6 +169,13 @@ export async function GET() {
         "The response stage, status, requiredInputs, nextActions, and continuation determine the next valid caller action.",
       numericChoices:
         "Numeric aliases are valid only with the continuation for the menu stage that issued them.",
+      callerInstructions: {
+        relayMessage: true,
+        doNotInferMissingInputs: true,
+        sendContinuationUnchanged: true,
+        doNotGenerateAProfile: true,
+        surfaceOfficialUrls: true,
+      },
       priority: [
         "valid continuation and current stage",
         "explicit operation",
@@ -195,6 +210,9 @@ export async function GET() {
       "low-information listings are filtered or penalized",
       "ranking combines category, skill, experience, location, quality, deadline, and expected value",
       "only verified active opportunity pages may receive Apply Now",
+      "direct opportunities, official directories, and supporting resources are returned in separate collections",
+      "every visible direct opportunity includes one canonical officialUrl and the human-readable message includes that URL",
+      "caller-supplied and resume-extracted profiles require user confirmation before matching",
       "program directories and inactive listings are explicitly identified",
       "unknown profile information remains unknown rather than being invented",
       "resume optimization never fabricates jobs, degrees, projects, metrics, certifications, or skills",

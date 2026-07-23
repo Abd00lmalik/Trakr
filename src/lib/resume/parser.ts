@@ -521,6 +521,28 @@ function inferHeadline(text: string) {
   return undefined;
 }
 
+function inferEducationDetails(education: string[]) {
+  const text = education.join(" ");
+  const degreeMatch = text.match(
+    /\b(PhD|Doctorate|MSc|Master(?:'s)?|MA|MBA|BSc|Bachelor(?:'s)?|BA|HND|OND|Diploma|Certificate)\b/i,
+  );
+  const fieldMatch = text.match(
+    /\b(?:PhD|Doctorate|MSc|Master(?:'s)?|MA|MBA|BSc|Bachelor(?:'s)?|BA|HND|OND|Diploma|Certificate)(?:\s+(?:in|of))?\s+([A-Za-z][A-Za-z &/-]{2,80}?)(?=\s+(?:student|candidate|at|from|expected|graduat)|[,.]|$)/i,
+  );
+  const institutionMatch = text.match(
+    /\b(?:at|from)\s+([A-Z][A-Za-z0-9 &.'-]{2,100}?(?:University|College|Institute|School|Polytechnic))\b/i,
+  );
+  const graduationMatch = text.match(
+    /\b(?:graduat(?:ion|ing)|expected)\s*(?:in|:)?\s*((?:19|20)\d{2})\b/i,
+  );
+  return {
+    currentDegreeLevel: degreeMatch?.[1],
+    fieldOfStudy: fieldMatch?.[1]?.trim(),
+    currentInstitution: institutionMatch?.[1]?.trim(),
+    graduationYear: graduationMatch?.[1],
+  };
+}
+
 function redactContactDetails(text: string) {
   return text
     .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "")
@@ -654,6 +676,7 @@ export function extractProfileFromText(
     "Volunteering",
   );
   const leadership = sectionEntries("Leadership", "Leadership Experience");
+  const educationDetails = inferEducationDetails(education);
   const profile = sanitizeUntrustedProfile({
     name: inferName(cleaned),
     headline: inferHeadline(evidenceText),
@@ -664,6 +687,9 @@ export function extractProfileFromText(
     interests: inferInterests(cleaned),
     goals: inferGoals(goalText),
     education,
+    ...educationDetails,
+    countryOfResidence: inferLocation(cleaned),
+    preferredStudyCountries: [],
     workHistory,
     projects,
     research,
@@ -681,6 +707,11 @@ export function extractProfileFromText(
     "location",
     "skills",
     "education",
+    "fieldOfStudy",
+    "currentDegreeLevel",
+    "currentInstitution",
+    "graduationYear",
+    "countryOfResidence",
     "workHistory",
     "projects",
     "research",
@@ -699,7 +730,7 @@ export function extractProfileFromText(
     })
     .map((field) => ({
       field,
-      source: "explicit" as const,
+      source: origin === "resume" ? ("extracted" as const) : ("explicit" as const),
       origin,
       value: profile[field as keyof StructuredUserProfile] as
         | string

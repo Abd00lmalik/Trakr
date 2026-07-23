@@ -61,7 +61,7 @@ const categoryIntent: Record<OpportunityCategory, string[]> = {
     "research",
     "open source",
   ],
-  scholarship: ["scholarship", "student", "university", "education", "learn", "tuition", "bootcamp"],
+  scholarship: ["scholarship", "tuition funding", "study funding", "financial award"],
   fellowship: [
     "fellowship",
     "student",
@@ -87,6 +87,11 @@ const categoryIntent: Record<OpportunityCategory, string[]> = {
     "defi",
     "smart contract",
   ],
+  learning_resource: ["learning resource", "training", "course", "education"],
+  student_benefit: ["student benefit", "student tools", "developer pack"],
+  developer_program: ["developer program", "developer community", "training"],
+  official_directory: ["directory", "catalogue", "program list", "job board"],
+  research_lead: ["research lead", "research organization", "potential funder"],
 };
 
 const sourceBaseQuality: Record<string, number> = {
@@ -518,7 +523,19 @@ function overlap(profileTokens: Set<string>, candidateValues: string[]) {
 }
 
 function categoryScore(opportunity: Opportunity, request: RecommendationRequest) {
-  if (request.filters.categories?.includes(opportunity.category)) {
+  const requestedTypes = new Set<string>(
+    (request.filters.categories ?? []).map((category) =>
+      category === "remote_job"
+        ? "job"
+        : category === "web3_bounty"
+          ? "bounty"
+          : category,
+    ),
+  );
+  if (
+    request.filters.categories?.includes(opportunity.category) ||
+    opportunity.secondaryTypes?.some((type) => requestedTypes.has(type))
+  ) {
     return 100;
   }
 
@@ -537,6 +554,25 @@ function categoryScore(opportunity: Opportunity, request: RecommendationRequest)
 
   if (includesPhrase(requestedValues, categoryIntent[opportunity.category])) {
     return 92;
+  }
+  const secondaryCategorySignals = (opportunity.secondaryTypes ?? []).flatMap(
+    (type) => {
+      const category =
+        type === "job"
+          ? "remote_job"
+          : type === "bounty"
+            ? "web3_bounty"
+            : type;
+      return category in categoryIntent
+        ? categoryIntent[category as OpportunityCategory]
+        : [];
+    },
+  );
+  if (
+    secondaryCategorySignals.length &&
+    includesPhrase(requestedValues, secondaryCategorySignals)
+  ) {
+    return 90;
   }
 
   const requestedTokens = tokenize(requestedValues);
@@ -931,7 +967,18 @@ function hardMismatchAssessment(
   }
   if (
     request.filters.categories?.length &&
-    !request.filters.categories.includes(opportunity.category)
+    !request.filters.categories.includes(opportunity.category) &&
+    !opportunity.secondaryTypes?.some((type) =>
+      new Set<string>(
+        request.filters.categories?.map((category) =>
+          category === "remote_job"
+            ? "job"
+            : category === "web3_bounty"
+              ? "bounty"
+              : category,
+        ),
+      ).has(type),
+    )
   ) {
     generalReasons.push(
       "The opportunity type does not match the requested categories.",
@@ -965,7 +1012,17 @@ function hardMismatchAssessment(
 
   if (
     opportunity.verificationStatus === "program_directory" ||
-    ["hackathon", "grant", "scholarship", "web3_bounty"].includes(
+    [
+      "hackathon",
+      "grant",
+      "scholarship",
+      "web3_bounty",
+      "learning_resource",
+      "student_benefit",
+      "developer_program",
+      "official_directory",
+      "research_lead",
+    ].includes(
       opportunity.category,
     )
   ) {
@@ -1177,7 +1234,19 @@ export function scoreOpportunity(
     score -= 28;
   }
 
-  if (skill.score < 15 && !["hackathon", "scholarship", "grant"].includes(opportunity.category)) {
+  if (
+    skill.score < 15 &&
+    ![
+      "hackathon",
+      "scholarship",
+      "grant",
+      "learning_resource",
+      "student_benefit",
+      "developer_program",
+      "official_directory",
+      "research_lead",
+    ].includes(opportunity.category)
+  ) {
     score -= 12;
   }
 

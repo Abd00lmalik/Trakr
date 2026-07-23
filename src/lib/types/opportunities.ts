@@ -8,6 +8,11 @@ export const opportunityCategorySchema = z.enum([
   "internship",
   "remote_job",
   "web3_bounty",
+  "learning_resource",
+  "student_benefit",
+  "developer_program",
+  "official_directory",
+  "research_lead",
 ]);
 
 export const opportunityTypeSchema = z.enum([
@@ -26,6 +31,11 @@ export const opportunityTypeSchema = z.enum([
   "volunteer_program",
   "academic_program",
   "training_program",
+  "learning_resource",
+  "student_benefit",
+  "developer_program",
+  "official_directory",
+  "research_lead",
 ]);
 
 export const opportunityDomainSchema = z.enum([
@@ -200,6 +210,20 @@ export const structuredUserProfileSchema = z.object({
   interests: z.array(z.string().min(1)).default([]),
   goals: z.array(z.string().min(1)).default([]),
   education: z.array(z.string()).default([]),
+  fieldOfStudy: z.string().optional(),
+  currentDegreeLevel: z.string().optional(),
+  targetDegreeLevel: z.string().optional(),
+  currentInstitution: z.string().optional(),
+  graduationYear: z.string().optional(),
+  nationality: z.string().optional(),
+  countryOfResidence: z.string().optional(),
+  preferredStudyCountries: z.array(z.string()).optional(),
+  intendedStartYear: z.string().optional(),
+  fundingRequirement: z.string().optional(),
+  languageTestStatus: z.string().optional(),
+  workAuthorization: z.string().optional(),
+  sponsorshipRequired: z.boolean().optional(),
+  availability: z.string().optional(),
   workHistory: z.array(z.string()).default([]),
   projects: z.array(z.string()).default([]),
   research: z.array(z.string()).optional(),
@@ -214,7 +238,9 @@ export const structuredUserProfileSchema = z.object({
 
 export const profileEvidenceSourceSchema = z.enum([
   "explicit",
+  "extracted",
   "inferred",
+  "caller_supplied",
   "unknown",
 ]);
 
@@ -513,6 +539,17 @@ export const recommendationSchema = z.object({
   confidenceScore: z.number().min(0).max(100).optional(),
   guidanceAction: companionGuidanceActionSchema.optional(),
   recommendationState: opportunityRecommendationStateSchema.optional(),
+  officialUrl: z.string().url().optional(),
+  applicationUrl: z.string().url().nullable().optional(),
+  canonicalUrl: z.string().url().optional(),
+  publisherDomain: z.string().optional(),
+  sourceName: z.string().optional(),
+  verificationStatus: verificationStatusSchema.optional(),
+  lastVerifiedAt: z.string().datetime().nullable().optional(),
+  deadline: z.string().date().nullable().optional(),
+  deadlineStatus: deadlineStateSchema.optional(),
+  eligibilitySummary: z.string().optional(),
+  geographicEligibility: z.string().optional(),
   eligibilityConcerns: z.array(z.string()).optional(),
   provenance: z
     .object({
@@ -558,9 +595,54 @@ export const recommendationResponseSchema = z.object({
     totalCandidates: z.number().int().nonnegative(),
   }),
   recommendations: z.array(recommendationSchema),
+  directOpportunities: z.array(recommendationSchema).optional(),
+  explorePrograms: z.array(recommendationSchema).optional(),
+  supportingResources: z.array(recommendationSchema).optional(),
+  categoryCoverage: z
+    .array(
+      z.object({
+        category: opportunityCategorySchema,
+        status: z.enum([
+          "covered",
+          "limited",
+          "no_qualified_matches",
+          "inventory_gap",
+          "directories_only",
+          "eligibility_unknown",
+        ]),
+        inventoryCandidates: z.number().int().nonnegative(),
+        eligibleCandidates: z.number().int().nonnegative(),
+        selectedResults: z.number().int().nonnegative(),
+        reason: z.string(),
+      }),
+    )
+    .optional(),
   actionPlan: actionPlanSchema,
   learningRoadmap: learningRoadmapSchema,
   agentNotes: z.array(z.string()),
+  callerInstructions: z
+    .object({
+      relayMessage: z.literal(true),
+      doNotInferMissingInputs: z.literal(true),
+      sendContinuationUnchanged: z.literal(true),
+      doNotGenerateAProfile: z.literal(true),
+      surfaceOfficialUrls: z.literal(true),
+    })
+    .optional(),
+  profileOrigin: z
+    .enum([
+      "none",
+      "resume",
+      "user_message",
+      "caller_structured",
+      "continuation",
+      "mixed",
+    ])
+    .optional(),
+  profileConfirmed: z.boolean().optional(),
+  evidenceSources: z.array(z.string()).optional(),
+  inferredFields: z.array(z.string()).optional(),
+  confirmationRequired: z.boolean().optional(),
   operation: serviceOperationSchema.optional(),
   coverage: z
     .object({

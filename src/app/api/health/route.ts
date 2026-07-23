@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { checkDatabase } from "@/lib/db";
 import { getAiMetricsSnapshot } from "@/lib/ai/metrics";
+import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 
 export const runtime = "nodejs";
 
@@ -20,6 +21,8 @@ export async function GET() {
 
   return NextResponse.json({
     service: "trakr",
+    displayTitle: "Trakr Opportunity & Resume Services",
+    version: TRAKR_SERVICE_VERSION,
     status,
     ok: status === "ok",
     timestamp: new Date().toISOString(),

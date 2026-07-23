@@ -17,6 +17,7 @@ import { opportunitySource } from "@/lib/opportunities/sources";
 import {
   buildContinuationContext,
   buildConversationalProfile,
+  confirmProfileEvidence,
 } from "@/lib/profile/conversation";
 import { buildRecommendationNarrative } from "@/lib/recommendation/action-plan";
 import { scoreOpportunity } from "@/lib/recommendation/scoring";
@@ -47,8 +48,9 @@ import type {
   RequiredInput,
   DownloadableArtifact,
 } from "@/lib/types/opportunities";
+import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 
-const SERVICE_VERSION = "0.6.0";
+const SERVICE_VERSION = TRAKR_SERVICE_VERSION;
 
 function serviceForOperation(operation: ServiceOperation): UserFacingService {
   if (operation === "benchmark" || operation === "optimize") {
@@ -480,6 +482,10 @@ function emptyResponse(
       totalCandidates: 0,
     },
     recommendations: [],
+    directOpportunities: [],
+    explorePrograms: [],
+    supportingResources: [],
+    categoryCoverage: [],
     actionPlan: {
       immediate: [],
       sevenDayPlan: [],
@@ -494,6 +500,13 @@ function emptyResponse(
       "This response is a conversational capability state, not a completed opportunity recommendation run.",
       "Continuation is an encrypted, caller-carried session reference with a short lifetime; Trakr does not keep a shared personal profile.",
     ],
+    callerInstructions: {
+      relayMessage: true,
+      doNotInferMissingInputs: true,
+      sendContinuationUnchanged: true,
+      doNotGenerateAProfile: true,
+      surfaceOfficialUrls: true,
+    },
     conversation,
     capabilityResult,
     artifacts,
@@ -505,6 +518,111 @@ function emptyResponse(
     nextActions: conversation.nextActions,
     continuation: conversation.continuation,
   };
+}
+
+function profileOrigin(evidence: ProfileEvidence[]) {
+  const origins = new Set(
+    evidence
+      .map((item) => item.origin)
+      .filter((origin): origin is NonNullable<ProfileEvidence["origin"]> =>
+        Boolean(origin),
+      ),
+  );
+  if (!origins.size) return "none" as const;
+  if (origins.size > 1) return "mixed" as const;
+  const [origin] = [...origins];
+  if (origin === "resume") return "resume" as const;
+  if (origin === "user") return "user_message" as const;
+  if (origin === "structured_profile") return "caller_structured" as const;
+  if (origin === "context") return "continuation" as const;
+  return "mixed" as const;
+}
+
+function profileConfirmationMessage(
+  built: ReturnType<typeof buildConversationalProfile>,
+) {
+  const profile = built.profile;
+  const extracted = [
+    profile.fieldOfStudy ? `- Course or field: ${profile.fieldOfStudy}` : "",
+    profile.currentDegreeLevel
+      ? `- Current qualification: ${profile.currentDegreeLevel}`
+      : "",
+    profile.currentInstitution
+      ? `- Institution: ${profile.currentInstitution}`
+      : "",
+    profile.experienceLevel
+      ? `- Current stage: ${profile.experienceLevel}`
+      : "",
+    profile.location ? `- Location: ${profile.location}` : "",
+    profile.skills.length
+      ? `- Skills: ${profile.skills.slice(0, 8).join(", ")}`
+      : "",
+    profile.projects.length
+      ? `- Projects: ${profile.projects.slice(0, 2).join("; ")}`
+      : "",
+  ].filter(Boolean);
+  const missing = built.missingInformation
+    .filter((item) => item.required)
+    .map((item) => item.field);
+  return [
+    "I extracted this session profile:",
+    ...extracted,
+    missing.length
+      ? `Missing before reliable matching: ${missing.join(", ")}.`
+      : "No required profile fields are currently missing.",
+    "Is this accurate? Confirm or correct it before matching.",
+  ].join("\n");
+}
+
+function renderRecommendationMessage(
+  response: Awaited<ReturnType<typeof generateRecommendations>>,
+) {
+  const lines: string[] = [];
+  if (response.directOpportunities?.length) {
+    lines.push("Verified direct opportunities:");
+    for (const recommendation of response.directOpportunities) {
+      lines.push(
+        [
+          `${recommendation.rank}. ${recommendation.opportunity.title}`,
+          `Type: ${recommendation.opportunity.opportunityType ?? recommendation.opportunity.category}`,
+          `Status: ${recommendation.recommendationState === "apply_now" ? "Apply Now" : "Explore"}`,
+          `Deadline: ${recommendation.deadline ?? recommendation.deadlineStatus?.replaceAll("_", " ") ?? "requires confirmation"}`,
+          `Eligibility: ${recommendation.eligibilitySummary ?? "Requires confirmation on the official page."}`,
+          `Location: ${recommendation.geographicEligibility ?? "Geographic eligibility requires confirmation."}`,
+          `Why it matches: ${recommendation.reasoning}`,
+          `Official page: ${recommendation.officialUrl ?? recommendation.opportunity.canonicalUrl}`,
+        ].join("\n"),
+      );
+    }
+  } else {
+    lines.push(
+      "I found no verified direct matches in Trakr's current inventory for the supplied profile and constraints.",
+    );
+  }
+  if (response.explorePrograms?.length) {
+    lines.push(
+      `Explore programs and official directories: ${response.explorePrograms
+        .map((item) => `${item.opportunity.title} (${item.officialUrl})`)
+        .join("; ")}`,
+    );
+  }
+  if (response.supportingResources?.length) {
+    lines.push(
+      `Supporting resources, not application opportunities: ${response.supportingResources
+        .map((item) => `${item.opportunity.title} (${item.officialUrl})`)
+        .join("; ")}`,
+    );
+  }
+  if (response.categoryCoverage?.length) {
+    lines.push(
+      "Coverage by requested category:",
+      ...response.categoryCoverage.map(
+        (item) =>
+          `- ${item.category.replaceAll("_", " ")}: ${item.status}. ${item.reason}`,
+      ),
+    );
+  }
+  return lines.join("\n\n");
 }
 
 function conversationFor(
@@ -806,8 +924,9 @@ function hasGenerationEvidence(evidence: ProfileEvidence[]) {
   return evidence.some((item) => {
     if (
       !substantiveFields.has(item.field) ||
-      item.source !== "explicit" ||
-      item.confirmed === false ||
+      item.source === "unknown" ||
+      item.source === "inferred" ||
+      item.confirmed !== true ||
       !(item.allowedUse ?? []).includes("generation")
     ) {
       return false;
@@ -941,6 +1060,90 @@ export async function handleOpportunityCompanionRequest(
       ? { ...request, message: undefined }
       : request,
   );
+  const profileConfirmedNow = confirmedProfile(request);
+  if (profileConfirmedNow) {
+    built.evidence = confirmProfileEvidence(built.evidence);
+  }
+  if (
+    activeContext(request)?.awaitingProfileConfirmation &&
+    /^(no|n|incorrect|not accurate|deny|reject|start over)\b/i.test(
+      request.message?.trim() ?? "",
+    )
+  ) {
+    const clearedContext: CompanionContext = {
+      profileEvidence: [],
+      profileConfirmed: false,
+      awaitingProfileConfirmation: false,
+      unansweredQuestions: [],
+      documentReferences: [],
+      service: activeContext(request)?.service,
+      operation: activeContext(request)?.operation,
+      stage: "discover_choose_input",
+      consent: activeContext(request)?.consent,
+      filters: activeContext(request)?.filters,
+      target: activeContext(request)?.target,
+      generationPreferences: activeContext(request)?.generationPreferences,
+      sessionVersion: "2",
+    };
+    const clearedRequest: OpportunityCompanionRequest = {
+      ...request,
+      user: undefined,
+      profile: undefined,
+      resumeText: undefined,
+      message: undefined,
+      context: clearedContext,
+    };
+    const cleared = buildConversationalProfile(clearedRequest);
+    const choices = [
+      {
+        id: "resume",
+        value: "resume",
+        number: 1,
+        label: "Upload a resume",
+      },
+      {
+        id: "background",
+        value: "background",
+        number: 2,
+        label: "Provide background information",
+      },
+      {
+        id: "request",
+        value: "request",
+        number: 3,
+        label: "Describe what you are looking for",
+      },
+    ];
+    const conversation = conversationFor(
+      clearedRequest,
+      cleared,
+      "profile_build",
+      "discover",
+      "opportunity_finding",
+      "choose_profile_source",
+      menuMessage(
+        "The unconfirmed supplied profile was removed. Choose a fresh intake route:",
+        choices,
+      ),
+      ["resume", "background", "request"],
+      undefined,
+      {
+        requiredAction: "select_profile_source",
+        choices,
+        requiredInputs: [
+          requiredInput({
+            id: "discovery_input_method",
+            type: "enum",
+            prompt: "Choose a fresh intake route",
+            options: choices,
+          }),
+        ],
+        clearProfileFromSession: true,
+        stage: "discover_choose_input",
+      },
+    );
+    return emptyResponse(clearedRequest, conversation, undefined, cleared.filters);
+  }
   const selectedFromServiceMenu =
     (activeContext(request)?.stage === "choose_service" &&
       Boolean(serviceForSelectedValue(request.message))) ||
@@ -1082,6 +1285,7 @@ export async function handleOpportunityCompanionRequest(
               "document.base64",
               "document.text",
               "resumeText",
+              "multipart:/api/a2mcp/recommend",
               "multipart:/api/profile/parse-resume",
             ],
             acceptedMimeTypes: [
@@ -1183,8 +1387,75 @@ export async function handleOpportunityCompanionRequest(
     return emptyResponse(request, conversation, undefined, built.filters);
   }
 
+  const requiresProfileConfirmation =
+    !profileConfirmedNow &&
+    !activeContext(request)?.profileConfirmed &&
+    !request.resumeText &&
+    !request.document &&
+    !request.target &&
+    request.intakeRoute !== "target" &&
+    request.intakeRoute !== "generate" &&
+    operation !== "benchmark" &&
+    operation !== "optimize" &&
+    operation !== "generate" &&
+    operation !== "generate_resume" &&
+    service !== "resume_generation" &&
+    service !== "resume_benchmarking" &&
+    built.evidence.some((item) => item.origin === "structured_profile") &&
+    !built.evidence.some(
+      (item) => item.origin === "user" || item.origin === "resume",
+    );
+  if (requiresProfileConfirmation) {
+    const suppliedByCaller = built.evidence.some(
+      (item) => item.origin === "structured_profile",
+    );
+    const conversation = conversationFor(
+      request,
+      built,
+      "profile_build",
+      operation,
+      service,
+      "profile_confirmation",
+      suppliedByCaller
+        ? [
+            "The calling agent supplied this unconfirmed profile.",
+            profileConfirmationMessage(built),
+            "Trakr will not use these facts until the user confirms or explicitly corrects them.",
+          ].join("\n")
+        : profileConfirmationMessage(built),
+      [
+        "Relay the extracted profile to the user without adding facts.",
+        "Submit the user's confirmation or corrections with the continuation unchanged.",
+      ],
+      undefined,
+      {
+        requiredAction: "review_profile",
+        requiredInputs: [
+          requiredInput({
+            id: "profile_confirmation",
+            type: "boolean",
+            prompt:
+              "Confirm whether the extracted or caller-supplied profile is accurate.",
+          }),
+          requiredInput({
+            id: "profile_corrections",
+            type: "object",
+            required: false,
+            prompt: "Provide corrections to any inaccurate profile fields.",
+            fields: built.evidence.map((item) => item.field),
+          }),
+        ],
+        profileConfirmed: false,
+        awaitingProfileConfirmation: true,
+        profileSource: built.profileSource,
+        stage: "profile_confirmation",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
   if (
-    request.operation === "generate_resume" ||
+    operation === "generate_resume" ||
     intent === "resume_generation"
   ) {
     const recommendationRequest = toRecommendationRequest(
@@ -1412,6 +1683,7 @@ export async function handleOpportunityCompanionRequest(
                 "document.base64",
                 "document.text",
                 "resumeText",
+                "multipart:/api/a2mcp/recommend",
                 "multipart:/api/profile/parse-resume",
                 "structured_profile",
               ],
@@ -1648,6 +1920,7 @@ export async function handleOpportunityCompanionRequest(
               "document.base64",
               "document.text",
               "resumeText",
+              "multipart:/api/a2mcp/recommend",
               "multipart:/api/profile/parse-resume",
             ],
             acceptedMimeTypes: [
@@ -1823,9 +2096,7 @@ export async function handleOpportunityCompanionRequest(
       "discover",
       "opportunity_finding",
       "recommendations",
-      response.recommendations.length >= 10
-        ? "I found 10 grounded opportunities ranked against the profile."
-        : `I found ${response.recommendations.length} suitable grounded opportunities. I did not add weaker or invented results just to reach 10.`,
+      renderRecommendationMessage(response),
       [
         "Present the ranked recommendations and coverage report.",
         "Offer to explain a recommendation or assess readiness.",

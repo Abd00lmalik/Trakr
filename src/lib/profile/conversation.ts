@@ -101,6 +101,7 @@ const emptyProfile: StructuredUserProfile = {
   interests: [],
   goals: [],
   education: [],
+  preferredStudyCountries: [],
   workHistory: [],
   projects: [],
   research: [],
@@ -132,10 +133,45 @@ function mergeProfiles(
     if (profile.location) result.location = profile.location;
     if (profile.timezone) result.timezone = profile.timezone;
     if (profile.experienceLevel) result.experienceLevel = profile.experienceLevel;
+    if (profile.fieldOfStudy) result.fieldOfStudy = profile.fieldOfStudy;
+    if (profile.currentDegreeLevel) {
+      result.currentDegreeLevel = profile.currentDegreeLevel;
+    }
+    if (profile.targetDegreeLevel) {
+      result.targetDegreeLevel = profile.targetDegreeLevel;
+    }
+    if (profile.currentInstitution) {
+      result.currentInstitution = profile.currentInstitution;
+    }
+    if (profile.graduationYear) result.graduationYear = profile.graduationYear;
+    if (profile.nationality) result.nationality = profile.nationality;
+    if (profile.countryOfResidence) {
+      result.countryOfResidence = profile.countryOfResidence;
+    }
+    if (profile.intendedStartYear) {
+      result.intendedStartYear = profile.intendedStartYear;
+    }
+    if (profile.fundingRequirement) {
+      result.fundingRequirement = profile.fundingRequirement;
+    }
+    if (profile.languageTestStatus) {
+      result.languageTestStatus = profile.languageTestStatus;
+    }
+    if (profile.workAuthorization) {
+      result.workAuthorization = profile.workAuthorization;
+    }
+    if (profile.sponsorshipRequired !== undefined) {
+      result.sponsorshipRequired = profile.sponsorshipRequired;
+    }
+    if (profile.availability) result.availability = profile.availability;
     result.skills = unique([...result.skills, ...profile.skills]);
     result.interests = unique([...result.interests, ...profile.interests]);
     result.goals = unique([...result.goals, ...profile.goals]);
     result.education = unique([...result.education, ...profile.education]);
+    result.preferredStudyCountries = unique([
+      ...(result.preferredStudyCountries ?? []),
+      ...(profile.preferredStudyCountries ?? []),
+    ]);
     result.workHistory = unique([...result.workHistory, ...profile.workHistory]);
     result.projects = unique([...result.projects, ...profile.projects]);
     result.research = unique([
@@ -224,6 +260,40 @@ function inferPreferredLocation(message: string) {
     /\b(?:opportunities|roles|jobs|internships?|fellowships?|scholarships?|grants?|hackathons?)\s+(?:based\s+)?in\s+([A-Z][A-Za-z .'-]{2,50}?)(?=[,.;]|\s+(?:or|and|that|which|with|for)\b|$)/,
   );
   return match?.[1]?.trim();
+}
+
+function inferNationality(message: string) {
+  const explicit = message.match(
+    /\b(?:nationality|citizenship)\s*(?:is|:|-)?\s*([A-Z][A-Za-z -]{2,50})\b/i,
+  )?.[1];
+  if (explicit) return explicit.trim();
+  for (const [pattern, country] of countryDemonyms) {
+    if (
+      pattern.test(message) &&
+      /\b(citizen|citizenship|national|nationality)\b/i.test(message)
+    ) {
+      return country;
+    }
+  }
+}
+
+function inferTargetDegreeLevel(message: string) {
+  return message.match(
+    /\b(?:target(?:ing)?|seeking|want(?:ing)?|apply(?:ing)? for|fund(?:ing)?|scholarship for)\s+(?:an?\s+)?(PhD|doctorate|master(?:'s)?|MSc|MBA|bachelor(?:'s)?|BSc|diploma|certificate)\b/i,
+  )?.[1];
+}
+
+function inferPreferredStudyCountries(message: string) {
+  const match = message.match(
+    /\b(?:study|studying|universities|programmes?|programs?)\s+in\s+([A-Z][A-Za-z ,&'-]{2,120})(?=[.;]|\s+(?:for|starting|beginning|and my)\b|$)/i,
+  )?.[1];
+  if (!match) return [];
+  return unique(
+    match
+      .split(/,|&|\band\b/i)
+      .map((country) => country.trim())
+      .filter((country) => country.length >= 2),
+  );
 }
 
 function locationWasInferredFromDemonym(message: string) {
@@ -357,6 +427,10 @@ function enrichEvidence(
         item.confidence ??
         (item.source === "explicit"
           ? 1
+          : item.source === "extracted"
+            ? 0.85
+            : item.source === "caller_supplied"
+              ? 0.7
           : item.source === "inferred"
             ? 0.65
             : 0),
@@ -372,6 +446,8 @@ function enrichEvidence(
                 "optimization",
                 "generation",
               ] as const)
+            : item.source === "caller_supplied"
+              ? ([] as const)
             : (["matching", "assessment"] as const)),
     };
   });
@@ -390,7 +466,7 @@ function contextFromRequest(
 function evidenceFromProvidedProfile(
   profile: StructuredUserProfile | undefined,
   evidence: ProfileEvidence[],
-  source: "explicit" | "inferred",
+  source: ProfileEvidence["source"],
   origin: ProfileEvidence["origin"],
   onlyIfFieldMissing = false,
 ) {
@@ -407,6 +483,20 @@ function evidenceFromProvidedProfile(
     "interests",
     "goals",
     "education",
+    "fieldOfStudy",
+    "currentDegreeLevel",
+    "targetDegreeLevel",
+    "currentInstitution",
+    "graduationYear",
+    "nationality",
+    "countryOfResidence",
+    "preferredStudyCountries",
+    "intendedStartYear",
+    "fundingRequirement",
+    "languageTestStatus",
+    "workAuthorization",
+    "sponsorshipRequired",
+    "availability",
     "workHistory",
     "projects",
     "research",
@@ -586,6 +676,62 @@ function buildMissingInformation(
     });
   }
 
+  if (filters.categories?.includes("scholarship")) {
+    const scholarshipFields: Array<{
+      field: string;
+      value: unknown;
+      question: string;
+    }> = [
+      {
+        field: "fieldOfStudy",
+        value: profile.fieldOfStudy,
+        question:
+          "What is your current or intended field of study for scholarship matching?",
+      },
+      {
+        field: "currentDegreeLevel",
+        value: profile.currentDegreeLevel,
+        question:
+          "What qualification or degree level are you currently completing or have completed?",
+      },
+      {
+        field: "targetDegreeLevel",
+        value: profile.targetDegreeLevel,
+        question:
+          "What degree or qualification level do you want the scholarship to fund?",
+      },
+      {
+        field: "nationality",
+        value: profile.nationality,
+        question:
+          "What nationality should Trakr use only for published scholarship eligibility checks?",
+      },
+      {
+        field: "countryOfResidence",
+        value: profile.countryOfResidence ?? profile.location,
+        question:
+          "What is your current country of residence for published eligibility checks?",
+      },
+      {
+        field: "preferredStudyCountries",
+        value: profile.preferredStudyCountries?.length
+          ? profile.preferredStudyCountries
+          : undefined,
+        question:
+          "Which countries, if any, are you willing to study in?",
+      },
+    ];
+    for (const item of scholarshipFields) {
+      if (!item.value) {
+        missing.push({
+          field: item.field,
+          question: item.question,
+          required: true,
+        });
+      }
+    }
+  }
+
   return missing;
 }
 
@@ -652,6 +798,36 @@ export function buildConversationalProfile(
         ]),
         goals: messageProfile?.goals ?? [],
         education: educationEvidenceSentences(message),
+        fieldOfStudy: messageProfile?.fieldOfStudy,
+        currentDegreeLevel: messageProfile?.currentDegreeLevel,
+        targetDegreeLevel: inferTargetDegreeLevel(message),
+        currentInstitution: messageProfile?.currentInstitution,
+        graduationYear: messageProfile?.graduationYear,
+        nationality: inferNationality(message),
+        countryOfResidence: inferLocation(message),
+        preferredStudyCountries: inferPreferredStudyCountries(message),
+        intendedStartYear: message.match(
+          /\b(?:start|starting|entry|intake)\s*(?:in|:)?\s*((?:20)\d{2})\b/i,
+        )?.[1],
+        fundingRequirement: /\bfull(?:y)? funded|full funding\b/i.test(message)
+          ? "Full funding required"
+          : /\bpartial funding\b/i.test(message)
+            ? "Partial funding acceptable"
+            : undefined,
+        languageTestStatus: message.match(
+          /\b(?:IELTS|TOEFL|language test)\s*(?:status|is|:|-)?\s*([^.;]{2,80})/i,
+        )?.[1]?.trim(),
+        workAuthorization: message.match(
+          /\b(?:work authorization|right to work|work permit)\s*(?:is|:|-)?\s*([^.;]{2,120})/i,
+        )?.[1]?.trim(),
+        sponsorshipRequired: /\b(?:need|require|seeking)\s+(?:visa\s+)?sponsorship\b/i.test(
+          message,
+        )
+          ? true
+          : undefined,
+        availability: message.match(
+          /\b(?:available|availability)\s*(?:from|is|:|-)?\s*([^.;]{2,100})/i,
+        )?.[1]?.trim(),
         workHistory: unique([
           ...(messageProfile?.workHistory ?? []),
           ...evidenceSentences(
@@ -687,6 +863,7 @@ export function buildConversationalProfile(
       interests: request.interests ?? [],
       goals: request.goals ?? [],
       education: [],
+      preferredStudyCountries: [],
       workHistory: [],
       projects: [],
       research: [],
@@ -710,7 +887,7 @@ export function buildConversationalProfile(
   evidenceFromProvidedProfile(
     providedProfile,
     evidence,
-    "explicit",
+    "caller_supplied",
     "structured_profile",
   );
   if (resumeExtraction) {
@@ -797,6 +974,22 @@ export function buildConversationalProfile(
       request.intakeRoute ??
       (request.resumeText ? "resume" : message ? "request" : undefined),
   };
+}
+
+export function confirmProfileEvidence<T extends ProfileEvidence>(
+  evidence: T[],
+) {
+  for (const item of evidence) {
+    if (item.source === "unknown") continue;
+    item.confirmed = true;
+    item.allowedUse = [
+      "matching",
+      "assessment",
+      "optimization",
+      "generation",
+    ];
+  }
+  return evidence;
 }
 
 export function buildContinuationContext(

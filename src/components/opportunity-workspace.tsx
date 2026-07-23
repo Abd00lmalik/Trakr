@@ -4,6 +4,7 @@ import Image from "next/image";
 import {
   AlertCircle,
   ArrowRight,
+  BookOpen,
   BriefcaseBusiness,
   CheckCircle2,
   ChevronRight,
@@ -37,16 +38,8 @@ import type {
   OpportunityCompanionResponse,
   OpportunityIntakeRoute,
   RecommendationResponse,
-  StructuredUserProfile,
   UserFacingService,
 } from "@/lib/types/opportunities";
-
-type ResumeParseResponse = {
-  fileName: string;
-  contentType: string;
-  resumeText: string;
-  profileDraft: StructuredUserProfile;
-};
 
 type UploadState = "idle" | "uploading" | "parsing" | "complete" | "error";
 type ServiceState = "checking" | "online" | "unavailable";
@@ -190,6 +183,13 @@ function RecommendationResults({
 }: {
   response: RecommendationResponse;
 }) {
+  const directOpportunities =
+    response.directOpportunities ??
+    response.recommendations.filter(
+      (item) => item.recommendationState === "apply_now",
+    );
+  const explorePrograms = response.explorePrograms ?? [];
+  const supportingResources = response.supportingResources ?? [];
   const hasActionPlan = [
     ...response.actionPlan.immediate,
     ...response.actionPlan.sevenDayPlan,
@@ -205,7 +205,7 @@ function RecommendationResults({
       <div className="section-heading results-heading">
         <div>
           <p className="section-kicker">Opportunity Finding</p>
-          <h2 id="recommendations-title">Grounded matches</h2>
+          <h2 id="recommendations-title">Verified direct opportunities</h2>
         </div>
         <div className="ai-status">
           <Sparkles aria-hidden="true" size={16} />
@@ -241,7 +241,32 @@ function RecommendationResults({
         </div>
       ) : null}
 
-      {!response.recommendations.length ? (
+      {response.categoryCoverage?.length ? (
+        <div className="coverage-panel">
+          <div className="coverage-heading">
+            <Target aria-hidden="true" size={18} />
+            <div>
+              <strong>Requested category coverage</strong>
+              <span>
+                Only verified direct opportunities satisfy coverage.
+              </span>
+            </div>
+          </div>
+          <div className="coverage-list">
+            {response.categoryCoverage.map((item) => (
+              <div className="coverage-row" key={item.category}>
+                <span>{item.category.replaceAll("_", " ")}</span>
+                <strong className={`coverage-${item.status}`}>
+                  {item.status.replaceAll("_", " ")}
+                </strong>
+                <p>{item.reason}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {!directOpportunities.length ? (
         <div className="empty-results">
           <Target aria-hidden="true" size={20} />
           <div>
@@ -256,7 +281,7 @@ function RecommendationResults({
       ) : null}
 
       <div className="recommendation-list">
-        {response.recommendations.map((recommendation) => {
+        {directOpportunities.map((recommendation) => {
           const confidence = Math.round(
             recommendation.opportunity.verificationConfidence * 100,
           );
@@ -309,6 +334,13 @@ function RecommendationResults({
                   </div>
 
                   <p className="reasoning">{recommendation.reasoning}</p>
+                  <p className="provenance-note">
+                    Eligibility:{" "}
+                    {recommendation.eligibilitySummary ??
+                      "Confirm on the official page."}{" "}
+                    {recommendation.geographicEligibility ??
+                      "Geographic eligibility requires confirmation."}
+                  </p>
 
                   <div className="recommendation-details">
                     <div>
@@ -379,7 +411,10 @@ function RecommendationResults({
                 </div>
                 <a
                   className={`source-button ${canApply ? "primary-source" : ""}`}
-                  href={recommendation.opportunity.sourceUrl}
+                  href={
+                    recommendation.officialUrl ??
+                    recommendation.opportunity.canonicalUrl
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -391,6 +426,60 @@ function RecommendationResults({
           );
         })}
       </div>
+
+      {explorePrograms.length ? (
+        <div className="action-plan">
+          <div className="action-plan-heading">
+            <Search aria-hidden="true" size={20} />
+            <h3>Explore programs and official directories</h3>
+          </div>
+          <ul className="detail-list">
+            {explorePrograms.map((recommendation) => (
+              <li key={recommendation.opportunity.id}>
+                <ExternalLink aria-hidden="true" size={15} />
+                <a
+                  href={
+                    recommendation.officialUrl ??
+                    recommendation.opportunity.canonicalUrl
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {recommendation.opportunity.title}
+                </a>
+                <span>Explore</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {supportingResources.length ? (
+        <div className="action-plan">
+          <div className="action-plan-heading">
+            <BookOpen aria-hidden="true" size={20} />
+            <h3>Supporting resources</h3>
+          </div>
+          <ul className="detail-list">
+            {supportingResources.map((recommendation) => (
+              <li key={recommendation.opportunity.id}>
+                <ExternalLink aria-hidden="true" size={15} />
+                <a
+                  href={
+                    recommendation.officialUrl ??
+                    recommendation.opportunity.canonicalUrl
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {recommendation.opportunity.title}
+                </a>
+                <span>Not an application opportunity</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       {hasActionPlan ? (
         <div className="action-plan">
@@ -767,12 +856,20 @@ export function OpportunityWorkspace() {
     const formData = new FormData();
     formData.append("resume", file);
     formData.append("consent", "true");
+    formData.append(
+      "operation",
+      selectedService ? operationForService(selectedService) : "discover",
+    );
+    formData.append("intakeRoute", "resume");
+    if (continuation?.token) {
+      formData.append("continuation", continuation.token);
+    }
     const request = new XMLHttpRequest();
     setFileName(file.name);
     setUploadProgress(0);
     setUploadError("");
     setUploadState("uploading");
-    request.open("POST", "/api/profile/parse-resume");
+    request.open("POST", "/api/a2mcp/recommend");
     request.upload.onprogress = (event) => {
       if (event.lengthComputable) {
         setUploadProgress(Math.round((event.loaded / event.total) * 100));
@@ -784,10 +881,10 @@ export function OpportunityWorkspace() {
       setUploadError("The upload could not be completed.");
     };
     request.onload = () => {
-      let body: ResumeParseResponse | { message?: string };
+      let body: OpportunityCompanionResponse | { message?: string };
       try {
         body = JSON.parse(request.responseText) as
-          | ResumeParseResponse
+          | OpportunityCompanionResponse
           | { message?: string };
       } catch {
         body = { message: "The resume response could not be read." };
@@ -801,17 +898,25 @@ export function OpportunityWorkspace() {
         );
         return;
       }
-      const parsed = body as ResumeParseResponse;
+      const companionResponse = body as OpportunityCompanionResponse;
       setUploadProgress(100);
       setUploadState("complete");
-      void submitToAgent({
-        displayUser: "Resume uploaded for this session.",
-        operation: selectedService
-          ? operationForService(selectedService)
-          : "discover",
-        intakeRoute: "resume",
-        resumeText: parsed.resumeText,
+      appendMessage({
+        role: "user",
+        content: "Resume uploaded for this session.",
       });
+      setResponse(companionResponse);
+      if (companionResponse.conversation) {
+        setContinuation(companionResponse.conversation.continuation);
+        setSelectedService(companionResponse.conversation.service);
+        setIntakeRoute(
+          companionResponse.conversation.profileSource ?? "resume",
+        );
+        appendMessage({
+          role: "assistant",
+          content: companionResponse.conversation.message,
+        });
+      }
     };
     request.send(formData);
   }

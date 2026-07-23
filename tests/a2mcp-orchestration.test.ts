@@ -5,6 +5,8 @@ import { Document, Packer, Paragraph } from "docx";
 import PDFDocument from "pdfkit";
 import { GET as downloadArtifact } from "../src/app/api/artifacts/[id]/route";
 import { POST } from "../src/app/api/a2mcp/recommend/route";
+import { GET as getOpenApi } from "../src/app/api/a2mcp/openapi/route";
+import { curatedOfficialOpportunities } from "../src/lib/opportunities/data/curated-official-opportunities";
 import {
   clearLocalArtifactsForTests,
   retrieveArtifact,
@@ -188,8 +190,188 @@ test("empty and minimal cold starts return the three-service chooser with HTTP 2
   for (const input of cases) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.7.0");
     assertChooser(result.body);
   }
+});
+
+test("caller-supplied profiles require confirmation and denial removes them", async () => {
+  const supplied = await callRoute({
+    operation: "discover",
+    user: {
+      headline: "Data Science/AI/ML",
+      experienceLevel: "early-career",
+      location: "Remote",
+      skills: ["Python", "Machine learning"],
+      interests: ["AI"],
+      goals: ["Find remote opportunities"],
+    },
+  });
+
+  assert.equal(supplied.body.stage, "profile_confirmation");
+  assert.equal(supplied.body.profileOrigin, "caller_structured");
+  assert.equal(supplied.body.profileConfirmed, false);
+  assert.equal(supplied.body.confirmationRequired, true);
+  assert.equal(supplied.body.recommendations.length, 0);
+  assert.equal(supplied.body.callerInstructions.doNotGenerateAProfile, true);
+  assert.ok(
+    supplied.body.conversation.profile.evidence.every(
+      (item: { source: string; confirmed: boolean }) =>
+        item.source === "caller_supplied" && item.confirmed === false,
+    ),
+  );
+
+  const denied = await callRoute({
+    message: "No, that profile is incorrect. Start over.",
+    continuation: supplied.body.continuation,
+  });
+  assert.equal(denied.body.stage, "discover_choose_input");
+  assert.equal(denied.body.recommendations.length, 0);
+  assert.equal(denied.body.conversation.profile.draft.headline, undefined);
+  assert.equal(denied.body.conversation.profile.draft.skills.length, 0);
+});
+
+test("resume scholarship intake confirms extraction before collecting scholarship gates", async () => {
+  const syntheticResume = `AMINA FICTIONAL
+Lagos, Nigeria
+EDUCATION
+BSc Computer Science student at Fictional University
+SKILLS
+Python, JavaScript, React, SQL
+PROJECTS
+Built a fictional study planner and data dashboard.`;
+  const extracted = await callRoute({
+    operation: "discover",
+    intakeRoute: "resume",
+    message: "Find jobs, scholarships, and internships.",
+    resumeText: syntheticResume,
+    consent,
+  });
+
+  assert.equal(extracted.body.stage, "discover_missing_information");
+  assert.equal(
+    extracted.body.conversation.profile.draft.fieldOfStudy,
+    "Computer Science",
+  );
+  assert.equal(extracted.body.recommendations.length, 0);
+  assert.ok(
+    extracted.body.requiredInputs.some(
+      (item: { id: string }) => item.id === "nationality",
+    ),
+  );
+  assert.ok(
+    extracted.body.requiredInputs.some(
+      (item: { id: string }) => item.id === "targetDegreeLevel",
+    ),
+  );
+  assert.ok(
+    extracted.body.requiredInputs.some(
+      (item: { id: string }) => item.id === "preferredStudyCountries",
+    ),
+  );
+
+  const matched = await callRoute({
+    message:
+      "My nationality is Nigerian. I live in Nigeria. I am targeting a Master's degree and I am willing to study in the United Kingdom, Germany, or Canada.",
+    continuation: extracted.body.continuation,
+  });
+  assert.equal(matched.body.stage, "discover_completed");
+  assert.deepEqual(
+    new Set(
+      matched.body.categoryCoverage.map(
+        (item: { category: string }) => item.category,
+      ),
+    ),
+    new Set(["remote_job", "scholarship", "internship"]),
+  );
+  assert.ok(
+    matched.body.directOpportunities.every(
+      (item: { officialUrl?: string }) => Boolean(item.officialUrl),
+    ),
+  );
+  for (const item of matched.body.directOpportunities) {
+    assert.match(matched.body.message, new RegExp(item.officialUrl));
+  }
+  assert.match(
+    matched.body.categoryCoverage
+      .map((item: { reason: string }) => item.reason)
+      .join(" "),
+    /Trakr|verified direct|current profile/i,
+  );
+});
+
+test("learning resources cannot be direct scholarships", () => {
+  const expected = new Map([
+    ["official-microsoft-learn-student-hub", "learning_resource"],
+    ["official-github-education", "student_benefit"],
+    ["official-google-developer-programs", "developer_program"],
+  ]);
+  for (const [id, category] of expected) {
+    const opportunity = curatedOfficialOpportunities.find(
+      (item) => item.id === id,
+    );
+    assert.ok(opportunity, id);
+    assert.equal(opportunity.category, category, id);
+    assert.notEqual(opportunity.category, "scholarship", id);
+    assert.equal(opportunity.verificationStatus, "program_directory", id);
+  }
+  assert.equal(
+    curatedOfficialOpportunities.some(
+      (item) => item.title === "Developer Student Scholarship",
+    ),
+    false,
+  );
+});
+
+test("multipart recommendation upload returns a confirmation continuation without echoing resume text", async () => {
+  const formData = new FormData();
+  formData.append(
+    "resume",
+    new File([resumeText], "synthetic-resume.txt", { type: "text/plain" }),
+  );
+  formData.append("consent", "true");
+  formData.append("operation", "discover");
+  formData.append("intakeRoute", "resume");
+  formData.append("message", "Find internships.");
+
+  const response = await POST(
+    new Request("http://localhost/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "x-forwarded-for": "198.51.100.220" },
+      body: formData,
+    }),
+  );
+  const body = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(body.stage, "discover_completed");
+  assert.equal(body.profileOrigin, "mixed");
+  assert.ok(body.evidenceSources.includes("resume"));
+  assert.doesNotMatch(body.continuation.token, /AMINA|React|TypeScript/i);
+});
+
+test("OpenAPI fully types visible recommendation links and separated collections", async () => {
+  const response = await getOpenApi();
+  const document = await response.json();
+  const success =
+    document.paths["/api/a2mcp/recommend"].post.responses["200"].content[
+      "application/json"
+    ].schema;
+  const recommendation =
+    success.properties.directOpportunities.items;
+  assert.ok(recommendation.required.includes("officialUrl"));
+  assert.equal(
+    recommendation.properties.officialUrl.format,
+    "uri",
+  );
+  assert.ok(success.required.includes("directOpportunities"));
+  assert.ok(success.required.includes("explorePrograms"));
+  assert.ok(success.required.includes("supportingResources"));
+  assert.ok(success.required.includes("categoryCoverage"));
+  assert.ok(
+    document.paths["/api/a2mcp/recommend"].post.requestBody.content[
+      "multipart/form-data"
+    ],
+  );
 });
 
 test("the exact Agent 5198 service declaration remains an ambiguous cold start", async () => {
@@ -336,8 +518,15 @@ test("TXT, DOCX, and PDF base64 documents are parsed through the public contract
       target,
     });
     assert.equal(result.response.status, 200, document.fileName);
-    assert.equal(result.body.stage, "optimize_confirmation", document.fileName);
-    assert.ok(result.body.capabilityResult?.resumeBenchmark, document.fileName);
+    assert.equal(
+      result.body.stage,
+      "optimize_confirmation",
+      document.fileName,
+    );
+    assert.ok(
+      result.body.capabilityResult?.resumeBenchmark,
+      document.fileName,
+    );
   }
 });
 
@@ -396,7 +585,7 @@ test("unsafe, malformed, unsupported, and oversized document inputs fail structu
 
 test("benchmarking precedes optimization and explicit decline creates no artifact", async () => {
   clearLocalArtifactsForTests();
-  const benchmark = await callRoute({
+  const supplied = await callRoute({
     operation: "optimize",
     document: {
       representation: "text",
@@ -408,14 +597,14 @@ test("benchmarking precedes optimization and explicit decline creates no artifac
     consent,
     target,
   });
-  assert.equal(benchmark.body.stage, "optimize_confirmation");
-  assert.equal(benchmark.body.conversation?.requiredAction, "confirm_optimization");
-  assert.equal(benchmark.body.capabilityResult?.resumeOptimization, undefined);
-  assert.equal(benchmark.body.artifacts, undefined);
+  assert.equal(supplied.body.stage, "optimize_confirmation");
+  assert.equal(supplied.body.conversation?.requiredAction, "confirm_optimization");
+  assert.equal(supplied.body.capabilityResult?.resumeOptimization, undefined);
+  assert.equal(supplied.body.artifacts, undefined);
 
   const declined = await callRoute({
     message: "No, finish with the benchmark.",
-    continuation: benchmark.body.continuation,
+    continuation: supplied.body.continuation,
   });
   assert.equal(declined.body.stage, "benchmark_completed");
   assert.equal(declined.body.status, "completed");
@@ -424,15 +613,16 @@ test("benchmarking precedes optimization and explicit decline creates no artifac
 
 test("approved optimization creates authorized, evidence-linked DOCX and PDF artifacts", async () => {
   clearLocalArtifactsForTests();
-  const benchmark = await callRoute({
+  const supplied = await callRoute({
     operation: "optimize",
     resumeText,
     consent,
     target,
   });
+  assert.equal(supplied.body.stage, "optimize_confirmation");
   const optimized = await callRoute({
     message: "Yes, optimize using only my confirmed information.",
-    continuation: benchmark.body.continuation,
+    continuation: supplied.body.continuation,
   });
   assert.equal(optimized.body.stage, "optimize_completed");
   assert.equal(optimized.body.status, "completed");
@@ -457,11 +647,16 @@ test("approved optimization creates authorized, evidence-linked DOCX and PDF art
 
 test("target-first generation creates real downloadable artifacts without invented claims", async () => {
   clearLocalArtifactsForTests();
-  const generated = await callRoute({
+  const supplied = await callRoute({
     operation: "generate_resume",
     user: profile,
     target,
     consent,
+  });
+  assert.equal(supplied.body.stage, "profile_confirmation");
+  const generated = await callRoute({
+    message: "Yes, this profile is accurate.",
+    continuation: supplied.body.continuation,
   });
   assert.equal(generated.body.stage, "generate_completed");
   assert.equal(generated.body.status, "completed");

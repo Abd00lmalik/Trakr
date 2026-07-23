@@ -155,11 +155,11 @@ await run("ORCH-PROD-001-metadata-readiness", async () => {
   assert.equal(health.response.status, 200);
   assert.equal(health.body.ok, true);
   assert.equal(health.body.database.artifactStorageReady, true);
-  assert.equal(metadata.body.version, "0.6.0");
+  assert.equal(metadata.body.version, "0.7.0");
   assert.equal(metadata.body.displayTitle, "Trakr Opportunity & Resume Services");
   assert.equal(metadata.body.submission.pricing, "free");
   assert.equal(metadata.body.submission.paymentRequired, false);
-  assert.equal(openapi.body.info.version, "0.6.0");
+  assert.equal(openapi.body.info.version, "0.7.0");
   assert.ok(openapi.body.paths["/api/artifacts/{id}"]);
   return {
     status: 200,

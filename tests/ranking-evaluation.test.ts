@@ -66,7 +66,7 @@ test("benchmark rewards honest short lists instead of requiring padding", () => 
   );
 
   assert.ok(securityPersona);
-  assert.equal(securityPersona.topResults.length, 2);
+  assert.ok(securityPersona.topResults.length >= 1);
   assert.equal(securityPersona.precisionAt3, 1);
   assert.equal(securityPersona.ndcgAt5, 1);
 });

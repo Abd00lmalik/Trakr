@@ -82,7 +82,7 @@ AWS Certified Cloud Practitioner`,
   assert.ok(parsed.profile.certifications.includes("AWS Certified Cloud Practitioner"));
   assert.equal(
     parsed.evidence.find((item) => item.field === "skills")?.source,
-    "explicit",
+    "extracted",
   );
   assert.equal(
     parsed.evidence.find((item) => item.field === "headline")?.source,
@@ -187,7 +187,7 @@ Fictional University Research Prize.`,
     parsed.evidence.some(
       (item) =>
         item.field === "publications" &&
-        item.source === "explicit",
+        item.source === "extracted",
     ),
   );
 });
@@ -208,7 +208,7 @@ test("workspace exposes the outcome-first Opportunity Finding journey", async ()
     "Tell Trakr about my background",
     "Describe what I am looking for",
     "Session context is caller-carried",
-    "Grounded matches",
+    "Verified direct opportunities",
     "No qualified matches yet",
     "Missing requirements",
     "Next actions",
@@ -304,7 +304,7 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
   assert.equal(generationService.status, "available");
   assert.equal(generationService.operation, "generate_resume");
   assert.ok(generationService.documentTypes.includes("biosketch"));
-  assert.equal(document.info.version, "0.6.0");
+  assert.equal(document.info.version, "0.7.0");
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);

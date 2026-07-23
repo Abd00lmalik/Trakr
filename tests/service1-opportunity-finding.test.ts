@@ -154,12 +154,29 @@ test("explicit service operations with structured profiles do not fall through t
 
   assert.equal(response.status, 200);
   assert.equal(body.conversation?.service, "resume_generation");
-  assert.equal(body.conversation?.state, "needs_more_information");
+  assert.equal(body.conversation?.state, "profile_confirmation");
   assert.equal(
     body.conversation?.requiredAction,
-    "provide_generation_target",
+    "review_profile",
   );
   assert.equal(body.operation, "generate_resume");
+
+  const confirmed = await POST(
+    new Request("http://localhost/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: "Yes, that profile is accurate.",
+        continuation: body.continuation,
+      }),
+    }),
+  );
+  const confirmedBody = await confirmed.json();
+  assert.equal(confirmedBody.conversation?.state, "needs_more_information");
+  assert.equal(
+    confirmedBody.conversation?.requiredAction,
+    "provide_generation_target",
+  );
 });
 
 test("explicit intake routes work without a synthetic route-selection message", async () => {

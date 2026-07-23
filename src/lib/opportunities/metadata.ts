@@ -422,6 +422,21 @@ function recommendationState(
   deadline: DeadlineEvidence,
 ): OpportunityRecommendationState {
   if (
+    [
+      "learning_resource",
+      "student_benefit",
+      "developer_program",
+    ].includes(opportunity.category)
+  ) {
+    return "research_lead";
+  }
+  if (opportunity.category === "official_directory") {
+    return "explore";
+  }
+  if (opportunity.category === "research_lead") {
+    return "research_lead";
+  }
+  if (
     !opportunity.isActive ||
     opportunity.verificationStatus === "inactive_listing" ||
     deadline.state === "passed" ||

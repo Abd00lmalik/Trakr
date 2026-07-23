@@ -2,7 +2,7 @@
   {
     "caseId": "S2C-0001",
     "benchmark": {
-      "benchmarkId": "bench_vIuinGdcioMwzqDboQgcv73B-zDpUeSD",
+      "benchmarkId": "bench_UwoA7Tk2hbWCZzl84RLzqgzsVOO8bBc9",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "targetType": "internship",
@@ -224,7 +224,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_vIuinGdcioMwzqDboQgcv73B-zDpUeSD",
+      "benchmarkId": "bench_UwoA7Tk2hbWCZzl84RLzqgzsVOO8bBc9",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "optimizedHeadline": "Frontend Engineer | React, TypeScript, Accessible HTML.",
@@ -300,7 +300,7 @@
   {
     "caseId": "S2C-0002",
     "benchmark": {
-      "benchmarkId": "bench_gc8C84vKSzES0I43c_0RhHVOmMy4KUlH",
+      "benchmarkId": "bench_AmjbmbKFj5SOzfBjXQ-rhvUWtZm-7fiV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "targetType": "internship",
@@ -528,7 +528,7 @@
   {
     "caseId": "S2C-0003",
     "benchmark": {
-      "benchmarkId": "bench_ev3amqwLNCcUiWTkzDYgTZmgQc6DYkCC",
+      "benchmarkId": "bench_Mm3dFvtgbKvtXUfVySbSDXhsLpmqF8-P",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Frontend Engineer",
       "targetType": "internship",
@@ -780,7 +780,7 @@
   {
     "caseId": "S2C-0004",
     "benchmark": {
-      "benchmarkId": "bench_x4i2tsTeZSZNAioLkwOwLpi8X_aDwK8N",
+      "benchmarkId": "bench_3l4LwprgXSICG7jIJvwIjBfdS1Eqy50k",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "targetType": "remote_job",
@@ -996,7 +996,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_x4i2tsTeZSZNAioLkwOwLpi8X_aDwK8N",
+      "benchmarkId": "bench_3l4LwprgXSICG7jIJvwIjBfdS1Eqy50k",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "optimizedHeadline": "Backend Engineer | Node.js, PostgreSQL, REST APIs.",
@@ -1073,7 +1073,7 @@
   {
     "caseId": "S2C-0005",
     "benchmark": {
-      "benchmarkId": "bench_HyZe96McCnPEpZVFRSfTGjiSSbe_D7tU",
+      "benchmarkId": "bench_NIZwGRp1fUDKjWT307ZIOEi6G7bkx4AV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "targetType": "remote_job",
@@ -1300,7 +1300,7 @@
   {
     "caseId": "S2C-0006",
     "benchmark": {
-      "benchmarkId": "bench_q-SB9eFqZzbVHJRW0G0UySNZM4pe29Kk",
+      "benchmarkId": "bench_Lx53RFvw9j55xVpXjvwzy1Jj-n9UsGha",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Backend Engineer",
       "targetType": "remote_job",
@@ -1548,7 +1548,7 @@
   {
     "caseId": "S2C-0007",
     "benchmark": {
-      "benchmarkId": "bench_TNcln19z_hzYTQZXxU76eU7Q1hqEpzuP",
+      "benchmarkId": "bench_f9WKWcFeEPG2hU4OZyM5nM2E0b0lrkmh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "targetType": "remote_job",
@@ -1766,7 +1766,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_TNcln19z_hzYTQZXxU76eU7Q1hqEpzuP",
+      "benchmarkId": "bench_f9WKWcFeEPG2hU4OZyM5nM2E0b0lrkmh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "optimizedHeadline": "Full-Stack Engineer | React, Node.js, PostgreSQL.",
@@ -1856,7 +1856,7 @@
   {
     "caseId": "S2C-0008",
     "benchmark": {
-      "benchmarkId": "bench_4_R0TIqnrsITKH-HWOwOP4oGitzeYx5w",
+      "benchmarkId": "bench_xeltN3pfOznVr1Mi1K_m_Dj9jDn_xLK6",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "targetType": "remote_job",
@@ -2081,7 +2081,7 @@
   {
     "caseId": "S2C-0009",
     "benchmark": {
-      "benchmarkId": "bench_h-I2G2gz_vPgQG8qp3Yd6BoEE530xVk7",
+      "benchmarkId": "bench_VPkvcEMYRTQ7OPJ7xQjV466e9kkj2b6P",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Full-Stack Engineer",
       "targetType": "remote_job",
@@ -2327,7 +2327,7 @@
   {
     "caseId": "S2C-0010",
     "benchmark": {
-      "benchmarkId": "bench_6EZZp2J8TkYzxTMDhcFMNxv2_FLclvCe",
+      "benchmarkId": "bench_MHbC256daUhYnVO1eofxJ8UQAjZ_OZh1",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "targetType": "internship",
@@ -2542,7 +2542,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_6EZZp2J8TkYzxTMDhcFMNxv2_FLclvCe",
+      "benchmarkId": "bench_MHbC256daUhYnVO1eofxJ8UQAjZ_OZh1",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "optimizedHeadline": "Mobile Developer | Flutter, Dart, Mobile accessibility.",
@@ -2619,7 +2619,7 @@
   {
     "caseId": "S2C-0011",
     "benchmark": {
-      "benchmarkId": "bench_2Nu4w7FLkzw6LwCuOJwxoTUNJA3X3_OZ",
+      "benchmarkId": "bench_BeKQkksL12DmwnbLscw3hEuJISSm_KFA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "targetType": "internship",
@@ -2848,7 +2848,7 @@
   {
     "caseId": "S2C-0012",
     "benchmark": {
-      "benchmarkId": "bench__5d9hduDAV2oPm3Km78KtS9_QtH0xkbz",
+      "benchmarkId": "bench__MnFXXwx3zCfLeRv1azlBw_huIbyC9Uk",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Mobile Developer",
       "targetType": "internship",
@@ -3095,7 +3095,7 @@
   {
     "caseId": "S2C-0013",
     "benchmark": {
-      "benchmarkId": "bench_V-FRhNcO2z8YoLuyZ43uH4Ih8T6b-jEt",
+      "benchmarkId": "bench_MT2KLKrecuuZ49nh5dr4skcTIS8j9XJ7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "targetType": "remote_job",
@@ -3311,7 +3311,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_V-FRhNcO2z8YoLuyZ43uH4Ih8T6b-jEt",
+      "benchmarkId": "bench_MT2KLKrecuuZ49nh5dr4skcTIS8j9XJ7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "optimizedHeadline": "DevOps Engineer | AWS, Docker, Terraform.",
@@ -3388,7 +3388,7 @@
   {
     "caseId": "S2C-0014",
     "benchmark": {
-      "benchmarkId": "bench_1ltrXQNbNCw-FM20J2XNwq5hJyZ7gmlm",
+      "benchmarkId": "bench_sRihKZTWtvlHHXwtCgQJ_VdZ24WR4h6K",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "targetType": "remote_job",
@@ -3606,7 +3606,7 @@
   {
     "caseId": "S2C-0015",
     "benchmark": {
-      "benchmarkId": "bench_pETT2PRxuw5l0_sCzUSZ_GcwT2Vocpcf",
+      "benchmarkId": "bench_hdq46vPENXkGhhSO_9g0GZRRzav9vNeP",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "DevOps Engineer",
       "targetType": "remote_job",
@@ -3850,7 +3850,7 @@
   {
     "caseId": "S2C-0016",
     "benchmark": {
-      "benchmarkId": "bench_0FQLx9GUpLs2Uz_NEXux_gGf9RFAdcM1",
+      "benchmarkId": "bench_MYXU7LkHG2hf00tdENAZU-1J4Ru1qShL",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "targetType": "remote_job",
@@ -4066,7 +4066,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_0FQLx9GUpLs2Uz_NEXux_gGf9RFAdcM1",
+      "benchmarkId": "bench_MYXU7LkHG2hf00tdENAZU-1J4Ru1qShL",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "optimizedHeadline": "Cybersecurity Analyst | SIEM, Incident response, Network security.",
@@ -4143,7 +4143,7 @@
   {
     "caseId": "S2C-0017",
     "benchmark": {
-      "benchmarkId": "bench_qfYkjw2kx-gXS9k55go-L6UgTDR264AH",
+      "benchmarkId": "bench_m8SfhhubPERaSUCjDPGDjExpOl7kiCTC",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "targetType": "remote_job",
@@ -4370,7 +4370,7 @@
   {
     "caseId": "S2C-0018",
     "benchmark": {
-      "benchmarkId": "bench_NRf-45b3t-9qb6KphetRck8IvlFKy3BE",
+      "benchmarkId": "bench_waazfQyIY8Vd-HKavRF5EXGL1wrYiOZR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cybersecurity Analyst",
       "targetType": "remote_job",
@@ -4618,7 +4618,7 @@
   {
     "caseId": "S2C-0019",
     "benchmark": {
-      "benchmarkId": "bench_px2zwxcoHkoGuHtLVZKDRQpmFj0E-Or5",
+      "benchmarkId": "bench_FiZTIh7GRyPNMeK2SNQyX9gyFeLDXtBh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "targetType": "internship",
@@ -4838,7 +4838,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_px2zwxcoHkoGuHtLVZKDRQpmFj0E-Or5",
+      "benchmarkId": "bench_FiZTIh7GRyPNMeK2SNQyX9gyFeLDXtBh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "optimizedHeadline": "Data Analyst | SQL, Spreadsheets, Data visualization.",
@@ -4915,7 +4915,7 @@
   {
     "caseId": "S2C-0020",
     "benchmark": {
-      "benchmarkId": "bench_k7kKW2vETGLGprrt2h-HP0czI1NV0XFo",
+      "benchmarkId": "bench_nJSwdlmn4BUTxmwmrztGEAdBdaWkIIVt",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "targetType": "internship",
@@ -5138,7 +5138,7 @@
   {
     "caseId": "S2C-0021",
     "benchmark": {
-      "benchmarkId": "bench_iYOdBigzBMX1KfEQkOPS-bbJ4hrKh3Nw",
+      "benchmarkId": "bench_k6S2L_IeZBKRDsko479m9MEuDP5q1q8p",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Analyst",
       "targetType": "internship",
@@ -5394,7 +5394,7 @@
   {
     "caseId": "S2C-0022",
     "benchmark": {
-      "benchmarkId": "bench_Co1Tma4aR9qK7xCLgsMTyiR_MN4o9QM8",
+      "benchmarkId": "bench_QHQO8hQCrEL0TcPBt4QQbYigwyxP1T2A",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "targetType": "remote_job",
@@ -5612,7 +5612,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_Co1Tma4aR9qK7xCLgsMTyiR_MN4o9QM8",
+      "benchmarkId": "bench_QHQO8hQCrEL0TcPBt4QQbYigwyxP1T2A",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "optimizedHeadline": "Data Scientist | Python, Statistics, Machine learning.",
@@ -5689,7 +5689,7 @@
   {
     "caseId": "S2C-0023",
     "benchmark": {
-      "benchmarkId": "bench_8BVrVLHMizmaC3JHHzWjeAH0ePTWwd4t",
+      "benchmarkId": "bench_fP3V1Yz3setg04PN1ItnXKXA5iXFM9qb",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "targetType": "remote_job",
@@ -5919,7 +5919,7 @@
   {
     "caseId": "S2C-0024",
     "benchmark": {
-      "benchmarkId": "bench_8c88XvTEakNr6zab_SRzYlEimiwF6pzY",
+      "benchmarkId": "bench_-0JRb3X0ZcgksPvwl36lC-w8bjdmvauR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Data Scientist",
       "targetType": "remote_job",
@@ -6163,7 +6163,7 @@
   {
     "caseId": "S2C-0025",
     "benchmark": {
-      "benchmarkId": "bench_IGrbElcBL80ndxjsZgd8H_PdOWA1Fb9q",
+      "benchmarkId": "bench_fN2YQmaqbpTT_BQhxi_4qDaBlwayyHZ3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "targetType": "remote_job",
@@ -6381,7 +6381,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_IGrbElcBL80ndxjsZgd8H_PdOWA1Fb9q",
+      "benchmarkId": "bench_fN2YQmaqbpTT_BQhxi_4qDaBlwayyHZ3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "optimizedHeadline": "Machine Learning Engineer | Python, PyTorch, Model deployment.",
@@ -6458,7 +6458,7 @@
   {
     "caseId": "S2C-0026",
     "benchmark": {
-      "benchmarkId": "bench_CQBYfltQKXglMCeiHOvwuLKXrLgXHvWW",
+      "benchmarkId": "bench_nsry9ZliGfJxqey4rvniYRQiBdiAUHp7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "targetType": "remote_job",
@@ -6685,7 +6685,7 @@
   {
     "caseId": "S2C-0027",
     "benchmark": {
-      "benchmarkId": "bench_nHfJ47Br65t9laU7kU2U1wtFrpInfD9T",
+      "benchmarkId": "bench_1kVrJyJEEQaAmua_P4C_aQpAiejjCj_Q",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Machine Learning Engineer",
       "targetType": "remote_job",
@@ -6933,7 +6933,7 @@
   {
     "caseId": "S2C-0028",
     "benchmark": {
-      "benchmarkId": "bench_Q75DMFH9Me4PHGge-IPC252QWZqloZDx",
+      "benchmarkId": "bench_RtdPUTfeSfnqYFUCbTllv3UBdFj80aH8",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "targetType": "remote_job",
@@ -7174,7 +7174,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_Q75DMFH9Me4PHGge-IPC252QWZqloZDx",
+      "benchmarkId": "bench_RtdPUTfeSfnqYFUCbTllv3UBdFj80aH8",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "optimizedHeadline": "AI Research Assistant | Python, Literature review, Experimental methods.",
@@ -7265,7 +7265,7 @@
   {
     "caseId": "S2C-0029",
     "benchmark": {
-      "benchmarkId": "bench_0ZH_qq7nPcqtekb99ltTa8C8gvlRb3pe",
+      "benchmarkId": "bench_omzLunP-xjZJNETei6fqmU2BKF_ngnfL",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "targetType": "remote_job",
@@ -7516,7 +7516,7 @@
   {
     "caseId": "S2C-0030",
     "benchmark": {
-      "benchmarkId": "bench_a97VudyYRicXGbEhyV67N1i2SZWnCUcV",
+      "benchmarkId": "bench_DRd7OBQX3bemjziiseuXYv-mOvM9TNvK",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "AI Research Assistant",
       "targetType": "remote_job",
@@ -7794,7 +7794,7 @@
   {
     "caseId": "S2C-0031",
     "benchmark": {
-      "benchmarkId": "bench_7sjlqRDcl2ouCjoYlKscRU2a_7nY1j0M",
+      "benchmarkId": "bench_kAHow72Fmu9ByUTUmO1oWHHJrAk7PNVn",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "targetType": "hackathon",
@@ -8039,7 +8039,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_7sjlqRDcl2ouCjoYlKscRU2a_7nY1j0M",
+      "benchmarkId": "bench_kAHow72Fmu9ByUTUmO1oWHHJrAk7PNVn",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "optimizedHeadline": "Blockchain Engineer | Solidity, TypeScript, Smart contract testing.",
@@ -8117,7 +8117,7 @@
   {
     "caseId": "S2C-0032",
     "benchmark": {
-      "benchmarkId": "bench__hpDlEat6dlE_KbCotf4nfON55IuLGhd",
+      "benchmarkId": "bench_VsdvLvJatOdn6TH2iilfW973CgLuJF2y",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "targetType": "hackathon",
@@ -8366,7 +8366,7 @@
   {
     "caseId": "S2C-0033",
     "benchmark": {
-      "benchmarkId": "bench_FkBOlxaW_SloqJ6vqnhScMq3LO8dMVw7",
+      "benchmarkId": "bench_Hhz8pry3iHfrh-lpVIujmMdtasRRj1_-",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Blockchain Engineer",
       "targetType": "hackathon",
@@ -8634,7 +8634,7 @@
   {
     "caseId": "S2C-0034",
     "benchmark": {
-      "benchmarkId": "bench_L3FBZwH0HD6lJzL3vbZ75uPrq_57TAFH",
+      "benchmarkId": "bench_zUv1G4KLJgtSBYubo0GmK10MD1G38yv3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "targetType": "remote_job",
@@ -8854,7 +8854,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_L3FBZwH0HD6lJzL3vbZ75uPrq_57TAFH",
+      "benchmarkId": "bench_zUv1G4KLJgtSBYubo0GmK10MD1G38yv3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "optimizedHeadline": "Technical Product Manager | Product discovery, API products, Roadmapping.",
@@ -8931,7 +8931,7 @@
   {
     "caseId": "S2C-0035",
     "benchmark": {
-      "benchmarkId": "bench_SC6jZ5lk8Md7idxHXaP5VUGX9mIgxHMS",
+      "benchmarkId": "bench_a_dl0oDlAtx-eYz0kywz_I-GBpsNSaa9",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "targetType": "remote_job",
@@ -9158,7 +9158,7 @@
   {
     "caseId": "S2C-0036",
     "benchmark": {
-      "benchmarkId": "bench_PbFoV2FHfCMTeNbyaUkWDiQLUm7UuSsN",
+      "benchmarkId": "bench_ztVPG3bxDqxxg_UEmDjctCbfXTDwaOZD",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Product Manager",
       "targetType": "remote_job",
@@ -9402,7 +9402,7 @@
   {
     "caseId": "S2C-0037",
     "benchmark": {
-      "benchmarkId": "bench_yWYUa0eykAT9FgOyf0e5udVHgiQ1-9cj",
+      "benchmarkId": "bench_UkXJz1CpWJMef_VZ07dU5-OnwY10tZBa",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "targetType": "remote_job",
@@ -9623,7 +9623,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_yWYUa0eykAT9FgOyf0e5udVHgiQ1-9cj",
+      "benchmarkId": "bench_UkXJz1CpWJMef_VZ07dU5-OnwY10tZBa",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "optimizedHeadline": "Quality Assurance Engineer | Test planning, Playwright, API testing.",
@@ -9713,7 +9713,7 @@
   {
     "caseId": "S2C-0038",
     "benchmark": {
-      "benchmarkId": "bench_XhICY_Z1aYdU--KAHtYV1fQ5kvMvZPms",
+      "benchmarkId": "bench_3fRCfzCVc-b0jU2_nPT5Rd95psxRucIf",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "targetType": "remote_job",
@@ -9942,7 +9942,7 @@
   {
     "caseId": "S2C-0039",
     "benchmark": {
-      "benchmarkId": "bench_IPAcKlf1CYeJEhJG-ysh7QjTesoiTjo-",
+      "benchmarkId": "bench_Ka_mmZOXxVpD0rf9fdaP5trw2dwQwbWA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Quality Assurance Engineer",
       "targetType": "remote_job",
@@ -10196,7 +10196,7 @@
   {
     "caseId": "S2C-0040",
     "benchmark": {
-      "benchmarkId": "bench_MdJpW7pdoP454k0Zv54KQhkwzdIY0fDE",
+      "benchmarkId": "bench_WADPD1z7xEfVs6F8w1ndu4WsAHmf4_lU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "targetType": "remote_job",
@@ -10414,7 +10414,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_MdJpW7pdoP454k0Zv54KQhkwzdIY0fDE",
+      "benchmarkId": "bench_WADPD1z7xEfVs6F8w1ndu4WsAHmf4_lU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "optimizedHeadline": "Technical Support Specialist | Troubleshooting, Customer communication, SQL.",
@@ -10491,7 +10491,7 @@
   {
     "caseId": "S2C-0041",
     "benchmark": {
-      "benchmarkId": "bench_2Pb-99S3ZTlgtCK-BqvbhGvo7lyurlzF",
+      "benchmarkId": "bench_RCXrFqUL7ZLACl7A8gaAtE3abnmAaKw0",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "targetType": "remote_job",
@@ -10718,7 +10718,7 @@
   {
     "caseId": "S2C-0042",
     "benchmark": {
-      "benchmarkId": "bench_s2PWPJDLotJLIFCgzSt6CRcyyECJFagT",
+      "benchmarkId": "bench_WbUZXrOzwCtsQc9k5BHAvlK_RGj10HVW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Technical Support Specialist",
       "targetType": "remote_job",
@@ -10966,7 +10966,7 @@
   {
     "caseId": "S2C-0043",
     "benchmark": {
-      "benchmarkId": "bench_EmtSeAygFQjHpe43CSDt9hgS1FkgGFn7",
+      "benchmarkId": "bench_o6YX322gHslARiHyYUtTItoXDJoZ7eRu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "targetType": "remote_job",
@@ -11187,7 +11187,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_EmtSeAygFQjHpe43CSDt9hgS1FkgGFn7",
+      "benchmarkId": "bench_o6YX322gHslARiHyYUtTItoXDJoZ7eRu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "optimizedHeadline": "Cloud Security Engineer | AWS security, IAM, Threat modeling.",
@@ -11264,7 +11264,7 @@
   {
     "caseId": "S2C-0044",
     "benchmark": {
-      "benchmarkId": "bench_i8XWQN2xvnziur97M0zj41U81waEYvfc",
+      "benchmarkId": "bench_qVcipNPayqllxaWHbXzW4mWyb31OkJ2O",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "targetType": "remote_job",
@@ -11494,7 +11494,7 @@
   {
     "caseId": "S2C-0045",
     "benchmark": {
-      "benchmarkId": "bench_fUJ0JNFy56qMAGT8raDHbTMr2V4DZb_Z",
+      "benchmarkId": "bench_aDTQDoc1GIHW0Q2GJDNTRefIiQU5LSBJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Cloud Security Engineer",
       "targetType": "remote_job",
@@ -11745,7 +11745,7 @@
   {
     "caseId": "S2C-0046",
     "benchmark": {
-      "benchmarkId": "bench_8qR2Emfm_E4TB_DbCI4YgKyWMFQNZZSv",
+      "benchmarkId": "bench_w1HoZxRmOPs4AAsiXX2lhKuir_8wVxV3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "targetType": "remote_job",
@@ -11960,7 +11960,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_8qR2Emfm_E4TB_DbCI4YgKyWMFQNZZSv",
+      "benchmarkId": "bench_w1HoZxRmOPs4AAsiXX2lhKuir_8wVxV3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "optimizedHeadline": "Engineering Manager | Engineering leadership, Delivery management, System design.",
@@ -12036,7 +12036,7 @@
   {
     "caseId": "S2C-0047",
     "benchmark": {
-      "benchmarkId": "bench_Kh2gAYkZzLI9FwHfvMAYFsiGpp_3kOmQ",
+      "benchmarkId": "bench_7xuMqKjdb-7FkY2Q50PiPny9ahYiIfdb",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "targetType": "remote_job",
@@ -12251,7 +12251,7 @@
   {
     "caseId": "S2C-0048",
     "benchmark": {
-      "benchmarkId": "bench_2OA1TRNubZh_oyfEWnbIyqKzAqakY21C",
+      "benchmarkId": "bench_TCV0HKuC4viSJL9mpSL5jcZUyCI4tTGD",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Engineering Manager",
       "targetType": "remote_job",
@@ -12493,7 +12493,7 @@
   {
     "caseId": "S2C-0049",
     "benchmark": {
-      "benchmarkId": "bench_JkVr4In_dzfRiX8qkCSh8PvNercNE7l4",
+      "benchmarkId": "bench_vT_Ou4sRnSr95jEU71KyymKWzRujswva",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "targetType": "remote_job",
@@ -12724,7 +12724,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_JkVr4In_dzfRiX8qkCSh8PvNercNE7l4",
+      "benchmarkId": "bench_vT_Ou4sRnSr95jEU71KyymKWzRujswva",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "optimizedHeadline": "Product Designer | Figma, Product discovery, Prototyping.",
@@ -12814,7 +12814,7 @@
   {
     "caseId": "S2C-0050",
     "benchmark": {
-      "benchmarkId": "bench_7Dufeg7POwATEEpjxjbk7TkSuhhGog9z",
+      "benchmarkId": "bench_KpcLR2gS20mMcNDytXaLuo8PGy5XI7fi",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "targetType": "remote_job",
@@ -13042,7 +13042,7 @@
   {
     "caseId": "S2C-0051",
     "benchmark": {
-      "benchmarkId": "bench_YrOTZyYIkIkqBk_xFCr0lQfPYGJ8Lh7T",
+      "benchmarkId": "bench_G9JS6JsvLnF3eV9-dEb_kEy6qPiGE0zR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Product Designer",
       "targetType": "remote_job",
@@ -13296,7 +13296,7 @@
   {
     "caseId": "S2C-0052",
     "benchmark": {
-      "benchmarkId": "bench_ItrsYJ7RmOXobcQUf0npVXhRIsMgGYs3",
+      "benchmarkId": "bench_HKMD5-1Zbekrc1kTuG-6c8tPxkKAQ_We",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "targetType": "internship",
@@ -13537,7 +13537,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_ItrsYJ7RmOXobcQUf0npVXhRIsMgGYs3",
+      "benchmarkId": "bench_HKMD5-1Zbekrc1kTuG-6c8tPxkKAQ_We",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "optimizedHeadline": "UX Designer | User research, Wireframing, Usability testing.",
@@ -13628,7 +13628,7 @@
   {
     "caseId": "S2C-0053",
     "benchmark": {
-      "benchmarkId": "bench_eAM-VjT5whARK5WhG69mQaEO-FKz0v9r",
+      "benchmarkId": "bench_ZElp7ANqwXnwkgv5Utc5tV6cyBTtcbys",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "targetType": "internship",
@@ -13862,7 +13862,7 @@
   {
     "caseId": "S2C-0054",
     "benchmark": {
-      "benchmarkId": "bench_2vA4j4-GynN_fFSPlJZ__ffGfz3_3Ge9",
+      "benchmarkId": "bench_LLvQKGxqsAlnb4f8l8GgdlCeD8xZtIXu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Designer",
       "targetType": "internship",
@@ -14122,7 +14122,7 @@
   {
     "caseId": "S2C-0055",
     "benchmark": {
-      "benchmarkId": "bench_Wx-GUHEoHHD_O-wVpklP29IyrmzrJwOT",
+      "benchmarkId": "bench_g7ckq-0STYo9PZrqMnMbkmIDfaUWtzbx",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "targetType": "remote_job",
@@ -14365,7 +14365,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_Wx-GUHEoHHD_O-wVpklP29IyrmzrJwOT",
+      "benchmarkId": "bench_g7ckq-0STYo9PZrqMnMbkmIDfaUWtzbx",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "optimizedHeadline": "UI Designer | Visual design, Design systems, Figma.",
@@ -14456,7 +14456,7 @@
   {
     "caseId": "S2C-0056",
     "benchmark": {
-      "benchmarkId": "bench_AlCW8HxtDlDb8FA4ZOv0FMMgZSZOCbcE",
+      "benchmarkId": "bench_0FPTS_hAqCnL7HgqzYP7g1zEuPE34OeN",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "targetType": "remote_job",
@@ -14690,7 +14690,7 @@
   {
     "caseId": "S2C-0057",
     "benchmark": {
-      "benchmarkId": "bench_hQV-l7vXqp0svysmHMTX4iu_cz7junN7",
+      "benchmarkId": "bench_0zKK2zVqrd_oBxVJJT9u1-PmNitCbSby",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UI Designer",
       "targetType": "remote_job",
@@ -14960,7 +14960,7 @@
   {
     "caseId": "S2C-0058",
     "benchmark": {
-      "benchmarkId": "bench_vHngycQuX1UdDhFE77iwxzY7nfvRR5s7",
+      "benchmarkId": "bench_xbvEGSsy9CY9HsBpgfqQLxwhoYqasCOY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "targetType": "remote_job",
@@ -15202,7 +15202,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_vHngycQuX1UdDhFE77iwxzY7nfvRR5s7",
+      "benchmarkId": "bench_xbvEGSsy9CY9HsBpgfqQLxwhoYqasCOY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "optimizedHeadline": "UX Researcher | Qualitative interviews, Survey design, Research synthesis.",
@@ -15280,7 +15280,7 @@
   {
     "caseId": "S2C-0059",
     "benchmark": {
-      "benchmarkId": "bench_bSNwqIb68y5lW2zBWClG5zDjNNVe5pw0",
+      "benchmarkId": "bench_PgRrxpFPw7TsK1zqI2ZEjoqxi7syAjqJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "targetType": "remote_job",
@@ -15521,7 +15521,7 @@
   {
     "caseId": "S2C-0060",
     "benchmark": {
-      "benchmarkId": "bench_0VJ6Y64R9KD7MK3-uLT8pcfklXXIM311",
+      "benchmarkId": "bench_yg_GcArFAAe_AFNz7jpahHbLzFFxcw-x",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "UX Researcher",
       "targetType": "remote_job",
@@ -15781,7 +15781,7 @@
   {
     "caseId": "S2C-0061",
     "benchmark": {
-      "benchmarkId": "bench_Rp7-asOA5nlMqkOYN-lODI4z1s5zCMG8",
+      "benchmarkId": "bench_q-CG75fFOXO2ZFvQmIAgRojil1mgD49B",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "targetType": "remote_job",
@@ -16032,7 +16032,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_Rp7-asOA5nlMqkOYN-lODI4z1s5zCMG8",
+      "benchmarkId": "bench_q-CG75fFOXO2ZFvQmIAgRojil1mgD49B",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "optimizedHeadline": "Graphic Designer | Typography, Layout, Adobe Illustrator.",
@@ -16123,7 +16123,7 @@
   {
     "caseId": "S2C-0062",
     "benchmark": {
-      "benchmarkId": "bench_wnFoyHH1eY7eEmL-ky_dx_UsE1pm3xtp",
+      "benchmarkId": "bench_m5oX9AxXp2tM6qEDu4A2M6SXtRsaYt9Q",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "targetType": "remote_job",
@@ -16374,7 +16374,7 @@
   {
     "caseId": "S2C-0063",
     "benchmark": {
-      "benchmarkId": "bench_oM0lmQGW-U_fApujvxlnl7bU58XmujEI",
+      "benchmarkId": "bench_iX-GLUUswpVEIZ0W7MfwcJpo18wWQZmQ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graphic Designer",
       "targetType": "remote_job",
@@ -16645,7 +16645,7 @@
   {
     "caseId": "S2C-0064",
     "benchmark": {
-      "benchmarkId": "bench_yJa4l7CbJM2CJifDo-KlAzg4Zu2Imimz",
+      "benchmarkId": "bench_ahuRsp7cZDoKz8m0m8xL3cysokfpAt45",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "targetType": "remote_job",
@@ -16882,7 +16882,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_yJa4l7CbJM2CJifDo-KlAzg4Zu2Imimz",
+      "benchmarkId": "bench_ahuRsp7cZDoKz8m0m8xL3cysokfpAt45",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "optimizedHeadline": "Brand Designer | Brand systems, Art direction, Illustration.",
@@ -16972,7 +16972,7 @@
   {
     "caseId": "S2C-0065",
     "benchmark": {
-      "benchmarkId": "bench_9Jt462zT2QHlZveUs2jLYskcKK1H0tpe",
+      "benchmarkId": "bench_SJ0w9aU-LdNA9VGBcLRRIrKVJl5_krui",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "targetType": "remote_job",
@@ -17207,7 +17207,7 @@
   {
     "caseId": "S2C-0066",
     "benchmark": {
-      "benchmarkId": "bench_7dtsaRNFcsYubdBi6Do21U1PcVXWGzl0",
+      "benchmarkId": "bench_BhI9ABqKuaJxnuIyKgbMdW5GTCCEv6qf",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Brand Designer",
       "targetType": "remote_job",
@@ -17471,7 +17471,7 @@
   {
     "caseId": "S2C-0067",
     "benchmark": {
-      "benchmarkId": "bench_y5NDquvO1Pw8JRQnNFmSwfhVeo0d7LI-",
+      "benchmarkId": "bench_9IrGjLR-zckoztmG1cnC5EsQqDN5KQnr",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "targetType": "remote_job",
@@ -17697,7 +17697,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_y5NDquvO1Pw8JRQnNFmSwfhVeo0d7LI-",
+      "benchmarkId": "bench_9IrGjLR-zckoztmG1cnC5EsQqDN5KQnr",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "optimizedHeadline": "Motion Designer | After Effects, Storyboarding, Motion graphics.",
@@ -17787,7 +17787,7 @@
   {
     "caseId": "S2C-0068",
     "benchmark": {
-      "benchmarkId": "bench_ww13ziqsaOR_2Sg3ZUM0g5GYSPI4kf6A",
+      "benchmarkId": "bench_ydwsPfNuxgfub3FuyBoETICTta-tgT2E",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "targetType": "remote_job",
@@ -18018,7 +18018,7 @@
   {
     "caseId": "S2C-0069",
     "benchmark": {
-      "benchmarkId": "bench_KeL_D4_D0GWSTPXvVGZgGXZkdkByd5nC",
+      "benchmarkId": "bench_R3sceYbnH9ZHIP-0ATAjwlXljzVmVg1J",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Motion Designer",
       "targetType": "remote_job",
@@ -18272,7 +18272,7 @@
   {
     "caseId": "S2C-0070",
     "benchmark": {
-      "benchmarkId": "bench_1XjogIEf5Gjrkial1WW8GsA63iAWK9OM",
+      "benchmarkId": "bench_iPy7oG3yWJqrrKBXoqLR9DrBGdUNLOAO",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "targetType": "remote_job",
@@ -18495,7 +18495,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_1XjogIEf5Gjrkial1WW8GsA63iAWK9OM",
+      "benchmarkId": "bench_iPy7oG3yWJqrrKBXoqLR9DrBGdUNLOAO",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "optimizedHeadline": "Interior Designer | Space planning, AutoCAD, Materials specification.",
@@ -18585,7 +18585,7 @@
   {
     "caseId": "S2C-0071",
     "benchmark": {
-      "benchmarkId": "bench_06wt_dGrEBgkcD4NL0RDMysI13df8WYh",
+      "benchmarkId": "bench_ShPaUQBtxd0YKhyoYgojO7GObLdJhE4E",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "targetType": "remote_job",
@@ -18810,7 +18810,7 @@
   {
     "caseId": "S2C-0072",
     "benchmark": {
-      "benchmarkId": "bench_5BwOjC32KAzYLEzVKMqHBLJN6QzLp84-",
+      "benchmarkId": "bench_F9VJi07w_be2c2a-4luc34md9b2lgp1E",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Interior Designer",
       "targetType": "remote_job",
@@ -19055,7 +19055,7 @@
   {
     "caseId": "S2C-0073",
     "benchmark": {
-      "benchmarkId": "bench_UtUhMZszOvMyv6iUVbGNKxghgUgzCdJx",
+      "benchmarkId": "bench_pflRSn-9KrbOdL710HAFwZQ4qqZ7w4rF",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "targetType": "remote_job",
@@ -19285,7 +19285,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_UtUhMZszOvMyv6iUVbGNKxghgUgzCdJx",
+      "benchmarkId": "bench_pflRSn-9KrbOdL710HAFwZQ4qqZ7w4rF",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "optimizedHeadline": "Industrial Designer | CAD, Prototyping, Manufacturing methods.",
@@ -19375,7 +19375,7 @@
   {
     "caseId": "S2C-0074",
     "benchmark": {
-      "benchmarkId": "bench_kwb_4NfTKHYSYDnfjyZuPcgFKmZ1QTG3",
+      "benchmarkId": "bench_lxqR7Y8YHVveDbQsWyQGIG2XChq4uVNN",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "targetType": "remote_job",
@@ -19604,7 +19604,7 @@
   {
     "caseId": "S2C-0075",
     "benchmark": {
-      "benchmarkId": "bench_661ZBM1PH6tfdThgsRJW63puqdF9gqi-",
+      "benchmarkId": "bench_RaMBasTbk3W0DNrjrwZrxoON3swMeVyw",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Industrial Designer",
       "targetType": "remote_job",
@@ -19862,7 +19862,7 @@
   {
     "caseId": "S2C-0076",
     "benchmark": {
-      "benchmarkId": "bench_uPToex9QaSdZIgz0shit4Kmna5fz40cP",
+      "benchmarkId": "bench_atoV7F9vqrI8tDfv4vNdnSN8YCo6BPzT",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "targetType": "remote_job",
@@ -20104,7 +20104,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_uPToex9QaSdZIgz0shit4Kmna5fz40cP",
+      "benchmarkId": "bench_atoV7F9vqrI8tDfv4vNdnSN8YCo6BPzT",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "optimizedHeadline": "Public Health Research Assistant | Survey methods, Statistics, Research ethics.",
@@ -20182,7 +20182,7 @@
   {
     "caseId": "S2C-0077",
     "benchmark": {
-      "benchmarkId": "bench_w3znCFClik8BbgizNZHBUXj7oN8rHTog",
+      "benchmarkId": "bench_tB6h7aLN3Zj5wx1rVChcxUGv7ipgBhSU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "targetType": "remote_job",
@@ -20434,7 +20434,7 @@
   {
     "caseId": "S2C-0078",
     "benchmark": {
-      "benchmarkId": "bench_mq2Ai7IguSdx9iXMV9AAv0Ah4UEULKdx",
+      "benchmarkId": "bench_058R_yKSK1yWj9gAzakTxGuT6CSqsaYW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Public Health Research Assistant",
       "targetType": "remote_job",
@@ -20702,7 +20702,7 @@
   {
     "caseId": "S2C-0079",
     "benchmark": {
-      "benchmarkId": "bench_8g5PZDOxa32iEM4UKddPI5odSb0G9nBV",
+      "benchmarkId": "bench_9pjUN0mlzyLmhPJ5lCC7Z6QXGXK3tuUW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "targetType": "fellowship",
@@ -20958,7 +20958,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_8g5PZDOxa32iEM4UKddPI5odSb0G9nBV",
+      "benchmarkId": "bench_9pjUN0mlzyLmhPJ5lCC7Z6QXGXK3tuUW",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "optimizedHeadline": "Postdoctoral Fellow | Experimental design, Scientific writing, Statistics.",
@@ -21037,7 +21037,7 @@
   {
     "caseId": "S2C-0080",
     "benchmark": {
-      "benchmarkId": "bench_jrVJBWyV19L8CMgSM6c8_WDKjj9890HZ",
+      "benchmarkId": "bench_b8lM_GFrFe_yY-977j_FaWV1jfcx1wAO",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "targetType": "fellowship",
@@ -21292,7 +21292,7 @@
   {
     "caseId": "S2C-0081",
     "benchmark": {
-      "benchmarkId": "bench_Gf7rFyk_HF-9M9nFBkqf4bax7unXreUy",
+      "benchmarkId": "bench_Q3GSyFPDUc9G4HoT9G3ZikyXrLlwNfdr",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Postdoctoral Fellow",
       "targetType": "fellowship",
@@ -21579,7 +21579,7 @@
   {
     "caseId": "S2C-0082",
     "benchmark": {
-      "benchmarkId": "bench_X_0jyhAp2xmukfuyPrcYGON_Btc4QcnX",
+      "benchmarkId": "bench_tDlINmkWEB-G2JkcciolIjVmIyD_BoNh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "targetType": "remote_job",
@@ -21801,7 +21801,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_X_0jyhAp2xmukfuyPrcYGON_Btc4QcnX",
+      "benchmarkId": "bench_tDlINmkWEB-G2JkcciolIjVmIyD_BoNh",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "optimizedHeadline": "Policy Researcher | Policy analysis, Qualitative research, Writing.",
@@ -21891,7 +21891,7 @@
   {
     "caseId": "S2C-0083",
     "benchmark": {
-      "benchmarkId": "bench_FSHFXvtzt6Tx99jpaKLu1EHWT6n9aIfu",
+      "benchmarkId": "bench_inGdf49vw_7n3LnQksDYyNaV4GcfUlQ8",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "targetType": "remote_job",
@@ -22114,7 +22114,7 @@
   {
     "caseId": "S2C-0084",
     "benchmark": {
-      "benchmarkId": "bench_COkvi-tlG2rvGD2pL_31LFXM0T815RLq",
+      "benchmarkId": "bench_qjV0VG7JiC3rPlV8Unq1W18EulVcwpCy",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Researcher",
       "targetType": "remote_job",
@@ -22365,7 +22365,7 @@
   {
     "caseId": "S2C-0085",
     "benchmark": {
-      "benchmarkId": "bench_4ESSUhb-8Ccz4o6dv-5WAhEa7bin7glB",
+      "benchmarkId": "bench_iCyP2Uul1T7jtWEbJBDz2hrOcjfDIFlj",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "targetType": "remote_job",
@@ -22610,7 +22610,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_4ESSUhb-8Ccz4o6dv-5WAhEa7bin7glB",
+      "benchmarkId": "bench_iCyP2Uul1T7jtWEbJBDz2hrOcjfDIFlj",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "optimizedHeadline": "Research Data Manager | Research data management, Metadata, Reproducibility.",
@@ -22701,7 +22701,7 @@
   {
     "caseId": "S2C-0086",
     "benchmark": {
-      "benchmarkId": "bench_koNnUKkBXx4HUvJ9XMr8cIXHXRXT6t9p",
+      "benchmarkId": "bench_LNkschdtUdw-Zdwtug-BpwX3EJh3sn1D",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "targetType": "remote_job",
@@ -22955,7 +22955,7 @@
   {
     "caseId": "S2C-0087",
     "benchmark": {
-      "benchmarkId": "bench_cDL7gPHhR-bvnoSQkkO5e_XE5VWCGndD",
+      "benchmarkId": "bench_-UseI4ya5dzPOksQ1HQlFNPtPNKurY4s",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Data Manager",
       "targetType": "remote_job",
@@ -23227,7 +23227,7 @@
   {
     "caseId": "S2C-0088",
     "benchmark": {
-      "benchmarkId": "bench_zlnZIaNYYuVbo_kCtB0F_-Q3vUljsTRx",
+      "benchmarkId": "bench_KsJG4vOg4KvbouXbP0kqi4QFCFnO4rht",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "targetType": "remote_job",
@@ -23467,7 +23467,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_zlnZIaNYYuVbo_kCtB0F_-Q3vUljsTRx",
+      "benchmarkId": "bench_KsJG4vOg4KvbouXbP0kqi4QFCFnO4rht",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "optimizedHeadline": "Clinical Research Coordinator | Study coordination, Research ethics, Participant communication.",
@@ -23545,7 +23545,7 @@
   {
     "caseId": "S2C-0089",
     "benchmark": {
-      "benchmarkId": "bench_-ox82aRBVGLyCzcCNZICSmq5Aq_ch9-A",
+      "benchmarkId": "bench_fQ6_W5ELH2bO6hMml6xIoujv92z4zAXU",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "targetType": "remote_job",
@@ -23797,7 +23797,7 @@
   {
     "caseId": "S2C-0090",
     "benchmark": {
-      "benchmarkId": "bench_BC3UYw5Mnq8WdSPxKRPwu5FkJr8vOLcL",
+      "benchmarkId": "bench_RlFIQKwA-u0_WY3Wk0-VMXb_tv6_czlJ",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Clinical Research Coordinator",
       "targetType": "remote_job",
@@ -24067,7 +24067,7 @@
   {
     "caseId": "S2C-0091",
     "benchmark": {
-      "benchmarkId": "bench_0nHI5vzpPyjv-jNNdpxLMgkvM58yYMvU",
+      "benchmarkId": "bench_iOwDZqEisMUjeIwIBnAtLtDMhYCGcMb8",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "targetType": "remote_job",
@@ -24338,7 +24338,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_0nHI5vzpPyjv-jNNdpxLMgkvM58yYMvU",
+      "benchmarkId": "bench_iOwDZqEisMUjeIwIBnAtLtDMhYCGcMb8",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "optimizedHeadline": "Research Program Lead | Research leadership, Program strategy, Grant management.",
@@ -24417,7 +24417,7 @@
   {
     "caseId": "S2C-0092",
     "benchmark": {
-      "benchmarkId": "bench_jQfkGQSWJGGSodU2Ina1Z4wW9X5rmaeJ",
+      "benchmarkId": "bench_VZhCdVwSpkMq6GfLp8h-Knr4VbDLDH8w",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "targetType": "remote_job",
@@ -24691,7 +24691,7 @@
   {
     "caseId": "S2C-0093",
     "benchmark": {
-      "benchmarkId": "bench_SoAkGrdmI5glWLJlfOMhwA72o8Yox5Ni",
+      "benchmarkId": "bench_D4pDfMU8YMHhHg4aD4KrfpafD5CNgkEm",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Program Lead",
       "targetType": "remote_job",
@@ -24992,7 +24992,7 @@
   {
     "caseId": "S2C-0094",
     "benchmark": {
-      "benchmarkId": "bench_nPFYrCCg7IvakyNIse3OO6rW4NO16-Db",
+      "benchmarkId": "bench_vnYEjp9rE44rg5L4oKh2gmxMT-zcio40",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "targetType": "scholarship",
@@ -25235,7 +25235,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_nPFYrCCg7IvakyNIse3OO6rW4NO16-Db",
+      "benchmarkId": "bench_vnYEjp9rE44rg5L4oKh2gmxMT-zcio40",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "optimizedHeadline": "STEM Leadership Scholar | Academic achievement, Community leadership, STEM.",
@@ -25313,7 +25313,7 @@
   {
     "caseId": "S2C-0095",
     "benchmark": {
-      "benchmarkId": "bench__KJk-wHEO6JQmv8Hoe1rc3ZA-lIkCAEl",
+      "benchmarkId": "bench_FmFj1aBlzE_WueSmoEmmtFwRI5JRXG7y",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "targetType": "scholarship",
@@ -25566,7 +25566,7 @@
   {
     "caseId": "S2C-0096",
     "benchmark": {
-      "benchmarkId": "bench_9-9HcRREsz-uFPyum4Lir-m64oAZ1185",
+      "benchmarkId": "bench_8hFG0Cn1kDlBGhyCQUYkEJ68fWXqOP8S",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "STEM Leadership Scholar",
       "targetType": "scholarship",
@@ -25830,7 +25830,7 @@
   {
     "caseId": "S2C-0097",
     "benchmark": {
-      "benchmarkId": "bench_TPwMxEWKfyC2MZDLh2MfxMl_38_Z6CSm",
+      "benchmarkId": "bench_am-VbwMYz-X0m4lUsEM_b4Fkms9A5onB",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "targetType": "scholarship",
@@ -26070,7 +26070,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_TPwMxEWKfyC2MZDLh2MfxMl_38_Z6CSm",
+      "benchmarkId": "bench_am-VbwMYz-X0m4lUsEM_b4Fkms9A5onB",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "optimizedHeadline": "Global Public Policy Scholar | Policy analysis, Leadership, Community service.",
@@ -26161,7 +26161,7 @@
   {
     "caseId": "S2C-0098",
     "benchmark": {
-      "benchmarkId": "bench_CemlEHeiPXwxth8ZzSpUXFiMobwq3pBO",
+      "benchmarkId": "bench_L_CxC6-amNoVuBZhXXnZ0YKxMy0PGZVP",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "targetType": "scholarship",
@@ -26400,7 +26400,7 @@
   {
     "caseId": "S2C-0099",
     "benchmark": {
-      "benchmarkId": "bench_XvpxTubyt2GtUb1TGsnH1AQEkrmBNZ3P",
+      "benchmarkId": "bench_IRx-FFclRxxZbIrsjbhaD0HsuNeqskzs",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Global Public Policy Scholar",
       "targetType": "scholarship",
@@ -26668,7 +26668,7 @@
   {
     "caseId": "S2C-0100",
     "benchmark": {
-      "benchmarkId": "bench_-kiIvpzHaulo_hK3vNNwD-oSfA5DKJ9K",
+      "benchmarkId": "bench_7MBvLZXChaVcw7OrKIO3VKTnXISA9EiX",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "targetType": "scholarship",
@@ -26914,7 +26914,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_-kiIvpzHaulo_hK3vNNwD-oSfA5DKJ9K",
+      "benchmarkId": "bench_7MBvLZXChaVcw7OrKIO3VKTnXISA9EiX",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "optimizedHeadline": "Graduate Climate Scholar | Climate analysis, Academic writing, Leadership.",
@@ -27005,7 +27005,7 @@
   {
     "caseId": "S2C-0101",
     "benchmark": {
-      "benchmarkId": "bench_RsdZDdEZwyupL32-n_M5_FLN97ASRLDi",
+      "benchmarkId": "bench_M5d2Ht38jHcPYKanGo1HWDIlczd0WSe0",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "targetType": "scholarship",
@@ -27249,7 +27249,7 @@
   {
     "caseId": "S2C-0102",
     "benchmark": {
-      "benchmarkId": "bench_xXUWeuKiWYjkld89xiafWM81j2i_YqEE",
+      "benchmarkId": "bench_EcrjuRKtwpUhKuUmzdchiKLdAWDSdtNA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Graduate Climate Scholar",
       "targetType": "scholarship",
@@ -27521,7 +27521,7 @@
   {
     "caseId": "S2C-0103",
     "benchmark": {
-      "benchmarkId": "bench_8FycHNImylADPq3WrFFBDbbrQz8mxSmV",
+      "benchmarkId": "bench_Std6PVnPzPQnvL57u7ohy4cOwvsfiwyz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "targetType": "scholarship",
@@ -27794,7 +27794,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_8FycHNImylADPq3WrFFBDbbrQz8mxSmV",
+      "benchmarkId": "bench_Std6PVnPzPQnvL57u7ohy4cOwvsfiwyz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "optimizedHeadline": "Creative Industries Scholar | Creative practice, Portfolio presentation, Community engagement.",
@@ -27873,7 +27873,7 @@
   {
     "caseId": "S2C-0104",
     "benchmark": {
-      "benchmarkId": "bench_doOEK2o-SNkjD76QKzrCtDJ1HgTG_Dd4",
+      "benchmarkId": "bench_lJipA2tCrHschtSLs85MSKyebZSnB17K",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "targetType": "scholarship",
@@ -28140,7 +28140,7 @@
   {
     "caseId": "S2C-0105",
     "benchmark": {
-      "benchmarkId": "bench_tY8fvvpMyQl0eLkDOWcmRAowp42KV3ad",
+      "benchmarkId": "bench_1dQhBh2oEozCuXPYPo8yjRDPp0CLh1wG",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Creative Industries Scholar",
       "targetType": "scholarship",
@@ -28433,7 +28433,7 @@
   {
     "caseId": "S2C-0106",
     "benchmark": {
-      "benchmarkId": "bench_mi4gZehmFgYp9PQbvBnl8oljdg7gkWYl",
+      "benchmarkId": "bench_R8l7wgtXBz7BD-egzjxPKSND3ltUzZSY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "targetType": "fellowship",
@@ -28682,7 +28682,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_mi4gZehmFgYp9PQbvBnl8oljdg7gkWYl",
+      "benchmarkId": "bench_R8l7wgtXBz7BD-egzjxPKSND3ltUzZSY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "optimizedHeadline": "Social Innovation Fellow | Program design, Community engagement, Impact measurement.",
@@ -28774,7 +28774,7 @@
   {
     "caseId": "S2C-0107",
     "benchmark": {
-      "benchmarkId": "bench_XeNWNorNu2uDasPdqlPsRJFAKjC16Tyb",
+      "benchmarkId": "bench_yh2p-jMm7pDvOQBdIcPHAboCb4gY_xBs",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "targetType": "fellowship",
@@ -29029,7 +29029,7 @@
   {
     "caseId": "S2C-0108",
     "benchmark": {
-      "benchmarkId": "bench_51_kXFRH-B1bHbwZ1iaz70Fm65MUwiKs",
+      "benchmarkId": "bench_T11KAb9Pmy43KNzMR91VwXm4VkhiThJu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Social Innovation Fellow",
       "targetType": "fellowship",
@@ -29299,7 +29299,7 @@
   {
     "caseId": "S2C-0109",
     "benchmark": {
-      "benchmarkId": "bench_cmhKI8j0c_W44Yv0UpTN6XVPlM1rcOYy",
+      "benchmarkId": "bench_usaZm0wBUlybpxxlGzQN0rCFOW99BnQX",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "targetType": "grant",
@@ -29538,7 +29538,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_cmhKI8j0c_W44Yv0UpTN6XVPlM1rcOYy",
+      "benchmarkId": "bench_usaZm0wBUlybpxxlGzQN0rCFOW99BnQX",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "optimizedHeadline": "Climate Innovation Grant Applicant | Climate innovation, Project planning, Budgeting.",
@@ -29629,7 +29629,7 @@
   {
     "caseId": "S2C-0110",
     "benchmark": {
-      "benchmarkId": "bench_n1vMjWudYvR4pce91VXAaPJpqrmScmTg",
+      "benchmarkId": "bench_uEQFWwXMtfxD-DuuusysaQWAvZWiIqud",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "targetType": "grant",
@@ -29872,7 +29872,7 @@
   {
     "caseId": "S2C-0111",
     "benchmark": {
-      "benchmarkId": "bench_4z5T43_GrOchWfJJSZlDFfBqvnu1NUWW",
+      "benchmarkId": "bench_0PY3S6C4duGb_pgml_Zb-cKeVqQJBeN_",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Climate Innovation Grant Applicant",
       "targetType": "grant",
@@ -30144,7 +30144,7 @@
   {
     "caseId": "S2C-0112",
     "benchmark": {
-      "benchmarkId": "bench_j_yLb0Ejv_aY9HUVek-WKZIcfL2N6G1N",
+      "benchmarkId": "bench_VEe043Qm7xTWIr3e6S9N2qGUytuHIu9K",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "targetType": "fellowship",
@@ -30402,7 +30402,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_j_yLb0Ejv_aY9HUVek-WKZIcfL2N6G1N",
+      "benchmarkId": "bench_VEe043Qm7xTWIr3e6S9N2qGUytuHIu9K",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "optimizedHeadline": "Research Fellowship Applicant | Research methods, Academic writing, Statistics.",
@@ -30481,7 +30481,7 @@
   {
     "caseId": "S2C-0113",
     "benchmark": {
-      "benchmarkId": "bench_No1lr_B7M_CbRD7zEOcO1CSCIZv4YeGw",
+      "benchmarkId": "bench_kCrJG-y_O8VB0VgvRCBJ6UUu1XC4K48N",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "targetType": "fellowship",
@@ -30751,7 +30751,7 @@
   {
     "caseId": "S2C-0114",
     "benchmark": {
-      "benchmarkId": "bench_nTtUh7Hh8toJCMrZ1O7IFhbAnAwUHUqS",
+      "benchmarkId": "bench_pd4zZG98STYibNhd6Mit3aYnfnX7xD9q",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Fellowship Applicant",
       "targetType": "fellowship",
@@ -31038,7 +31038,7 @@
   {
     "caseId": "S2C-0115",
     "benchmark": {
-      "benchmarkId": "bench_naoBodbYalSyJsEtuGAgIcetRiP2_bcE",
+      "benchmarkId": "bench_T9U4xBpvaiNXxidVw4VjPMoC9hIXoRcE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "targetType": "fellowship",
@@ -31293,7 +31293,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_naoBodbYalSyJsEtuGAgIcetRiP2_bcE",
+      "benchmarkId": "bench_T9U4xBpvaiNXxidVw4VjPMoC9hIXoRcE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "optimizedHeadline": "Open Source Maintainer Fellow | Open source, Git, Community support.",
@@ -31385,7 +31385,7 @@
   {
     "caseId": "S2C-0116",
     "benchmark": {
-      "benchmarkId": "bench_T4pq5aUO8OlBAlCve3mFHJe-N5rvDloJ",
+      "benchmarkId": "bench_v7bSCUfXyur2Gt3akT6RmEgwgJL-GoAv",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "targetType": "fellowship",
@@ -31643,7 +31643,7 @@
   {
     "caseId": "S2C-0117",
     "benchmark": {
-      "benchmarkId": "bench_ndORo63Ju3Fe6ZD7O1iO0hhFV1hXD9p2",
+      "benchmarkId": "bench_NEIiGlfOyVG0jPyqZmbmoay4IYyvMtIY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Open Source Maintainer Fellow",
       "targetType": "fellowship",
@@ -31921,7 +31921,7 @@
   {
     "caseId": "S2C-0118",
     "benchmark": {
-      "benchmarkId": "bench_FjRl-99Iq-nmxBGJ72iE31usPGFU5SMr",
+      "benchmarkId": "bench_QPqUVnq1SOCW0s5zUrepwSW5wbDVqm_0",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "targetType": "internship",
@@ -32142,7 +32142,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_FjRl-99Iq-nmxBGJ72iE31usPGFU5SMr",
+      "benchmarkId": "bench_QPqUVnq1SOCW0s5zUrepwSW5wbDVqm_0",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "optimizedHeadline": "Marketing Analyst | Campaign analysis, Spreadsheets, Writing.",
@@ -32219,7 +32219,7 @@
   {
     "caseId": "S2C-0119",
     "benchmark": {
-      "benchmarkId": "bench_bCcKJscNcOTIWcjvdSJikJNZ_z2cQ3zl",
+      "benchmarkId": "bench_LHG96uSJIwV76w-f4zUZUJ3vqekctidc",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "targetType": "internship",
@@ -32449,7 +32449,7 @@
   {
     "caseId": "S2C-0120",
     "benchmark": {
-      "benchmarkId": "bench_X6hpZDogJkJDBxf1xvoKFRe_iNZPI2Mg",
+      "benchmarkId": "bench_3Y22HsX-vlAHK2ZFH3cqf5v_08jHaGDp",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Marketing Analyst",
       "targetType": "internship",
@@ -32700,7 +32700,7 @@
   {
     "caseId": "S2C-0121",
     "benchmark": {
-      "benchmarkId": "bench_A0rO9m1Yw4dbK5x3F6MdJXEMZfTQT2n4",
+      "benchmarkId": "bench_kFDYK-bRTqk00GlCF0DmGgedisY4J8gz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "targetType": "remote_job",
@@ -32915,7 +32915,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_A0rO9m1Yw4dbK5x3F6MdJXEMZfTQT2n4",
+      "benchmarkId": "bench_kFDYK-bRTqk00GlCF0DmGgedisY4J8gz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "optimizedHeadline": "Sales Development Representative | Prospecting, Customer communication, CRM.",
@@ -32992,7 +32992,7 @@
   {
     "caseId": "S2C-0122",
     "benchmark": {
-      "benchmarkId": "bench_bC4yqVWgBjDFirZLwJCkqHNwptCkRmOG",
+      "benchmarkId": "bench_5UypVujsFfRRKWSFp9Bn9kLol6dcpUzo",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "targetType": "remote_job",
@@ -33222,7 +33222,7 @@
   {
     "caseId": "S2C-0123",
     "benchmark": {
-      "benchmarkId": "bench_8OAAJ6aH9zfX0FCHJSAo7_JljkkhDSHu",
+      "benchmarkId": "bench_DtgbQFy1Mila_6mSqwuBO7cfGwodzS4t",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Sales Development Representative",
       "targetType": "remote_job",
@@ -33469,7 +33469,7 @@
   {
     "caseId": "S2C-0124",
     "benchmark": {
-      "benchmarkId": "bench_9JTFwKurGdM0lmtdvMEhv9e1-j_5gffn",
+      "benchmarkId": "bench_2dWTCoqsvvSqcmXAXufiFYXfkiJ8W_Uj",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "targetType": "remote_job",
@@ -33690,7 +33690,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_9JTFwKurGdM0lmtdvMEhv9e1-j_5gffn",
+      "benchmarkId": "bench_2dWTCoqsvvSqcmXAXufiFYXfkiJ8W_Uj",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "optimizedHeadline": "Financial Analyst | Financial modeling, Excel, Accounting.",
@@ -33767,7 +33767,7 @@
   {
     "caseId": "S2C-0125",
     "benchmark": {
-      "benchmarkId": "bench_8QL_50AnjcCs-DyKaQv5kiE2_4iVavHy",
+      "benchmarkId": "bench_dW8HSRgH_F6dugvHlPhuWXFIbuV_I5cG",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "targetType": "remote_job",
@@ -33997,7 +33997,7 @@
   {
     "caseId": "S2C-0126",
     "benchmark": {
-      "benchmarkId": "bench_lEopbxRmN4tROTkz2d3mvb5xMdmUhiT9",
+      "benchmarkId": "bench_RRYZBeQu6XQJScBq5X0SYrOSB8-sQcRo",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Financial Analyst",
       "targetType": "remote_job",
@@ -34247,7 +34247,7 @@
   {
     "caseId": "S2C-0127",
     "benchmark": {
-      "benchmarkId": "bench_M0my9xeg3Uas6Kid73MLM1zODqOy2LJh",
+      "benchmarkId": "bench_nynk2dHOPBBMzIlg6KgHOBRCMbc3p0SA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "targetType": "internship",
@@ -34469,7 +34469,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_M0my9xeg3Uas6Kid73MLM1zODqOy2LJh",
+      "benchmarkId": "bench_nynk2dHOPBBMzIlg6KgHOBRCMbc3p0SA",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "optimizedHeadline": "Operations Coordinator | Operations, Scheduling, Process documentation.",
@@ -34546,7 +34546,7 @@
   {
     "caseId": "S2C-0128",
     "benchmark": {
-      "benchmarkId": "bench_iPZc24K8e2QuyikooXoPlijI0bfVJMZa",
+      "benchmarkId": "bench_gzJ1JVCb6faMxWPWHUeGww55gxmoZS5W",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "targetType": "internship",
@@ -34770,7 +34770,7 @@
   {
     "caseId": "S2C-0129",
     "benchmark": {
-      "benchmarkId": "bench_D3KO31ndPukuoshtdndopyw0plQ-t704",
+      "benchmarkId": "bench_qGrlmCnCEA9HCWpxXlnV-hWr-4jJCIBz",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Operations Coordinator",
       "targetType": "internship",
@@ -35028,7 +35028,7 @@
   {
     "caseId": "S2C-0130",
     "benchmark": {
-      "benchmarkId": "bench_STV6jRAVz92w_ETohi66jZ32L2bFd1HO",
+      "benchmarkId": "bench_PNIdk7VHWqMSAoZEGH35tvDPo75wg4Nk",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "targetType": "remote_job",
@@ -35250,7 +35250,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_STV6jRAVz92w_ETohi66jZ32L2bFd1HO",
+      "benchmarkId": "bench_PNIdk7VHWqMSAoZEGH35tvDPo75wg4Nk",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "optimizedHeadline": "Human Resources Associate | HR operations, Employee communication, Data privacy.",
@@ -35340,7 +35340,7 @@
   {
     "caseId": "S2C-0131",
     "benchmark": {
-      "benchmarkId": "bench_FP6xP0z6ZcuONxmhXSUp8C9VcPn_0oNp",
+      "benchmarkId": "bench_hjIhPl-Q781BFheFvqSvBueRvstWj2j3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "targetType": "remote_job",
@@ -35561,7 +35561,7 @@
   {
     "caseId": "S2C-0132",
     "benchmark": {
-      "benchmarkId": "bench_acOtwnw_NS_TLdm1vIWUOQ3PfsmiKMBG",
+      "benchmarkId": "bench_WHBQTHd88hOUf2WytH0W8qgqhok_vPri",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Human Resources Associate",
       "targetType": "remote_job",
@@ -35806,7 +35806,7 @@
   {
     "caseId": "S2C-0133",
     "benchmark": {
-      "benchmarkId": "bench_QGP_8_mti2d094UhRGOV0FWBWZ9A8u-2",
+      "benchmarkId": "bench_PmrzD90XjgapkmS9jpPPwlHHuVHeqh5H",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "targetType": "remote_job",
@@ -36022,7 +36022,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_QGP_8_mti2d094UhRGOV0FWBWZ9A8u-2",
+      "benchmarkId": "bench_PmrzD90XjgapkmS9jpPPwlHHuVHeqh5H",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "optimizedHeadline": "Project Coordinator | Project planning, Stakeholder communication, Risk tracking.",
@@ -36099,7 +36099,7 @@
   {
     "caseId": "S2C-0134",
     "benchmark": {
-      "benchmarkId": "bench_1kNeZu_PDk1ZrFTbcK6u9uci-KNLNiTi",
+      "benchmarkId": "bench_5kVFgMCGgSH4hhN8AUFw3RGI0ItdR7ZI",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "targetType": "remote_job",
@@ -36317,7 +36317,7 @@
   {
     "caseId": "S2C-0135",
     "benchmark": {
-      "benchmarkId": "bench_ilhCv6Spl_ASXDHH-znM2lI3jQiMY4In",
+      "benchmarkId": "bench_J0V2c_x1h4GI0sGrQYMwVgXAMpNZXygs",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Project Coordinator",
       "targetType": "remote_job",
@@ -36561,7 +36561,7 @@
   {
     "caseId": "S2C-0136",
     "benchmark": {
-      "benchmarkId": "bench_9th4_d1GxlG-xbj5Nn92H9vcW-cNMjY3",
+      "benchmarkId": "bench_aM7n29rNFAb4n-_iNXM1tjU9EK9t0Ae3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "targetType": "remote_job",
@@ -36783,7 +36783,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_9th4_d1GxlG-xbj5Nn92H9vcW-cNMjY3",
+      "benchmarkId": "bench_aM7n29rNFAb4n-_iNXM1tjU9EK9t0Ae3",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "optimizedHeadline": "Customer Success Specialist | Customer onboarding, Problem solving, SaaS.",
@@ -36860,7 +36860,7 @@
   {
     "caseId": "S2C-0137",
     "benchmark": {
-      "benchmarkId": "bench_oPxiB5Gk9HCtt0Wt4hyLvzeC8zUndtok",
+      "benchmarkId": "bench_3C7tw0wvK0keI9BJ7gxdkAKWtXO77so0",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "targetType": "remote_job",
@@ -37090,7 +37090,7 @@
   {
     "caseId": "S2C-0138",
     "benchmark": {
-      "benchmarkId": "bench_d7KN-zL2sL5JvCFF_G3TWUHfTW-NRtz7",
+      "benchmarkId": "bench_dNYP6nZ0-jrfFsv9b0g766kk1BYr10-7",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Customer Success Specialist",
       "targetType": "remote_job",
@@ -37344,7 +37344,7 @@
   {
     "caseId": "S2C-0139",
     "benchmark": {
-      "benchmarkId": "bench__r7X-u4coQcag8e7KlY6J7r7-LnpSKaw",
+      "benchmarkId": "bench_ZVRpyN0Gx2_ebp4HEM3_EmDCjgwGEmT9",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "targetType": "internship",
@@ -37572,7 +37572,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench__r7X-u4coQcag8e7KlY6J7r7-LnpSKaw",
+      "benchmarkId": "bench_ZVRpyN0Gx2_ebp4HEM3_EmDCjgwGEmT9",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "optimizedHeadline": "Policy Communications Intern | Policy writing, Communications, Research.",
@@ -37649,7 +37649,7 @@
   {
     "caseId": "S2C-0140",
     "benchmark": {
-      "benchmarkId": "bench_V-29q1eMggBJ9uS08TNlUwk-8p9Lwtax",
+      "benchmarkId": "bench_Rwd4vFr1cErVbhZbmyUiDeumbpLfBDVE",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "targetType": "internship",
@@ -37878,7 +37878,7 @@
   {
     "caseId": "S2C-0141",
     "benchmark": {
-      "benchmarkId": "bench_zSE-B5FShSdMYE-gT7iG4DwQkDBpHQHI",
+      "benchmarkId": "bench_FD-tjk_mfstpiy8hQdd4GgyM6y6L7yIo",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Policy Communications Intern",
       "targetType": "internship",
@@ -38137,7 +38137,7 @@
   {
     "caseId": "S2C-0142",
     "benchmark": {
-      "benchmarkId": "bench_2yHaNngMGfRGj5cUckUDV8SJwgKfFnc9",
+      "benchmarkId": "bench_wvwXTyGzQ7Em7sBM9jf7YOAP526JAe79",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "targetType": "remote_job",
@@ -38376,7 +38376,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_2yHaNngMGfRGj5cUckUDV8SJwgKfFnc9",
+      "benchmarkId": "bench_wvwXTyGzQ7Em7sBM9jf7YOAP526JAe79",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "optimizedHeadline": "Director of Product | Product leadership, Strategy, Team development.",
@@ -38454,7 +38454,7 @@
   {
     "caseId": "S2C-0143",
     "benchmark": {
-      "benchmarkId": "bench_ZfxuBdjlRom1101p-8AcS9l97oYWtV_x",
+      "benchmarkId": "bench_f1xyomURjBQj1uyyM5fJ6fw8dWIo7iko",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "targetType": "remote_job",
@@ -38697,7 +38697,7 @@
   {
     "caseId": "S2C-0144",
     "benchmark": {
-      "benchmarkId": "bench_k8p9kisPrVi59VWkLF5eNN1Lb1uKPcHe",
+      "benchmarkId": "bench_bsmTXccf1GURr_e3tv4e0dIQX2Q-esqd",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Director of Product",
       "targetType": "remote_job",
@@ -38957,7 +38957,7 @@
   {
     "caseId": "S2C-0145",
     "benchmark": {
-      "benchmarkId": "bench_ACsQbNjBTZoeonCmrrLrHgUh6qgNRmSM",
+      "benchmarkId": "bench_nBTmwvvccuLtaGnpYlN_NHRXvbx2iY_C",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "targetType": "remote_job",
@@ -39199,7 +39199,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_ACsQbNjBTZoeonCmrrLrHgUh6qgNRmSM",
+      "benchmarkId": "bench_nBTmwvvccuLtaGnpYlN_NHRXvbx2iY_C",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "optimizedHeadline": "Head of Operations | Operations leadership, Process improvement, Budget ownership.",
@@ -39277,7 +39277,7 @@
   {
     "caseId": "S2C-0146",
     "benchmark": {
-      "benchmarkId": "bench_cl1eUOMruv3SostYvIDFPR90uRsrF5Ev",
+      "benchmarkId": "bench_iJSaw2_cVKhGzdIOmji8xwwJG87WfC5h",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "targetType": "remote_job",
@@ -39521,7 +39521,7 @@
   {
     "caseId": "S2C-0147",
     "benchmark": {
-      "benchmarkId": "bench_5JlxmPdiDxmPi8YdddSQxMttHLS84dMz",
+      "benchmarkId": "bench_Mg5QmI-tqbDdbu2SP-0zqVpmF2mdZfGc",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Head of Operations",
       "targetType": "remote_job",
@@ -39795,7 +39795,7 @@
   {
     "caseId": "S2C-0148",
     "benchmark": {
-      "benchmarkId": "bench_u7AwiZg42yjhwe0_FuBWw_tpCXNZlZ0P",
+      "benchmarkId": "bench_7s0Mn0JR3how3D0MqvLWXStk8ZAJ1Adr",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "targetType": "remote_job",
@@ -40053,7 +40053,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_u7AwiZg42yjhwe0_FuBWw_tpCXNZlZ0P",
+      "benchmarkId": "bench_7s0Mn0JR3how3D0MqvLWXStk8ZAJ1Adr",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "optimizedHeadline": "Research Director | Research strategy, Team leadership, Funding.",
@@ -40145,7 +40145,7 @@
   {
     "caseId": "S2C-0149",
     "benchmark": {
-      "benchmarkId": "bench_DtaLTEaifZ-cPKRffsBY8rL6kb6-xnm3",
+      "benchmarkId": "bench_qK61nOsa0OD8XhWpVmF5kdRrheKVpagV",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "targetType": "remote_job",
@@ -40403,7 +40403,7 @@
   {
     "caseId": "S2C-0150",
     "benchmark": {
-      "benchmarkId": "bench_vlAip1kkBTjM3H8YaKAcL7DyATUW-T7R",
+      "benchmarkId": "bench_uczFm_40AZ6LZNHbCZfVi3F_GscSnmMR",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Research Director",
       "targetType": "remote_job",
@@ -40692,7 +40692,7 @@
   {
     "caseId": "S2C-0151",
     "benchmark": {
-      "benchmarkId": "bench_uXVrqudvXcUsMh-9kR2ATxgsDJqO1-Pw",
+      "benchmarkId": "bench_vZCzg5d6_TEfdQZCZF6kWz34R9spiLfu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "targetType": "remote_job",
@@ -40928,7 +40928,7 @@
       "factualIntegrity": "This benchmark uses only supplied profile and resume facts. Missing keywords are gaps to verify, not claims to add automatically."
     },
     "optimization": {
-      "benchmarkId": "bench_uXVrqudvXcUsMh-9kR2ATxgsDJqO1-Pw",
+      "benchmarkId": "bench_vZCzg5d6_TEfdQZCZF6kWz34R9spiLfu",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "optimizedHeadline": "Program Director | Program strategy, Partnerships, Monitoring and evaluation.",
@@ -41006,7 +41006,7 @@
   {
     "caseId": "S2C-0152",
     "benchmark": {
-      "benchmarkId": "bench_lf-mu7VyxzX8xwrnrs5w7yD04QPuDhla",
+      "benchmarkId": "bench_wp3ly4nTa6LitjN9BQWrtMujf8vz_8SY",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "targetType": "remote_job",
@@ -41243,7 +41243,7 @@
   {
     "caseId": "S2C-0153",
     "benchmark": {
-      "benchmarkId": "bench_pl7JcF3dH84Xt_2y7zrnRlqeIc3rz5uW",
+      "benchmarkId": "bench_3xFeqXd7MFbSef9-8NATsLM-IBS4CyAv",
       "rubricVersion": "resume-rubric-2026-07-21",
       "target": "Program Director",
       "targetType": "remote_job",

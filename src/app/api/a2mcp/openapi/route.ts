@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 
 export const runtime = "nodejs";
 
@@ -85,6 +86,104 @@ const artifactSchema = {
   },
 };
 
+const recommendationSchema = {
+  type: "object",
+  required: [
+    "rank",
+    "opportunity",
+    "matchScore",
+    "reasoning",
+    "missingRequirements",
+    "recommendedAction",
+    "nextSteps",
+    "officialUrl",
+    "canonicalUrl",
+    "publisherDomain",
+    "sourceName",
+    "verificationStatus",
+    "lastVerifiedAt",
+    "deadline",
+    "deadlineStatus",
+    "eligibilitySummary",
+    "geographicEligibility",
+    "recommendationState",
+  ],
+  properties: {
+    rank: { type: "integer", minimum: 1 },
+    opportunity: {
+      type: "object",
+      required: ["id", "title", "organization", "category"],
+      properties: {
+        id: { type: "string" },
+        title: { type: "string" },
+        organization: { type: "string" },
+        category: { type: "string" },
+        opportunityType: { type: "string" },
+        summary: { type: "string" },
+      },
+    },
+    matchScore: { type: "number", minimum: 0, maximum: 100 },
+    reasoning: { type: "string" },
+    missingRequirements: { type: "array", items: { type: "string" } },
+    recommendedAction: {
+      type: "string",
+      enum: ["Apply Now", "Prepare First", "Skip"],
+    },
+    nextSteps: { type: "array", items: { type: "string" } },
+    officialUrl: {
+      type: "string",
+      format: "uri",
+      description:
+        "Canonical official provider page that callers must render as a clickable link.",
+    },
+    applicationUrl: {
+      type: ["string", "null"],
+      format: "uri",
+      description:
+        "Direct application route when distinct and verified; null for Explore or supporting records.",
+    },
+    canonicalUrl: { type: "string", format: "uri" },
+    publisherDomain: { type: "string" },
+    sourceName: { type: "string" },
+    verificationStatus: {
+      type: "string",
+      enum: [
+        "verified",
+        "program_directory",
+        "inactive_listing",
+        "unverified",
+      ],
+    },
+    lastVerifiedAt: { type: ["string", "null"], format: "date-time" },
+    deadline: { type: ["string", "null"], format: "date" },
+    deadlineStatus: {
+      type: "string",
+      enum: [
+        "exact_future",
+        "rolling",
+        "recurring",
+        "historical_estimate",
+        "unclear",
+        "requires_confirmation",
+        "passed",
+        "closed",
+      ],
+    },
+    eligibilitySummary: { type: "string" },
+    geographicEligibility: { type: "string" },
+    recommendationState: {
+      type: "string",
+      enum: [
+        "apply_now",
+        "explore",
+        "research_lead",
+        "unavailable_or_unverified",
+      ],
+    },
+    eligibilityConcerns: { type: "array", items: { type: "string" } },
+  },
+};
+
 const structuredProfileSchema = {
   type: "object",
   properties: {
@@ -103,6 +202,23 @@ const structuredProfileSchema = {
     interests: { type: "array", items: { type: "string" } },
     goals: { type: "array", items: { type: "string" } },
     education: { type: "array", items: { type: "string" } },
+    fieldOfStudy: { type: "string" },
+    currentDegreeLevel: { type: "string" },
+    targetDegreeLevel: { type: "string" },
+    currentInstitution: { type: "string" },
+    graduationYear: { type: "string" },
+    nationality: { type: "string" },
+    countryOfResidence: { type: "string" },
+    preferredStudyCountries: {
+      type: "array",
+      items: { type: "string" },
+    },
+    intendedStartYear: { type: "string" },
+    fundingRequirement: { type: "string" },
+    languageTestStatus: { type: "string" },
+    workAuthorization: { type: "string" },
+    sponsorshipRequired: { type: "boolean" },
+    availability: { type: "string" },
     workHistory: { type: "array", items: { type: "string" } },
     projects: { type: "array", items: { type: "string" } },
     research: { type: "array", items: { type: "string" } },
@@ -121,7 +237,7 @@ export async function GET() {
     openapi: "3.1.0",
     info: {
       title: "Trakr Opportunity & Resume Services",
-      version: "0.6.0",
+      version: TRAKR_SERVICE_VERSION,
       description:
         "One outcome-first, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request returns HTTP 200 with a machine-readable chooser and never assumes Opportunity Finding. Existing valid legacy recommendation payloads remain compatible.",
     },
@@ -315,17 +431,87 @@ export async function GET() {
                   directGeneration: { value: { operation: "generate_resume", user: { headline: "Student developer" }, target: { role: "Frontend Intern" } } },
                 },
               },
+              "multipart/form-data": {
+                schema: {
+                  type: "object",
+                  required: ["resume", "consent"],
+                  properties: {
+                    resume: {
+                      type: "string",
+                      format: "binary",
+                      description:
+                        "PDF, DOCX, or TXT file up to 2.5 MB. Trakr parses the file and returns an opaque continuation; callers do not need to base64-encode or resend the document.",
+                    },
+                    consent: {
+                      type: "string",
+                      enum: ["true"],
+                      description:
+                        "Required affirmative session-only processing consent.",
+                    },
+                    operation: {
+                      type: "string",
+                      enum: ["discover", "benchmark", "optimize", "generate_resume"],
+                      default: "discover",
+                    },
+                    message: { type: "string", maxLength: 6000 },
+                    continuation: {
+                      type: "string",
+                      minLength: 40,
+                      description:
+                        "Prior opaque continuation token, returned unchanged.",
+                    },
+                    filters: {
+                      type: "string",
+                      description: "Optional JSON-encoded recommendation filters.",
+                    },
+                    target: {
+                      type: "string",
+                      description: "Optional JSON-encoded target.",
+                    },
+                    generationPreferences: {
+                      type: "string",
+                      description:
+                        "Optional JSON-encoded generation preferences.",
+                    },
+                  },
+                },
+              },
             },
           },
           responses: {
             "200": {
               description:
                 "Conversational state or a completed service result. Bootstrap returns choose_service, status needs_input, all three options, and an opaque continuation. Legacy recommendation fields remain present for compatible clients.",
+              headers: {
+                "X-Trakr-Version": {
+                  required: true,
+                  schema: { type: "string" },
+                  description:
+                    "Deployment contract version returned on every recommendation response.",
+                },
+              },
               content: {
                 "application/json": {
                   schema: {
                     type: "object",
-                    required: ["service", "version", "requestId", "generatedAt", "provider", "aiStatus", "querySummary", "recommendations", "actionPlan", "learningRoadmap", "agentNotes"],
+                    required: [
+                      "service",
+                      "version",
+                      "requestId",
+                      "generatedAt",
+                      "provider",
+                      "aiStatus",
+                      "querySummary",
+                      "recommendations",
+                      "directOpportunities",
+                      "explorePrograms",
+                      "supportingResources",
+                      "categoryCoverage",
+                      "actionPlan",
+                      "learningRoadmap",
+                      "agentNotes",
+                      "callerInstructions",
+                    ],
                     properties: {
                       service: { const: "trakr" },
                       version: { type: "string" },
@@ -346,7 +532,109 @@ export async function GET() {
                       continuation: continuationSchema,
                       artifacts: { type: "array", items: artifactSchema },
                       querySummary: { type: "object" },
-                      recommendations: { type: "array", items: { type: "object" } },
+                      recommendations: {
+                        type: "array",
+                        items: recommendationSchema,
+                        description:
+                          "Legacy-compatible ranked direct and Explore records. Use the separated collections and recommendationState for rendering.",
+                      },
+                      directOpportunities: {
+                        type: "array",
+                        items: recommendationSchema,
+                        description:
+                          "Verified current direct opportunities only. Every item has officialUrl.",
+                      },
+                      explorePrograms: {
+                        type: "array",
+                        items: recommendationSchema,
+                        description:
+                          "Official directories or recurring programmes that require current-call verification.",
+                      },
+                      supportingResources: {
+                        type: "array",
+                        items: recommendationSchema,
+                        description:
+                          "Learning resources and student benefits that are not application opportunities.",
+                      },
+                      categoryCoverage: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          required: [
+                            "category",
+                            "status",
+                            "inventoryCandidates",
+                            "eligibleCandidates",
+                            "selectedResults",
+                            "reason",
+                          ],
+                          properties: {
+                            category: { type: "string" },
+                            status: {
+                              type: "string",
+                              enum: [
+                                "covered",
+                                "limited",
+                                "no_qualified_matches",
+                                "inventory_gap",
+                                "directories_only",
+                                "eligibility_unknown",
+                              ],
+                            },
+                            inventoryCandidates: {
+                              type: "integer",
+                              minimum: 0,
+                            },
+                            eligibleCandidates: {
+                              type: "integer",
+                              minimum: 0,
+                            },
+                            selectedResults: {
+                              type: "integer",
+                              minimum: 0,
+                            },
+                            reason: { type: "string" },
+                          },
+                        },
+                      },
+                      callerInstructions: {
+                        type: "object",
+                        required: [
+                          "relayMessage",
+                          "doNotInferMissingInputs",
+                          "sendContinuationUnchanged",
+                          "doNotGenerateAProfile",
+                          "surfaceOfficialUrls",
+                        ],
+                        properties: {
+                          relayMessage: { const: true },
+                          doNotInferMissingInputs: { const: true },
+                          sendContinuationUnchanged: { const: true },
+                          doNotGenerateAProfile: { const: true },
+                          surfaceOfficialUrls: { const: true },
+                        },
+                      },
+                      profileOrigin: {
+                        type: "string",
+                        enum: [
+                          "none",
+                          "resume",
+                          "user_message",
+                          "caller_structured",
+                          "continuation",
+                          "mixed",
+                        ],
+                      },
+                      profileConfirmed: { type: "boolean" },
+                      evidenceSources: {
+                        type: "array",
+                        items: { type: "string" },
+                      },
+                      inferredFields: {
+                        type: "array",
+                        items: { type: "string" },
+                      },
+                      confirmationRequired: { type: "boolean" },
                       actionPlan: { type: "object" },
                       learningRoadmap: { type: "object" },
                       agentNotes: { type: "array", items: { type: "string" } },
