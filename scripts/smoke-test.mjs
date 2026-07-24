@@ -126,7 +126,7 @@ try {
   if (
     !metadata.response.ok ||
     metadata.body?.type !== "A2MCP" ||
-    metadata.body?.version !== "0.7.0"
+    metadata.body?.version !== "0.7.1"
   ) {
     throw new Error("A2MCP metadata endpoint did not return the expected contract.");
   }

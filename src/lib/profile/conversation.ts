@@ -278,19 +278,43 @@ function inferNationality(message: string) {
 }
 
 function inferFieldOfStudy(message: string) {
-  return message
+  const labelled = message
     .match(
       /\b(?:field|course|subject)\s+of\s+study\s*(?:is|:|-)\s*([^.;\n]{2,120})/i,
+    )?.[1]
+    ?.trim();
+  if (labelled) return labelled;
+  return message
+    .match(
+      /\b(?:i\s+(?:am\s+)?studying|i\s+study|student\s+studying)\s+([^.;\n]{2,120})/i,
     )?.[1]
     ?.trim();
 }
 
 function inferCurrentDegreeLevel(message: string) {
-  return message
+  const labelled = message
     .match(
       /\b(?:current\s+degree\s+level|current\s+qualification|qualification\s+level)\s*(?:is|:|-)\s*([^.;\n]{2,80})/i,
     )?.[1]
     ?.trim();
+  if (labelled) return labelled;
+  const studentLevel = message.match(
+    /\b(?:a|an)?\s*(bachelor(?:'s)?|bsc|master(?:'s)?|msc|mba|phd|doctorate|diploma|certificate)\s+(?:degree\s+)?student\b/i,
+  )?.[1];
+  if (!studentLevel) return undefined;
+  const normalized = studentLevel.toLowerCase();
+  if (normalized === "bsc") return "Bachelor's degree";
+  if (normalized === "msc") return "Master's degree";
+  if (normalized === "phd" || normalized === "doctorate") {
+    return "Doctorate or PhD";
+  }
+  if (normalized === "bachelor" || normalized === "bachelor's") {
+    return "Bachelor's degree";
+  }
+  if (normalized === "master" || normalized === "master's") {
+    return "Master's degree";
+  }
+  return studentLevel;
 }
 
 function inferTargetDegreeLevel(message: string) {
@@ -317,7 +341,7 @@ function inferPreferredStudyCountries(message: string) {
   return unique(
     match
       .split(/,|&|\band\b/i)
-      .map((country) => country.trim())
+      .map((country) => country.trim().replace(/^the\s+/i, ""))
       .filter((country) => country.length >= 2),
   );
 }
@@ -931,16 +955,39 @@ export function buildConversationalProfile(
     explicitMessageProfile?.location &&
     locationWasInferredFromDemonym(message)
   ) {
-    const locationEvidence = evidence.find(
-      (item) => item.field === "location" && item.origin === "user",
-    );
-    if (locationEvidence) {
+    const inferredLocationFields = new Set([
+      "location",
+      "countryOfResidence",
+    ]);
+    for (const locationEvidence of evidence.filter(
+      (item) =>
+        inferredLocationFields.has(item.field) && item.origin === "user",
+    )) {
       locationEvidence.source = "inferred";
       locationEvidence.origin = "inference";
       locationEvidence.evidence = `Inferred from "${message.match(countryDemonyms.find(([pattern]) => pattern.test(message))?.[0] ?? /$^/)?.[0] ?? "regional wording"}".`;
     }
   }
 
+  const confirmedEligibilityField = (field: string) =>
+    evidence.some(
+      (item) =>
+        item.field === field &&
+        item.source !== "unknown" &&
+        item.source !== "inferred" &&
+        item.source !== "caller_supplied" &&
+        (item.confirmed === true || item.source === "explicit"),
+    );
+  const confirmedApplicantCountry =
+    confirmedEligibilityField("countryOfResidence")
+      ? profile.countryOfResidence
+      : confirmedEligibilityField("location")
+        ? profile.location
+        : undefined;
+  const confirmedApplicantNationality =
+    confirmedEligibilityField("nationality")
+      ? profile.nationality
+      : undefined;
   const profilePreferenceText = [
     ...profile.goals,
     ...profile.interests,
@@ -967,14 +1014,9 @@ export function buildConversationalProfile(
         ? true
         : context?.filters?.remote),
     applicantCountry:
-      request.filters.applicantCountry ??
-      profile.countryOfResidence ??
-      profile.location ??
-      context?.filters?.applicantCountry,
+      confirmedApplicantCountry,
     applicantNationality:
-      request.filters.applicantNationality ??
-      profile.nationality ??
-      context?.filters?.applicantNationality,
+      confirmedApplicantNationality,
   };
 
   if (

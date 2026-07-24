@@ -175,6 +175,10 @@ export async function GET() {
         sendContinuationUnchanged: true,
         doNotGenerateAProfile: true,
         surfaceOfficialUrls: true,
+        doNotSelectService: true,
+        askUserForRequiredInputs: true,
+        doNotReplaceTrakrMatching: true,
+        treatHttp200AsBusinessResponse: true,
       },
       priority: [
         "valid continuation and current stage",

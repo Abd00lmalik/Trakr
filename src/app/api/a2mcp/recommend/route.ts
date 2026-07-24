@@ -175,6 +175,10 @@ function exposeConversationContract<T extends Record<string, unknown>>(
                 : "mixed";
   return {
     ...response,
+    interactionState:
+      value.state === "choose_service"
+        ? "service_selection_required"
+        : value.state,
     stage: value.stage,
     status: value.status,
     message: value.message,
@@ -188,6 +192,10 @@ function exposeConversationContract<T extends Record<string, unknown>>(
       sendContinuationUnchanged: true,
       doNotGenerateAProfile: true,
       surfaceOfficialUrls: true,
+      doNotSelectService: true,
+      askUserForRequiredInputs: true,
+      doNotReplaceTrakrMatching: true,
+      treatHttp200AsBusinessResponse: true,
     },
     profileOrigin,
     profileConfirmed: profile?.confirmed === true,

@@ -509,6 +509,10 @@ function emptyResponse(
       sendContinuationUnchanged: true,
       doNotGenerateAProfile: true,
       surfaceOfficialUrls: true,
+      doNotSelectService: true,
+      askUserForRequiredInputs: true,
+      doNotReplaceTrakrMatching: true,
+      treatHttp200AsBusinessResponse: true,
     },
     conversation,
     capabilityResult,
@@ -588,7 +592,8 @@ function renderRecommendationMessage(
         [
           `${recommendation.rank}. ${recommendation.opportunity.title}`,
           `Type: ${recommendation.opportunity.opportunityType ?? recommendation.opportunity.category}`,
-          `Status: ${recommendation.recommendationState === "apply_now" ? "Apply Now" : "Explore"}`,
+          "Application state: Verified active direct opportunity",
+          `Recommended action: ${recommendation.recommendedAction}`,
           `Deadline: ${recommendation.deadline ?? recommendation.deadlineStatus?.replaceAll("_", " ") ?? "requires confirmation"}`,
           `Eligibility: ${recommendation.eligibilitySummary ?? "Requires confirmation on the official page."}`,
           `Location: ${recommendation.geographicEligibility ?? "Geographic eligibility requires confirmation."}`,
@@ -655,9 +660,18 @@ function conversationFor(
     optimizationApproved?: boolean;
     generationPreferences?: CompanionContext["generationPreferences"];
     clearProfileFromSession?: boolean;
+    missingInformation?: ReturnType<
+      typeof buildConversationalProfile
+    >["missingInformation"];
+    unknownFields?: string[];
+    unansweredQuestions?: string[];
+    hideProfile?: boolean;
   } = {},
 ): CompanionConversation {
   const context = activeContext(request);
+  const missingInformation =
+    options.missingInformation ?? built.missingInformation;
+  const unknownFields = options.unknownFields ?? built.unknownFields;
   const existingDocumentReferences = context?.documentReferences ?? [];
   const suppliedDocumentReference = request.resumeText
     ? buildDocumentReference(
@@ -687,9 +701,11 @@ function conversationFor(
       service: service ?? context?.service,
       operation,
       stage: options.stage ?? state,
-      unansweredQuestions: built.missingInformation
-        .filter((item) => item.required)
-        .map((item) => item.question),
+      unansweredQuestions:
+        options.unansweredQuestions ??
+        missingInformation
+          .filter((item) => item.required)
+          .map((item) => item.question),
       documentReferences,
       consent: request.consent ?? context?.consent ?? {
         processPersonalData: Boolean(request.resumeText || hasMeaningfulProfile(built.profile)),
@@ -717,6 +733,26 @@ function conversationFor(
     sessionContext.optimizationApproved = undefined;
   }
 
+  const visibleProfile = options.hideProfile
+    ? {
+        skills: [],
+        interests: [],
+        goals: [],
+        education: [],
+        preferredStudyCountries: [],
+        workHistory: [],
+        projects: [],
+        research: [],
+        publications: [],
+        achievements: [],
+        awards: [],
+        volunteerExperience: [],
+        leadership: [],
+        certifications: [],
+        links: [],
+      }
+    : built.profile;
+
   return {
     state,
     intent,
@@ -733,13 +769,13 @@ function conversationFor(
         : "needs_input"),
     message,
     profile: {
-      draft: built.profile,
-      evidence: built.evidence,
-      unknownFields: built.unknownFields,
-      completenessScore: built.completenessScore,
+      draft: visibleProfile,
+      evidence: options.hideProfile ? [] : built.evidence,
+      unknownFields,
+      completenessScore: options.hideProfile ? 0 : built.completenessScore,
       confirmed: options.profileConfirmed ?? confirmedProfile(request),
     },
-    missingInformation: built.missingInformation,
+    missingInformation,
     nextActions,
     continuation: createSessionReference(sessionContext),
     requiredAction: options.requiredAction,
@@ -1186,6 +1222,11 @@ export async function handleOpportunityCompanionRequest(
         ],
         stage: "choose_service",
         status: "needs_input",
+        missingInformation: [],
+        unknownFields: [],
+        unansweredQuestions: [],
+        hideProfile: true,
+        clearProfileFromSession: true,
       },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
@@ -1393,14 +1434,20 @@ export async function handleOpportunityCompanionRequest(
   const hasNewConfirmableProfileInput = Boolean(
     request.user || request.resumeText || request.document,
   );
+  const hasCallerNormalizedProfileInput = Boolean(
+    request.goals?.length || request.interests?.length,
+  );
   const requiresProfileConfirmation =
     !profileConfirmedNow &&
     (!activeContext(request)?.profileConfirmed ||
       hasNewConfirmableProfileInput) &&
-    built.evidence.some(
+    (built.evidence.some(
       (item) =>
         item.origin === "structured_profile" || item.origin === "resume",
-    );
+    ) ||
+      (hasCallerNormalizedProfileInput &&
+        built.sufficient &&
+        built.evidence.some((item) => item.origin === "user")));
   if (requiresProfileConfirmation) {
     const suppliedByCaller = built.evidence.some(
       (item) => item.origin === "structured_profile",

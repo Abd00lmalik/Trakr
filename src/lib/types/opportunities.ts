@@ -628,6 +628,10 @@ export const recommendationResponseSchema = z.object({
       sendContinuationUnchanged: z.literal(true),
       doNotGenerateAProfile: z.literal(true),
       surfaceOfficialUrls: z.literal(true),
+      doNotSelectService: z.literal(true),
+      askUserForRequiredInputs: z.literal(true),
+      doNotReplaceTrakrMatching: z.literal(true),
+      treatHttp200AsBusinessResponse: z.literal(true),
     })
     .optional(),
   profileOrigin: z

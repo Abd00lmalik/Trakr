@@ -12,7 +12,10 @@ import {
 } from "../src/lib/opportunities/source-registry";
 import { curatedOfficialOpportunities } from "../src/lib/opportunities/data/curated-official-opportunities";
 import { diversifyRankedOpportunities } from "../src/lib/recommendation/diversification";
-import { eligibilitySummary } from "../src/lib/recommendation/service";
+import {
+  eligibilitySummary,
+  generateRecommendations,
+} from "../src/lib/recommendation/service";
 import {
   buildProfileText,
   rankOpportunities,
@@ -77,6 +80,33 @@ test("visible eligibility summaries remove markup and remain concise", () => {
   assert.equal(/&lt;|&gt;|<p>|<\/p>/.test(summary), false);
   assert.ok(summary.length <= 240);
   assert.match(summary, /Published location: Remote/);
+});
+
+test("country-restricted opportunities are not direct matches when applicant geography is unknown", async () => {
+  const response = await generateRecommendations(
+    recommendationRequestSchema.parse({
+      user: {
+        headline: "Life Sciences and Software Engineering student",
+        experienceLevel: "student",
+        skills: ["Python", "JavaScript", "Biology research", "Data analysis"],
+        interests: ["Research"],
+        goals: ["Find a scholarship"],
+        education: ["Bachelor's degree student"],
+        workHistory: [],
+        projects: [],
+        certifications: [],
+        links: [],
+      },
+      filters: { categories: ["scholarship"], limit: 10 },
+    }),
+  );
+
+  assert.equal(response.directOpportunities?.length ?? 0, 0);
+  assert.equal(response.categoryCoverage?.[0]?.status, "eligibility_unknown");
+  assert.match(
+    response.categoryCoverage?.[0]?.reason ?? "",
+    /country|nationality|unconfirmed/i,
+  );
 });
 
 function scored(

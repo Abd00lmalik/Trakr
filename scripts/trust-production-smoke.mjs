@@ -78,7 +78,7 @@ async function assertOfficialUrl(url) {
   const response = await fetch(url, {
     method: "HEAD",
     redirect: "manual",
-    headers: { "User-Agent": "Trakr-Release-Verification/0.7.0" },
+    headers: { "User-Agent": "Trakr-Release-Verification/0.7.1" },
     signal: AbortSignal.timeout(15000),
   });
   assert.ok(
@@ -92,13 +92,17 @@ const coldStarts = [];
 for (let index = 0; index < 5; index += 1) {
   const result = await post({ message: declaration });
   assert.equal(result.response.status, 200);
-  assert.equal(result.response.headers.get("x-trakr-version"), "0.7.0");
+  assert.equal(result.response.headers.get("x-trakr-version"), "0.7.1");
+  assert.equal(result.body.interactionState, "service_selection_required");
   assert.equal(result.body.stage, "choose_service");
   assert.equal(result.body.operation, "start");
   assert.equal(result.body.message, expectedMenu);
   assert.equal(result.body.selectedService, null);
   assert.ok(result.body.requestId);
   assert.ok(result.body.continuation?.token);
+  assert.deepEqual(result.body.conversation.missingInformation, []);
+  assert.deepEqual(result.body.conversation.profile.unknownFields, []);
+  assert.deepEqual(result.body.conversation.profile.evidence, []);
   coldStarts.push({
     requestId: result.body.requestId,
     stage: result.body.stage,

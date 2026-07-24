@@ -12,6 +12,7 @@ import {
 } from "@/lib/recommendation/action-plan";
 import { enforceApplyNowEligibility } from "@/lib/opportunities/verification";
 import { enrichOpportunityMetadata } from "@/lib/opportunities/metadata";
+import { isGeographicallyActionable } from "@/lib/opportunities/metadata";
 import { logRecommendationRun } from "@/lib/repositories/recommendation-log";
 import type {
   CompanionGuidanceAction,
@@ -55,9 +56,15 @@ function guidanceAction(
   opportunity: Opportunity,
   action: Recommendation["recommendedAction"],
 ): CompanionGuidanceAction {
+  if (
+    opportunity.verificationStatus === "program_directory" ||
+    opportunity.recommendationState === "explore" ||
+    opportunity.recommendationState === "research_lead"
+  ) {
+    return "explore";
+  }
   if (action === "Apply Now") return "apply_now";
   if (action === "Skip") return "not_currently_recommended";
-  if (opportunity.verificationStatus === "program_directory") return "explore";
   return "prepare_first";
 }
 
@@ -204,17 +211,22 @@ function toRecommendation(
   const recommendationState =
     opportunity.recommendationState ?? "unavailable_or_unverified";
   const officialUrl = opportunity.canonicalUrl || opportunity.sourceUrl;
+  const recommendedAction = enforceApplyNowEligibility(
+    opportunity,
+    candidate.action,
+  );
+  const consistentCandidate = {
+    ...candidate,
+    action: recommendedAction,
+  };
   return {
     rank,
     opportunity,
     matchScore: candidate.score,
-    reasoning: buildRecommendationNarrative(candidate),
+    reasoning: buildRecommendationNarrative(consistentCandidate),
     missingRequirements: candidate.missingRequirements,
-    recommendedAction: enforceApplyNowEligibility(
-      opportunity,
-      candidate.action,
-    ),
-    nextSteps: buildNextSteps(candidate),
+    recommendedAction,
+    nextSteps: buildNextSteps(consistentCandidate),
     confidenceScore: Math.round(
       Math.min(
         100,
@@ -224,7 +236,7 @@ function toRecommendation(
           profileCompleteness(request) * 100 * 0.1,
       ),
     ),
-    guidanceAction: guidanceAction(opportunity, candidate.action),
+    guidanceAction: guidanceAction(opportunity, recommendedAction),
     recommendationState,
     officialUrl,
     applicationUrl:
@@ -245,8 +257,18 @@ function toRecommendation(
   };
 }
 
-function isDirectCandidate(candidate: ScoredOpportunity) {
+function isDirectCandidate(
+  candidate: ScoredOpportunity,
+  request: RecommendationRequest,
+) {
+  const geographyActionable = isGeographicallyActionable(
+    candidate.opportunity,
+    request.filters.applicantCountry,
+    Boolean(request.filters.remote),
+    request.filters.applicantNationality,
+  );
   return (
+    geographyActionable &&
     candidate.opportunity.recommendationState === "apply_now" &&
     candidate.opportunity.verificationStatus === "verified" &&
     candidate.opportunity.isActive &&
@@ -293,7 +315,7 @@ function buildCategoryCoverage(
     const eligible = scored.filter(
       (candidate) =>
         categoryMatches(candidate.opportunity, category) &&
-        isDirectCandidate(candidate),
+        isDirectCandidate(candidate, request),
     );
     const selectedResults = selected.filter((recommendation) =>
       categoryMatches(recommendation.opportunity, category),
@@ -309,6 +331,18 @@ function buildCategoryCoverage(
         opportunity.geography?.confidence === "unknown" ||
         opportunity.geography?.unknownConditions.length,
     ).length;
+    const applicantGeographyMissing =
+      !request.filters.applicantCountry &&
+      !request.filters.applicantNationality &&
+      inventory.some(
+        (opportunity) =>
+          Boolean(opportunity.geography?.eligibleCountries.length) ||
+          Boolean(opportunity.geography?.eligibleRegions.length) ||
+          Boolean(opportunity.geography?.citizenshipRequirements.length) ||
+          Boolean(
+            opportunity.geography?.applicantResidencyRequirements.length,
+          ),
+      );
 
     if (!inventory.length) {
       return {
@@ -330,14 +364,19 @@ function buildCategoryCoverage(
         reason: `Trakr found official directories or recurring programs for ${category.replaceAll("_", " ")}, but no verified direct opportunity passed the current application, eligibility, and evidence gates.`,
       };
     }
-    if (!eligible.length && unknownEligibility) {
+    if (
+      !eligible.length &&
+      (unknownEligibility || applicantGeographyMissing)
+    ) {
       return {
         category,
         status: "eligibility_unknown" as const,
         inventoryCandidates: inventory.length,
         eligibleCandidates: 0,
         selectedResults: 0,
-        reason: `Trakr found ${category.replaceAll("_", " ")} records, but material geographic or eligibility conditions remain unknown.`,
+        reason: applicantGeographyMissing
+          ? `Trakr found ${category.replaceAll("_", " ")} records with published geographic or citizenship restrictions, but the applicant's relevant country or nationality is unconfirmed. Trakr did not treat those records as direct matches.`
+          : `Trakr found ${category.replaceAll("_", " ")} records, but material geographic or eligibility conditions remain unknown.`,
       };
     }
     if (!eligible.length || !selectedResults) {
@@ -414,6 +453,10 @@ function buildDraftResponse(
       sendContinuationUnchanged: true,
       doNotGenerateAProfile: true,
       surfaceOfficialUrls: true,
+      doNotSelectService: true,
+      askUserForRequiredInputs: true,
+      doNotReplaceTrakrMatching: true,
+      treatHttp200AsBusinessResponse: true,
     },
   };
 }
@@ -526,7 +569,9 @@ export async function generateRecommendations(
     )
   ).map((opportunity) => enrichOpportunityMetadata(opportunity));
   const baseRanked = rankOpportunities(opportunities, groundedRequest);
-  const directCandidates = baseRanked.filter(isDirectCandidate);
+  const directCandidates = baseRanked.filter((candidate) =>
+    isDirectCandidate(candidate, groundedRequest),
+  );
   const exploreCandidates = baseRanked.filter(isExploreCandidate);
   const supportingCandidates = baseRanked.filter((candidate) =>
     supportingCategories.has(candidate.opportunity.category),

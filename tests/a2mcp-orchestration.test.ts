@@ -12,6 +12,7 @@ import {
   retrieveArtifact,
   storeArtifact,
 } from "../src/lib/artifacts/store";
+import { resolveSessionContext } from "../src/lib/companion/session";
 import {
   companionContextSchema,
   type DownloadableArtifact,
@@ -108,9 +109,17 @@ async function confirmProfile(
 
 function assertChooser(body: Record<string, any>) {
   assert.equal(body.operation, "start");
+  assert.equal(body.interactionState, "service_selection_required");
   assert.equal(body.stage, "choose_service");
   assert.equal(body.status, "needs_input");
   assert.equal(body.selectedService, null);
+  assert.equal(body.conversation.state, "choose_service");
+  assert.deepEqual(body.conversation.missingInformation, []);
+  assert.deepEqual(body.conversation.profile.unknownFields, []);
+  assert.deepEqual(body.conversation.profile.evidence, []);
+  assert.deepEqual(body.conversation.profile.draft.skills, []);
+  assert.deepEqual(body.conversation.profile.draft.goals, []);
+  assert.deepEqual(body.conversation.profile.draft.education, []);
   assert.deepEqual(body.nextActions, [
     "discover",
     "benchmark",
@@ -135,6 +144,10 @@ function assertChooser(body: Record<string, any>) {
     ],
   );
   assert.ok(body.continuation?.token.length >= 40);
+  const resolved = resolveSessionContext(body.continuation);
+  assert.deepEqual(resolved?.unansweredQuestions, []);
+  assert.equal(resolved?.profile, undefined);
+  assert.deepEqual(resolved?.profileEvidence, []);
 }
 
 async function docxBuffer(text: string) {
@@ -200,7 +213,7 @@ test("empty and minimal cold starts return the three-service chooser with HTTP 2
   for (const input of cases) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.7.0");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.7.1");
     assertChooser(result.body);
   }
 });
@@ -239,6 +252,43 @@ test("caller-supplied profiles require confirmation and denial removes them", as
   assert.equal(denied.body.recommendations.length, 0);
   assert.equal(denied.body.conversation.profile.draft.headline, undefined);
   assert.equal(denied.body.conversation.profile.draft.skills.length, 0);
+});
+
+test("caller-built multi-turn profile cannot silently bypass user confirmation", async () => {
+  const first = await callRoute({
+    operation: "discover",
+    intent: "opportunity_matching",
+    message:
+      "Find open high-value engineering opportunities, hackathons, grants, and Web3 bounties.",
+  });
+  assert.equal(first.body.recommendations.length, 0);
+  assert.equal(first.body.status, "needs_input");
+
+  const fabricated = await callRoute({
+    operation: "discover",
+    intent: "opportunity_matching",
+    continuation: first.body.continuation,
+    message:
+      "I am a senior full-stack Web3 and AI engineer skilled in TypeScript, React, Node.js, Python, Smart Contracts, and Autonomous AI Agents. I am seeking remote developer jobs, hackathons, Web3 bounties, and grants.",
+    goals: ["remote jobs", "hackathons", "bounties", "grants"],
+    interests: ["TypeScript", "Python", "Solidity", "AI Agents"],
+  });
+
+  assert.equal(fabricated.body.stage, "profile_confirmation");
+  assert.equal(fabricated.body.status, "needs_input");
+  assert.equal(fabricated.body.confirmationRequired, true);
+  assert.equal(fabricated.body.recommendations.length, 0);
+  assert.match(fabricated.body.message, /confirm|review/i);
+  assert.equal(fabricated.body.callerInstructions.doNotGenerateAProfile, true);
+  assert.equal(fabricated.body.callerInstructions.doNotSelectService, true);
+  assert.equal(
+    fabricated.body.callerInstructions.askUserForRequiredInputs,
+    true,
+  );
+  assert.equal(
+    fabricated.body.callerInstructions.doNotReplaceTrakrMatching,
+    true,
+  );
 });
 
 test("resume scholarship intake confirms extraction before collecting scholarship gates", async () => {
@@ -311,6 +361,21 @@ Built a fictional study planner and data dashboard.`;
   );
   for (const item of matched.body.directOpportunities) {
     assert.match(matched.body.message, new RegExp(item.officialUrl));
+    assert.equal(
+      item.guidanceAction,
+      item.recommendedAction === "Apply Now"
+        ? "apply_now"
+        : item.recommendedAction === "Prepare First"
+          ? "prepare_first"
+          : "not_currently_recommended",
+    );
+    assert.match(
+      matched.body.message,
+      new RegExp(`Recommended action: ${item.recommendedAction}`),
+    );
+  }
+  for (const item of matched.body.explorePrograms) {
+    assert.equal(item.guidanceAction, "explore");
   }
   assert.match(
     matched.body.categoryCoverage
@@ -355,6 +420,79 @@ test("scholarship intake maps explicit required-field labels", async () => {
   assert.deepEqual(
     completed.body.conversation.profile.draft.preferredStudyCountries,
     ["United Kingdom", "Germany"],
+  );
+});
+
+test("mixed student scholarship intake accumulates facts without loops or category loss", async () => {
+  const started = await callRoute({
+    operation: "discover",
+    intakeRoute: "background",
+    message:
+      "I am a Bachelor's student studying Life Sciences and Software Engineering. I live in Nigeria. My skills include Python, JavaScript, biology research, and data analysis. I want jobs, internships, scholarships, and hackathons.",
+  });
+  assert.equal(started.body.stage, "discover_missing_information");
+
+  const nationality = await callRoute({
+    message: "Nationality: Nigerian.",
+    continuation: started.body.continuation,
+  });
+  assert.equal(nationality.body.stage, "discover_missing_information");
+  assert.equal(
+    nationality.body.conversation.profile.draft.countryOfResidence,
+    "Nigeria",
+  );
+  assert.equal(
+    nationality.body.conversation.profile.draft.nationality,
+    "Nigerian",
+  );
+  assert.match(
+    nationality.body.conversation.profile.draft.fieldOfStudy,
+    /Life Sciences/i,
+  );
+
+  const targetDegree = await callRoute({
+    message: "Target degree level: Master's degree.",
+    continuation: nationality.body.continuation,
+  });
+  assert.equal(targetDegree.body.stage, "discover_missing_information");
+  assert.equal(
+    targetDegree.body.conversation.profile.draft.nationality,
+    "Nigerian",
+  );
+  assert.equal(
+    targetDegree.body.conversation.profile.draft.targetDegreeLevel,
+    "Master's degree",
+  );
+
+  const completed = await callRoute({
+    message:
+      "Preferred study countries: Germany and the United Kingdom.",
+    continuation: targetDegree.body.continuation,
+  });
+  assert.equal(completed.body.stage, "discover_completed");
+  assert.deepEqual(
+    new Set(
+      completed.body.categoryCoverage.map(
+        (item: { category: string }) => item.category,
+      ),
+    ),
+    new Set(["remote_job", "internship", "scholarship", "hackathon"]),
+  );
+  assert.equal(
+    completed.body.conversation.profile.draft.countryOfResidence,
+    "Nigeria",
+  );
+  assert.equal(
+    completed.body.conversation.profile.draft.nationality,
+    "Nigerian",
+  );
+  assert.equal(
+    completed.body.conversation.profile.draft.targetDegreeLevel,
+    "Master's degree",
+  );
+  assert.deepEqual(
+    completed.body.conversation.profile.draft.preferredStudyCountries,
+    ["Germany", "United Kingdom"],
   );
 });
 

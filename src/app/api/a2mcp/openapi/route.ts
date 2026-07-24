@@ -520,6 +520,11 @@ export async function GET() {
                       provider: { type: "string" },
                       aiStatus: { type: "string", enum: ["enhanced", "retrying", "degraded", "fallback"] },
                       operation: { type: "string", enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume"] },
+                      interactionState: {
+                        type: "string",
+                        description:
+                          "Unambiguous server-authoritative interaction state. A cold start returns service_selection_required.",
+                      },
                       stage: { type: "string" },
                       status: { type: "string", enum: ["needs_input", "in_progress", "completed"] },
                       message: { type: "string" },
@@ -605,6 +610,10 @@ export async function GET() {
                           "sendContinuationUnchanged",
                           "doNotGenerateAProfile",
                           "surfaceOfficialUrls",
+                          "doNotSelectService",
+                          "askUserForRequiredInputs",
+                          "doNotReplaceTrakrMatching",
+                          "treatHttp200AsBusinessResponse",
                         ],
                         properties: {
                           relayMessage: { const: true },
@@ -612,6 +621,10 @@ export async function GET() {
                           sendContinuationUnchanged: { const: true },
                           doNotGenerateAProfile: { const: true },
                           surfaceOfficialUrls: { const: true },
+                          doNotSelectService: { const: true },
+                          askUserForRequiredInputs: { const: true },
+                          doNotReplaceTrakrMatching: { const: true },
+                          treatHttp200AsBusinessResponse: { const: true },
                         },
                       },
                       profileOrigin: {
@@ -679,6 +692,7 @@ export async function GET() {
                       value: {
                         requestId: "request_example",
                         operation: "start",
+                        interactionState: "service_selection_required",
                         stage: "choose_service",
                         status: "needs_input",
                         message:

@@ -63,6 +63,7 @@ async function run(id, operation) {
 function assertChooser(result) {
   assert.equal(result.response.status, 200);
   assert.equal(result.body.operation, "start");
+  assert.equal(result.body.interactionState, "service_selection_required");
   assert.equal(result.body.stage, "choose_service");
   assert.equal(result.body.status, "needs_input");
   assert.equal(result.body.selectedService, null);
@@ -88,6 +89,11 @@ function assertChooser(result) {
     ],
   );
   assert.ok(result.body.continuation?.token);
+  assert.deepEqual(result.body.conversation.missingInformation, []);
+  assert.deepEqual(result.body.conversation.profile.unknownFields, []);
+  assert.deepEqual(result.body.conversation.profile.evidence, []);
+  assert.deepEqual(result.body.conversation.profile.draft.skills, []);
+  assert.deepEqual(result.body.conversation.profile.draft.goals, []);
   assert.equal(result.response.headers.has("payment-required"), false);
   assert.equal(result.response.headers.has("www-authenticate"), false);
 }
@@ -167,11 +173,11 @@ await run("ORCH-PROD-001-metadata-readiness", async () => {
   assert.equal(health.response.status, 200);
   assert.equal(health.body.ok, true);
   assert.equal(health.body.database.artifactStorageReady, true);
-  assert.equal(metadata.body.version, "0.7.0");
+  assert.equal(metadata.body.version, "0.7.1");
   assert.equal(metadata.body.displayTitle, "Trakr Opportunity & Resume Services");
   assert.equal(metadata.body.submission.pricing, "free");
   assert.equal(metadata.body.submission.paymentRequired, false);
-  assert.equal(openapi.body.info.version, "0.7.0");
+  assert.equal(openapi.body.info.version, "0.7.1");
   assert.ok(openapi.body.paths["/api/artifacts/{id}"]);
   return {
     status: 200,
@@ -283,6 +289,39 @@ await run("ORCH-PROD-010-clear-natural-routing", async () => {
       benchmark.body.stage,
       generate.body.stage,
     ],
+  };
+});
+
+await run("ORCH-PROD-010A-caller-built-profile-confirmation", async () => {
+  const first = await post({
+    operation: "discover",
+    intent: "opportunity_matching",
+    message:
+      "Find open high-value engineering opportunities, hackathons, grants, and Web3 bounties.",
+  });
+  assert.equal(first.body.recommendations.length, 0);
+
+  const fabricated = await post({
+    operation: "discover",
+    intent: "opportunity_matching",
+    continuation: first.body.continuation,
+    message:
+      "I am a senior full-stack Web3 and AI engineer skilled in TypeScript, React, Node.js, Python, Smart Contracts, and Autonomous AI Agents. I am seeking remote developer jobs, hackathons, Web3 bounties, and grants.",
+    goals: ["remote jobs", "hackathons", "bounties", "grants"],
+    interests: ["TypeScript", "Python", "Solidity", "AI Agents"],
+  });
+  assert.equal(fabricated.body.stage, "profile_confirmation");
+  assert.equal(fabricated.body.confirmationRequired, true);
+  assert.equal(fabricated.body.recommendations.length, 0);
+  assert.equal(fabricated.body.callerInstructions.doNotSelectService, true);
+  assert.equal(
+    fabricated.body.callerInstructions.askUserForRequiredInputs,
+    true,
+  );
+  return {
+    status: fabricated.response.status,
+    stage: fabricated.body.stage,
+    recommendationCount: fabricated.body.recommendations.length,
   };
 });
 
