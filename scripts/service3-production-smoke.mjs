@@ -5,9 +5,9 @@ const baseUrl =
   "https://trakr-production-c70e.up.railway.app";
 const endpoint = `${baseUrl}/api/a2mcp/recommend`;
 const results = [];
-const requestTimeoutMs = 90_000;
+const requestTimeoutMs = 30_000;
 
-async function fetchWithRetry(url, options = {}, attempts = 3) {
+async function fetchWithRetry(url, options = {}, attempts = 2) {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     try {
@@ -104,19 +104,23 @@ async function run(id, operation) {
   const startedAt = Date.now();
   try {
     const detail = await operation();
-    results.push({
+    const result = {
       id,
       pass: true,
       durationMs: Date.now() - startedAt,
       ...detail,
-    });
+    };
+    results.push(result);
+    console.error(JSON.stringify(result));
   } catch (error) {
-    results.push({
+    const result = {
       id,
       pass: false,
       durationMs: Date.now() - startedAt,
       error: error instanceof Error ? error.message : String(error),
-    });
+    };
+    results.push(result);
+    console.error(JSON.stringify(result));
   }
 }
 
