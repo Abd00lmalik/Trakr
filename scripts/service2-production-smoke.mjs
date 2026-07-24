@@ -5,10 +5,40 @@ const baseUrl =
   "https://trakr-production-c70e.up.railway.app";
 const endpoint = `${baseUrl}/api/a2mcp/recommend`;
 const results = [];
+const requestTimeoutMs = 90_000;
+
+async function fetchWithRetry(url, options = {}, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(requestTimeoutMs),
+      });
+      if (
+        attempt < attempts &&
+        (response.status === 429 || response.status >= 500)
+      ) {
+        await response.arrayBuffer();
+        const retryAfter = Number(response.headers.get("retry-after") ?? 1);
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.max(1, retryAfter) * 1000),
+        );
+        continue;
+      }
+      return response;
+    } catch (error) {
+      lastError = error;
+      if (attempt === attempts) throw error;
+      await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+    }
+  }
+  throw lastError;
+}
 
 async function request(path, options = {}) {
   const startedAt = Date.now();
-  const response = await fetch(`${baseUrl}${path}`, options);
+  const response = await fetchWithRetry(`${baseUrl}${path}`, options);
   const text = await response.text();
   let body;
   try {
@@ -54,7 +84,9 @@ async function assertArtifacts(artifacts, regenerateAction) {
   );
   for (const artifact of artifacts) {
     assert.equal(artifact.regenerateAction, regenerateAction);
-    const response = await fetch(artifact.downloadUrl, { redirect: "error" });
+    const response = await fetchWithRetry(artifact.downloadUrl, {
+      redirect: "error",
+    });
     const bytes = Buffer.from(await response.arrayBuffer());
     assert.equal(response.status, 200);
     assert.equal(response.headers.get("content-type"), artifact.mimeType);
