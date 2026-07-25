@@ -273,7 +273,7 @@ await run("S1-PROD-RERUN-007-free-form-multi-interest", async () => {
       message:
         "I want active climate, fintech, and AI jobs, internships, grants, and fellowships that I can apply to remotely from Africa.",
     },
-    "I am an early-career data analyst in Nigeria. I use Python, SQL, data analysis, statistics, and machine learning. I want jobs, internships, grants, and fellowships.",
+    "I am an early-career data analyst in Nigeria with a BSc in Computer Science. I use Python, SQL, data analysis, statistics, and machine learning. I want jobs, internships, grants, and fellowships, including funding for a climate-data research project.",
   );
   const recommendations = auditRecommendations(response.body);
   const coverage = response.body.coverage?.interests ?? [];
