@@ -201,12 +201,12 @@ test("workspace exposes the outcome-first Opportunity Finding journey", async ()
   for (const requirement of [
     "XMLHttpRequest",
     "Opportunity Finding",
-    "Resume Benchmarking & Optimization",
+    "Resume Benchmarking and Optimization",
     "Resume Generation",
     "Tell Trakr what you need",
-    "Use my resume or CV",
-    "Tell Trakr about my background",
-    "Describe what I am looking for",
+    "serverChoices",
+    "workflowChoices",
+    "attachmentsAccepted",
     "Session context is caller-carried",
     "Verified direct opportunities",
     "No qualified matches yet",
@@ -304,7 +304,7 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
   assert.equal(generationService.status, "available");
   assert.equal(generationService.operation, "generate_resume");
   assert.ok(generationService.documentTypes.includes("biosketch"));
-  assert.equal(document.info.version, "0.7.1");
+  assert.equal(document.info.version, "0.8.0");
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);

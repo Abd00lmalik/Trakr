@@ -19,11 +19,16 @@ import type {
   Opportunity,
   Recommendation,
   OpportunityCategory,
+  DiscoveryCategory,
   RecommendationRequest,
   RecommendationResponse,
   ScoredOpportunity,
 } from "@/lib/types/opportunities";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
+import {
+  discoveryCategoryLabel,
+  discoveryCategoryMatchesOpportunity,
+} from "@/lib/opportunities/discovery-categories";
 
 const SERVICE_VERSION = TRAKR_SERVICE_VERSION;
 const supportingCategories = new Set<OpportunityCategory>([
@@ -290,8 +295,27 @@ function isExploreCandidate(candidate: ScoredOpportunity) {
 
 function categoryMatches(
   opportunity: Opportunity,
-  category: OpportunityCategory,
+  category: OpportunityCategory | DiscoveryCategory,
 ) {
+  if (
+    [
+      "jobs",
+      "internships",
+      "hackathons",
+      "scholarships",
+      "fellowships",
+      "grants_funding",
+      "bounties_freelance",
+      "accelerators_incubators",
+      "creator_opportunities",
+      "competitions_challenges",
+    ].includes(category)
+  ) {
+    return discoveryCategoryMatchesOpportunity(
+      category as DiscoveryCategory,
+      opportunity,
+    );
+  }
   if (opportunity.category === category) return true;
   const type =
     category === "remote_job"
@@ -299,7 +323,9 @@ function categoryMatches(
       : category === "web3_bounty"
         ? "bounty"
         : category;
-  return opportunity.secondaryTypes?.includes(type) ?? false;
+  return opportunity.secondaryTypes?.includes(
+    type as NonNullable<Opportunity["opportunityType"]>,
+  ) ?? false;
 }
 
 function buildCategoryCoverage(
@@ -308,7 +334,18 @@ function buildCategoryCoverage(
   scored: ScoredOpportunity[],
   selected: Recommendation[],
 ): RecommendationResponse["categoryCoverage"] {
-  return (request.filters.categories ?? []).map((category) => {
+  const requestedCategories =
+    request.selectedDiscoveryCategories ??
+    request.filters.discoveryCategories ??
+    request.filters.categories ??
+    [];
+  return requestedCategories.map((category) => {
+    const categoryName = (
+      request.selectedDiscoveryCategories?.includes(category as DiscoveryCategory) ||
+      request.filters.discoveryCategories?.includes(category as DiscoveryCategory)
+        ? discoveryCategoryLabel(category as DiscoveryCategory)
+        : category.replaceAll("_", " ")
+    ).toLowerCase();
     const inventory = opportunities.filter((opportunity) =>
       categoryMatches(opportunity, category),
     );
@@ -351,7 +388,7 @@ function buildCategoryCoverage(
         inventoryCandidates: 0,
         eligibleCandidates: 0,
         selectedResults: 0,
-        reason: `Trakr currently has no current records for ${category.replaceAll("_", " ")} in its inventory. This is an inventory limitation, not a claim that no such opportunities exist.`,
+        reason: `Trakr currently has no current records for ${categoryName} in its inventory. This is an inventory limitation, not a claim that no such opportunities exist.`,
       };
     }
     if (!eligible.length && directories) {
@@ -361,7 +398,7 @@ function buildCategoryCoverage(
         inventoryCandidates: inventory.length,
         eligibleCandidates: 0,
         selectedResults: 0,
-        reason: `Trakr found official directories or recurring programs for ${category.replaceAll("_", " ")}, but no verified direct opportunity passed the current application, eligibility, and evidence gates.`,
+        reason: `Trakr found official directories or recurring programs for ${categoryName}, but no verified direct opportunity passed the current application, eligibility, and evidence gates.`,
       };
     }
     if (
@@ -375,8 +412,8 @@ function buildCategoryCoverage(
         eligibleCandidates: 0,
         selectedResults: 0,
         reason: applicantGeographyMissing
-          ? `Trakr found ${category.replaceAll("_", " ")} records with published geographic or citizenship restrictions, but the applicant's relevant country or nationality is unconfirmed. Trakr did not treat those records as direct matches.`
-          : `Trakr found ${category.replaceAll("_", " ")} records, but material geographic or eligibility conditions remain unknown.`,
+          ? `Trakr found ${categoryName} records with published geographic or citizenship restrictions, but the applicant's relevant country or nationality is unconfirmed. Trakr did not treat those records as direct matches.`
+          : `Trakr found ${categoryName} records, but material geographic or eligibility conditions remain unknown.`,
       };
     }
     if (!eligible.length || !selectedResults) {
@@ -386,7 +423,7 @@ function buildCategoryCoverage(
         inventoryCandidates: inventory.length,
         eligibleCandidates: eligible.length,
         selectedResults: 0,
-        reason: `No current ${category.replaceAll("_", " ")} record passed Trakr's relevance, activity, eligibility, and verification gates for the supplied profile.`,
+        reason: `No current ${categoryName} record passed Trakr's relevance, activity, eligibility, and verification gates for the supplied profile.`,
       };
     }
     return {
@@ -399,8 +436,8 @@ function buildCategoryCoverage(
       selectedResults,
       reason:
         eligible.length === 1 || selectedResults === 1
-          ? `Only one verified direct ${category.replaceAll("_", " ")} matched the current profile and safety gates.`
-          : `${selectedResults} verified direct ${category.replaceAll("_", " ")} results matched the current profile and safety gates.`,
+          ? `Only one verified direct ${categoryName} matched the current profile and safety gates.`
+          : `${selectedResults} verified direct ${categoryName} results matched the current profile and safety gates.`,
     };
   });
 }
@@ -457,6 +494,7 @@ function buildDraftResponse(
       askUserForRequiredInputs: true,
       doNotReplaceTrakrMatching: true,
       treatHttp200AsBusinessResponse: true,
+      doNotExposeProtocolWorkWhenFree: true,
     },
   };
 }

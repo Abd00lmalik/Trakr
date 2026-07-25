@@ -4,6 +4,7 @@ import type {
   RecommendationRequest,
 } from "@/lib/types/opportunities";
 import { isGeographicallyActionable } from "@/lib/opportunities/metadata";
+import { discoveryCategoryMatchesOpportunity } from "@/lib/opportunities/discovery-categories";
 
 export interface OpportunitySource {
   name: string;
@@ -18,6 +19,15 @@ export function applyOpportunityFilters(
   filters: RecommendationFilters,
 ) {
   return opportunities.filter((opportunity) => {
+    if (
+      filters.discoveryCategories?.length &&
+      !filters.discoveryCategories.some((category) =>
+        discoveryCategoryMatchesOpportunity(category, opportunity),
+      )
+    ) {
+      return false;
+    }
+
     if (filters.categories?.length) {
       const requestedTypes = new Set<string>(filters.categories.map((category) =>
         category === "remote_job"

@@ -6,6 +6,7 @@ import type {
   ScoredOpportunity,
   StructuredUserProfile,
 } from "@/lib/types/opportunities";
+import { discoveryCategoryMatchesOpportunity } from "@/lib/opportunities/discovery-categories";
 import { canApplyNow } from "@/lib/opportunities/verification";
 
 const stopWords = new Set([
@@ -982,6 +983,16 @@ function hardMismatchAssessment(
   ) {
     generalReasons.push(
       "The opportunity type does not match the requested categories.",
+    );
+  }
+  if (
+    request.filters.discoveryCategories?.length &&
+    !request.filters.discoveryCategories.some((category) =>
+      discoveryCategoryMatchesOpportunity(category, opportunity),
+    )
+  ) {
+    generalReasons.push(
+      "The opportunity type does not match the requested discovery categories.",
     );
   }
   if (request.filters.remote === true && !opportunity.remote) {

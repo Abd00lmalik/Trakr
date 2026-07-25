@@ -142,22 +142,28 @@ test("empty auto request exposes the three user-facing services", async () => {
   );
 });
 
-test("explicit discovery and the third intake route remain conversational", async () => {
+test("explicit discovery begins with the ten-category menu", async () => {
   const discovery = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({ operation: "discover" }),
   );
-  assert.equal(discovery.conversation?.state, "choose_profile_source");
+  assert.equal(discovery.conversation?.state, "choose_opportunity_categories");
+  assert.equal(discovery.conversation?.choices?.length, 10);
 
-  const requestRoute = await handleOpportunityCompanionRequest(
+  const categorySelection = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
-      message: "3",
+      message: "1 and 3",
       continuation: discovery.conversation?.continuation,
     }),
   );
-  assert.equal(requestRoute.conversation?.state, "collecting_request");
+  assert.equal(categorySelection.conversation?.state, "needs_more_information");
   assert.equal(
-    requestRoute.conversation?.requiredAction,
-    "provide_opportunity_request",
+    categorySelection.conversation?.requiredAction,
+    "provide_opportunity_context",
+  );
+  assert.deepEqual(
+    resolveSessionContext(categorySelection.continuation)
+      ?.selectedDiscoveryCategories,
+    ["jobs", "hackathons"],
   );
 });
 
@@ -224,7 +230,7 @@ test("explicit service operations with structured profiles do not fall through t
   );
 });
 
-test("explicit intake routes work without a synthetic route-selection message", async () => {
+test("legacy explicit resume intake remains available after category selection", async () => {
   const response = await POST(
     new Request("http://localhost/api/a2mcp/recommend", {
       method: "POST",
@@ -232,6 +238,7 @@ test("explicit intake routes work without a synthetic route-selection message", 
       body: JSON.stringify({
         operation: "discover",
         intakeRoute: "resume",
+        selectedDiscoveryCategories: ["internships"],
       }),
     }),
   );
@@ -341,6 +348,7 @@ ${longEvidence}`.slice(0, 40000);
     opportunityCompanionRequestSchema.parse({
       operation: "discover",
       intent: "profile_build",
+      selectedDiscoveryCategories: ["internships"],
       resumeText,
       consent: {
         processPersonalData: true,

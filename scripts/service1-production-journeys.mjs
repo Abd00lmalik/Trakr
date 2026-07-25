@@ -98,6 +98,7 @@ await run("S1-PROD-RERUN-001-resume-student", async () => {
   const response = await completeJourney({
     operation: "discover",
     intakeRoute: "resume",
+    selectedDiscoveryCategories: ["internships"],
     consent: {
       processPersonalData: true,
       retention: "session_only",
@@ -138,6 +139,11 @@ await run("S1-PROD-RERUN-002-resume-career-changer", async () => {
   const response = await completeJourney({
     operation: "discover",
     intakeRoute: "resume",
+    selectedDiscoveryCategories: [
+      "jobs",
+      "hackathons",
+      "bounties_freelance",
+    ],
     consent: {
       processPersonalData: true,
       retention: "session_only",

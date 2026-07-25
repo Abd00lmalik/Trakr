@@ -11,26 +11,37 @@ import {
 import { generateRecommendations } from "../src/lib/recommendation/service";
 import { POST } from "../src/app/api/a2mcp/recommend/route";
 
-test("profileless first contact offers all Opportunity Finding intake paths", async () => {
+test("profileless Opportunity Finding begins with all ten categories", async () => {
   const request = opportunityCompanionRequestSchema.parse({
     message: "I want opportunities.",
   });
   const response = await handleOpportunityCompanionRequest(request);
 
   assert.doesNotThrow(() => opportunityCompanionResponseSchema.parse(response));
-  assert.equal(response.conversation?.state, "choose_profile_source");
+  assert.equal(response.conversation?.state, "choose_opportunity_categories");
   assert.equal(response.recommendations.length, 0);
   assert.match(
     response.conversation?.message ?? "",
-    /without requiring a resume/i,
+    /Choose one or more opportunity categories/i,
   );
   assert.deepEqual(
     response.conversation?.choices?.map((choice) => choice.id),
-    ["resume", "background", "request"],
+    [
+      "jobs",
+      "internships",
+      "hackathons",
+      "scholarships",
+      "fellowships",
+      "grants_funding",
+      "bounties_freelance",
+      "accelerators_incubators",
+      "creator_opportunities",
+      "competitions_challenges",
+    ],
   );
 });
 
-test("source choice continues into background collection without requiring a resume", async () => {
+test("category choice continues into one merged adaptive intake", async () => {
   const initial = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message:
@@ -45,16 +56,16 @@ test("source choice continues into background collection without requiring a res
       continuation: initial.conversation?.continuation,
     }),
   );
-  assert.equal(discovery.conversation?.state, "choose_profile_source");
+  assert.equal(discovery.conversation?.state, "choose_opportunity_categories");
 
   const collecting = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
-      message: "2",
+      message: "2 and 3",
       continuation: discovery.conversation?.continuation,
     }),
   );
-  assert.equal(collecting.conversation?.state, "collecting_background");
-  assert.equal(collecting.conversation?.requiredAction, "provide_background");
+  assert.equal(collecting.conversation?.state, "needs_more_information");
+  assert.equal(collecting.conversation?.requiredAction, "provide_opportunity_context");
 
   const matched = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
@@ -80,13 +91,13 @@ test("resume path preserves extracted evidence and continues within the session"
       continuation: initial.conversation?.continuation,
     }),
   );
-  const awaitingResume = await handleOpportunityCompanionRequest(
+  const categorySelection = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
-      message: "1",
+      message: "2 and 3",
       continuation: discovery.conversation?.continuation,
     }),
   );
-  assert.equal(awaitingResume.conversation?.state, "awaiting_resume");
+  assert.equal(categorySelection.conversation?.state, "needs_more_information");
 
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
@@ -103,7 +114,7 @@ Goals: Seeking remote AI and Web3 internships and hackathons.`,
         retention: "session_only",
         source: "explicit",
       },
-      continuation: awaitingResume.conversation?.continuation,
+      continuation: categorySelection.conversation?.continuation,
     }),
   );
 
@@ -150,6 +161,7 @@ test("resume-derived opportunity preferences become matching filters", async () 
     opportunityCompanionRequestSchema.parse({
       operation: "discover",
       intakeRoute: "resume",
+      selectedDiscoveryCategories: ["internships"],
       resumeText: `Amina Fictional
 Computer Science Student
 Location: Lagos, Nigeria
@@ -363,7 +375,7 @@ test("minimal student input asks for gates instead of making weak recommendation
 test("natural-language background builds a grounded profile and recommendations", async () => {
   const request = opportunityCompanionRequestSchema.parse({
     message:
-      "I am a Nigerian computer science student. I know React, TypeScript, Python, and some Solidity. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
+      "I am a Nigerian computer science student. I know React, TypeScript, Python, and some Solidity. I built a campus research dashboard. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
   });
   const response = await handleOpportunityCompanionRequest(request);
 
@@ -399,7 +411,7 @@ test("natural skill phrasing ending in experience clears the skill gate", async 
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message:
-        "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
+        "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I built a campus research dashboard. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
     }),
   );
 

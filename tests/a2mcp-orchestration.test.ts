@@ -138,7 +138,7 @@ function assertChooser(body: Record<string, any>) {
       {
         value: "benchmark",
         number: 2,
-        label: "Resume Benchmarking & Optimization",
+        label: "Resume Benchmarking and Optimization",
       },
       { value: "generate_resume", number: 3, label: "Resume Generation" },
     ],
@@ -213,7 +213,7 @@ test("empty and minimal cold starts return the three-service chooser with HTTP 2
   for (const input of cases) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.7.1");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.8.0");
     assertChooser(result.body);
   }
 });
@@ -221,6 +221,7 @@ test("empty and minimal cold starts return the three-service chooser with HTTP 2
 test("caller-supplied profiles require confirmation and denial removes them", async () => {
   const supplied = await callRoute({
     operation: "discover",
+    selectedDiscoveryCategories: ["jobs"],
     user: {
       headline: "Data Science/AI/ML",
       experienceLevel: "early-career",
@@ -248,7 +249,7 @@ test("caller-supplied profiles require confirmation and denial removes them", as
     message: "No, that profile is incorrect. Start over.",
     continuation: supplied.body.continuation,
   });
-  assert.equal(denied.body.stage, "discover_choose_input");
+  assert.equal(denied.body.stage, "choose_opportunity_categories");
   assert.equal(denied.body.recommendations.length, 0);
   assert.equal(denied.body.conversation.profile.draft.headline, undefined);
   assert.equal(denied.body.conversation.profile.draft.skills.length, 0);
@@ -303,6 +304,7 @@ Built a fictional study planner and data dashboard.`;
   const extracted = await callRoute({
     operation: "discover",
     intakeRoute: "resume",
+    selectedDiscoveryCategories: ["jobs", "scholarships", "internships"],
     message: "Find jobs, scholarships, and internships.",
     resumeText: syntheticResume,
     consent,
@@ -316,21 +318,12 @@ Built a fictional study planner and data dashboard.`;
   assert.equal(extracted.body.recommendations.length, 0);
 
   const confirmed = await confirmProfile(extracted);
-  assert.equal(confirmed.body.stage, "discover_missing_information");
-  assert.ok(
-    confirmed.body.requiredInputs.some(
-      (item: { id: string }) => item.id === "nationality",
+  assert.equal(confirmed.body.stage, "discover_completed");
+  assert.deepEqual(
+    confirmed.body.categoryCoverage.map(
+      (item: { category: string }) => item.category,
     ),
-  );
-  assert.ok(
-    confirmed.body.requiredInputs.some(
-      (item: { id: string }) => item.id === "targetDegreeLevel",
-    ),
-  );
-  assert.ok(
-    confirmed.body.requiredInputs.some(
-      (item: { id: string }) => item.id === "preferredStudyCountries",
-    ),
+    ["jobs", "scholarships", "internships"],
   );
 
   const matched = await callRoute({
@@ -345,7 +338,7 @@ Built a fictional study planner and data dashboard.`;
         (item: { category: string }) => item.category,
       ),
     ),
-    new Set(["remote_job", "scholarship", "internship"]),
+    new Set(["jobs", "scholarships", "internships"]),
   );
   assert.ok(
     matched.body.directOpportunities.every(
@@ -392,11 +385,11 @@ test("scholarship intake maps explicit required-field labels", async () => {
     message:
       "I am a mid-level public policy researcher in Uganda with four years of nonprofit research experience. I want scholarships, fellowships, grants, and research opportunities.",
   });
-  assert.equal(started.body.stage, "discover_missing_information");
+  assert.equal(started.body.stage, "discover_collecting_context");
 
   const completed = await callRoute({
     message:
-      "Field of study: Public policy. Current degree level: Master's degree completed. Target degree level: Doctorate or PhD. Nationality: Ugandan. Country of residence: Uganda. Preferred study countries: United Kingdom and Germany.",
+      "Field of study: Public policy. Current degree level: Master's degree completed. Target degree level: Doctorate or PhD. Nationality: Ugandan. Country of residence: Uganda. Preferred study countries: United Kingdom and Germany. Project: I am seeking support for nonprofit public-policy research.",
     continuation: started.body.continuation,
   });
 
@@ -430,13 +423,13 @@ test("mixed student scholarship intake accumulates facts without loops or catego
     message:
       "I am a Bachelor's student studying Life Sciences and Software Engineering. I live in Nigeria. My skills include Python, JavaScript, biology research, and data analysis. I want jobs, internships, scholarships, and hackathons.",
   });
-  assert.equal(started.body.stage, "discover_missing_information");
+  assert.equal(started.body.stage, "discover_completed");
 
   const nationality = await callRoute({
     message: "Nationality: Nigerian.",
     continuation: started.body.continuation,
   });
-  assert.equal(nationality.body.stage, "discover_missing_information");
+  assert.equal(nationality.body.stage, "discover_completed");
   assert.equal(
     nationality.body.conversation.profile.draft.countryOfResidence,
     "Nigeria",
@@ -454,7 +447,7 @@ test("mixed student scholarship intake accumulates facts without loops or catego
     message: "Target degree level: Master's degree.",
     continuation: nationality.body.continuation,
   });
-  assert.equal(targetDegree.body.stage, "discover_missing_information");
+  assert.equal(targetDegree.body.stage, "discover_completed");
   assert.equal(
     targetDegree.body.conversation.profile.draft.nationality,
     "Nigerian",
@@ -476,7 +469,7 @@ test("mixed student scholarship intake accumulates facts without loops or catego
         (item: { category: string }) => item.category,
       ),
     ),
-    new Set(["remote_job", "internship", "scholarship", "hackathon"]),
+    new Set(["jobs", "internships", "scholarships", "hackathons"]),
   );
   assert.equal(
     completed.body.conversation.profile.draft.countryOfResidence,
@@ -625,7 +618,7 @@ test("numeric choices are bound to the continuation stage", async () => {
     message: "1",
     continuation: cold.body.continuation,
   });
-  assert.equal(discovery.body.stage, "discover_choose_input");
+  assert.equal(discovery.body.stage, "choose_opportunity_categories");
   assert.deepEqual(
     discovery.body.requiredInputs[0].options.map(
       (option: { value: string; number: number }) => [
@@ -634,17 +627,28 @@ test("numeric choices are bound to the continuation stage", async () => {
       ],
     ),
     [
-      ["resume", 1],
-      ["background", 2],
+      ["jobs", 1],
+      ["internships", 2],
+      ["hackathons", 3],
+      ["scholarships", 4],
+      ["fellowships", 5],
+      ["grants_funding", 6],
+      ["bounties_freelance", 7],
+      ["accelerators_incubators", 8],
+      ["creator_opportunities", 9],
+      ["competitions_challenges", 10],
     ],
   );
 
-  const resumeRoute = await callRoute({
+  const categoryRoute = await callRoute({
     message: "1",
     continuation: discovery.body.continuation,
   });
-  assert.equal(resumeRoute.body.stage, "discover_awaiting_resume");
-  assert.equal(resumeRoute.body.conversation?.requiredAction, "provide_resume");
+  assert.equal(categoryRoute.body.stage, "discover_collecting_context");
+  assert.equal(
+    categoryRoute.body.conversation?.requiredAction,
+    "provide_opportunity_context",
+  );
 
   const withoutContinuation = await callRoute({ message: "1" });
   assertChooser(withoutContinuation.body);
@@ -675,11 +679,15 @@ test("each top-level service selection returns service-specific required inputs"
     message: "3",
     continuation: cold.body.continuation,
   });
-  assert.equal(generation.body.stage, "generate_awaiting_information");
+  assert.equal(generation.body.stage, "generate_awaiting_target");
   assert.equal(generation.body.selectedService, "resume_generation");
   assert.deepEqual(
     generation.body.requiredInputs.map((input: { id: string }) => input.id),
-    ["generation_target", "verified_facts", "output_preferences"],
+    ["generation_target"],
+  );
+  assert.deepEqual(
+    generation.body.optionalInputs.map((input: { id: string }) => input.id),
+    ["output_preferences"],
   );
 });
 

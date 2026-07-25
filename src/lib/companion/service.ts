@@ -47,8 +47,15 @@ import type {
   CompanionChoice,
   RequiredInput,
   DownloadableArtifact,
+  DiscoveryCategory,
+  CallerAction,
 } from "@/lib/types/opportunities";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
+import {
+  discoveryCategoryChoices,
+  discoveryCategoryLabel,
+  parseDiscoveryCategories,
+} from "@/lib/opportunities/discovery-categories";
 
 const SERVICE_VERSION = TRAKR_SERVICE_VERSION;
 
@@ -98,7 +105,7 @@ function serviceChoices(): CompanionChoice[] {
       id: "resume_benchmarking_optimization",
       value: "benchmark",
       number: 2,
-      label: "Resume Benchmarking & Optimization",
+      label: "Resume Benchmarking and Optimization",
       description: "Compare your evidence with a specific target before rewriting.",
     },
     {
@@ -109,6 +116,184 @@ function serviceChoices(): CompanionChoice[] {
       description: "Create a truthful, target-specific document from verified facts.",
     },
   ];
+}
+
+function discoveryCategoryMenuMessage(prefix = "Choose one or more opportunity categories:") {
+  return menuMessage(prefix, discoveryCategoryChoices());
+}
+
+function uniqueDiscoveryCategories(values: DiscoveryCategory[]) {
+  return [...new Set(values)];
+}
+
+function discoveryCategoriesForRequest(
+  request: OpportunityCompanionRequest,
+  service: UserFacingService | null,
+) {
+  if (service !== "opportunity_finding") return [];
+  return uniqueDiscoveryCategories([
+    ...(activeContext(request)?.selectedDiscoveryCategories ?? []),
+    ...(request.selectedDiscoveryCategories ?? []),
+    ...parseDiscoveryCategories(request.message),
+  ]);
+}
+
+function discoveryIntake(
+  profile: StructuredUserProfile,
+  filters: OpportunityCompanionRequest["filters"],
+  categories: DiscoveryCategory[],
+) {
+  const required = new Map<string, string>();
+  const optional = new Map<string, string>();
+  const hasField = Boolean(
+    profile.fieldOfStudy ||
+      profile.headline ||
+      profile.bio ||
+      profile.interests.length ||
+      profile.skills.length,
+  );
+  const hasStage = Boolean(
+    profile.experienceLevel ||
+      profile.currentDegreeLevel ||
+      profile.education.length ||
+      profile.workHistory.length,
+  );
+  const hasLocationPreference = Boolean(
+    profile.location ||
+      profile.countryOfResidence ||
+      filters.location ||
+      filters.remote !== undefined,
+  );
+
+  if (!hasField) {
+    required.set(
+      "field_or_interest",
+      "What broad field, expertise, subject, technology, industry, or creator niche should Trakr search?",
+    );
+  }
+
+  if (
+    categories.some((category) =>
+      [
+        "jobs",
+        "internships",
+        "fellowships",
+        "bounties_freelance",
+        "competitions_challenges",
+      ].includes(category),
+    ) &&
+    !hasStage
+  ) {
+    required.set(
+      "experience_or_academic_stage",
+      "What best describes your current experience or academic stage?",
+    );
+  }
+
+  if (
+    categories.some((category) => ["jobs", "internships"].includes(category)) &&
+    !hasLocationPreference
+  ) {
+    required.set(
+      "location_or_work_preference",
+      "Where are you based, and should Trakr look for remote, hybrid, onsite, or location-specific options?",
+    );
+  }
+
+  if (
+    categories.includes("scholarships") &&
+    !profile.currentDegreeLevel
+  ) {
+    required.set(
+      "academic_level",
+      "What is your current academic level or the qualification level you want funded?",
+    );
+  }
+
+  if (
+    categories.includes("accelerators_incubators") &&
+    !profile.projects.length &&
+    !profile.bio
+  ) {
+    required.set(
+      "project_and_stage",
+      "What project or startup are you building, and what stage is it at?",
+    );
+  }
+
+  if (
+    categories.includes("grants_funding") &&
+    !profile.projects.length &&
+    !profile.research?.length &&
+    !/\b(project|research topic|funding goal|seeking support)\b/i.test(
+      profile.bio ?? "",
+    )
+  ) {
+    required.set(
+      "project_or_funding_goal",
+      "What project, research topic, organization, or activity needs funding?",
+    );
+  }
+
+  if (!hasLocationPreference) {
+    optional.set(
+      "region_preferences",
+      "Optionally share applicant region, destination preferences, travel limits, or remote preferences.",
+    );
+  }
+  if (categories.includes("scholarships")) {
+    optional.set(
+      "scholarship_preferences",
+      "Optionally share intended study region, destination countries, start year, and full or partial funding preference.",
+    );
+  }
+  if (categories.includes("hackathons")) {
+    optional.set(
+      "hackathon_preferences",
+      "Optionally share online or in-person preference, ecosystem, team preference, or prize goals.",
+    );
+  }
+  if (categories.includes("fellowships")) {
+    optional.set(
+      "fellowship_preferences",
+      "Optionally share funding, travel, remote, duration, or fellowship-type preferences.",
+    );
+  }
+  if (categories.includes("bounties_freelance")) {
+    optional.set(
+      "bounty_preferences",
+      "Optionally share payment, ecosystem, work format, or project-duration preferences.",
+    );
+  }
+
+  return {
+    required: [...required.entries()].map(([field, question]) => ({
+      field,
+      question,
+      required: true,
+    })),
+    optional: [...optional.entries()].map(([field, question]) => ({
+      field,
+      question,
+      required: false,
+    })),
+  };
+}
+
+function discoveryIntakeMessage(
+  categories: DiscoveryCategory[],
+  required: Array<{ question: string }>,
+  optional: Array<{ question: string }>,
+) {
+  const categoryNames = categories.map(discoveryCategoryLabel).join(", ");
+  return [
+    `Selected categories: ${categoryNames}.`,
+    "Reply naturally or use the numbered prompts. A resume is optional.",
+    ...required.map((item, index) => `${index + 1}. ${item.question}`),
+    ...(optional.length
+      ? [`Optional: ${optional.map((item) => item.question).join(" ")}`]
+      : []),
+  ].join("\n");
 }
 
 function requiredInput(
@@ -366,6 +551,9 @@ function isStageControlMessage(request: OpportunityCompanionRequest) {
   if (stage === "discover_choose_input") {
     return Boolean(profileSourceChoice(message)) || /^\d+$/.test(message);
   }
+  if (stage === "generate_awaiting_target") {
+    return true;
+  }
   if (stage === "optimize_confirmation") {
     return /^(yes|y|no|n|1|2|optimize|continue|proceed|finish|stop|not now)\b/i.test(
       message,
@@ -460,6 +648,9 @@ function toRecommendationRequest(
       ...filters,
       limit: filters.limit ?? 10,
     },
+    selectedDiscoveryCategories:
+      request.selectedDiscoveryCategories ??
+      activeContext(request)?.selectedDiscoveryCategories,
     requestId: request.requestId,
   };
 }
@@ -474,6 +665,7 @@ function emptyResponse(
   return {
     service: "trakr",
     version: SERVICE_VERSION,
+    apiVersion: SERVICE_VERSION,
     requestId: request.requestId ?? nanoid(),
     generatedAt: new Date().toISOString(),
     provider: "deterministic-local",
@@ -513,6 +705,7 @@ function emptyResponse(
       askUserForRequiredInputs: true,
       doNotReplaceTrakrMatching: true,
       treatHttp200AsBusinessResponse: true,
+      doNotExposeProtocolWorkWhenFree: true,
     },
     conversation,
     capabilityResult,
@@ -522,6 +715,10 @@ function emptyResponse(
     message: conversation.message,
     selectedService: conversation.service,
     requiredInputs: conversation.requiredInputs,
+    optionalInputs: conversation.optionalInputs,
+    allowedResponses: conversation.allowedResponses,
+    attachmentsAccepted: conversation.attachmentsAccepted,
+    callerAction: conversation.callerAction,
     nextActions: conversation.nextActions,
     continuation: conversation.continuation,
   };
@@ -650,6 +847,8 @@ function conversationFor(
         Partial<Pick<CompanionChoice, "value" | "number">>
     >;
     requiredInputs?: RequiredInput[];
+    optionalInputs?: RequiredInput[];
+    callerAction?: CallerAction;
     status?: CompanionConversation["status"];
     profileConfirmed?: boolean;
     profileSource?: "resume" | "background" | "request";
@@ -666,6 +865,7 @@ function conversationFor(
     unknownFields?: string[];
     unansweredQuestions?: string[];
     hideProfile?: boolean;
+    selectedDiscoveryCategories?: DiscoveryCategory[];
   } = {},
 ): CompanionConversation {
   const context = activeContext(request);
@@ -713,6 +913,11 @@ function conversationFor(
         source: request.consent ? "explicit" : "implicit_legacy",
       },
       filters: built.filters,
+      selectedDiscoveryCategories:
+        options.selectedDiscoveryCategories ??
+        context?.selectedDiscoveryCategories ??
+        request.selectedDiscoveryCategories ??
+        [],
       target: options.target ?? request.target ?? context?.target,
       generationPreferences:
         safeGenerationPreferences(
@@ -752,6 +957,50 @@ function conversationFor(
         links: [],
       }
     : built.profile;
+  const choices = options.choices?.map((choice, index) => ({
+    ...choice,
+    value: choice.value ?? choice.id,
+    number: choice.number ?? index + 1,
+  })) ?? [];
+  const requiredInputs = options.requiredInputs ?? [];
+  const optionalInputs = options.optionalInputs ?? [];
+  const attachmentsAccepted = [...requiredInputs, ...optionalInputs]
+    .filter(
+      (
+        input,
+      ): input is RequiredInput & {
+        acceptedRepresentations: string[];
+        acceptedMimeTypes: string[];
+        maxBytes: number;
+      } =>
+        input.type === "document" &&
+        Boolean(input.acceptedRepresentations?.length) &&
+        Boolean(input.acceptedMimeTypes?.length) &&
+        Boolean(input.maxBytes),
+    )
+    .map((input) => ({
+      id: input.id,
+      required: input.required,
+      acceptedRepresentations: input.acceptedRepresentations,
+      acceptedMimeTypes: input.acceptedMimeTypes,
+      maxBytes: input.maxBytes,
+    }));
+  const status =
+    options.status ??
+    (state === "recommendations" ||
+    state === "resume_optimization" ||
+    state === "resume_generation"
+      ? "completed"
+      : "needs_input");
+  const callerAction =
+    options.callerAction ??
+    (choices.length
+      ? "show_selection_menu"
+      : requiredInputs.some((input) => input.type === "document")
+        ? "request_upload"
+        : status === "completed"
+          ? "display_results"
+          : "ask_user_question");
 
   return {
     state,
@@ -760,13 +1009,7 @@ function conversationFor(
     operation,
     profileSource: options.profileSource ?? built.profileSource,
     stage: options.stage ?? state,
-    status:
-      options.status ??
-      (state === "recommendations" ||
-      state === "resume_optimization" ||
-      state === "resume_generation"
-        ? "completed"
-        : "needs_input"),
+    status,
     message,
     profile: {
       draft: visibleProfile,
@@ -779,12 +1022,12 @@ function conversationFor(
     nextActions,
     continuation: createSessionReference(sessionContext),
     requiredAction: options.requiredAction,
-    requiredInputs: options.requiredInputs ?? [],
-    choices: options.choices?.map((choice, index) => ({
-      ...choice,
-      value: choice.value ?? choice.id,
-      number: choice.number ?? index + 1,
-    })),
+    callerAction,
+    requiredInputs,
+    optionalInputs,
+    allowedResponses: choices,
+    attachmentsAccepted,
+    choices: choices.length ? choices : undefined,
   };
 }
 
@@ -990,14 +1233,28 @@ function hasUsableTarget(
 export async function handleOpportunityCompanionRequest(
   rawRequest: OpportunityCompanionRequest,
 ): Promise<OpportunityCompanionResponse> {
-  const request = normalizedRequest(rawRequest);
-  const intent = detectIntent(request);
-  const operation = operationForRequest(request, intent);
-  const selectedService = serviceSelectionFromRequest(request);
+  const normalized = normalizedRequest(rawRequest);
+  const intent = detectIntent(normalized);
+  const operation = operationForRequest(normalized, intent);
+  const selectedService = serviceSelectionFromRequest(normalized);
   const service =
     operation === "start"
       ? null
       : selectedService ?? serviceForOperation(operation);
+  const selectedDiscoveryCategories = discoveryCategoriesForRequest(
+    normalized,
+    service,
+  );
+  const request: OpportunityCompanionRequest = {
+    ...normalized,
+    selectedDiscoveryCategories,
+    filters: {
+      ...normalized.filters,
+      discoveryCategories: selectedDiscoveryCategories.length
+        ? selectedDiscoveryCategories
+        : normalized.filters.discoveryCategories,
+    },
+  };
   const priorConsent = activeContext(request)?.consent?.processPersonalData;
   const contextHasPersonalData = Boolean(
     activeContext(request)?.profile ||
@@ -1117,9 +1374,11 @@ export async function handleOpportunityCompanionRequest(
       documentReferences: [],
       service: activeContext(request)?.service,
       operation: activeContext(request)?.operation,
-      stage: "discover_choose_input",
+      stage: "choose_opportunity_categories",
       consent: activeContext(request)?.consent,
       filters: activeContext(request)?.filters,
+      selectedDiscoveryCategories:
+        activeContext(request)?.selectedDiscoveryCategories ?? [],
       target: activeContext(request)?.target,
       generationPreferences: activeContext(request)?.generationPreferences,
       sessionVersion: "2",
@@ -1133,52 +1392,33 @@ export async function handleOpportunityCompanionRequest(
       context: clearedContext,
     };
     const cleared = buildConversationalProfile(clearedRequest);
-    const choices = [
-      {
-        id: "resume",
-        value: "resume",
-        number: 1,
-        label: "Upload a resume",
-      },
-      {
-        id: "background",
-        value: "background",
-        number: 2,
-        label: "Provide background information",
-      },
-      {
-        id: "request",
-        value: "request",
-        number: 3,
-        label: "Describe what you are looking for",
-      },
-    ];
+    const choices = discoveryCategoryChoices();
     const conversation = conversationFor(
       clearedRequest,
       cleared,
       "profile_build",
       "discover",
       "opportunity_finding",
-      "choose_profile_source",
-      menuMessage(
-        "The unconfirmed supplied profile was removed. Choose a fresh intake route:",
-        choices,
+      "choose_opportunity_categories",
+      discoveryCategoryMenuMessage(
+        "The unconfirmed supplied profile was removed. Choose one or more opportunity categories:",
       ),
-      ["resume", "background", "request"],
+      choices.map((choice) => choice.value),
       undefined,
       {
-        requiredAction: "select_profile_source",
+        requiredAction: "select_opportunity_categories",
         choices,
         requiredInputs: [
           requiredInput({
-            id: "discovery_input_method",
+            id: "opportunity_categories",
             type: "enum",
-            prompt: "Choose a fresh intake route",
+            prompt: "Choose one or more opportunity categories",
             options: choices,
           }),
         ],
         clearProfileFromSession: true,
-        stage: "discover_choose_input",
+        selectedDiscoveryCategories: [],
+        stage: "choose_opportunity_categories",
       },
     );
     return emptyResponse(clearedRequest, conversation, undefined, cleared.filters);
@@ -1191,7 +1431,7 @@ export async function handleOpportunityCompanionRequest(
       !/^\s*[1-3]\s*$/.test(request.message ?? ""));
   const sourceChoice = selectedFromServiceMenu
     ? undefined
-    : request.intakeRoute ?? profileSourceChoice(request.message);
+    : request.intakeRoute;
 
   if (
     isColdStartRequest(request) ||
@@ -1233,44 +1473,72 @@ export async function handleOpportunityCompanionRequest(
   }
 
   if (selectedFromServiceMenu && service === "opportunity_finding") {
-    const choices: CompanionChoice[] = [
-      {
-        id: "resume",
-        value: "resume",
-        number: 1,
-        label: "Upload a resume",
-        description: "Provide PDF, DOCX, TXT, extracted text, or a secure document reference.",
-      },
-      {
-        id: "background",
-        value: "background",
-        number: 2,
-        label: "Provide background information",
-        description: "Describe your goals, evidence, location, and constraints naturally.",
-      },
-    ];
+    const choices = discoveryCategoryChoices();
     const conversation = conversationFor(
       request,
       built,
-      "profile_build",
+      "opportunity_matching",
       "discover",
       service,
-      "choose_profile_source",
-      menuMessage("Choose how you would like to provide your information:", choices),
-      ["resume", "background"],
+      "choose_opportunity_categories",
+      discoveryCategoryMenuMessage(),
+      choices.map((choice) => choice.value),
       undefined,
       {
-        requiredAction: "select_profile_source",
+        requiredAction: "select_opportunity_categories",
         choices,
         requiredInputs: [
           requiredInput({
-            id: "discovery_input_method",
+            id: "opportunity_categories",
             type: "enum",
-            prompt: "Choose how to provide your information",
+            prompt:
+              "Choose one or more categories by number, category name, or a natural-language goal.",
             options: choices,
           }),
         ],
-        stage: "discover_choose_input",
+        selectedDiscoveryCategories: [],
+        stage: "choose_opportunity_categories",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (
+    service === "opportunity_finding" &&
+    selectedDiscoveryCategories.length === 0
+  ) {
+    const choices = discoveryCategoryChoices();
+    const invalidSelection =
+      activeContext(request)?.stage === "choose_opportunity_categories" &&
+      Boolean(request.message?.trim());
+    const conversation = conversationFor(
+      request,
+      built,
+      "opportunity_matching",
+      "discover",
+      service,
+      "choose_opportunity_categories",
+      discoveryCategoryMenuMessage(
+        invalidSelection
+          ? "I could not identify an opportunity category from that answer. Choose one or more categories:"
+          : "Choose one or more opportunity categories:",
+      ),
+      choices.map((choice) => choice.value),
+      undefined,
+      {
+        requiredAction: "select_opportunity_categories",
+        choices,
+        requiredInputs: [
+          requiredInput({
+            id: "opportunity_categories",
+            type: "enum",
+            prompt:
+              "Choose one or more categories by number, category name, or a natural-language goal.",
+            options: choices,
+          }),
+        ],
+        selectedDiscoveryCategories: [],
+        stage: "choose_opportunity_categories",
       },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
@@ -1365,7 +1633,7 @@ export async function handleOpportunityCompanionRequest(
 
   if (selectedFromServiceMenu && service === "resume_generation") {
     const prompt =
-      "Provide the purpose and target for the document, then share the verified facts you want included. A natural-language answer is welcome; include only facts you can confirm.";
+      "What job, internship, scholarship, fellowship, grant, academic program, or other opportunity are you applying for? Paste the description, share the official URL, upload the requirements, or explain the target naturally.";
     const conversation = conversationFor(
       request,
       built,
@@ -1377,7 +1645,7 @@ export async function handleOpportunityCompanionRequest(
       ["generate_resume"],
       undefined,
       {
-        requiredAction: "provide_generation_target_and_facts",
+        requiredAction: "provide_generation_target",
         requiredInputs: [
           requiredInput({
             id: "generation_target",
@@ -1391,27 +1659,8 @@ export async function handleOpportunityCompanionRequest(
               "target.locale",
             ],
           }),
-          requiredInput({
-            id: "verified_facts",
-            type: "object",
-            prompt: "Provide verified applicant facts in one natural-language message or a structured profile.",
-            fields: [
-              "name",
-              "contact details",
-              "location",
-              "education",
-              "work history",
-              "projects",
-              "skills",
-              "achievements",
-              "certifications",
-              "volunteering",
-              "leadership",
-              "research",
-              "publications",
-              "portfolio links",
-            ],
-          }),
+        ],
+        optionalInputs: [
           requiredInput({
             id: "output_preferences",
             type: "object",
@@ -1425,7 +1674,7 @@ export async function handleOpportunityCompanionRequest(
             ],
           }),
         ],
-        stage: "generate_awaiting_information",
+        stage: "generate_awaiting_target",
       },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
@@ -1495,6 +1744,107 @@ export async function handleOpportunityCompanionRequest(
       },
     );
     return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (
+    service === "opportunity_finding" &&
+    sourceChoice === "resume" &&
+    !request.resumeText
+  ) {
+    const conversation = conversationFor(
+      request,
+      built,
+      "profile_build",
+      "discover",
+      service,
+      "awaiting_resume",
+      "Attach your resume or CV, or paste its text. The selected opportunity categories are already preserved, and the document remains optional for Opportunity Finding.",
+      ["Ask the user to provide the resume only because they selected the resume route."],
+      undefined,
+      {
+        requiredAction: "provide_resume",
+        requiredInputs: [
+          requiredInput({
+            id: "resume",
+            type: "document",
+            prompt: "Upload a PDF, DOCX, or TXT resume, or provide extracted text.",
+            acceptedRepresentations: [
+              "document.base64",
+              "document.text",
+              "resumeText",
+              "multipart:/api/a2mcp/recommend",
+              "multipart:/api/profile/parse-resume",
+            ],
+            acceptedMimeTypes: [
+              "application/pdf",
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+              "text/plain",
+            ],
+            maxBytes: 2_500_000,
+          }),
+          requiredInput({
+            id: "consent",
+            type: "boolean",
+            prompt: "Consent to session-only resume processing.",
+          }),
+        ],
+        profileSource: "resume",
+        selectedDiscoveryCategories,
+        stage: "discover_awaiting_resume",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (service === "opportunity_finding") {
+    const intake = discoveryIntake(
+      built.profile,
+      built.filters,
+      selectedDiscoveryCategories,
+    );
+    if (intake.required.length) {
+      const conversation = conversationFor(
+        request,
+        built,
+        "opportunity_matching",
+        "discover",
+        service,
+        "needs_more_information",
+        discoveryIntakeMessage(
+          selectedDiscoveryCategories,
+          intake.required,
+          intake.optional,
+        ),
+        intake.required.map((item) => `Ask the user: ${item.question}`),
+        undefined,
+        {
+          requiredAction: "provide_opportunity_context",
+          requiredInputs: [
+            requiredInput({
+              id: "opportunity_context",
+              type: "object",
+              prompt:
+                "Answer the numbered prompts in one natural-language message or as structured fields.",
+              fields: intake.required.map((item) => item.field),
+            }),
+          ],
+          optionalInputs: intake.optional.map((item) =>
+            requiredInput({
+              id: item.field,
+              type: "text",
+              required: false,
+              prompt: item.question,
+            }),
+          ),
+          selectedDiscoveryCategories,
+          missingInformation: intake.required,
+          unknownFields: intake.required.map((item) => item.field),
+          unansweredQuestions: intake.required.map((item) => item.question),
+          stage: "discover_collecting_context",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
   }
 
   if (
@@ -1867,7 +2217,11 @@ export async function handleOpportunityCompanionRequest(
     );
   }
 
-  if (shouldOfferProfileSource(request, built) && !sourceChoice) {
+  if (
+    service !== "opportunity_finding" &&
+    shouldOfferProfileSource(request, built) &&
+    !sourceChoice
+  ) {
     const conversation = conversationFor(
       request,
       built,
@@ -2063,7 +2417,7 @@ export async function handleOpportunityCompanionRequest(
     return emptyResponse(request, conversation, undefined, built.filters);
   }
 
-  if (!built.sufficient) {
+  if (service !== "opportunity_finding" && !built.sufficient) {
     const conversation = conversationFor(
       request,
       built,
@@ -2089,11 +2443,9 @@ export async function handleOpportunityCompanionRequest(
           ),
         profileSource: sourceChoice ?? built.profileSource,
         stage:
-          service === "opportunity_finding"
-            ? "discover_missing_information"
-            : service === "resume_benchmarking_optimization"
-              ? "benchmark_missing_information"
-              : "generate_missing_information",
+          service === "resume_benchmarking_optimization"
+            ? "benchmark_missing_information"
+            : "generate_missing_information",
       },
     );
     return emptyResponse(request, conversation, undefined, built.filters);

@@ -83,7 +83,7 @@ function assertChooser(result) {
       {
         value: "benchmark",
         number: 2,
-        label: "Resume Benchmarking & Optimization",
+        label: "Resume Benchmarking and Optimization",
       },
       { value: "generate_resume", number: 3, label: "Resume Generation" },
     ],
@@ -173,11 +173,11 @@ await run("ORCH-PROD-001-metadata-readiness", async () => {
   assert.equal(health.response.status, 200);
   assert.equal(health.body.ok, true);
   assert.equal(health.body.database.artifactStorageReady, true);
-  assert.equal(metadata.body.version, "0.7.1");
+  assert.equal(metadata.body.version, "0.8.0");
   assert.equal(metadata.body.displayTitle, "Trakr Opportunity & Resume Services");
   assert.equal(metadata.body.submission.pricing, "free");
   assert.equal(metadata.body.submission.paymentRequired, false);
-  assert.equal(openapi.body.info.version, "0.7.1");
+  assert.equal(openapi.body.info.version, "0.8.0");
   assert.ok(openapi.body.paths["/api/artifacts/{id}"]);
   return {
     status: 200,
@@ -221,20 +221,34 @@ await run("ORCH-PROD-006-service1-menu-binding", async () => {
     message: "1",
     continuation: chooser.continuation,
   });
-  assert.equal(service.body.stage, "discover_choose_input");
+  assert.equal(service.body.stage, "choose_opportunity_categories");
   assert.deepEqual(
     service.body.requiredInputs[0].options.map((option) => option.value),
-    ["resume", "background"],
+    [
+      "jobs",
+      "internships",
+      "hackathons",
+      "scholarships",
+      "fellowships",
+      "grants_funding",
+      "bounties_freelance",
+      "accelerators_incubators",
+      "creator_opportunities",
+      "competitions_challenges",
+    ],
   );
-  const resume = await post({
-    message: "1",
+  const categories = await post({
+    message: "1 and 3",
     continuation: service.body.continuation,
   });
-  assert.equal(resume.body.stage, "discover_awaiting_resume");
-  assert.equal(resume.body.conversation.requiredAction, "provide_resume");
+  assert.equal(categories.body.stage, "discover_collecting_context");
+  assert.equal(
+    categories.body.conversation.requiredAction,
+    "provide_opportunity_context",
+  );
   return {
-    status: resume.response.status,
-    stages: [service.body.stage, resume.body.stage],
+    status: categories.response.status,
+    stages: [service.body.stage, categories.body.stage],
   };
 });
 

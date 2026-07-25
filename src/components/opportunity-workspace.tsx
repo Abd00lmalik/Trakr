@@ -11,10 +11,8 @@ import {
   Circle,
   ExternalLink,
   FileSearch,
-  FileText,
   LoaderCircle,
   MapPin,
-  MessageSquare,
   PenLine,
   RefreshCw,
   Search,
@@ -23,11 +21,9 @@ import {
   Sparkles,
   Target,
   UploadCloud,
-  UserRound,
 } from "lucide-react";
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -36,7 +32,6 @@ import {
 import type {
   CompanionConversation,
   OpportunityCompanionResponse,
-  OpportunityIntakeRoute,
   RecommendationResponse,
   UserFacingService,
 } from "@/lib/types/opportunities";
@@ -64,7 +59,7 @@ const serviceOptions: Array<{
   },
   {
     id: "resume_benchmarking_optimization",
-    label: "Resume Benchmarking & Optimization",
+    label: "Resume Benchmarking and Optimization",
     description: "Compare your evidence with a specific target before rewriting.",
     icon: FileSearch,
     active: true,
@@ -75,36 +70,6 @@ const serviceOptions: Array<{
     description: "Create a truthful, target-specific document from verified facts.",
     icon: PenLine,
     active: true,
-  },
-];
-
-const opportunityRoutes: Array<{
-  id: OpportunityIntakeRoute;
-  label: string;
-  description: string;
-  icon: typeof Search;
-  message: string;
-}> = [
-  {
-    id: "resume",
-    label: "Use my resume or CV",
-    description: "Extract evidence from a document for this session.",
-    icon: FileText,
-    message: "Use my resume or CV",
-  },
-  {
-    id: "background",
-    label: "Tell Trakr about my background",
-    description: "Describe your experience naturally in one message.",
-    icon: UserRound,
-    message: "Tell Trakr about my background",
-  },
-  {
-    id: "request",
-    label: "Describe what I am looking for",
-    description: "Start with a goal and add only important missing details.",
-    icon: MessageSquare,
-    message: "Describe what I am looking for",
   },
 ];
 
@@ -527,7 +492,7 @@ function CapabilityResults({
       <div className="section-heading">
         <div>
           <p className="section-kicker">
-            {generation ? "Resume Generation" : "Resume Benchmarking & Optimization"}
+            {generation ? "Resume Generation" : "Resume Benchmarking and Optimization"}
           </p>
           <h2 id="capability-title">
             {generation
@@ -650,8 +615,6 @@ export function OpportunityWorkspace() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedService, setSelectedService] =
     useState<UserFacingService | null>(null);
-  const [intakeRoute, setIntakeRoute] =
-    useState<OpportunityIntakeRoute | undefined>();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [continuation, setContinuation] =
@@ -677,25 +640,45 @@ export function OpportunityWorkspace() {
     return () => controller.abort();
   }, []);
 
-  const conversation = responseConversation(response);
-  const isOpportunityFinding = selectedService === "opportunity_finding";
-  const isWorking = isSending || uploadState === "uploading" || uploadState === "parsing";
-  const showRoutes =
-    isOpportunityFinding &&
-    (!conversation ||
-      conversation.state === "choose_profile_source" ||
-      conversation.state === "awaiting_resume" ||
-      conversation.state === "collecting_background" ||
-      conversation.state === "collecting_request");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/a2mcp/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+      cache: "no-store",
+      signal: controller.signal,
+    })
+      .then(async (result) => {
+        const body = (await result.json()) as OpportunityCompanionResponse;
+        if (!result.ok) {
+          throw new Error(body.message || "Trakr could not start a session.");
+        }
+        setResponse(body);
+        if (body.conversation) {
+          setContinuation(body.conversation.continuation);
+          setSelectedService(body.conversation.service);
+          setMessages([{ role: "assistant", content: body.conversation.message }]);
+        }
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) {
+          setRequestError(
+            error instanceof Error ? error.message : "Trakr could not start a session.",
+          );
+        }
+      });
+    return () => controller.abort();
+  }, []);
 
-  const routeOptions = useMemo(() => {
-    if (conversation?.choices?.length) {
-      return opportunityRoutes.filter((route) =>
-        conversation.choices?.some((choice) => choice.id === route.id),
-      );
-    }
-    return opportunityRoutes;
-  }, [conversation?.choices]);
+  const conversation = responseConversation(response);
+  const isWorking = isSending || uploadState === "uploading" || uploadState === "parsing";
+  const serverChoices = conversation?.choices ?? [];
+  const serviceChoices =
+    conversation?.state === "choose_service" ? serverChoices : [];
+  const workflowChoices =
+    conversation?.state !== "choose_service" ? serverChoices : [];
+  const acceptsDocument = Boolean(conversation?.attachmentsAccepted.length);
 
   function appendMessage(next: AssistantMessage) {
     setMessages((current) => [...current, next]);
@@ -704,8 +687,7 @@ export function OpportunityWorkspace() {
   async function submitToAgent(input: {
     message?: string;
     displayUser?: string;
-    operation?: "auto" | "discover" | "benchmark" | "optimize" | "generate_resume";
-    intakeRoute?: OpportunityIntakeRoute;
+    operation?: "start" | "auto" | "discover" | "benchmark" | "optimize" | "generate_resume";
     resumeText?: string;
     freshSession?: boolean;
   }) {
@@ -727,9 +709,6 @@ export function OpportunityWorkspace() {
         operation: selectedOperation,
       };
       if (userMessage) payload.message = userMessage;
-      if (input.intakeRoute ?? intakeRoute) {
-        payload.intakeRoute = input.intakeRoute ?? intakeRoute;
-      }
       if (input.resumeText) {
         payload.resumeText = input.resumeText;
         payload.consent = {
@@ -763,9 +742,6 @@ export function OpportunityWorkspace() {
       if (companionResponse.conversation) {
         setContinuation(companionResponse.conversation.continuation);
         setSelectedService(companionResponse.conversation.service);
-        if (companionResponse.conversation.profileSource) {
-          setIntakeRoute(companionResponse.conversation.profileSource);
-        }
         appendMessage({
           role: "assistant",
           content: companionResponse.conversation.message,
@@ -791,34 +767,15 @@ export function OpportunityWorkspace() {
   }
 
   function selectService(service: UserFacingService) {
+    const choice = serviceChoices.find((item) => item.id === service);
+    if (!choice) return;
     setSelectedService(service);
-    setIntakeRoute(undefined);
-    setResponse(null);
-    setContinuation(undefined);
-    setMessages([]);
     setRequestError("");
-    if (service === "opportunity_finding") {
-      void submitToAgent({ operation: "discover", freshSession: true });
-    } else {
-      void submitToAgent({
-        operation: operationForService(service),
-        freshSession: true,
-      });
-    }
-  }
-
-  function selectRoute(route: OpportunityIntakeRoute) {
-    setIntakeRoute(route);
-    const option = opportunityRoutes.find((item) => item.id === route);
-    if (option) {
-      void submitToAgent({
-        message:
-          route === "resume" ? "1" : route === "background" ? "2" : "3",
-        displayUser: option.message,
-        intakeRoute: route,
-        operation: "discover",
-      });
-    }
+    void submitToAgent({
+      message: String(choice.number ?? choice.value),
+      displayUser: choice.label,
+      operation: "auto",
+    });
   }
 
   function sendMessage() {
@@ -860,7 +817,6 @@ export function OpportunityWorkspace() {
       "operation",
       selectedService ? operationForService(selectedService) : "discover",
     );
-    formData.append("intakeRoute", "resume");
     if (continuation?.token) {
       formData.append("continuation", continuation.token);
     }
@@ -909,9 +865,6 @@ export function OpportunityWorkspace() {
       if (companionResponse.conversation) {
         setContinuation(companionResponse.conversation.continuation);
         setSelectedService(companionResponse.conversation.service);
-        setIntakeRoute(
-          companionResponse.conversation.profileSource ?? "resume",
-        );
         appendMessage({
           role: "assistant",
           content: companionResponse.conversation.message,
@@ -933,7 +886,6 @@ export function OpportunityWorkspace() {
 
   function resetWorkspace() {
     setSelectedService(null);
-    setIntakeRoute(undefined);
     setMessage("");
     setMessages([]);
     setContinuation(undefined);
@@ -945,6 +897,7 @@ export function OpportunityWorkspace() {
     setRequestError("");
     setConsent(false);
     if (inputRef.current) inputRef.current.value = "";
+    void submitToAgent({ operation: "start", freshSession: true });
   }
 
   return (
@@ -1032,23 +985,25 @@ export function OpportunityWorkspace() {
             </div>
 
             <div className="service-grid">
-              {serviceOptions.map((service) => {
+              {serviceChoices.map((choice) => {
+                const service = serviceOptions.find((item) => item.id === choice.id);
+                if (!service) return null;
                 const Icon = service.icon;
-                const selected = selectedService === service.id;
+                const selected = selectedService === choice.id;
                 return (
                   <button
                     type="button"
                     className={`service-choice ${selected ? "is-selected" : ""}`}
-                    key={service.id}
-                    onClick={() => selectService(service.id)}
+                    key={choice.id}
+                    onClick={() => selectService(choice.id as UserFacingService)}
                     disabled={isWorking}
                   >
                     <span className="service-choice-icon">
                       <Icon aria-hidden="true" size={21} />
                     </span>
                     <span className="service-choice-copy">
-                      <strong>{service.label}</strong>
-                      <span>{service.description}</span>
+                      <strong>{choice.label}</strong>
+                      <span>{choice.description ?? service.description}</span>
                     </span>
                     <ArrowRight aria-hidden="true" size={17} />
                     {!service.active ? (
@@ -1100,132 +1055,64 @@ export function OpportunityWorkspace() {
             </div>
           </section>
 
-          {selectedService === "opportunity_finding" && showRoutes ? (
-            <section className="workspace-section intake-section" aria-labelledby="intake-title">
+          {workflowChoices.length ? (
+            <section className="workspace-section intake-section" aria-labelledby="workflow-choice-title">
               <div className="section-heading">
                 <div>
-                  <p className="section-kicker">Opportunity Finding</p>
-                  <h2 id="intake-title">Choose your starting point</h2>
+                  <p className="section-kicker">Current step</p>
+                  <h2 id="workflow-choice-title">
+                    {conversation?.requiredInputs[0]?.prompt ?? "Choose an option"}
+                  </h2>
                 </div>
               </div>
-              <p className="section-intro">
-                A resume is optional. Pick the route that is easiest for you,
-                or use the message box above to describe your goal first.
-              </p>
               <div className="route-grid">
-                {routeOptions.map((route) => {
-                  const Icon = route.icon;
-                  return (
-                    <button
-                      type="button"
-                      className={`route-choice ${
-                        intakeRoute === route.id ? "is-selected" : ""
-                      }`}
-                      key={route.id}
-                      onClick={() => selectRoute(route.id)}
-                      disabled={isWorking}
-                    >
-                      <Icon aria-hidden="true" size={20} />
-                      <span>
-                        <strong>{route.label}</strong>
-                        <small>{route.description}</small>
-                      </span>
-                      <ChevronRight aria-hidden="true" size={17} />
-                    </button>
-                  );
-                })}
-              </div>
-
-              {intakeRoute === "resume" ||
-              conversation?.state === "awaiting_resume" ? (
-                <div className="resume-intake">
-                  <div className="consent-row">
-                    <input
-                      id="session-consent"
-                      type="checkbox"
-                      checked={consent}
-                      onChange={(event) => setConsent(event.target.checked)}
-                    />
-                    <label htmlFor="session-consent">
-                      Allow Trakr to process this resume for this session only.
-                    </label>
-                  </div>
-                  <div
-                    className={`upload-zone ${
-                      isDragging ? "is-dragging" : ""
-                    } ${uploadState === "error" ? "has-error" : ""}`}
-                    onDragEnter={(event) => {
-                      event.preventDefault();
-                      setIsDragging(true);
-                    }}
-                    onDragOver={(event) => event.preventDefault()}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={handleDrop}
+                {workflowChoices.map((choice) => (
+                  <button
+                    type="button"
+                    className="route-choice"
+                    key={choice.id}
+                    onClick={() =>
+                      void submitToAgent({
+                        message: String(choice.number ?? choice.value),
+                        displayUser: choice.label,
+                        operation: "auto",
+                      })
+                    }
+                    disabled={isWorking}
                   >
-                    <input
-                      ref={inputRef}
-                      id="resume-upload"
-                      type="file"
-                      accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
-                      onChange={handleFileInput}
-                      disabled={isWorking || !consent}
-                    />
-                    <label htmlFor="resume-upload">
-                      <span className="upload-icon">
-                        {uploadState === "complete" ? (
-                          <CheckCircle2 aria-hidden="true" size={26} />
-                        ) : (
-                          <UploadCloud aria-hidden="true" size={26} />
-                        )}
-                      </span>
-                      <span className="upload-title">
-                        {fileName || "Drop your resume here"}
-                      </span>
-                      <span className="upload-meta">
-                        {uploadState === "complete"
-                          ? "Evidence extracted for this session"
-                          : "PDF, DOCX, or TXT up to 2.5 MB"}
-                      </span>
-                    </label>
-                    {uploadState === "uploading" || uploadState === "parsing" ? (
-                      <div className="upload-progress" aria-live="polite">
-                        <div className="progress-track">
-                          <span style={{ width: `${uploadProgress}%` }} />
-                        </div>
-                        <span>
-                          {uploadState === "parsing"
-                            ? "Extracting profile evidence..."
-                            : `Uploading ${uploadProgress}%`}
-                        </span>
-                      </div>
-                    ) : null}
-                    {uploadState === "error" ? (
-                      <p className="inline-error" role="alert">
-                        <AlertCircle aria-hidden="true" size={17} />
-                        {uploadError}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
+                    <span className="step-marker">{choice.number}</span>
+                    <span>
+                      <strong>{choice.label}</strong>
+                      {choice.description ? <small>{choice.description}</small> : null}
+                    </span>
+                    <ChevronRight aria-hidden="true" size={17} />
+                  </button>
+                ))}
+              </div>
             </section>
           ) : null}
 
-          {selectedService &&
-          selectedService !== "opportunity_finding" ? (
+          {selectedService && acceptsDocument ? (
             <section className="workspace-section intake-section" aria-labelledby="resume-service-intake">
               <div className="section-heading">
                 <div>
                   <p className="section-kicker">
-                    {selectedService === "resume_generation"
-                      ? "Resume Generation"
-                      : "Resume Benchmarking & Optimization"}
+                    {selectedService === "opportunity_finding"
+                      ? "Optional profile evidence"
+                      : selectedService === "resume_generation"
+                        ? "Resume Generation"
+                        : "Resume Benchmarking and Optimization"}
                   </p>
-                  <h2 id="resume-service-intake">Add existing application evidence</h2>
+                  <h2 id="resume-service-intake">
+                    {conversation?.requiredInputs.find((input) => input.type === "document")
+                      ?.prompt ?? "Add existing application evidence"}
+                  </h2>
                 </div>
               </div>
               <p className="section-intro">
-                Upload a resume, CV, or text document, or describe verified facts in the message box. Trakr will ask for the target and only the missing evidence that matters.
+                Upload the requested document once. Trakr will parse it in the
+                deployed service and preserve only the session evidence and secure
+                document reference in the continuation.
               </p>
               <div className="resume-intake">
                 <div className="consent-row">

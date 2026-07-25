@@ -30,7 +30,7 @@
     "test:service2": "tsx --test tests/service2-resume-intelligence.test.ts",
     "test:service2:calibration": "tsx --test tests/service2-calibration-corpus.test.ts",
     "test:service3": "tsx --test tests/service3-resume-generation.test.ts",
-    "test:orchestration": "tsx --test tests/a2mcp-orchestration.test.ts",
+    "test:orchestration": "tsx --test tests/a2mcp-orchestration.test.ts tests/backend-orchestration-contract.test.ts",
     "test:workspace": "tsx --test tests/workspace.test.ts",
     "test:companion": "tsx --test tests/conversational-asp.test.ts",
     "devpost:compare": "tsx scripts/compare-devpost-normalization.ts",

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { opportunitySourceRegistry } from "@/lib/opportunities/source-registry";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
+import { discoveryCategoryDefinitions } from "@/lib/opportunities/discovery-categories";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,7 @@ export async function GET() {
     version: TRAKR_SERVICE_VERSION,
     type: "A2MCP",
     description:
-      "One conversational A2MCP endpoint for Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. An empty or ambiguous bootstrap request returns a machine-readable three-service menu.",
+      "One server-authoritative conversational A2MCP endpoint for Opportunity Finding, Resume Benchmarking and Optimization, and Resume Generation. An empty or ambiguous bootstrap request returns a machine-readable three-service menu.",
     endpoints: {
       recommend: {
         method: "POST",
@@ -58,6 +59,14 @@ export async function GET() {
       "official_directory",
       "research_lead",
     ],
+    discoveryCategories: discoveryCategoryDefinitions.map(
+      ({ id, number, label, description }) => ({
+        id,
+        number,
+        label,
+        description,
+      }),
+    ),
     actions: ["Apply Now", "Prepare First", "Skip"],
     aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
     services: [
@@ -66,11 +75,13 @@ export async function GET() {
         label: "Opportunity Finding",
         operation: "discover",
         status: "available",
-        intakeRoutes: ["resume", "background", "request"],
+        firstStage: "choose_opportunity_categories",
+        resumeOptional: true,
+        categories: discoveryCategoryDefinitions.map(({ id }) => id),
       },
       {
         id: "resume_benchmarking_optimization",
-        label: "Resume Benchmarking & Optimization",
+        label: "Resume Benchmarking and Optimization",
         operations: ["benchmark", "optimize"],
         status: "available",
       },
@@ -106,7 +117,7 @@ export async function GET() {
         {
           value: "benchmark",
           number: 2,
-          label: "Resume Benchmarking & Optimization",
+          label: "Resume Benchmarking and Optimization",
         },
         { value: "generate_resume", number: 3, label: "Resume Generation" },
       ],
@@ -150,6 +161,7 @@ export async function GET() {
     },
     conversationalStates: [
       "choose_service",
+      "choose_opportunity_categories",
       "service_pending",
       "consent_required",
       "choose_profile_source",
@@ -166,7 +178,7 @@ export async function GET() {
     ],
     orchestrationContract: {
       authority:
-        "The response stage, status, requiredInputs, nextActions, and continuation determine the next valid caller action.",
+        "The response callerAction, stage, status, requiredInputs, optionalInputs, allowedResponses, attachmentsAccepted, nextActions, and continuation determine the next valid caller action.",
       numericChoices:
         "Numeric aliases are valid only with the continuation for the menu stage that issued them.",
       callerInstructions: {
@@ -179,6 +191,7 @@ export async function GET() {
         askUserForRequiredInputs: true,
         doNotReplaceTrakrMatching: true,
         treatHttp200AsBusinessResponse: true,
+        doNotExposeProtocolWorkWhenFree: true,
       },
       priority: [
         "valid continuation and current stage",
@@ -190,6 +203,7 @@ export async function GET() {
     },
     capabilities: [
       "profile building without a resume",
+      "ten-category, broad-first Opportunity Finding with adaptive merged intake",
       "session-scoped profile evidence with explicit, inferred, and unknown facts",
       "opportunity matching and explanation",
       "eligibility and skill-gap analysis",

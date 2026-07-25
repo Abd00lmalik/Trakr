@@ -250,7 +250,7 @@ function inferLocation(message: string) {
   }
 
   const match = message.match(
-    /\b(?:from|based in|located in|living in|student in|graduate in|researcher in|professional in|applicant in|designer in|developer in|engineer in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
+    /\b(?:from|based in|located in|live in|living in|student in|graduate in|researcher in|professional in|applicant in|designer in|developer in|engineer in|applying from|remotely from)\s+([A-Z][A-Za-z .'-]*?(?:,\s*[A-Z][A-Za-z .'-]*?)?)(?=[.;]|\s+(?:with|and|who|looking|seeking|interested|want|only)\b|$)/,
   );
   return match?.[1]?.trim().replace(/[.;]+$/, "");
 }
@@ -299,7 +299,7 @@ function inferCurrentDegreeLevel(message: string) {
     ?.trim();
   if (labelled) return labelled;
   const studentLevel = message.match(
-    /\b(?:a|an)?\s*(bachelor(?:'s)?|bsc|master(?:'s)?|msc|mba|phd|doctorate|diploma|certificate)\s+(?:degree\s+)?student\b/i,
+    /\b(?:a|an)?\s*(bachelor(?:'s)?|bsc|master(?:'s)?|msc|mba|phd|doctorate|diploma|certificate)(?:\s+degree)?(?:\s+[A-Za-z][A-Za-z&/-]*){0,5}\s+student\b/i,
   )?.[1];
   if (!studentLevel) return undefined;
   const normalized = studentLevel.toLowerCase();
@@ -1002,6 +1002,12 @@ export function buildConversationalProfile(
     ...(context?.filters ?? {}),
     ...request.filters,
     categories: categories.length ? categories : request.filters.categories,
+    discoveryCategories:
+      request.selectedDiscoveryCategories?.length
+        ? request.selectedDiscoveryCategories
+        : request.filters.discoveryCategories ??
+          context?.selectedDiscoveryCategories ??
+          context?.filters?.discoveryCategories,
     location:
       request.filters.location ??
       inferPreferredLocation(request.message ?? "") ??
@@ -1048,9 +1054,11 @@ export function buildConversationalProfile(
     completenessScore: completenessScore(profile, filters),
     sufficient: missingInformation.every((item) => !item.required),
     profileSource:
-      context?.profileSource ??
-      request.intakeRoute ??
-      (request.resumeText ? "resume" : message ? "request" : undefined),
+      request.resumeText
+        ? "resume"
+        : request.intakeRoute ??
+          context?.profileSource ??
+          (message ? "request" : undefined),
   };
 }
 
@@ -1088,6 +1096,7 @@ export function buildContinuationContext(
       | "documentReferences"
       | "consent"
       | "filters"
+      | "selectedDiscoveryCategories"
       | "target"
       | "generationPreferences"
       | "lastBenchmark"
@@ -1116,6 +1125,10 @@ export function buildContinuationContext(
       updates.documentReferences ?? context?.documentReferences ?? [],
     consent: updates.consent ?? context?.consent,
     filters: updates.filters ?? context?.filters,
+    selectedDiscoveryCategories:
+      updates.selectedDiscoveryCategories ??
+      context?.selectedDiscoveryCategories ??
+      [],
     target: updates.target ?? context?.target,
     generationPreferences:
       updates.generationPreferences ?? context?.generationPreferences,

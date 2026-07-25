@@ -126,7 +126,7 @@ try {
   if (
     !metadata.response.ok ||
     metadata.body?.type !== "A2MCP" ||
-    metadata.body?.version !== "0.7.1"
+    metadata.body?.version !== "0.8.0"
   ) {
     throw new Error("A2MCP metadata endpoint did not return the expected contract.");
   }
@@ -258,14 +258,12 @@ try {
   if (
     !profilelessConversation.response.ok ||
     profilelessConversation.body?.conversation?.state !==
-      "choose_profile_source" ||
-    profilelessConversation.body?.conversation?.choices?.length !== 3 ||
-    JSON.stringify(profilelessConversation.body?.conversation?.choices).includes(
-      "service",
-    )
+      "choose_opportunity_categories" ||
+    profilelessConversation.body?.conversation?.choices?.length !== 10 ||
+    profilelessConversation.body?.callerAction !== "show_selection_menu"
   ) {
     throw new Error(
-      `Profileless conversational request did not offer all Opportunity Finding paths: ${JSON.stringify(
+      `Profileless conversational request did not offer all Opportunity Finding categories: ${JSON.stringify(
         profilelessConversation.body,
       )}`,
     );
@@ -281,10 +279,11 @@ try {
   });
   if (
     !requestChoice.response.ok ||
-    requestChoice.body?.conversation?.state !== "collecting_request"
+    requestChoice.body?.conversation?.state !== "needs_more_information" ||
+    !requestChoice.body?.conversation?.message?.includes("Hackathons")
   ) {
     throw new Error(
-      `Free-form request route did not continue correctly: ${JSON.stringify(
+      `Hackathon category did not continue into adaptive intake: ${JSON.stringify(
         requestChoice.body,
       )}`,
     );
@@ -301,10 +300,11 @@ try {
   });
   if (
     !backgroundChoice.response.ok ||
-    backgroundChoice.body?.conversation?.state !== "collecting_background"
+    backgroundChoice.body?.conversation?.state !== "needs_more_information" ||
+    !backgroundChoice.body?.conversation?.message?.includes("Internships")
   ) {
     throw new Error(
-      `Background source choice did not continue correctly: ${JSON.stringify(
+      `Internship category did not continue into adaptive intake: ${JSON.stringify(
         backgroundChoice.body,
       )}`,
     );
@@ -317,7 +317,7 @@ try {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message:
-          "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
+          "I am a Nigerian computer science student with React, TypeScript, Python, and Solidity experience. I built a campus research dashboard. I want remote AI and Web3 hackathons, grants, fellowships, and internships.",
       }),
     },
   );
@@ -326,10 +326,10 @@ try {
   const conversationalCoverage =
     conversationalRecommendation.body?.categoryCoverage;
   const requestedCoverageCategories = [
-    "hackathon",
-    "grant",
-    "fellowship",
-    "internship",
+    "hackathons",
+    "grants_funding",
+    "fellowships",
+    "internships",
   ];
   const coveredCategories = new Set(
     Array.isArray(conversationalCoverage)
@@ -380,41 +380,41 @@ try {
       message: "Find remote AI internships for a student in Nigeria.",
     }),
   });
-  if (
-    !constrainedInitial.response.ok ||
-    constrainedInitial.body?.conversation?.state !== "needs_more_information"
-  ) {
-    throw new Error(
-      `Constrained discovery intake did not request the essential missing profile facts: ${JSON.stringify(
-        constrainedInitial.body,
-      )}`,
-    );
-  }
-
-  const constrainedFollowUp = await requestJson("/api/a2mcp/recommend", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message: "I use React, TypeScript, Python, and machine learning.",
-      continuation: constrainedInitial.body?.conversation?.continuation,
-    }),
-  });
   const constrainedCategories =
-    constrainedFollowUp.body?.querySummary?.filtersApplied?.categories;
+    constrainedInitial.body?.querySummary?.filtersApplied?.categories;
+  const constrainedCoverage = constrainedInitial.body?.categoryCoverage;
   const wrongTypeRecommendation =
-    constrainedFollowUp.body?.recommendations?.find(
+    constrainedInitial.body?.recommendations?.find(
       (item) => item.opportunity?.category !== "internship",
     );
+  const inventedEvidence = constrainedInitial.body?.evidenceSources?.find(
+    (item) =>
+      item?.source === "caller_structured" ||
+      item?.source === "inferred" ||
+      item?.confirmedByUser === true,
+  );
+  const hasInternshipCoverage =
+    Array.isArray(constrainedCoverage) &&
+    constrainedCoverage.some((item) => item.category === "internships");
+  const hasHonestConstrainedOutcome =
+    constrainedInitial.body?.recommendations?.length > 0 ||
+    /no verified direct matches in Trakr's current inventory/i.test(
+      constrainedInitial.body?.message ?? "",
+    );
   if (
-    !constrainedFollowUp.response.ok ||
-    constrainedFollowUp.body?.conversation?.state !== "recommendations" ||
+    !constrainedInitial.response.ok ||
+    constrainedInitial.body?.stage !== "discover_completed" ||
+    constrainedInitial.body?.conversation?.state !== "recommendations" ||
     JSON.stringify(constrainedCategories) !== JSON.stringify(["internship"]) ||
-    constrainedFollowUp.body?.querySummary?.filtersApplied?.remote !== true ||
-    wrongTypeRecommendation
+    constrainedInitial.body?.querySummary?.filtersApplied?.remote !== true ||
+    !hasInternshipCoverage ||
+    !hasHonestConstrainedOutcome ||
+    wrongTypeRecommendation ||
+    inventedEvidence
   ) {
     throw new Error(
-      `Continuation lost or violated explicit discovery constraints: ${JSON.stringify(
-        constrainedFollowUp.body,
+      `Broad constrained discovery lost constraints, invented evidence, or obscured coverage: ${JSON.stringify(
+        constrainedInitial.body,
       )}`,
     );
   }
@@ -610,7 +610,7 @@ try {
         conversationalRecommendationCount:
           conversationalRecommendation.body.recommendations.length,
         constrainedRecommendationCount:
-          constrainedFollowUp.body.recommendations.length,
+          constrainedInitial.body.recommendations.length,
         provider: recommendation.body.provider,
         aiStatus: recommendation.body.aiStatus,
         topRecommendation: recommendation.body.recommendations[0].opportunity.title,

@@ -313,6 +313,7 @@ function normalizedContext(context: CompanionContext): CompanionContext {
       maxTotalLength: 1500,
     }),
     documentReferences: (context.documentReferences ?? []).slice(-8),
+    selectedDiscoveryCategories: context.selectedDiscoveryCategories ?? [],
     sessionVersion: SESSION_VERSION,
   });
 }

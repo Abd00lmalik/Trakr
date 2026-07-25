@@ -68,6 +68,7 @@ function hasConversationalFields(payload: unknown) {
     "intent",
     "operation",
     "intakeRoute",
+    "selectedDiscoveryCategories",
     "consent",
     "context",
     "continuation",
@@ -178,12 +179,19 @@ function exposeConversationContract<T extends Record<string, unknown>>(
     interactionState:
       value.state === "choose_service"
         ? "service_selection_required"
+        : value.state === "choose_opportunity_categories"
+          ? "opportunity_category_selection_required"
         : value.state,
+    apiVersion: response.version,
     stage: value.stage,
     status: value.status,
     message: value.message,
     selectedService: value.service,
     requiredInputs: value.requiredInputs,
+    optionalInputs: value.optionalInputs,
+    allowedResponses: value.allowedResponses,
+    attachmentsAccepted: value.attachmentsAccepted,
+    callerAction: value.callerAction,
     nextActions: value.nextActions,
     continuation: value.continuation,
     callerInstructions: {
@@ -196,6 +204,7 @@ function exposeConversationContract<T extends Record<string, unknown>>(
       askUserForRequiredInputs: true,
       doNotReplaceTrakrMatching: true,
       treatHttp200AsBusinessResponse: true,
+      doNotExposeProtocolWorkWhenFree: true,
     },
     profileOrigin,
     profileConfirmed: profile?.confirmed === true,

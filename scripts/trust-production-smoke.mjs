@@ -5,7 +5,7 @@ const baseUrl =
   "https://trakr-production-c70e.up.railway.app";
 const endpoint = `${baseUrl}/api/a2mcp/recommend`;
 const expectedMenu =
-  "Choose a service:\n1. Find opportunities\n2. Resume Benchmarking & Optimization\n3. Resume Generation";
+  "Choose a service:\n1. Find opportunities\n2. Resume Benchmarking and Optimization\n3. Resume Generation";
 const forbiddenScholarshipTitles = new Set([
   "Microsoft Learn Student Hub",
   "GitHub Education Student Developer Pack",
@@ -78,7 +78,7 @@ async function assertOfficialUrl(url) {
   const response = await fetch(url, {
     method: "HEAD",
     redirect: "manual",
-    headers: { "User-Agent": "Trakr-Release-Verification/0.7.1" },
+    headers: { "User-Agent": "Trakr-Release-Verification/0.8.0" },
     signal: AbortSignal.timeout(15000),
   });
   assert.ok(
@@ -92,7 +92,7 @@ const coldStarts = [];
 for (let index = 0; index < 5; index += 1) {
   const result = await post({ message: declaration });
   assert.equal(result.response.status, 200);
-  assert.equal(result.response.headers.get("x-trakr-version"), "0.7.1");
+  assert.equal(result.response.headers.get("x-trakr-version"), "0.8.0");
   assert.equal(result.body.interactionState, "service_selection_required");
   assert.equal(result.body.stage, "choose_service");
   assert.equal(result.body.operation, "start");
@@ -116,11 +116,12 @@ const selected = await post({
   message: "1",
   continuation: chooser.body.continuation,
 });
-assert.equal(selected.body.stage, "discover_choose_input");
+assert.equal(selected.body.stage, "choose_opportunity_categories");
 assert.equal(selected.body.recommendations.length, 0);
 
 const callerProfile = await post({
   operation: "discover",
+  selectedDiscoveryCategories: ["jobs"],
   user: {
     headline: "Data Science and AI",
     location: "Nigeria",
@@ -140,7 +141,7 @@ const denied = await post({
   message: "No, that profile is incorrect. Start over.",
   continuation: callerProfile.body.continuation,
 });
-assert.equal(denied.body.stage, "discover_choose_input");
+assert.equal(denied.body.stage, "choose_opportunity_categories");
 assert.equal(denied.body.recommendations.length, 0);
 assert.equal(denied.body.conversation.profile.draft.headline, undefined);
 assert.equal(denied.body.conversation.profile.draft.skills.length, 0);

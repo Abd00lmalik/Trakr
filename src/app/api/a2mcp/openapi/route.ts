@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
+import { discoveryCategoryDefinitions } from "@/lib/opportunities/discovery-categories";
 
 export const runtime = "nodejs";
 
@@ -9,10 +10,20 @@ const serviceChoices = [
     id: "resume_benchmarking_optimization",
     value: "benchmark",
     number: 2,
-    label: "Resume Benchmarking & Optimization",
+    label: "Resume Benchmarking and Optimization",
   },
   { id: "resume_generation", value: "generate_resume", number: 3, label: "Resume Generation" },
 ];
+
+const discoveryCategoryChoices = discoveryCategoryDefinitions.map(
+  ({ id, number, label, description }) => ({
+    id,
+    value: id,
+    number,
+    label,
+    description,
+  }),
+);
 
 const choiceSchema = {
   type: "object",
@@ -51,6 +62,24 @@ const requiredInputSchema = {
     acceptedMimeTypes: { type: "array", items: { type: "string" } },
     maxBytes: { type: "integer", minimum: 1 },
     fields: { type: "array", items: { type: "string" } },
+  },
+};
+
+const acceptedAttachmentSchema = {
+  type: "object",
+  required: [
+    "id",
+    "required",
+    "acceptedRepresentations",
+    "acceptedMimeTypes",
+    "maxBytes",
+  ],
+  properties: {
+    id: { type: "string" },
+    required: { type: "boolean" },
+    acceptedRepresentations: { type: "array", items: { type: "string" } },
+    acceptedMimeTypes: { type: "array", items: { type: "string" } },
+    maxBytes: { type: "integer", minimum: 1 },
   },
 };
 
@@ -239,7 +268,7 @@ export async function GET() {
       title: "Trakr Opportunity & Resume Services",
       version: TRAKR_SERVICE_VERSION,
       description:
-        "One outcome-first, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request returns HTTP 200 with a machine-readable chooser and never assumes Opportunity Finding. Existing valid legacy recommendation payloads remain compatible.",
+        "One server-authoritative, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking and Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request returns HTTP 200 with a machine-readable chooser and never assumes Opportunity Finding. Service 1 begins with ten broad opportunity categories and a resume is optional. Existing valid legacy recommendation payloads remain compatible.",
     },
     servers: [
       {
@@ -297,6 +326,16 @@ export async function GET() {
                       default: "auto",
                     },
                     intakeRoute: { type: "string", enum: ["resume", "background", "request"] },
+                    selectedDiscoveryCategories: {
+                      type: "array",
+                      maxItems: 10,
+                      items: {
+                        type: "string",
+                        enum: discoveryCategoryDefinitions.map(({ id }) => id),
+                      },
+                      description:
+                        "Optional structured equivalent of the server-issued Service 1 category selection. External agents should normally relay allowedResponses and return the user's answer with continuation.",
+                    },
                     user: {
                       ...structuredProfileSchema,
                       description: "Structured applicant profile; supported by all services. Contact fields are rendered only when explicitly supplied and authorized.",
@@ -533,6 +572,22 @@ export async function GET() {
                         enum: [null, "opportunity_finding", "resume_benchmarking_optimization", "resume_generation"],
                       },
                       requiredInputs: { type: "array", items: requiredInputSchema },
+                      optionalInputs: { type: "array", items: requiredInputSchema },
+                      allowedResponses: { type: "array", items: choiceSchema },
+                      attachmentsAccepted: {
+                        type: "array",
+                        items: acceptedAttachmentSchema,
+                      },
+                      callerAction: {
+                        type: "string",
+                        enum: [
+                          "show_selection_menu",
+                          "ask_user_question",
+                          "request_upload",
+                          "display_results",
+                          "offer_optional_next_action",
+                        ],
+                      },
                       nextActions: { type: "array", items: { type: "string" } },
                       continuation: continuationSchema,
                       artifacts: { type: "array", items: artifactSchema },
@@ -614,6 +669,7 @@ export async function GET() {
                           "askUserForRequiredInputs",
                           "doNotReplaceTrakrMatching",
                           "treatHttp200AsBusinessResponse",
+                          "doNotExposeProtocolWorkWhenFree",
                         ],
                         properties: {
                           relayMessage: { const: true },
@@ -625,6 +681,7 @@ export async function GET() {
                           askUserForRequiredInputs: { const: true },
                           doNotReplaceTrakrMatching: { const: true },
                           treatHttp200AsBusinessResponse: { const: true },
+                          doNotExposeProtocolWorkWhenFree: { const: true },
                         },
                       },
                       profileOrigin: {
@@ -654,7 +711,7 @@ export async function GET() {
                       conversation: {
                         type: "object",
                         description: "Server-authoritative state. External agents should ask for requiredInputs and submit the user's answer with continuation.",
-                        required: ["state", "intent", "service", "operation", "stage", "status", "message", "requiredInputs", "nextActions", "continuation"],
+                        required: ["state", "intent", "service", "operation", "stage", "status", "message", "callerAction", "requiredInputs", "optionalInputs", "allowedResponses", "attachmentsAccepted", "nextActions", "continuation"],
                         properties: {
                           state: { type: "string" },
                           intent: { type: "string" },
@@ -667,7 +724,23 @@ export async function GET() {
                           status: { type: "string", enum: ["needs_input", "in_progress", "completed"] },
                           message: { type: "string" },
                           requiredAction: { type: "string" },
+                          callerAction: {
+                            type: "string",
+                            enum: [
+                              "show_selection_menu",
+                              "ask_user_question",
+                              "request_upload",
+                              "display_results",
+                              "offer_optional_next_action",
+                            ],
+                          },
                           requiredInputs: { type: "array", items: requiredInputSchema },
+                          optionalInputs: { type: "array", items: requiredInputSchema },
+                          allowedResponses: { type: "array", items: choiceSchema },
+                          attachmentsAccepted: {
+                            type: "array",
+                            items: acceptedAttachmentSchema,
+                          },
                           choices: { type: "array", items: choiceSchema },
                           nextActions: { type: "array", items: { type: "string" } },
                           continuation: continuationSchema,
@@ -696,13 +769,39 @@ export async function GET() {
                         stage: "choose_service",
                         status: "needs_input",
                         message:
-                          "Choose a service:\n1. Find opportunities\n2. Resume Benchmarking & Optimization\n3. Resume Generation",
+                          "Choose a service:\n1. Find opportunities\n2. Resume Benchmarking and Optimization\n3. Resume Generation",
                         selectedService: null,
                         requiredInputs: [
                           { id: "service", type: "enum", required: true, prompt: "Choose a service", options: serviceChoices },
                         ],
+                        optionalInputs: [],
+                        allowedResponses: serviceChoices,
+                        attachmentsAccepted: [],
+                        callerAction: "show_selection_menu",
                         nextActions: ["discover", "benchmark", "generate_resume"],
                         continuation: { token: "opaque-encrypted-token-at-least-forty-characters", expiresAt: "2026-07-21T12:30:00.000Z", sessionVersion: "2" },
+                      },
+                    },
+                    opportunityCategories: {
+                      value: {
+                        operation: "discover",
+                        stage: "choose_opportunity_categories",
+                        status: "needs_input",
+                        callerAction: "show_selection_menu",
+                        message:
+                          "Choose one or more opportunity categories:\n1. Jobs\n2. Internships\n3. Hackathons\n4. Scholarships\n5. Fellowships\n6. Grants & Funding\n7. Bounties & Freelance Opportunities\n8. Accelerators & Incubators\n9. Creator Opportunities\n10. Competitions & Challenges",
+                        requiredInputs: [
+                          {
+                            id: "opportunity_categories",
+                            type: "enum",
+                            required: true,
+                            prompt: "Choose one or more opportunity categories",
+                            options: discoveryCategoryChoices,
+                          },
+                        ],
+                        optionalInputs: [],
+                        allowedResponses: discoveryCategoryChoices,
+                        attachmentsAccepted: [],
                       },
                     },
                   },

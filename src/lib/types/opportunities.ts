@@ -15,6 +15,19 @@ export const opportunityCategorySchema = z.enum([
   "research_lead",
 ]);
 
+export const discoveryCategorySchema = z.enum([
+  "jobs",
+  "internships",
+  "hackathons",
+  "scholarships",
+  "fellowships",
+  "grants_funding",
+  "bounties_freelance",
+  "accelerators_incubators",
+  "creator_opportunities",
+  "competitions_challenges",
+]);
+
 export const opportunityTypeSchema = z.enum([
   "job",
   "internship",
@@ -262,6 +275,7 @@ export const profileEvidenceSchema = z.object({
 
 export const recommendationFiltersSchema = z.object({
   categories: z.array(opportunityCategorySchema).optional(),
+  discoveryCategories: z.array(discoveryCategorySchema).max(10).optional(),
   opportunityTypes: z.array(opportunityTypeSchema).optional(),
   domains: z.array(opportunityDomainSchema).optional(),
   location: z.string().optional(),
@@ -281,6 +295,7 @@ export const recommendationRequestSchema = z
     goals: z.array(z.string().min(1)).optional(),
     interests: z.array(z.string().min(1)).optional(),
     filters: recommendationFiltersSchema.default({}),
+    selectedDiscoveryCategories: z.array(discoveryCategorySchema).max(10).optional(),
     requestId: z.string().optional(),
   })
   .superRefine((value, ctx) => {
@@ -420,6 +435,7 @@ export const companionContextSchema = z.object({
   documentReferences: z.array(documentReferenceSchema).max(8).default([]),
   consent: consentSchema.optional(),
   filters: recommendationFiltersSchema.optional(),
+  selectedDiscoveryCategories: z.array(discoveryCategorySchema).max(10).optional(),
   target: companionTargetSchema.optional(),
   generationPreferences: generationPreferencesSchema.optional(),
   lastBenchmark: resumeBenchmarkReferenceSchema.optional(),
@@ -447,6 +463,7 @@ export const opportunityCompanionRequestSchema = z
     goals: z.array(z.string().min(1)).optional(),
     interests: z.array(z.string().min(1)).optional(),
     filters: recommendationFiltersSchema.default({}),
+    selectedDiscoveryCategories: z.array(discoveryCategorySchema).max(10).optional(),
     requestId: z.string().optional(),
     message: z.string().max(6000).optional(),
     intent: companionIntentSchema.default("auto"),
@@ -586,6 +603,7 @@ export const learningRoadmapSchema = z.object({
 export const recommendationResponseSchema = z.object({
   service: z.literal("trakr"),
   version: z.string(),
+  apiVersion: z.string().optional(),
   requestId: z.string(),
   generatedAt: z.string().datetime(),
   provider: z.string(),
@@ -602,7 +620,7 @@ export const recommendationResponseSchema = z.object({
   categoryCoverage: z
     .array(
       z.object({
-        category: opportunityCategorySchema,
+        category: z.union([opportunityCategorySchema, discoveryCategorySchema]),
         status: z.enum([
           "covered",
           "limited",
@@ -632,6 +650,7 @@ export const recommendationResponseSchema = z.object({
       askUserForRequiredInputs: z.literal(true),
       doNotReplaceTrakrMatching: z.literal(true),
       treatHttp200AsBusinessResponse: z.literal(true),
+      doNotExposeProtocolWorkWhenFree: z.literal(true),
     })
     .optional(),
   profileOrigin: z
@@ -673,6 +692,7 @@ export const recommendationResponseSchema = z.object({
 
 export const companionStateSchema = z.enum([
   "choose_service",
+  "choose_opportunity_categories",
   "service_pending",
   "consent_required",
   "choose_profile_source",
@@ -716,6 +736,22 @@ export const requiredInputSchema = z.object({
   fields: z.array(z.string()).optional(),
 });
 
+export const callerActionSchema = z.enum([
+  "show_selection_menu",
+  "ask_user_question",
+  "request_upload",
+  "display_results",
+  "offer_optional_next_action",
+]);
+
+export const acceptedAttachmentSchema = z.object({
+  id: z.string(),
+  required: z.boolean(),
+  acceptedRepresentations: z.array(z.string()),
+  acceptedMimeTypes: z.array(z.string()),
+  maxBytes: z.number().int().positive(),
+});
+
 export const companionProfileSchema = z.object({
   draft: structuredUserProfileSchema,
   evidence: z.array(profileEvidenceSchema),
@@ -744,7 +780,11 @@ export const companionConversationSchema = z.object({
   nextActions: z.array(z.string()),
   continuation: companionSessionReferenceSchema,
   requiredAction: z.string().optional(),
+  callerAction: callerActionSchema,
   requiredInputs: z.array(requiredInputSchema).default([]),
+  optionalInputs: z.array(requiredInputSchema).default([]),
+  allowedResponses: z.array(companionChoiceSchema).default([]),
+  attachmentsAccepted: z.array(acceptedAttachmentSchema).default([]),
   choices: z.array(companionChoiceSchema).optional(),
 });
 
@@ -934,12 +974,17 @@ export const opportunityCompanionResponseSchema =
     message: z.string().optional(),
     selectedService: userFacingServiceSchema.nullable().optional(),
     requiredInputs: z.array(requiredInputSchema).optional(),
+    optionalInputs: z.array(requiredInputSchema).optional(),
+    allowedResponses: z.array(companionChoiceSchema).optional(),
+    attachmentsAccepted: z.array(acceptedAttachmentSchema).optional(),
+    callerAction: callerActionSchema.optional(),
     nextActions: z.array(z.string()).optional(),
     continuation: companionSessionReferenceSchema.optional(),
     artifacts: z.array(downloadableArtifactSchema).optional(),
   });
 
 export type OpportunityCategory = z.infer<typeof opportunityCategorySchema>;
+export type DiscoveryCategory = z.infer<typeof discoveryCategorySchema>;
 export type OpportunityType = z.infer<typeof opportunityTypeSchema>;
 export type OpportunityDomain = z.infer<typeof opportunityDomainSchema>;
 export type RemoteScope = z.infer<typeof remoteScopeSchema>;
@@ -1004,6 +1049,7 @@ export type ProfileEvidence = z.infer<typeof profileEvidenceSchema>;
 export type CompanionConversation = z.infer<typeof companionConversationSchema>;
 export type CompanionChoice = z.infer<typeof companionChoiceSchema>;
 export type RequiredInput = z.infer<typeof requiredInputSchema>;
+export type CallerAction = z.infer<typeof callerActionSchema>;
 export type DownloadableArtifact = z.infer<typeof downloadableArtifactSchema>;
 export type CompanionCapabilityResult = z.infer<
   typeof companionCapabilityResultSchema

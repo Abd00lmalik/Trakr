@@ -771,6 +771,7 @@ test("conflicting explicit location evidence remains unresolved rather than conf
   const initial = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       operation: "discover",
+      selectedDiscoveryCategories: ["jobs"],
       user: {
         headline: "Data analyst",
         location: "Nigeria",
@@ -786,10 +787,16 @@ test("conflicting explicit location evidence remains unresolved rather than conf
       },
     }),
   );
+  const confirmed = await handleOpportunityCompanionRequest(
+    opportunityCompanionRequestSchema.parse({
+      message: "Yes, this profile is accurate.",
+      continuation: initial.conversation?.continuation,
+    }),
+  );
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       operation: "benchmark",
-      continuation: initial.conversation?.continuation,
+      continuation: confirmed.conversation?.continuation,
       message: "I am now based in United Kingdom.",
       target: {
         role: "UK Data Analyst",
