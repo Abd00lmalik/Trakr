@@ -109,7 +109,7 @@ export function parseDiscoveryCategories(message: string | undefined) {
   }
 
   for (const definition of discoveryCategoryDefinitions) {
-    if (definition.aliases.some((pattern) => pattern.test(value))) {
+    if (definition.aliases.some((pattern) => hasPositiveMatch(value, pattern))) {
       selected.add(definition.id);
     }
   }
@@ -125,6 +125,23 @@ export function parseDiscoveryCategories(message: string | undefined) {
   return discoveryCategoryDefinitions
     .filter((definition) => selected.has(definition.id))
     .map((definition) => definition.id);
+}
+
+function hasPositiveMatch(value: string, pattern: RegExp) {
+  const flags = pattern.flags.includes("g") ? pattern.flags : `${pattern.flags}g`;
+  const matcher = new RegExp(pattern.source, flags);
+  for (const match of value.matchAll(matcher)) {
+    const prefix = value.slice(Math.max(0, (match.index ?? 0) - 64), match.index);
+    if (/\bnot only(?:\s+\w+){0,5}\s*$/i.test(prefix)) return true;
+    if (
+      !/\b(?:no|not|without|excluding?|except|avoid(?:ing)?|do not want|don't want)(?:\s+\w+){0,5}\s*$/i.test(
+        prefix,
+      )
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export function discoveryCategoryMatchesOpportunity(

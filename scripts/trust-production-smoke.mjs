@@ -164,7 +164,7 @@ const confirmed = await post({
   message: "Yes, this extracted profile is accurate.",
   continuation: uploaded.body.continuation,
 });
-assert.equal(confirmed.body.stage, "discover_missing_information");
+assert.equal(confirmed.body.stage, "discover_completed");
 
 const completed = await post({
   message:
@@ -180,7 +180,7 @@ assert.equal(
 );
 assert.deepEqual(
   new Set(completed.body.categoryCoverage.map((item) => item.category)),
-  new Set(["remote_job", "scholarship", "internship"]),
+  new Set(["jobs", "scholarships", "internships"]),
 );
 
 const directScholarships = completed.body.directOpportunities.filter(

@@ -8,6 +8,7 @@ import {
   opportunityCompanionResponseSchema,
   type DiscoveryCategory,
 } from "../src/lib/types/opportunities";
+import { parseDiscoveryCategories } from "../src/lib/opportunities/discovery-categories";
 
 const categories: Array<[number, DiscoveryCategory]> = [
   [1, "jobs"],
@@ -88,6 +89,15 @@ test("multiple numbers, names, and broad natural language share one category sta
   assert.deepEqual(
     resolveSessionContext(remote.continuation)?.selectedDiscoveryCategories,
     ["jobs"],
+  );
+});
+
+test("explicitly negated opportunity categories are not selected", () => {
+  assert.deepEqual(
+    parseDiscoveryCategories(
+      "I want scholarships, fellowships, grants, and research opportunities, not software jobs.",
+    ),
+    ["scholarships", "fellowships", "grants_funding"],
   );
 });
 

@@ -270,10 +270,14 @@ await run("ORCH-PROD-008-service3-selection", async () => {
     message: "3",
     continuation: chooser.continuation,
   });
-  assert.equal(result.body.stage, "generate_awaiting_information");
+  assert.equal(result.body.stage, "generate_awaiting_target");
   assert.deepEqual(
     result.body.requiredInputs.map((input) => input.id),
-    ["generation_target", "verified_facts", "output_preferences"],
+    ["generation_target"],
+  );
+  assert.deepEqual(
+    result.body.optionalInputs.map((input) => input.id),
+    ["output_preferences"],
   );
   return { status: result.response.status, stage: result.body.stage };
 });

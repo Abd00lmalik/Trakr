@@ -227,7 +227,7 @@ await run("S1-PROD-RERUN-005-background-researcher", async () => {
       message:
         "I am a mid-level public policy researcher in Uganda with four years of nonprofit research experience. My skills include qualitative interviews, survey design, academic writing, Excel, and data analysis. I supported a fictional digital-inclusion study. I want remote scholarships, fellowships, grants, and research opportunities, not software jobs.",
     },
-    "Field of study: Public policy. Current degree level: Master's degree completed. Target degree level: Doctorate or PhD. Nationality: Ugandan. Country of residence: Uganda. Preferred study countries: United Kingdom and Germany.",
+    "Field of study: Public policy. Current degree level: Master's degree completed. Target degree level: Doctorate or PhD. Nationality: Ugandan. Country of residence: Uganda. Preferred study countries: United Kingdom and Germany. I need funding for a digital-inclusion research project.",
   );
   const recommendations = auditRecommendations(response.body);
   const categories = response.body.querySummary.filtersApplied.categories ?? [];
@@ -271,7 +271,7 @@ await run("S1-PROD-RERUN-007-free-form-multi-interest", async () => {
   const response = await completeJourney(
     {
       message:
-        "I want active climate, fintech, and AI opportunities that I can apply to remotely from Africa.",
+        "I want active climate, fintech, and AI jobs, internships, grants, and fellowships that I can apply to remotely from Africa.",
     },
     "I am an early-career data analyst in Nigeria. I use Python, SQL, data analysis, statistics, and machine learning. I want jobs, internships, grants, and fellowships.",
   );
