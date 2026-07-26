@@ -15,6 +15,7 @@ import { ExactEvmScheme } from "@okxweb3/x402-evm/exact/server";
 import {
   getX402OkxCredentials,
   getX402PayTo,
+  getX402ResourceUrl,
   X402_ASSET,
   X402_ATOMIC_AMOUNT,
   X402_DEFAULT_FACILITATOR_BASE_URL,
@@ -144,7 +145,7 @@ export async function createX402Server(facilitator: FacilitatorClient) {
         price: `$${X402_PRICE_USD}`,
         maxTimeoutSeconds: 120,
       },
-      resource: "/api/a2mcp/recommend",
+      resource: getX402ResourceUrl(),
       description:
         "One paid Trakr API call for opportunity discovery, career readiness, or resume support.",
       mimeType: "application/json",
@@ -207,7 +208,10 @@ export function setX402ServerForTests(server: x402HTTPResourceServer) {
 }
 
 async function getServer() {
-  serverPromise ??= createServer();
+  serverPromise ??= createServer().catch((error) => {
+    serverPromise = undefined;
+    throw error;
+  });
   return serverPromise;
 }
 

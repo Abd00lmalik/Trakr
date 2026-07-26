@@ -342,18 +342,54 @@ function paymentInstructionResponse(
   },
   requestHeaders: Record<string, string>,
 ) {
-  const body =
+  const providedBody =
     instructions.body &&
     typeof instructions.body === "object" &&
     !Array.isArray(instructions.body)
-      ? { ...(instructions.body as Record<string, unknown>), requestId: requestHeaders["X-Request-Id"] }
-      : {
-          error: "payment_required",
-          code: "payment_required",
-          message: "Payment is required for this Trakr API call.",
-          requestId: requestHeaders["X-Request-Id"],
-          retryable: true,
-        };
+      ? (instructions.body as Record<string, unknown>)
+      : {};
+  let challengeError: string | undefined;
+  const paymentRequiredHeader =
+    instructions.headers["PAYMENT-REQUIRED"] ??
+    instructions.headers["payment-required"];
+  if (paymentRequiredHeader) {
+    try {
+      const decoded = JSON.parse(
+        Buffer.from(paymentRequiredHeader, "base64").toString("utf8"),
+      ) as { error?: unknown };
+      if (typeof decoded.error === "string" && decoded.error.trim()) {
+        challengeError = decoded.error.trim();
+      }
+    } catch {
+      // Preserve the SDK response even if an upstream header is malformed.
+    }
+  }
+  const normalizedChallengeCode = challengeError
+    ?.toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  const code =
+    typeof providedBody.code === "string"
+      ? providedBody.code
+      : normalizedChallengeCode || "payment_required";
+  const message =
+    typeof providedBody.message === "string"
+      ? providedBody.message
+      : code === "payment_required"
+        ? "Payment is required for this Trakr API call."
+        : `The payment proof was rejected (${code}). Obtain a fresh payment requirement and retry.`;
+  const body = {
+    error:
+      typeof providedBody.error === "string" ? providedBody.error : code,
+    code,
+    message,
+    retryable:
+      typeof providedBody.retryable === "boolean"
+        ? providedBody.retryable
+        : true,
+    ...providedBody,
+    requestId: requestHeaders["X-Request-Id"],
+  };
   return json(body, instructions.status, {
     ...requestHeaders,
     ...instructions.headers,

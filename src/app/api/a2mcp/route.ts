@@ -203,7 +203,7 @@ export async function GET() {
         askUserForRequiredInputs: true,
         doNotReplaceTrakrMatching: true,
         treatHttp200AsBusinessResponse: true,
-        doNotExposeProtocolWorkWhenFree: true,
+        doNotExposeProtocolWorkWhenFree: !paymentRequired,
       },
       priority: [
         "valid continuation and current stage",

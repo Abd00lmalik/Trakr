@@ -10,6 +10,9 @@ export const X402_TOKEN_DECIMALS = 6;
 export const X402_PRICE_USD = "0.005";
 export const X402_ATOMIC_AMOUNT = "5000";
 export const X402_ROUTE = "POST /api/a2mcp/recommend";
+export const X402_RESOURCE_PATH = "/api/a2mcp/recommend";
+export const X402_DEFAULT_PUBLIC_ORIGIN =
+  "https://trakr-production-c70e.up.railway.app";
 export const X402_DEFAULT_FACILITATOR_BASE_URL = "https://web3.okx.com";
 
 export function isX402Enforced() {
@@ -32,6 +35,23 @@ export function getX402PayTo() {
     );
   }
   return value.toLowerCase();
+}
+
+export function getX402ResourceUrl() {
+  const configuredOrigin =
+    process.env.TRAKR_SERVICE_URL?.trim() ||
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    X402_DEFAULT_PUBLIC_ORIGIN;
+  const origin = new URL(configuredOrigin);
+  if (
+    process.env.NODE_ENV === "production" &&
+    origin.protocol !== "https:"
+  ) {
+    throw new Error(
+      "TRAKR_SERVICE_URL must use HTTPS when x402 payment enforcement is enabled in production.",
+    );
+  }
+  return new URL(X402_RESOURCE_PATH, origin).toString();
 }
 
 export function getX402OkxCredentials() {

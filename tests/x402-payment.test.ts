@@ -182,9 +182,14 @@ test("official OKX server emits a compliant x402 v2 exact challenge", async () =
   assert.ok(header);
   const challenge = decodeHeader<{
     x402Version: number;
+    resource: { url: string };
     accepts: PaymentRequirements[];
   }>(header);
   assert.equal(challenge.x402Version, X402_VERSION);
+  assert.equal(
+    challenge.resource.url,
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+  );
   assert.equal(challenge.accepts.length, 1);
   assert.deepEqual(challenge.accepts[0], {
     scheme: X402_SCHEME,
@@ -326,6 +331,41 @@ test("a proof for the wrong network is rejected before settlement", async () => 
   assert.equal(facilitator.verifyCalls, 0);
   assert.equal(facilitator.settleCalls, 0);
   resetX402ServerForTests();
+});
+
+test("route payment failures preserve a machine-readable rejection body", async () => {
+  process.env.TRAKR_X402_ENFORCEMENT = "enforce";
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new FakeFacilitator();
+  setX402ServerForTests(await createX402Server(facilitator));
+
+  const unpaid = await POST(request());
+  const challenge = decodeHeader<{
+    x402Version: number;
+    resource: { url: string };
+    accepts: PaymentRequirements[];
+  }>(unpaid.headers.get("PAYMENT-REQUIRED") ?? "");
+  const wrongNetworkPayload: PaymentPayload = {
+    x402Version: X402_VERSION,
+    resource: challenge.resource,
+    accepted: {
+      ...challenge.accepts[0],
+      network: "eip155:1952",
+    },
+    payload: { authorization: {}, signature: "0x01" },
+  };
+
+  const rejected = await POST(request(encodeHeader(wrongNetworkPayload)));
+  const body = await rejected.json();
+  assert.equal(rejected.status, 402);
+  assert.equal(body.error, "no_matching_payment_requirements");
+  assert.equal(body.code, "no_matching_payment_requirements");
+  assert.match(body.message, /payment proof was rejected/i);
+  assert.equal(body.retryable, true);
+  assert.ok(rejected.headers.get("PAYMENT-REQUIRED"));
+
+  resetX402ServerForTests();
+  process.env.TRAKR_X402_ENFORCEMENT = "off";
 });
 
 test("wrong asset, amount, and recipient are rejected before settlement", async () => {

@@ -279,7 +279,7 @@ export async function GET() {
       title: "Trakr Opportunity & Resume Services",
       version: TRAKR_SERVICE_VERSION,
       description:
-        "One server-authoritative, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking and Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request returns HTTP 200 with a machine-readable chooser and never assumes Opportunity Finding. Service 1 begins with ten broad opportunity categories and a resume is optional. Existing valid legacy recommendation payloads remain compatible.",
+        `One server-authoritative, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking and Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request ${paymentRequired ? "first returns an HTTP 402 x402 challenge; after payment, the replay returns HTTP 200 with" : "returns HTTP 200 with"} a machine-readable chooser and never assumes Opportunity Finding. Service 1 begins with ten broad opportunity categories and a resume is optional. Existing valid legacy recommendation payloads remain compatible.`,
     },
     servers: [
       {
