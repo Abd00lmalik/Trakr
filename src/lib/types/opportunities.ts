@@ -327,6 +327,7 @@ export const serviceOperationSchema = z.enum([
   "benchmark",
   "optimize",
   "generate_resume",
+  "readiness",
 ]);
 
 export const userFacingServiceSchema = z.enum([
@@ -440,6 +441,7 @@ export const companionContextSchema = z.object({
   generationPreferences: generationPreferencesSchema.optional(),
   lastBenchmark: resumeBenchmarkReferenceSchema.optional(),
   optimizationApproved: z.boolean().optional(),
+  menuVersion: z.enum(["1", "2"]).optional(),
   sessionVersion: z.enum(["1", "2"]).optional(),
 });
 

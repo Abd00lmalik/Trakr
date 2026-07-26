@@ -280,7 +280,7 @@ test("OpenAPI documents additive discovery requests and required resume consent"
   assert.ok(resumeOperation.responses["403"]);
 });
 
-test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available capabilities", async () => {
+test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async () => {
   const metadataResponse = await getA2mcpMetadata();
   const metadata = await metadataResponse.json();
   const openApiResponse = await getOpenApi();
@@ -290,12 +290,18 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
       "application/json"
     ].schema;
 
-  const service = metadata.services.find(
+  const benchmarkService = metadata.services.find(
     (item: { id: string }) =>
-      item.id === "resume_benchmarking_optimization",
+      item.id === "resume_benchmarking",
   );
-  assert.equal(service.status, "available");
-  assert.deepEqual(service.operations, ["benchmark", "optimize"]);
+  assert.equal(benchmarkService.status, "available");
+  assert.equal(benchmarkService.operation, "benchmark");
+  const optimizationService = metadata.services.find(
+    (item: { id: string }) => item.id === "resume_optimization",
+  );
+  assert.equal(optimizationService.status, "available");
+  assert.equal(optimizationService.operation, "optimize");
+  assert.match(optimizationService.prerequisite, /benchmark/i);
   assert.equal(metadata.submission.pricing, "free");
   assert.equal(metadata.submission.paymentRequired, false);
   const generationService = metadata.services.find(
@@ -304,7 +310,13 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
   assert.equal(generationService.status, "available");
   assert.equal(generationService.operation, "generate_resume");
   assert.ok(generationService.documentTypes.includes("biosketch"));
-  assert.equal(document.info.version, "0.9.3");
+  const readinessService = metadata.services.find(
+    (item: { id: string }) => item.id === "application_readiness",
+  );
+  assert.equal(readinessService.status, "available");
+  assert.equal(readinessService.operation, "readiness");
+  assert.equal(metadata.bootstrap.options.length, 5);
+  assert.equal(document.info.version, "0.9.4");
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);

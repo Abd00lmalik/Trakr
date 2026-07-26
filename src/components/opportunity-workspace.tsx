@@ -31,8 +31,10 @@ import {
 } from "react";
 import type {
   CompanionConversation,
+  CompanionChoice,
   OpportunityCompanionResponse,
   RecommendationResponse,
+  ServiceOperation,
   UserFacingService,
 } from "@/lib/types/opportunities";
 
@@ -43,32 +45,46 @@ type AssistantMessage = {
   content: string;
 };
 
-const serviceOptions: Array<{
-  id: UserFacingService;
+const actionOptions: Array<{
+  value: ServiceOperation;
   label: string;
   description: string;
   icon: typeof Search;
   active: boolean;
 }> = [
   {
-    id: "opportunity_finding",
+    value: "discover",
     label: "Opportunity Finding",
     description: "Find current opportunities that fit your goals and constraints.",
     icon: Search,
     active: true,
   },
   {
-    id: "resume_benchmarking_optimization",
-    label: "Resume Benchmarking and Optimization",
-    description: "Compare your evidence with a specific target before rewriting.",
+    value: "benchmark",
+    label: "Resume Benchmarking",
+    description: "Compare your evidence with a specific target.",
     icon: FileSearch,
     active: true,
   },
   {
-    id: "resume_generation",
+    value: "optimize",
+    label: "Resume Optimization",
+    description: "Benchmark first, then improve the resume using confirmed evidence.",
+    icon: PenLine,
+    active: true,
+  },
+  {
+    value: "generate_resume",
     label: "Resume Generation",
     description: "Create a truthful, target-specific document from verified facts.",
     icon: PenLine,
+    active: true,
+  },
+  {
+    value: "readiness",
+    label: "Application Readiness",
+    description: "Assess a known opportunity or choose the right next step.",
+    icon: Target,
     active: true,
   },
 ];
@@ -615,6 +631,8 @@ export function OpportunityWorkspace() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedService, setSelectedService] =
     useState<UserFacingService | null>(null);
+  const [selectedAction, setSelectedAction] =
+    useState<ServiceOperation | null>(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [continuation, setContinuation] =
@@ -658,6 +676,12 @@ export function OpportunityWorkspace() {
         if (body.conversation) {
           setContinuation(body.conversation.continuation);
           setSelectedService(body.conversation.service);
+          setSelectedAction(
+            body.conversation.operation === "start" ||
+              body.conversation.operation === "auto"
+              ? null
+              : body.conversation.operation,
+          );
           setMessages([{ role: "assistant", content: body.conversation.message }]);
         }
       })
@@ -687,16 +711,17 @@ export function OpportunityWorkspace() {
   async function submitToAgent(input: {
     message?: string;
     displayUser?: string;
-    operation?: "start" | "auto" | "discover" | "benchmark" | "optimize" | "generate_resume";
+    operation?: ServiceOperation;
     resumeText?: string;
     freshSession?: boolean;
   }) {
     if (isSending) return;
     const selectedOperation =
       input.operation ??
+      (selectedAction ??
       (selectedService
         ? operationForService(selectedService)
-        : "auto");
+        : "auto"));
     const userMessage = input.message?.trim();
     if (userMessage || input.displayUser) {
       appendMessage({ role: "user", content: input.displayUser ?? userMessage ?? "" });
@@ -742,6 +767,12 @@ export function OpportunityWorkspace() {
       if (companionResponse.conversation) {
         setContinuation(companionResponse.conversation.continuation);
         setSelectedService(companionResponse.conversation.service);
+        setSelectedAction(
+          companionResponse.conversation.operation === "start" ||
+            companionResponse.conversation.operation === "auto"
+            ? null
+            : companionResponse.conversation.operation,
+        );
         appendMessage({
           role: "assistant",
           content: companionResponse.conversation.message,
@@ -766,10 +797,9 @@ export function OpportunityWorkspace() {
     }
   }
 
-  function selectService(service: UserFacingService) {
-    const choice = serviceChoices.find((item) => item.id === service);
-    if (!choice) return;
-    setSelectedService(service);
+  function selectService(choice: CompanionChoice) {
+    const operation = choice.value as ServiceOperation;
+    setSelectedAction(operation);
     setRequestError("");
     void submitToAgent({
       message: String(choice.number ?? choice.value),
@@ -815,7 +845,8 @@ export function OpportunityWorkspace() {
     formData.append("consent", "true");
     formData.append(
       "operation",
-      selectedService ? operationForService(selectedService) : "discover",
+      selectedAction ??
+        (selectedService ? operationForService(selectedService) : "discover"),
     );
     if (continuation?.token) {
       formData.append("continuation", continuation.token);
@@ -865,6 +896,7 @@ export function OpportunityWorkspace() {
       if (companionResponse.conversation) {
         setContinuation(companionResponse.conversation.continuation);
         setSelectedService(companionResponse.conversation.service);
+        setSelectedAction(companionResponse.conversation.operation);
         appendMessage({
           role: "assistant",
           content: companionResponse.conversation.message,
@@ -886,6 +918,7 @@ export function OpportunityWorkspace() {
 
   function resetWorkspace() {
     setSelectedService(null);
+    setSelectedAction(null);
     setMessage("");
     setMessages([]);
     setContinuation(undefined);
@@ -986,16 +1019,18 @@ export function OpportunityWorkspace() {
 
             <div className="service-grid">
               {serviceChoices.map((choice) => {
-                const service = serviceOptions.find((item) => item.id === choice.id);
-                if (!service) return null;
-                const Icon = service.icon;
-                const selected = selectedService === choice.id;
+                const action = actionOptions.find(
+                  (item) => item.value === choice.value,
+                );
+                if (!action) return null;
+                const Icon = action.icon;
+                const selected = selectedAction === choice.value;
                 return (
                   <button
                     type="button"
                     className={`service-choice ${selected ? "is-selected" : ""}`}
                     key={choice.id}
-                    onClick={() => selectService(choice.id as UserFacingService)}
+                    onClick={() => selectService(choice)}
                     disabled={isWorking}
                   >
                     <span className="service-choice-icon">
@@ -1003,10 +1038,10 @@ export function OpportunityWorkspace() {
                     </span>
                     <span className="service-choice-copy">
                       <strong>{choice.label}</strong>
-                      <span>{choice.description ?? service.description}</span>
+                      <span>{choice.description ?? action.description}</span>
                     </span>
                     <ArrowRight aria-hidden="true" size={17} />
-                    {!service.active ? (
+                    {!action.active ? (
                       <small>Service flow staged</small>
                     ) : null}
                   </button>

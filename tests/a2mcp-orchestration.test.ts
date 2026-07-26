@@ -123,7 +123,9 @@ function assertChooser(body: Record<string, any>) {
   assert.deepEqual(body.nextActions, [
     "discover",
     "benchmark",
+    "optimize",
     "generate_resume",
+    "readiness",
   ]);
   assert.deepEqual(
     body.requiredInputs[0].options.map(
@@ -138,9 +140,23 @@ function assertChooser(body: Record<string, any>) {
       {
         value: "benchmark",
         number: 2,
-        label: "Resume Benchmarking and Optimization",
+        label: "Benchmark or analyze my resume",
       },
-      { value: "generate_resume", number: 3, label: "Resume Generation" },
+      {
+        value: "optimize",
+        number: 3,
+        label: "Optimize my resume for a target",
+      },
+      {
+        value: "generate_resume",
+        number: 4,
+        label: "Generate a resume",
+      },
+      {
+        value: "readiness",
+        number: 5,
+        label: "Help me with my application or readiness",
+      },
     ],
   );
   assert.ok(body.continuation?.token.length >= 40);
@@ -148,6 +164,7 @@ function assertChooser(body: Record<string, any>) {
   assert.deepEqual(resolved?.unansweredQuestions, []);
   assert.equal(resolved?.profile, undefined);
   assert.deepEqual(resolved?.profileEvidence, []);
+  assert.equal(resolved?.menuVersion, "2");
 }
 
 async function docxBuffer(text: string) {
@@ -201,7 +218,7 @@ async function assertDownload(artifact: DownloadableArtifact) {
   }
 }
 
-test("empty and minimal cold starts return the three-service chooser with HTTP 200", async () => {
+test("empty and minimal cold starts return the five-action chooser with HTTP 200", async () => {
   const cases = [
     undefined,
     {},
@@ -213,7 +230,7 @@ test("empty and minimal cold starts return the three-service chooser with HTTP 2
   for (const input of cases) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.3");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.4");
     assertChooser(result.body);
   }
 });
@@ -675,8 +692,16 @@ test("each top-level service selection returns service-specific required inputs"
     ["resume", "target", "consent"],
   );
 
-  const generation = await callRoute({
+  const optimization = await callRoute({
     message: "3",
+    continuation: cold.body.continuation,
+  });
+  assert.equal(optimization.body.stage, "benchmark_awaiting_resume_and_target");
+  assert.equal(optimization.body.operation, "optimize");
+  assert.match(optimization.body.message, /benchmark first/i);
+
+  const generation = await callRoute({
+    message: "4",
     continuation: cold.body.continuation,
   });
   assert.equal(generation.body.stage, "generate_awaiting_target");
@@ -688,6 +713,113 @@ test("each top-level service selection returns service-specific required inputs"
   assert.deepEqual(
     generation.body.optionalInputs.map((input: { id: string }) => input.id),
     ["output_preferences"],
+  );
+
+  const readiness = await callRoute({
+    message: "5",
+    continuation: cold.body.continuation,
+  });
+  assert.equal(readiness.body.stage, "readiness_choose_route");
+  assert.equal(readiness.body.operation, "readiness");
+  assert.deepEqual(
+    readiness.body.allowedResponses.map(
+      (choice: { value: string }) => choice.value,
+    ),
+    [
+      "readiness_for_opportunity",
+      "benchmark_target",
+      "discover_first",
+    ],
+  );
+});
+
+test("legacy three-choice continuations keep option 3 mapped to resume generation", async () => {
+  const continuation = createSessionReference({
+    profileEvidence: [],
+    profileConfirmed: false,
+    unansweredQuestions: [],
+    documentReferences: [],
+    selectedDiscoveryCategories: [],
+    stage: "choose_service",
+    sessionVersion: "2",
+  });
+  const generation = await callRoute({
+    message: "3",
+    continuation,
+  });
+  assert.equal(generation.body.stage, "generate_awaiting_target");
+  assert.equal(generation.body.operation, "generate_resume");
+});
+
+test("application-readiness selection routes through existing readiness, benchmark, or discovery flows", async () => {
+  const cold = await callRoute({});
+  const readiness = await callRoute({
+    message: "5",
+    continuation: cold.body.continuation,
+  });
+
+  const benchmarkRoute = await callRoute({
+    message: "2",
+    continuation: readiness.body.continuation,
+  });
+  assert.equal(benchmarkRoute.body.stage, "benchmark_awaiting_resume_and_target");
+  assert.equal(benchmarkRoute.body.operation, "benchmark");
+
+  const readinessAgain = await callRoute({
+    message: "5",
+    continuation: cold.body.continuation,
+  });
+  const discoveryRoute = await callRoute({
+    message: "3",
+    continuation: readinessAgain.body.continuation,
+  });
+  assert.equal(discoveryRoute.body.stage, "choose_opportunity_categories");
+  assert.equal(discoveryRoute.body.operation, "discover");
+
+  const readinessThird = await callRoute({
+    message: "5",
+    continuation: cold.body.continuation,
+  });
+  const knownOpportunityRoute = await callRoute({
+    message: "1",
+    continuation: readinessThird.body.continuation,
+  });
+  assert.equal(
+    knownOpportunityRoute.body.stage,
+    "readiness_awaiting_target_and_profile",
+  );
+  assert.equal(knownOpportunityRoute.body.operation, "readiness");
+});
+
+test("known-opportunity readiness produces a grounded assessment after profile confirmation", async () => {
+  const targetOpportunity = curatedOfficialOpportunities[0];
+  assert.ok(targetOpportunity);
+
+  const cold = await callRoute({});
+  const readiness = await callRoute({
+    message: "5",
+    continuation: cold.body.continuation,
+  });
+  const knownOpportunityRoute = await callRoute({
+    message: "1",
+    continuation: readiness.body.continuation,
+  });
+  const supplied = await callRoute({
+    message: `Assess my readiness for ${targetOpportunity.title}.`,
+    continuation: knownOpportunityRoute.body.continuation,
+    user: profile,
+    target: { opportunityId: targetOpportunity.id },
+  });
+  const assessed = await confirmProfile(supplied);
+
+  assert.equal(assessed.body.stage, "readiness");
+  assert.equal(assessed.body.operation, "readiness");
+  assert.equal(
+    assessed.body.capabilityResult?.readiness?.opportunityId,
+    targetOpportunity.id,
+  );
+  assert.ok(
+    assessed.body.capabilityResult?.readiness?.gaps instanceof Array,
   );
 });
 

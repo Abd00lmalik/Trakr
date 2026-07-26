@@ -17,12 +17,29 @@ export const runtime = "nodejs";
 const serviceChoices = [
   { id: "opportunity_finding", value: "discover", number: 1, label: "Find opportunities" },
   {
-    id: "resume_benchmarking_optimization",
+    id: "resume_benchmarking",
     value: "benchmark",
     number: 2,
-    label: "Resume Benchmarking and Optimization",
+    label: "Benchmark or analyze my resume",
   },
-  { id: "resume_generation", value: "generate_resume", number: 3, label: "Resume Generation" },
+  {
+    id: "resume_optimization",
+    value: "optimize",
+    number: 3,
+    label: "Optimize my resume for a target",
+  },
+  {
+    id: "resume_generation",
+    value: "generate_resume",
+    number: 4,
+    label: "Generate a resume",
+  },
+  {
+    id: "application_readiness",
+    value: "readiness",
+    number: 5,
+    label: "Help me with my application or readiness",
+  },
 ];
 
 const discoveryCategoryChoices = discoveryCategoryDefinitions.map(
@@ -279,7 +296,7 @@ export async function GET() {
       title: "Trakr Opportunity & Resume Services",
       version: TRAKR_SERVICE_VERSION,
       description:
-        `One server-authoritative, conversation-first, evidence-first A2MCP endpoint for Opportunity Finding, Resume Benchmarking and Optimization, and Resume Generation. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request ${paymentRequired ? "first returns an HTTP 402 x402 challenge; after payment, the replay returns HTTP 200 with" : "returns HTTP 200 with"} a machine-readable chooser and never assumes Opportunity Finding. Service 1 begins with ten broad opportunity categories and a resume is optional. Existing valid legacy recommendation payloads remain compatible.`,
+        `One server-authoritative, conversation-first, evidence-first A2MCP endpoint exposing opportunity discovery, resume benchmarking, resume optimization, resume generation, and application-readiness guidance. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request ${paymentRequired ? "first returns an HTTP 402 x402 challenge; after payment, the replay returns HTTP 200 with" : "returns HTTP 200 with"} a machine-readable five-action chooser and never assumes Opportunity Finding. Existing valid legacy recommendation payloads and three-choice continuations remain compatible.`,
     },
     servers: [
       {
@@ -292,7 +309,7 @@ export async function GET() {
     paths: {
       "/api/a2mcp": {
         get: {
-          summary: "Discover Trakr's three A2MCP services and orchestration rules",
+          summary: "Discover Trakr's five goal-directed actions and orchestration rules",
           responses: { "200": { description: "A2MCP service metadata" } },
         },
       },
@@ -300,7 +317,7 @@ export async function GET() {
         post: {
           summary: "Start or continue a Trakr opportunity or resume workflow",
           description:
-            `The same endpoint supports start, discover, benchmark, optimize, and generate_resume. Bootstrap requests may have an empty body, {}, operation=start, an empty message, or a service declaration. Optimization requires a compatible benchmark and explicit approval. ${
+            `The same endpoint supports start, discover, benchmark, optimize, generate_resume, and readiness. Bootstrap requests may have an empty body, {}, operation=start, an empty message, or a service declaration. Optimization requires a compatible benchmark and explicit approval. Readiness can assess a known Trakr opportunity, route to target benchmarking, or begin with opportunity discovery. ${
               paymentRequired
                 ? `Every valid call requires ${X402_PRICE_USD} ${X402_TOKEN_NAME} through x402 v2 exact payment on ${X402_NETWORK}.`
                 : "Payment enforcement is currently disabled."
@@ -316,7 +333,7 @@ export async function GET() {
                   properties: {
                     operation: {
                       type: "string",
-                      enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume"],
+                      enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume", "readiness"],
                       default: "auto",
                     },
                     message: {
@@ -504,7 +521,13 @@ export async function GET() {
                     },
                     operation: {
                       type: "string",
-                      enum: ["discover", "benchmark", "optimize", "generate_resume"],
+                      enum: [
+                        "discover",
+                        "benchmark",
+                        "optimize",
+                        "generate_resume",
+                        "readiness",
+                      ],
                       default: "discover",
                     },
                     message: { type: "string", maxLength: 6000 },
@@ -535,7 +558,7 @@ export async function GET() {
           responses: {
             "200": {
               description:
-                "Conversational state or a completed service result. Bootstrap returns choose_service, status needs_input, all three options, and an opaque continuation. Legacy recommendation fields remain present for compatible clients.",
+                "Conversational state or a completed service result. Bootstrap returns choose_service, status needs_input, all five goal-directed actions, and an opaque continuation. Legacy recommendation fields remain present for compatible clients.",
               headers: {
                 "X-Trakr-Version": {
                   required: true,
@@ -573,7 +596,18 @@ export async function GET() {
                       generatedAt: { type: "string", format: "date-time" },
                       provider: { type: "string" },
                       aiStatus: { type: "string", enum: ["enhanced", "retrying", "degraded", "fallback"] },
-                      operation: { type: "string", enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume"] },
+                      operation: {
+                        type: "string",
+                        enum: [
+                          "start",
+                          "auto",
+                          "discover",
+                          "benchmark",
+                          "optimize",
+                          "generate_resume",
+                          "readiness",
+                        ],
+                      },
                       interactionState: {
                         type: "string",
                         description:
@@ -786,7 +820,7 @@ export async function GET() {
                         stage: "choose_service",
                         status: "needs_input",
                         message:
-                          "Choose a service:\n1. Find opportunities\n2. Resume Benchmarking and Optimization\n3. Resume Generation",
+                          "What would you like Trakr to help you with?\n1. Find opportunities\n2. Benchmark or analyze my resume\n3. Optimize my resume for a target\n4. Generate a resume\n5. Help me with my application or readiness",
                         selectedService: null,
                         requiredInputs: [
                           { id: "service", type: "enum", required: true, prompt: "Choose a service", options: serviceChoices },
@@ -795,7 +829,7 @@ export async function GET() {
                         allowedResponses: serviceChoices,
                         attachmentsAccepted: [],
                         callerAction: "show_selection_menu",
-                        nextActions: ["discover", "benchmark", "generate_resume"],
+                        nextActions: ["discover", "benchmark", "optimize", "generate_resume", "readiness"],
                         continuation: { token: "opaque-encrypted-token-at-least-forty-characters", expiresAt: "2026-07-21T12:30:00.000Z", sessionVersion: "2" },
                       },
                     },

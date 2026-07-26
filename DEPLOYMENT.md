@@ -104,7 +104,7 @@ Trakr remains one existing A2MCP service on Agent `#5198`:
 - Protocol payment: `0.005 USD?0` (`5000` atomic units) on
   `eip155:196`, x402 v2 `exact`
 - Input: empty bootstrap, explicit service operation, structured profile, resume text, canonical base64 PDF/DOCX/TXT, natural-language request, or caller-scoped continuation
-- Output: server-authoritative conversational state, three-service chooser, ranked opportunities, evidence-linked resume diagnostics, and short-lived DOCX/PDF artifacts
+- Output: server-authoritative conversational state, five-action goal chooser, ranked opportunities, evidence-linked resume diagnostics, application-readiness guidance, and short-lived DOCX/PDF artifacts
 
 Deploy payment-capable code with `TRAKR_X402_ENFORCEMENT=off` first. Apply the
 database migration and verify payment readiness before coordinating the listing

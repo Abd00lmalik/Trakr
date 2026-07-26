@@ -1101,6 +1101,7 @@ export function buildContinuationContext(
       | "generationPreferences"
       | "lastBenchmark"
       | "optimizationApproved"
+      | "menuVersion"
     >
   > = {},
 ): CompanionContext {
@@ -1135,6 +1136,7 @@ export function buildContinuationContext(
     lastBenchmark: updates.lastBenchmark ?? context?.lastBenchmark,
     optimizationApproved:
       updates.optimizationApproved ?? context?.optimizationApproved,
+    menuVersion: updates.menuVersion ?? context?.menuVersion,
     sessionVersion: "2",
   };
 }

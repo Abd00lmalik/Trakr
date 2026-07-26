@@ -138,7 +138,7 @@ test("the incomplete-response contract explicitly tells callers what to do", asy
   assert.equal(cold.status, "needs_input");
   assert.equal(cold.requiredInputs?.[0]?.id, "service");
   assert.deepEqual(cold.optionalInputs, []);
-  assert.equal(cold.allowedResponses?.length, 3);
+  assert.equal(cold.allowedResponses?.length, 5);
   assert.deepEqual(cold.attachmentsAccepted, []);
   assert.equal(cold.callerInstructions?.relayMessage, true);
   assert.equal(cold.callerInstructions?.doNotSelectService, true);

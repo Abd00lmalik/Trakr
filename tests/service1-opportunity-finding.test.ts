@@ -126,7 +126,7 @@ function scored(
   };
 }
 
-test("empty auto request exposes the three user-facing services", async () => {
+test("empty auto request exposes the five goal-directed actions", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({}),
   );
@@ -137,7 +137,9 @@ test("empty auto request exposes the three user-facing services", async () => {
     [
       "opportunity_finding",
       "resume_benchmarking_optimization",
+      "resume_optimization",
       "resume_generation",
+      "application_readiness",
     ],
   );
 });

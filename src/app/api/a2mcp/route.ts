@@ -25,7 +25,7 @@ export async function GET() {
     version: TRAKR_SERVICE_VERSION,
     type: "A2MCP",
     description:
-      "One server-authoritative conversational A2MCP endpoint for Opportunity Finding, Resume Benchmarking and Optimization, and Resume Generation. An empty or ambiguous bootstrap request returns a machine-readable three-service menu.",
+      "One server-authoritative conversational A2MCP endpoint exposing five goal-directed actions: opportunity discovery, resume benchmarking, resume optimization, resume generation, and application-readiness guidance.",
     endpoints: {
       recommend: {
         method: "POST",
@@ -92,9 +92,16 @@ export async function GET() {
         categories: discoveryCategoryDefinitions.map(({ id }) => id),
       },
       {
-        id: "resume_benchmarking_optimization",
-        label: "Resume Benchmarking and Optimization",
-        operations: ["benchmark", "optimize"],
+        id: "resume_benchmarking",
+        label: "Resume Benchmarking and Analysis",
+        operation: "benchmark",
+        status: "available",
+      },
+      {
+        id: "resume_optimization",
+        label: "Target-Specific Resume Optimization",
+        operation: "optimize",
+        prerequisite: "compatible target-specific benchmark",
         status: "available",
       },
       {
@@ -118,6 +125,17 @@ export async function GET() {
           "general_professional_profile",
         ],
       },
+      {
+        id: "application_readiness",
+        label: "Application and Readiness Guidance",
+        operation: "readiness",
+        routes: [
+          "assess a known Trakr opportunity",
+          "benchmark a resume against a target",
+          "find a suitable opportunity first",
+        ],
+        status: "available",
+      },
     ],
     bootstrap: {
       operation: "start",
@@ -129,9 +147,23 @@ export async function GET() {
         {
           value: "benchmark",
           number: 2,
-          label: "Resume Benchmarking and Optimization",
+          label: "Benchmark or analyze my resume",
         },
-        { value: "generate_resume", number: 3, label: "Resume Generation" },
+        {
+          value: "optimize",
+          number: 3,
+          label: "Optimize my resume for a target",
+        },
+        {
+          value: "generate_resume",
+          number: 4,
+          label: "Generate a resume",
+        },
+        {
+          value: "readiness",
+          number: 5,
+          label: "Help me with my application or readiness",
+        },
       ],
       rule:
         "A service declaration or legacy display title alone is ambiguous and must not route to Opportunity Finding.",
@@ -143,6 +175,7 @@ export async function GET() {
       "benchmark",
       "optimize",
       "generate_resume",
+      "readiness",
     ],
     inputModes: [
       "structured_profile",
@@ -184,6 +217,7 @@ export async function GET() {
       "recommendations",
       "explanation",
       "readiness",
+      "readiness_choose_route",
       "resume_benchmark",
       "resume_optimization",
       "resume_generation",

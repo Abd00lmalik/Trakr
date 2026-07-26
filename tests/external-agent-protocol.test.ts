@@ -43,10 +43,12 @@ test("Cross-Agent Contract: Cold Start across Claude, Codex, Antigravity, Hermes
     assert.equal(res.body.callerInstructions.doNotSelectService, true);
 
     const choices = res.body.allowedResponses;
-    assert.equal(choices.length, 3);
+    assert.equal(choices.length, 5);
     assert.equal(choices[0].value ?? choices[0], "discover");
     assert.equal(choices[1].value ?? choices[1], "benchmark");
-    assert.equal(choices[2].value ?? choices[2], "generate_resume");
+    assert.equal(choices[2].value ?? choices[2], "optimize");
+    assert.equal(choices[3].value ?? choices[3], "generate_resume");
+    assert.equal(choices[4].value ?? choices[4], "readiness");
   }
 });
 
@@ -115,9 +117,9 @@ test("Cross-Agent Contract: Service 3 target-first resume generation", async () 
   const cold = await callA2mcp({ message: "Start" });
   const cont1 = cold.body.continuation;
 
-  // Select Service 3 ("3")
+  // Select resume generation ("4")
   const service3 = await callA2mcp({
-    message: "3",
+    message: "4",
     continuation: cont1,
   });
   assert.equal(service3.body.stage, "generate_awaiting_target");

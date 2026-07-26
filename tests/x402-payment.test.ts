@@ -1056,6 +1056,12 @@ test("paid route requires fresh proof after failed settlement and replays succes
   const retryBody = await retryResponse.json();
   assert.equal(retryResponse.status, 200);
   assert.equal(retryBody.interactionState, "service_selection_required");
+  assert.deepEqual(
+    retryBody.allowedResponses.map(
+      (choice: { value: string }) => choice.value,
+    ),
+    ["discover", "benchmark", "optimize", "generate_resume", "readiness"],
+  );
   assert.ok(retryResponse.headers.get("PAYMENT-RESPONSE"));
   const verifyCallsAfterSuccess = facilitator.verifyCalls;
   const settleCallsAfterSuccess = facilitator.settleCalls;

@@ -69,20 +69,70 @@ function serviceForOperation(operation: ServiceOperation): UserFacingService {
   return "opportunity_finding";
 }
 
-function serviceForSelectedValue(value: string | undefined) {
+type ServiceMenuSelection = {
+  service: UserFacingService;
+  operation: ServiceOperation;
+  intent: CompanionIntent;
+};
+
+function serviceMenuSelection(
+  value: string | undefined,
+  menuVersion: CompanionContext["menuVersion"] = "2",
+): ServiceMenuSelection | undefined {
   const normalized = value?.trim().toLowerCase() ?? "";
   if (/^(1|discover|opportunity finding|find opportunities?)$/.test(normalized)) {
-    return "opportunity_finding" as const;
+    return {
+      service: "opportunity_finding",
+      operation: "discover",
+      intent: "opportunity_matching",
+    };
   }
   if (
-    /^(2|benchmark|optimi[sz]e|resume benchmarking(?: & optimization)?|resume benchmarking and optimization)$/.test(
+    /^(2|benchmark|resume benchmark(?:ing)?|benchmark\/analy[sz]e my resume|analy[sz]e my resume)$/.test(
       normalized,
     )
   ) {
-    return "resume_benchmarking_optimization" as const;
+    return {
+      service: "resume_benchmarking_optimization",
+      operation: "benchmark",
+      intent: "resume_benchmark",
+    };
   }
-  if (/^(3|generate_resume|resume generation|generate a resume)$/.test(normalized)) {
-    return "resume_generation" as const;
+  if (
+    /^(optimize|optimise|resume optimization|resume optimisation|optimi[sz]e my resume(?: for a target)?)$/.test(
+      normalized,
+    ) ||
+    (menuVersion === "2" && normalized === "3")
+  ) {
+    return {
+      service: "resume_benchmarking_optimization",
+      operation: "optimize",
+      intent: "resume_optimization",
+    };
+  }
+  if (
+    /^(generate_resume|resume generation|generate a resume|create a resume)$/.test(
+      normalized,
+    ) ||
+    (menuVersion === "2" && normalized === "4") ||
+    (menuVersion !== "2" && normalized === "3")
+  ) {
+    return {
+      service: "resume_generation",
+      operation: "generate_resume",
+      intent: "resume_generation",
+    };
+  }
+  if (
+    /^(5|readiness|application readiness|help me with my application(?:\/readiness)?|help with my application(?:\/readiness)?)$/.test(
+      normalized,
+    )
+  ) {
+    return {
+      service: "opportunity_finding",
+      operation: "readiness",
+      intent: "readiness_assessment",
+    };
   }
 }
 
@@ -105,15 +155,88 @@ function serviceChoices(): CompanionChoice[] {
       id: "resume_benchmarking_optimization",
       value: "benchmark",
       number: 2,
-      label: "Resume Benchmarking and Optimization",
-      description: "Compare your evidence with a specific target before rewriting.",
+      label: "Benchmark or analyze my resume",
+      description:
+        "Compare your evidence with a target and identify strengths, gaps, and readiness issues.",
+    },
+    {
+      id: "resume_optimization",
+      value: "optimize",
+      number: 3,
+      label: "Optimize my resume for a target",
+      description:
+        "Benchmark first, then improve the resume using only confirmed evidence.",
     },
     {
       id: "resume_generation",
       value: "generate_resume",
-      number: 3,
-      label: "Resume Generation",
+      number: 4,
+      label: "Generate a resume",
       description: "Create a truthful, target-specific document from verified facts.",
+    },
+    {
+      id: "application_readiness",
+      value: "readiness",
+      number: 5,
+      label: "Help me with my application or readiness",
+      description:
+        "Assess a known opportunity, benchmark against a target, or find a suitable opportunity first.",
+    },
+  ];
+}
+
+function serviceMenuSelectionForRequest(request: OpportunityCompanionRequest) {
+  const context = activeContext(request);
+  return serviceMenuSelection(
+    request.message,
+    context?.menuVersion ?? (context?.stage === "choose_service" ? "1" : "2"),
+  );
+}
+
+function readinessRouteChoice(message: string | undefined) {
+  const normalized = message?.trim().toLowerCase() ?? "";
+  if (
+    /^(1|readiness_for_opportunity|assess (my )?readiness|known opportunity|trakr opportunity)$/.test(
+      normalized,
+    )
+  ) {
+    return "readiness_for_opportunity" as const;
+  }
+  if (
+    /^(2|benchmark_target|benchmark|compare my resume|target benchmark)$/.test(
+      normalized,
+    )
+  ) {
+    return "benchmark_target" as const;
+  }
+  if (
+    /^(3|discover_first|find (an )?opportunit(?:y|ies) first|find opportunities)$/.test(
+      normalized,
+    )
+  ) {
+    return "discover_first" as const;
+  }
+}
+
+function readinessRouteChoices(): CompanionChoice[] {
+  return [
+    {
+      id: "readiness_for_opportunity",
+      value: "readiness_for_opportunity",
+      number: 1,
+      label: "Assess my readiness for a known Trakr opportunity",
+    },
+    {
+      id: "benchmark_target",
+      value: "benchmark_target",
+      number: 2,
+      label: "Benchmark my resume against a target",
+    },
+    {
+      id: "discover_first",
+      value: "discover_first",
+      number: 3,
+      label: "Find a suitable opportunity first",
     },
   ];
 }
@@ -312,7 +435,7 @@ function serviceSelectionFromRequest(request: OpportunityCompanionRequest) {
   if (contextService) return contextService;
   if (request.operation === "start") return undefined;
   if (request.operation !== "auto") return serviceForOperation(request.operation);
-  return serviceForSelectedValue(request.message);
+  return serviceMenuSelectionForRequest(request)?.service;
 }
 
 function isColdStartRequest(request: OpportunityCompanionRequest) {
@@ -323,7 +446,7 @@ function isColdStartRequest(request: OpportunityCompanionRequest) {
   if (request.operation === "start") return true;
   if (request.operation !== "auto") return false;
   if (!message) return true;
-  if (serviceForSelectedValue(message) && !/^[1-3]$/.test(message)) {
+  if (serviceMenuSelection(message) && !/^[1-5]$/.test(message)) {
     return false;
   }
   if (isServiceDeclarationOnly(message)) return true;
@@ -336,6 +459,13 @@ function isColdStartRequest(request: OpportunityCompanionRequest) {
 function detectIntent(request: OpportunityCompanionRequest): CompanionIntent {
   if (request.intent !== "auto") return request.intent;
   const message = request.message?.toLowerCase() ?? "";
+  if (
+    request.operation === "readiness" ||
+    activeContext(request)?.operation === "readiness" ||
+    activeContext(request)?.stage?.startsWith("readiness_")
+  ) {
+    return "readiness_assessment";
+  }
 
   if (
     /\b(create|generate|build|write|draft)\b.*\b(resume|cv)\b/.test(
@@ -412,12 +542,11 @@ function operationForRequest(
     return request.operation;
   }
   if (context?.stage === "choose_service") {
-    const selected = serviceForSelectedValue(request.message);
-    return selected ? operationForService(selected) : "start";
+    return serviceMenuSelectionForRequest(request)?.operation ?? "start";
   }
-  const selectedService = serviceForSelectedValue(request.message);
-  if (selectedService && !/^\s*[1-3]\s*$/.test(request.message ?? "")) {
-    return operationForService(selectedService);
+  const selected = serviceMenuSelectionForRequest(request);
+  if (selected && !/^\s*[1-5]\s*$/.test(request.message ?? "")) {
+    return selected.operation;
   }
   if (
     context?.stage === "optimize_confirmation" &&
@@ -428,6 +557,7 @@ function operationForRequest(
   if (intent === "resume_benchmark") return "benchmark";
   if (intent === "resume_optimization") return "optimize";
   if (intent === "resume_generation") return "generate_resume";
+  if (intent === "readiness_assessment") return "readiness";
   if (intent === "opportunity_matching" || intent === "profile_build") {
     return "discover";
   }
@@ -546,7 +676,12 @@ function isStageControlMessage(request: OpportunityCompanionRequest) {
   const message = request.message?.trim() ?? "";
   if (!stage || !message) return false;
   if (stage === "choose_service") {
-    return Boolean(serviceForSelectedValue(message)) || /^\d+$/.test(message);
+    return (
+      Boolean(serviceMenuSelectionForRequest(request)) || /^\d+$/.test(message)
+    );
+  }
+  if (stage === "readiness_choose_route") {
+    return Boolean(readinessRouteChoice(message)) || /^\d+$/.test(message);
   }
   if (stage === "discover_choose_input") {
     return Boolean(profileSourceChoice(message)) || /^\d+$/.test(message);
@@ -857,6 +992,7 @@ function conversationFor(
     target?: CompanionTarget;
     lastBenchmark?: ResumeBenchmarkReference;
     optimizationApproved?: boolean;
+    menuVersion?: CompanionContext["menuVersion"];
     generationPreferences?: CompanionContext["generationPreferences"];
     clearProfileFromSession?: boolean;
     missingInformation?: ReturnType<
@@ -928,6 +1064,7 @@ function conversationFor(
       lastBenchmark: options.lastBenchmark ?? context?.lastBenchmark,
       optimizationApproved:
         options.optimizationApproved ?? context?.optimizationApproved,
+      menuVersion: options.menuVersion ?? context?.menuVersion,
     },
   );
   if (options.clearProfileFromSession) {
@@ -1234,9 +1371,15 @@ export async function handleOpportunityCompanionRequest(
   rawRequest: OpportunityCompanionRequest,
 ): Promise<OpportunityCompanionResponse> {
   const normalized = normalizedRequest(rawRequest);
-  const intent = detectIntent(normalized);
-  const operation = operationForRequest(normalized, intent);
-  const selectedService = serviceSelectionFromRequest(normalized);
+  const menuSelection =
+    activeContext(normalized)?.stage === "choose_service"
+      ? serviceMenuSelectionForRequest(normalized)
+      : undefined;
+  const intent = menuSelection?.intent ?? detectIntent(normalized);
+  const operation =
+    menuSelection?.operation ?? operationForRequest(normalized, intent);
+  const selectedService =
+    menuSelection?.service ?? serviceSelectionFromRequest(normalized);
   const service =
     operation === "start"
       ? null
@@ -1425,10 +1568,10 @@ export async function handleOpportunityCompanionRequest(
   }
   const selectedFromServiceMenu =
     (activeContext(request)?.stage === "choose_service" &&
-      Boolean(serviceForSelectedValue(request.message))) ||
+      Boolean(serviceMenuSelectionForRequest(request))) ||
     (!activeContext(request) &&
-      Boolean(serviceForSelectedValue(request.message)) &&
-      !/^\s*[1-3]\s*$/.test(request.message ?? ""));
+      Boolean(serviceMenuSelectionForRequest(request)) &&
+      !/^\s*[1-5]\s*$/.test(request.message ?? ""));
   const sourceChoice = selectedFromServiceMenu
     ? undefined
     : request.intakeRoute;
@@ -1446,8 +1589,8 @@ export async function handleOpportunityCompanionRequest(
       "start",
       null,
       "choose_service",
-      menuMessage("Choose a service:", choices),
-      ["discover", "benchmark", "generate_resume"],
+      menuMessage("What would you like Trakr to help you with?", choices),
+      ["discover", "benchmark", "optimize", "generate_resume", "readiness"],
       undefined,
       {
         requiredAction: "select_service",
@@ -1465,6 +1608,7 @@ export async function handleOpportunityCompanionRequest(
         missingInformation: [],
         unknownFields: [],
         unansweredQuestions: [],
+        menuVersion: "2",
         hideProfile: true,
         clearProfileFromSession: true,
       },
@@ -1472,7 +1616,212 @@ export async function handleOpportunityCompanionRequest(
     return emptyResponse(request, conversation, undefined, built.filters);
   }
 
-  if (selectedFromServiceMenu && service === "opportunity_finding") {
+  if (
+    selectedFromServiceMenu &&
+    operation === "readiness" &&
+    intent === "readiness_assessment"
+  ) {
+    const choices = readinessRouteChoices();
+    const conversation = conversationFor(
+      request,
+      built,
+      "readiness_assessment",
+      "readiness",
+      "opportunity_finding",
+      "needs_more_information",
+      menuMessage(
+        "How should Trakr help with your application or readiness?",
+        choices,
+      ),
+      choices.map((choice) => choice.value),
+      undefined,
+      {
+        requiredAction: "select_readiness_route",
+        choices,
+        requiredInputs: [
+          requiredInput({
+            id: "readiness_route",
+            type: "enum",
+            prompt: "Choose how to continue with application readiness",
+            options: choices,
+          }),
+        ],
+        stage: "readiness_choose_route",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (activeContext(request)?.stage === "readiness_choose_route") {
+    const route = readinessRouteChoice(request.message);
+    if (route === "benchmark_target") {
+      const conversation = conversationFor(
+        request,
+        built,
+        "resume_benchmark",
+        "benchmark",
+        "resume_benchmarking_optimization",
+        "needs_more_information",
+        "Please provide your resume or verified background and the target job or opportunity. Trakr will benchmark the evidence, identify strengths and gaps, and then offer evidence-based optimization.",
+        ["benchmark"],
+        undefined,
+        {
+          requiredAction: "provide_resume_and_target",
+          requiredInputs: [
+            requiredInput({
+              id: "resume",
+              type: "document",
+              prompt:
+                "Provide the existing resume, CV, or structured verified background with session-only processing consent.",
+              acceptedRepresentations: [
+                "document.base64",
+                "document.text",
+                "resumeText",
+                "multipart:/api/a2mcp/recommend",
+                "multipart:/api/profile/parse-resume",
+                "structured_profile",
+              ],
+              acceptedMimeTypes: [
+                "application/pdf",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/plain",
+              ],
+              maxBytes: 2_500_000,
+            }),
+            requiredInput({
+              id: "target",
+              type: "object",
+              prompt:
+                "Provide the target description, requirements, or a supported Trakr opportunity URL.",
+              fields: [
+                "target.role",
+                "target.description",
+                "target.requirements",
+                "target.url",
+              ],
+            }),
+          ],
+          stage: "benchmark_awaiting_resume_and_target",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+    if (route === "discover_first") {
+      const choices = discoveryCategoryChoices();
+      const conversation = conversationFor(
+        request,
+        built,
+        "opportunity_matching",
+        "discover",
+        "opportunity_finding",
+        "choose_opportunity_categories",
+        discoveryCategoryMenuMessage(),
+        choices.map((choice) => choice.value),
+        undefined,
+        {
+          requiredAction: "select_opportunity_categories",
+          choices,
+          requiredInputs: [
+            requiredInput({
+              id: "opportunity_categories",
+              type: "enum",
+              prompt:
+                "Choose one or more categories by number, category name, or a natural-language goal.",
+              options: choices,
+            }),
+          ],
+          selectedDiscoveryCategories: [],
+          stage: "choose_opportunity_categories",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+    if (route === "readiness_for_opportunity") {
+      const conversation = conversationFor(
+        request,
+        built,
+        "readiness_assessment",
+        "readiness",
+        "opportunity_finding",
+        "needs_more_information",
+        "Share the Trakr opportunity ID or exact title you want assessed, plus your resume or a concise account of your relevant skills and evidence.",
+        ["readiness"],
+        undefined,
+        {
+          requiredAction: "provide_readiness_target_and_evidence",
+          requiredInputs: [
+            requiredInput({
+              id: "target_opportunity",
+              type: "object",
+              prompt:
+                "Provide the Trakr opportunity ID, exact title, or official URL.",
+              fields: [
+                "target.opportunityId",
+                "target.opportunityTitle",
+                "target.url",
+              ],
+            }),
+            requiredInput({
+              id: "profile_evidence",
+              type: "document",
+              prompt:
+                "Provide a resume, CV, or structured background with session-only processing consent.",
+              acceptedRepresentations: [
+                "document.base64",
+                "document.text",
+                "resumeText",
+                "structured_profile",
+              ],
+              acceptedMimeTypes: [
+                "application/pdf",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/plain",
+              ],
+              maxBytes: 2_500_000,
+            }),
+          ],
+          stage: "readiness_awaiting_target_and_profile",
+        },
+      );
+      return emptyResponse(request, conversation, undefined, built.filters);
+    }
+
+    const choices = readinessRouteChoices();
+    const conversation = conversationFor(
+      request,
+      built,
+      "readiness_assessment",
+      "readiness",
+      "opportunity_finding",
+      "needs_more_information",
+      menuMessage(
+        "I could not identify that readiness route. Choose one option:",
+        choices,
+      ),
+      choices.map((choice) => choice.value),
+      undefined,
+      {
+        requiredAction: "select_readiness_route",
+        choices,
+        requiredInputs: [
+          requiredInput({
+            id: "readiness_route",
+            type: "enum",
+            prompt: "Choose how to continue with application readiness",
+            options: choices,
+          }),
+        ],
+        stage: "readiness_choose_route",
+      },
+    );
+    return emptyResponse(request, conversation, undefined, built.filters);
+  }
+
+  if (
+    selectedFromServiceMenu &&
+    service === "opportunity_finding" &&
+    operation === "discover"
+  ) {
     const choices = discoveryCategoryChoices();
     const conversation = conversationFor(
       request,
@@ -1505,6 +1854,7 @@ export async function handleOpportunityCompanionRequest(
 
   if (
     service === "opportunity_finding" &&
+    operation === "discover" &&
     selectedDiscoveryCategories.length === 0
   ) {
     const choices = discoveryCategoryChoices();
@@ -1575,16 +1925,18 @@ export async function handleOpportunityCompanionRequest(
     service === "resume_benchmarking_optimization"
   ) {
     const prompt =
-      "Please provide your resume or CV and the target job or opportunity. Include the pasted description, published requirements, or a supported Trakr opportunity URL. Benchmarking comes before optimization.";
+      operation === "optimize"
+        ? "Please provide your resume or CV and the target job or opportunity. Trakr will benchmark first, then ask for confirmation before applying evidence-based optimization."
+        : "Please provide your resume or CV and the target job or opportunity. Include the pasted description, published requirements, or a supported Trakr opportunity URL.";
     const conversation = conversationFor(
       request,
       built,
-      "resume_benchmark",
-      "benchmark",
+      operation === "optimize" ? "resume_optimization" : "resume_benchmark",
+      operation,
       service,
       "needs_more_information",
       prompt,
-      ["benchmark"],
+      [operation],
       undefined,
       {
         requiredAction: "provide_resume_and_target",
@@ -2571,7 +2923,7 @@ export async function handleOpportunityCompanionRequest(
     request,
     built,
     intent,
-    "discover",
+    intent === "readiness_assessment" ? "readiness" : "discover",
     "opportunity_finding",
     "readiness",
     `Your readiness for ${candidate.opportunity.title} is ${readiness.readinessLevel.replace("_", " ")} at ${readiness.readinessScore}/100. The score is explained by matched skills, missing requirements, eligibility checks, and available evidence.`,
