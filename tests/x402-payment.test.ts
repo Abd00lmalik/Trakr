@@ -26,6 +26,7 @@ import {
   resetX402ServerForTests,
   setX402ServerForTests,
   settleX402Payment,
+  TRAKR_X402_OUTPUT_SCHEMA,
 } from "../src/lib/payments/x402";
 import {
   claimPaymentCall,
@@ -198,6 +199,46 @@ test("official OKX server emits a compliant x402 v2 exact challenge", async () =
     },
   });
   assert.equal(facilitator.verifyCalls, 0);
+  resetX402ServerForTests();
+});
+
+test("402 body advertises the paid POST request parameters for OKX replay", async () => {
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new FakeFacilitator();
+  const server = await createX402Server(facilitator);
+  setX402ServerForTests(server);
+
+  const message =
+    "Find remote Web3 hackathons for a frontend developer in Lagos";
+  const result = await processX402Request(
+    new Request(
+      "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      },
+    ),
+    { message },
+  );
+  assert.equal(result.type, "response");
+  if (result.type !== "response") return;
+
+  assert.deepEqual(
+    (result.response.body as { outputSchema?: unknown }).outputSchema,
+    TRAKR_X402_OUTPUT_SCHEMA,
+  );
+  assert.deepEqual(TRAKR_X402_OUTPUT_SCHEMA.input.message, {
+    carrier: "body",
+    required: false,
+    type: "string",
+  });
+  assert.deepEqual(TRAKR_X402_OUTPUT_SCHEMA.input.continuation, {
+    carrier: "body",
+    required: false,
+    type: "string",
+  });
+  assert.equal(TRAKR_X402_OUTPUT_SCHEMA.method, "POST");
   resetX402ServerForTests();
 });
 
@@ -615,6 +656,10 @@ test("paid route completes 402, settlement, business logic, and durable replay",
   setPaymentPoolForTests(pool);
   const facilitator = new FakeFacilitator();
   setX402ServerForTests(await createX402Server(facilitator));
+  const paidBusinessPayload = {
+    message:
+      "Find remote Web3 hackathons for a frontend developer in Lagos",
+  };
 
   const unpaidResponse = await POST(
     new Request(
@@ -625,7 +670,7 @@ test("paid route completes 402, settlement, business logic, and durable replay",
           "Content-Type": "application/json",
           "x-forwarded-for": "198.51.100.10",
         },
-        body: JSON.stringify({ operation: "start" }),
+        body: JSON.stringify(paidBusinessPayload),
       },
     ),
   );
@@ -670,13 +715,15 @@ test("paid route completes 402, settlement, business logic, and durable replay",
       {
         method: "POST",
         headers: paidHeaders,
-        body: JSON.stringify({ operation: "start" }),
+        body: JSON.stringify(paidBusinessPayload),
       },
     ),
   );
   const paidBody = await paidResponse.json();
   assert.equal(paidResponse.status, 200);
-  assert.equal(paidBody.interactionState, "service_selection_required");
+  assert.equal(paidBody.interactionState, "recommendations");
+  assert.equal(paidBody.selectedService, "opportunity_finding");
+  assert.equal(paidBody.stage, "discover_completed");
   assert.ok(paidResponse.headers.get("PAYMENT-RESPONSE"));
   assert.equal(facilitator.verifyCalls, 1);
   assert.equal(facilitator.settleCalls, 1);
@@ -690,7 +737,7 @@ test("paid route completes 402, settlement, business logic, and durable replay",
           ...paidHeaders,
           "x-forwarded-for": "198.51.100.12",
         },
-        body: JSON.stringify({ operation: "start" }),
+        body: JSON.stringify(paidBusinessPayload),
       },
     ),
   );

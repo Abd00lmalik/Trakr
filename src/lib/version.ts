@@ -1,1 +1,1 @@
-export const TRAKR_SERVICE_VERSION = "0.9.0";
+export const TRAKR_SERVICE_VERSION = "0.9.1";

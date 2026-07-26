@@ -94,6 +94,40 @@ export type VerifiedX402Payment = {
   };
 };
 
+type X402InputType = "array" | "object" | "string";
+
+function bodyInput(type: X402InputType) {
+  return {
+    carrier: "body",
+    required: false,
+    type,
+  };
+}
+
+export const TRAKR_X402_OUTPUT_SCHEMA = {
+  method: "POST",
+  input: {
+    operation: bodyInput("string"),
+    message: bodyInput("string"),
+    intent: bodyInput("string"),
+    intakeRoute: bodyInput("string"),
+    selectedDiscoveryCategories: bodyInput("array"),
+    user: bodyInput("object"),
+    profile: bodyInput("object"),
+    resumeText: bodyInput("string"),
+    document: bodyInput("object"),
+    consent: bodyInput("object"),
+    target: bodyInput("object"),
+    generationPreferences: bodyInput("object"),
+    context: bodyInput("object"),
+    continuation: bodyInput("string"),
+    goals: bodyInput("array"),
+    interests: bodyInput("array"),
+    filters: bodyInput("object"),
+    requestId: bodyInput("string"),
+  },
+} as const;
+
 let serverPromise: Promise<x402HTTPResourceServer> | undefined;
 
 export async function createX402Server(facilitator: FacilitatorClient) {
@@ -119,9 +153,9 @@ export async function createX402Server(facilitator: FacilitatorClient) {
         body: {
           error: "payment_required",
           code: "payment_required",
-          message:
-            "This valid Trakr API call requires 0.005 USD₮0 on X Layer.",
+          message: `This valid Trakr API call requires ${X402_PRICE_USD} ${X402_TOKEN_NAME} on X Layer.`,
           retryable: true,
+          outputSchema: TRAKR_X402_OUTPUT_SCHEMA,
           payment: {
             x402Version: X402_VERSION,
             scheme: X402_SCHEME,
