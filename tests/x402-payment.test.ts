@@ -354,38 +354,51 @@ test("all three marketplace service entries receive the same compliant x402 chal
   process.env.TRAKR_X402_ENFORCEMENT = "enforce";
   process.env.TRAKR_X402_PAY_TO = payTo;
   const facilitator = new FakeFacilitator();
-  setX402ServerForTests(await createX402Server(facilitator));
 
-  const urls = [
-    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
-    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-benchmarking-optimization",
-    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-generation",
+  const entries = [
+    {
+      url: "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+      service: "opportunity_finding",
+    },
+    {
+      url: "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+      service: "resume_benchmarking_optimization",
+    },
+    {
+      url: "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-generation",
+      service: "resume_generation",
+    },
   ];
-  for (const [index, url] of urls.entries()) {
+  for (const [index, entry] of entries.entries()) {
+    setX402ServerForTests(
+      await createX402Server(facilitator, entry.url),
+    );
     const response = await POST(
-      new Request(url, {
+      new Request(entry.url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-forwarded-for": `198.51.100.${100 + index}`,
         },
-        body: "{}",
+        body: JSON.stringify({ service: entry.service }),
       }),
     );
-    assert.equal(response.status, 402, url);
+    assert.equal(response.status, 402, entry.url);
     const challenge = decodeHeader<{
       x402Version: number;
+      resource: { url: string };
       accepts: PaymentRequirements[];
     }>(response.headers.get("PAYMENT-REQUIRED") ?? "");
     assert.equal(challenge.x402Version, X402_VERSION);
+    assert.equal(challenge.resource.url, entry.url);
     assert.equal(challenge.accepts[0].scheme, X402_SCHEME);
     assert.equal(challenge.accepts[0].network, X402_NETWORK);
     assert.equal(challenge.accepts[0].asset, X402_ASSET);
     assert.equal(challenge.accepts[0].amount, X402_ATOMIC_AMOUNT);
     assert.equal(challenge.accepts[0].payTo, payTo);
+    resetX402ServerForTests();
   }
 
-  resetX402ServerForTests();
   process.env.TRAKR_X402_ENFORCEMENT = "off";
 });
 

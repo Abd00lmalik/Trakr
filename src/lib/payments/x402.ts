@@ -100,6 +100,7 @@ export type VerifiedX402Payment = {
     method: string;
     paymentHeader?: string;
     routePattern?: string;
+    resourceUrl: string;
   };
 };
 
@@ -142,7 +143,8 @@ export const TRAKR_X402_OUTPUT_SCHEMA = {
   },
 } as const;
 
-let serverPromise: Promise<x402HTTPResourceServer> | undefined;
+const serverPromises = new Map<string, Promise<x402HTTPResourceServer>>();
+let testServer: x402HTTPResourceServer | undefined;
 
 class ProductionFacilitatorClient implements FacilitatorClient {
   constructor(
@@ -217,7 +219,10 @@ export function createProductionFacilitatorClient(
   return new ProductionFacilitatorClient(facilitator, getX402PayTo());
 }
 
-export async function createX402Server(facilitator: FacilitatorClient) {
+export async function createX402Server(
+  facilitator: FacilitatorClient,
+  resourceUrl = getX402ResourceUrl(),
+) {
   const resourceServer = new x402ResourceServer(facilitator).register(
     X402_NETWORK,
     new ExactEvmScheme(),
@@ -231,7 +236,7 @@ export async function createX402Server(facilitator: FacilitatorClient) {
         price: `$${X402_PRICE_USD}`,
         maxTimeoutSeconds: 120,
       },
-      resource: getX402ResourceUrl(),
+      resource: resourceUrl,
       description:
         "One paid Trakr API call for opportunity discovery, career readiness, or resume support.",
       mimeType: "application/json",
@@ -273,7 +278,7 @@ export async function createX402Server(facilitator: FacilitatorClient) {
   return httpServer;
 }
 
-async function createServer() {
+async function createServer(resourceUrl: string) {
   const credentials = getX402OkxCredentials();
   const okxFacilitator = new OKXFacilitatorClient({
     ...credentials,
@@ -283,22 +288,45 @@ async function createServer() {
     syncSettle: true,
   });
   const facilitator = createProductionFacilitatorClient(okxFacilitator);
-  return createX402Server(facilitator);
+  return createX402Server(facilitator, resourceUrl);
 }
 
 export function resetX402ServerForTests() {
-  serverPromise = undefined;
+  serverPromises.clear();
+  testServer = undefined;
 }
 
 export function setX402ServerForTests(server: x402HTTPResourceServer) {
-  serverPromise = Promise.resolve(server);
+  testServer = server;
 }
 
-async function getServer() {
-  serverPromise ??= createServer().catch((error) => {
-    serverPromise = undefined;
-    throw error;
-  });
+function resourceUrlForRequest(body: unknown) {
+  const resourceUrl = new URL(getX402ResourceUrl());
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return resourceUrl.toString();
+  }
+  const service = (body as { service?: unknown }).service;
+  if (service === "resume_benchmarking_optimization") {
+    resourceUrl.searchParams.set(
+      "service",
+      "resume-benchmarking-optimization",
+    );
+  } else if (service === "resume_generation") {
+    resourceUrl.searchParams.set("service", "resume-generation");
+  }
+  return resourceUrl.toString();
+}
+
+async function getServer(resourceUrl: string) {
+  if (testServer) return testServer;
+  let serverPromise = serverPromises.get(resourceUrl);
+  if (!serverPromise) {
+    serverPromise = createServer(resourceUrl).catch((error) => {
+      serverPromises.delete(resourceUrl);
+      throw error;
+    });
+    serverPromises.set(resourceUrl, serverPromise);
+  }
   return serverPromise;
 }
 
@@ -313,7 +341,8 @@ export async function processX402Request(
   | { type: "response"; response: Extract<HTTPProcessResult, { type: "payment-error" }>["response"] }
   | { type: "verified"; payment: VerifiedX402Payment }
 > {
-  const server = await getServer();
+  const resourceUrl = resourceUrlForRequest(body);
+  const server = await getServer(resourceUrl);
   const adapter = new WebRequestAdapter(request, body);
   const context = {
     adapter,
@@ -321,6 +350,7 @@ export async function processX402Request(
     method: adapter.getMethod(),
     paymentHeader: adapter.getHeader("PAYMENT-SIGNATURE"),
     routePattern: X402_ROUTE,
+    resourceUrl,
   };
   const result = await server.processHTTPRequest(context);
   if (result.type === "payment-error") {
@@ -344,7 +374,7 @@ export async function settleX402Payment(
   payment: VerifiedX402Payment,
   responseBody: unknown,
 ) {
-  const server = await getServer();
+  const server = await getServer(payment.context.resourceUrl);
   return server.processSettlement(
     payment.paymentPayload,
     payment.paymentRequirements,

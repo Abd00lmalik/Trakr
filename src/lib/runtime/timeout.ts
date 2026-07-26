@@ -33,7 +33,6 @@ export async function withTimeout<T>(
           () => reject(new OperationTimeoutError(code, timeoutMs)),
           timeoutMs,
         );
-        timer.unref?.();
       }),
     ]);
   } finally {

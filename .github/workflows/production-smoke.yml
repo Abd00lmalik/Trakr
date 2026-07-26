@@ -18,16 +18,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - suite: orchestration
-            script: smoke:orchestration:production
-          - suite: service-1
-            script: smoke:service1:production
-          - suite: service-2
-            script: smoke:service2:production
-          - suite: service-3
-            script: smoke:service3:production
+          - suite: opportunity-discovery
+            path: /api/a2mcp/recommend
+          - suite: resume-benchmarking-optimization
+            path: /api/a2mcp/recommend?service=resume-benchmarking-optimization
+          - suite: resume-generation
+            path: /api/a2mcp/recommend?service=resume-generation
     env:
       SMOKE_BASE_URL: https://trakr-production-c70e.up.railway.app
+      TRAKR_SMOKE_SERVICE_PATH: ${{ matrix.path }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,4 +34,4 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run ${{ matrix.script }}
+      - run: npm run smoke:x402:production
