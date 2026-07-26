@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 import { createHash } from "node:crypto";
 import { nanoid } from "nanoid";
 import { CompanionSessionError } from "@/lib/companion/session";
+import { resolveSessionContext } from "@/lib/companion/session";
 import { handleOpportunityCompanionRequest } from "@/lib/companion/service";
+import {
+  operationBelongsToMarketplaceService,
+  parseMarketplaceService,
+} from "@/lib/companion/marketplace-services";
 import { generateRecommendations } from "@/lib/recommendation/service";
 import { parseResumeBuffer } from "@/lib/resume/parser";
 import { beginIdempotentRequest } from "@/lib/security/idempotency";
@@ -43,7 +48,7 @@ const responseHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, X-Trakr-Api-Key, Idempotency-Key, X-Request-Id, PAYMENT-SIGNATURE",
+    "Content-Type, Authorization, X-Trakr-Api-Key, X-Trakr-Service, Idempotency-Key, X-Request-Id, PAYMENT-SIGNATURE",
   "Access-Control-Expose-Headers":
     "X-Request-Id, X-Idempotency-Status, X-Trakr-Version, X-Trakr-Duration-Ms, Server-Timing, PAYMENT-REQUIRED, PAYMENT-RESPONSE",
   "Cache-Control": "no-store",
@@ -92,6 +97,7 @@ function hasConversationalFields(payload: unknown) {
     "message",
     "intent",
     "operation",
+    "service",
     "intakeRoute",
     "selectedDiscoveryCategories",
     "consent",
@@ -114,7 +120,121 @@ function normalizePayload(payload: unknown) {
   if (!normalized.context && normalized.continuation) {
     normalized.context = normalized.continuation;
   }
+  if (!normalized.service && normalized.serviceEntry) {
+    normalized.service = normalized.serviceEntry;
+  }
+  if (!normalized.service && normalized.capability) {
+    normalized.service = normalized.capability;
+  }
   return normalized;
+}
+
+function normalizeMarketplaceServiceRequest(
+  request: Request,
+  payload: unknown,
+) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return payload;
+  }
+
+  const normalized = { ...(payload as Record<string, unknown>) };
+  const url = new URL(request.url);
+  const rawSelectors = [
+    normalized.service,
+    normalized.serviceEntry,
+    normalized.capability,
+    url.searchParams.get("service"),
+    url.searchParams.get("serviceEntry"),
+    url.searchParams.get("capability"),
+    request.headers.get("x-trakr-service"),
+  ].filter(
+    (value): value is string =>
+      typeof value === "string" && Boolean(value.trim()),
+  );
+  const parsedSelectors = rawSelectors.map((value) => ({
+    raw: value,
+    service: parseMarketplaceService(value),
+  }));
+  const invalid = parsedSelectors.find((item) => !item.service);
+  if (invalid) {
+    throw new Error(
+      `Unsupported Trakr marketplace service selector: ${invalid.raw}`,
+    );
+  }
+  const services = [
+    ...new Set(
+      parsedSelectors
+        .map((item) => item.service)
+        .filter((service) => service !== undefined),
+    ),
+  ];
+  if (services.length > 1) {
+    throw new Error(
+      "Conflicting Trakr marketplace service selectors were supplied.",
+    );
+  }
+
+  const explicitOperation =
+    typeof normalized.operation === "string"
+      ? normalized.operation
+      : undefined;
+  const message =
+    typeof normalized.message === "string"
+      ? normalized.message.trim()
+      : "";
+  const explicitLegacyBootstrap =
+    !services.length &&
+    !explicitOperation &&
+    /^(start|show (available )?services?|show me the services?)$/i.test(
+      message,
+    );
+  if (explicitLegacyBootstrap) {
+    normalized.operation = "start";
+  }
+  const legacyRequest =
+    !hasConversationalFields(normalized) &&
+    recommendationRequestSchema.safeParse(normalized).success;
+  const bareOpportunityEntry =
+    !message ||
+    /^\d+$/.test(message) ||
+    /\b(agent\s*#?\s*5198|opportunity matching api)\b/i.test(message);
+  const selectedService =
+    services[0] ??
+    (!legacyRequest &&
+    !normalized.context &&
+    !normalized.continuation &&
+    !explicitLegacyBootstrap &&
+    (!explicitOperation || explicitOperation === "auto") &&
+    bareOpportunityEntry
+      ? "opportunity_finding"
+      : undefined);
+  if (selectedService) {
+    normalized.service = selectedService;
+  }
+  delete normalized.serviceEntry;
+  delete normalized.capability;
+  return normalized;
+}
+
+function validateServiceContinuation(
+  payload: Parameters<typeof handleOpportunityCompanionRequest>[0],
+) {
+  if (!payload.service) return;
+  if (
+    !operationBelongsToMarketplaceService(payload.operation, payload.service)
+  ) {
+    throw new Error(
+      "The requested operation does not belong to the selected Trakr marketplace service.",
+    );
+  }
+  const suppliedContext = payload.context ?? payload.continuation;
+  if (!suppliedContext) return;
+  const context = resolveSessionContext(suppliedContext);
+  if (context?.service && context.service !== payload.service) {
+    throw new Error(
+      "This continuation belongs to a different Trakr marketplace service.",
+    );
+  }
 }
 
 async function prepareDocumentPayload(payload: unknown) {
@@ -291,7 +411,7 @@ async function readRequestPayload(request: Request) {
     operation:
       typeof operation === "string" && operation
         ? operation
-        : "discover",
+        : undefined,
     intakeRoute:
       typeof intakeRoute === "string" && intakeRoute
         ? intakeRoute
@@ -707,7 +827,12 @@ export async function POST(request: Request) {
   let normalizedPayload: unknown;
   try {
     normalizedPayload = await withTimeout(
-      prepareDocumentPayload(normalizePayload(payload)),
+      prepareDocumentPayload(
+        normalizeMarketplaceServiceRequest(
+          request,
+          normalizePayload(payload),
+        ),
+      ),
       timeoutFromEnv(
         "TRAKR_DOCUMENT_PROCESSING_TIMEOUT_MS",
         8_000,
@@ -746,6 +871,39 @@ export async function POST(request: Request) {
         issues: parsed.error.issues,
       },
       400,
+    );
+  }
+  try {
+    validateServiceContinuation(parsed.data);
+  } catch (error) {
+    if (error instanceof CompanionSessionError) {
+      return complete(
+        {
+          error: error.code,
+          code: error.code,
+          message: error.message,
+          requestId,
+          retryable: error.code === "session_unavailable",
+        },
+        error.code === "expired_session"
+          ? 410
+          : error.code === "session_unavailable"
+            ? 503
+            : 400,
+      );
+    }
+    return complete(
+      {
+        error: "service_boundary_conflict",
+        code: "service_boundary_conflict",
+        message:
+          error instanceof Error
+            ? error.message
+            : "The request conflicts with the selected Trakr marketplace service.",
+        requestId,
+        retryable: false,
+      },
+      409,
     );
   }
 

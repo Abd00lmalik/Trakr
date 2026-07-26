@@ -48,20 +48,12 @@ test("category choice continues into one merged adaptive intake", async () => {
         "I want to use Agent #5198, the Opportunity Matching API, through its A2MCP endpoint.",
     }),
   );
-  assert.equal(initial.conversation?.state, "choose_service");
-
-  const discovery = await handleOpportunityCompanionRequest(
-    opportunityCompanionRequestSchema.parse({
-      message: "1",
-      continuation: initial.conversation?.continuation,
-    }),
-  );
-  assert.equal(discovery.conversation?.state, "choose_opportunity_categories");
+  assert.equal(initial.conversation?.state, "choose_opportunity_categories");
 
   const collecting = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "2 and 3",
-      continuation: discovery.conversation?.continuation,
+      continuation: initial.conversation?.continuation,
     }),
   );
   assert.equal(collecting.conversation?.state, "needs_more_information");
@@ -84,17 +76,11 @@ test("resume path preserves extracted evidence and continues within the session"
       message: "Use the Opportunity Matching API from Agent #5198.",
     }),
   );
-  assert.equal(initial.conversation?.state, "choose_service");
-  const discovery = await handleOpportunityCompanionRequest(
-    opportunityCompanionRequestSchema.parse({
-      message: "1",
-      continuation: initial.conversation?.continuation,
-    }),
-  );
+  assert.equal(initial.conversation?.state, "choose_opportunity_categories");
   const categorySelection = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
       message: "2 and 3",
-      continuation: discovery.conversation?.continuation,
+      continuation: initial.conversation?.continuation,
     }),
   );
   assert.equal(categorySelection.conversation?.state, "needs_more_information");
@@ -367,9 +353,12 @@ test("minimal student input asks for gates instead of making weak recommendation
     }),
   );
 
-  assert.equal(response.conversation?.state, "choose_service");
+  assert.equal(response.conversation?.state, "choose_opportunity_categories");
   assert.equal(response.recommendations.length, 0);
-  assert.equal(response.conversation?.requiredAction, "select_service");
+  assert.equal(
+    response.conversation?.requiredAction,
+    "select_opportunity_categories",
+  );
 });
 
 test("natural-language background builds a grounded profile and recommendations", async () => {

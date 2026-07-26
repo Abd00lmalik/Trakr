@@ -459,6 +459,7 @@ export const companionContinuationInputSchema = z.union([
 
 export const opportunityCompanionRequestSchema = z
   .object({
+    service: userFacingServiceSchema.optional(),
     user: structuredUserProfileSchema.optional(),
     profile: structuredUserProfileSchema.optional(),
     resumeText: z.string().min(80).max(40000).optional(),
@@ -479,6 +480,39 @@ export const opportunityCompanionRequestSchema = z
     document: documentInputSchema.optional(),
   })
   .superRefine((value, ctx) => {
+    if (
+      value.service === "opportunity_finding" &&
+      !["auto", "start", "discover", "readiness"].includes(value.operation)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "The selected Opportunity Discovery service cannot execute that operation.",
+        path: ["operation"],
+      });
+    }
+    if (
+      value.service === "resume_benchmarking_optimization" &&
+      !["auto", "start", "benchmark", "optimize"].includes(value.operation)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "The selected Resume Benchmarking & Optimization service cannot execute that operation.",
+        path: ["operation"],
+      });
+    }
+    if (
+      value.service === "resume_generation" &&
+      !["auto", "start", "generate_resume"].includes(value.operation)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "The selected Resume Generation service cannot execute that operation.",
+        path: ["operation"],
+      });
+    }
     const hasFilters = Object.keys(value.filters).length > 0;
     if (
       !value.user &&

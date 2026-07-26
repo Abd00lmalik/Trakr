@@ -116,6 +116,11 @@ function bodyInput(type: X402InputType) {
 export const TRAKR_X402_OUTPUT_SCHEMA = {
   method: "POST",
   input: {
+    service: {
+      carrier: "query",
+      required: false,
+      type: "string",
+    },
     operation: bodyInput("string"),
     message: bodyInput("string"),
     intent: bodyInput("string"),

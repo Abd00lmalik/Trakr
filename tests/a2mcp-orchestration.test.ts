@@ -76,6 +76,7 @@ let requestSequence = 0;
 async function callRoute(
   body?: unknown,
   headers: Record<string, string> = {},
+  url = "http://localhost/api/a2mcp/recommend",
 ) {
   requestSequence += 1;
   const requestHeaders: Record<string, string> = {
@@ -88,7 +89,7 @@ async function callRoute(
     requestBody = typeof body === "string" ? body : JSON.stringify(body);
   }
   const response = await POST(
-    new Request("http://localhost/api/a2mcp/recommend", {
+    new Request(url, {
       method: "POST",
       headers: requestHeaders,
       body: requestBody,
@@ -123,9 +124,7 @@ function assertChooser(body: Record<string, any>) {
   assert.deepEqual(body.nextActions, [
     "discover",
     "benchmark",
-    "optimize",
     "generate_resume",
-    "readiness",
   ]);
   assert.deepEqual(
     body.requiredInputs[0].options.map(
@@ -136,26 +135,16 @@ function assertChooser(body: Record<string, any>) {
       }),
     ),
     [
-      { value: "discover", number: 1, label: "Find opportunities" },
+      { value: "discover", number: 1, label: "Find an Opportunity" },
       {
         value: "benchmark",
         number: 2,
-        label: "Benchmark or analyze my resume",
-      },
-      {
-        value: "optimize",
-        number: 3,
-        label: "Optimize my resume for a target",
+        label: "Resume Benchmarking & Optimization",
       },
       {
         value: "generate_resume",
-        number: 4,
-        label: "Generate a resume",
-      },
-      {
-        value: "readiness",
-        number: 5,
-        label: "Help me with my application or readiness",
+        number: 3,
+        label: "Resume Generation",
       },
     ],
   );
@@ -164,7 +153,19 @@ function assertChooser(body: Record<string, any>) {
   assert.deepEqual(resolved?.unansweredQuestions, []);
   assert.equal(resolved?.profile, undefined);
   assert.deepEqual(resolved?.profileEvidence, []);
-  assert.equal(resolved?.menuVersion, "2");
+  assert.equal(resolved?.menuVersion, "1");
+}
+
+function assertOpportunityEntry(body: Record<string, any>) {
+  assert.equal(body.operation, "discover");
+  assert.equal(
+    body.interactionState,
+    "opportunity_category_selection_required",
+  );
+  assert.equal(body.stage, "choose_opportunity_categories");
+  assert.equal(body.selectedService, "opportunity_finding");
+  assert.equal(body.requiredInputs[0].id, "opportunity_categories");
+  assert.equal(body.requiredInputs[0].options.length, 10);
 }
 
 async function docxBuffer(text: string) {
@@ -218,19 +219,20 @@ async function assertDownload(artifact: DownloadableArtifact) {
   }
 }
 
-test("empty and minimal cold starts return the five-action chooser with HTTP 200", async () => {
-  const cases = [
-    undefined,
-    {},
-    { operation: "start" },
-    { message: "" },
-    { message: "Start" },
-    { message: "Show available services" },
-  ];
-  for (const input of cases) {
+test("bare marketplace entry starts Opportunity Discovery and explicit bootstrap keeps the original three-service chooser", async () => {
+  for (const input of [undefined, {}, { message: "" }]) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.4");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.5");
+    assertOpportunityEntry(result.body);
+  }
+  for (const input of [
+    { operation: "start" },
+    { message: "Start" },
+    { message: "Show available services" },
+  ]) {
+    const result = await callRoute(input);
+    assert.equal(result.response.status, 200);
     assertChooser(result.body);
   }
 });
@@ -583,7 +585,7 @@ test("OpenAPI fully types visible recommendation links and separated collections
   );
 });
 
-test("the exact Agent 5198 service declaration remains an ambiguous cold start", async () => {
+test("the existing Agent 5198 service declaration enters Opportunity Discovery", async () => {
   const message = `I'd like to use the service provided by Agent 5198:
 
 Service title: Opportunity Matching API
@@ -593,7 +595,7 @@ Endpoint: https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend
 Please use OKX Agent Payments Protocol to send a request to this endpoint`;
   const result = await callRoute({ message });
   assert.equal(result.response.status, 200);
-  assertChooser(result.body);
+  assertOpportunityEntry(result.body);
   assert.equal(result.body.paymentRequired, undefined);
   assert.equal(result.response.headers.has("payment-required"), false);
   assert.equal(result.response.headers.has("www-authenticate"), false);
@@ -630,7 +632,7 @@ test("clear natural-language outcomes route directly to the matching service", a
 });
 
 test("numeric choices are bound to the continuation stage", async () => {
-  const cold = await callRoute({});
+  const cold = await callRoute({ operation: "start" });
   const discovery = await callRoute({
     message: "1",
     continuation: cold.body.continuation,
@@ -668,7 +670,10 @@ test("numeric choices are bound to the continuation stage", async () => {
   );
 
   const withoutContinuation = await callRoute({ message: "1" });
-  assertChooser(withoutContinuation.body);
+  assert.equal(
+    withoutContinuation.body.stage,
+    "choose_opportunity_categories",
+  );
   const invalidNumber = await callRoute({
     message: "9",
     continuation: cold.body.continuation,
@@ -677,7 +682,7 @@ test("numeric choices are bound to the continuation stage", async () => {
 });
 
 test("each top-level service selection returns service-specific required inputs", async () => {
-  const cold = await callRoute({});
+  const cold = await callRoute({ operation: "start" });
   const benchmark = await callRoute({
     message: "2",
     continuation: cold.body.continuation,
@@ -692,16 +697,8 @@ test("each top-level service selection returns service-specific required inputs"
     ["resume", "target", "consent"],
   );
 
-  const optimization = await callRoute({
-    message: "3",
-    continuation: cold.body.continuation,
-  });
-  assert.equal(optimization.body.stage, "benchmark_awaiting_resume_and_target");
-  assert.equal(optimization.body.operation, "optimize");
-  assert.match(optimization.body.message, /benchmark first/i);
-
   const generation = await callRoute({
-    message: "4",
+    message: "3",
     continuation: cold.body.continuation,
   });
   assert.equal(generation.body.stage, "generate_awaiting_target");
@@ -715,22 +712,62 @@ test("each top-level service selection returns service-specific required inputs"
     ["output_preferences"],
   );
 
-  const readiness = await callRoute({
-    message: "5",
-    continuation: cold.body.continuation,
-  });
-  assert.equal(readiness.body.stage, "readiness_choose_route");
-  assert.equal(readiness.body.operation, "readiness");
-  assert.deepEqual(
-    readiness.body.allowedResponses.map(
-      (choice: { value: string }) => choice.value,
-    ),
-    [
-      "readiness_for_opportunity",
-      "benchmark_target",
-      "discover_first",
-    ],
+});
+
+test("the three marketplace service entry points start their own workflows directly", async () => {
+  const discovery = await callRoute({});
+  assertOpportunityEntry(discovery.body);
+
+  const benchmark = await callRoute(
+    {},
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-benchmarking-optimization",
   );
+  assert.equal(benchmark.response.status, 200);
+  assert.equal(
+    benchmark.body.selectedService,
+    "resume_benchmarking_optimization",
+  );
+  assert.equal(benchmark.body.operation, "benchmark");
+  assert.equal(benchmark.body.stage, "benchmark_awaiting_resume_and_target");
+  assert.deepEqual(
+    benchmark.body.requiredInputs.map((input: { id: string }) => input.id),
+    ["resume", "target", "consent"],
+  );
+
+  const generation = await callRoute(
+    {},
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-generation",
+  );
+  assert.equal(generation.response.status, 200);
+  assert.equal(generation.body.selectedService, "resume_generation");
+  assert.equal(generation.body.operation, "generate_resume");
+  assert.equal(generation.body.stage, "generate_awaiting_target");
+  assert.equal(generation.body.requiredInputs[0].id, "generation_target");
+});
+
+test("marketplace service selectors reject cross-service operations and continuations before business execution", async () => {
+  const conflict = await callRoute(
+    { operation: "generate_resume" },
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+  );
+  assert.equal(conflict.response.status, 400);
+  assert.equal(conflict.body.code, "validation_error");
+
+  const generation = await callRoute(
+    {},
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-generation",
+  );
+  const crossService = await callRoute(
+    { continuation: generation.body.continuation },
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+  );
+  assert.equal(crossService.response.status, 409);
+  assert.equal(crossService.body.code, "service_boundary_conflict");
 });
 
 test("legacy three-choice continuations keep option 3 mapped to resume generation", async () => {
@@ -751,62 +788,13 @@ test("legacy three-choice continuations keep option 3 mapped to resume generatio
   assert.equal(generation.body.operation, "generate_resume");
 });
 
-test("application-readiness selection routes through existing readiness, benchmark, or discovery flows", async () => {
-  const cold = await callRoute({});
-  const readiness = await callRoute({
-    message: "5",
-    continuation: cold.body.continuation,
-  });
-
-  const benchmarkRoute = await callRoute({
-    message: "2",
-    continuation: readiness.body.continuation,
-  });
-  assert.equal(benchmarkRoute.body.stage, "benchmark_awaiting_resume_and_target");
-  assert.equal(benchmarkRoute.body.operation, "benchmark");
-
-  const readinessAgain = await callRoute({
-    message: "5",
-    continuation: cold.body.continuation,
-  });
-  const discoveryRoute = await callRoute({
-    message: "3",
-    continuation: readinessAgain.body.continuation,
-  });
-  assert.equal(discoveryRoute.body.stage, "choose_opportunity_categories");
-  assert.equal(discoveryRoute.body.operation, "discover");
-
-  const readinessThird = await callRoute({
-    message: "5",
-    continuation: cold.body.continuation,
-  });
-  const knownOpportunityRoute = await callRoute({
-    message: "1",
-    continuation: readinessThird.body.continuation,
-  });
-  assert.equal(
-    knownOpportunityRoute.body.stage,
-    "readiness_awaiting_target_and_profile",
-  );
-  assert.equal(knownOpportunityRoute.body.operation, "readiness");
-});
-
 test("known-opportunity readiness produces a grounded assessment after profile confirmation", async () => {
   const targetOpportunity = curatedOfficialOpportunities[0];
   assert.ok(targetOpportunity);
 
-  const cold = await callRoute({});
-  const readiness = await callRoute({
-    message: "5",
-    continuation: cold.body.continuation,
-  });
-  const knownOpportunityRoute = await callRoute({
-    message: "1",
-    continuation: readiness.body.continuation,
-  });
   const supplied = await callRoute({
     message: `Assess my readiness for ${targetOpportunity.title}.`,
-    continuation: knownOpportunityRoute.body.continuation,
+    operation: "readiness",
     user: profile,
     target: { opportunityId: targetOpportunity.id },
   });

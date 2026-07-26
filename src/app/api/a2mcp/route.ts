@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { opportunitySourceRegistry } from "@/lib/opportunities/source-registry";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 import { discoveryCategoryDefinitions } from "@/lib/opportunities/discovery-categories";
+import { TRAKR_MARKETPLACE_SERVICES } from "@/lib/companion/marketplace-services";
 import {
   isX402Enforced,
   X402_ASSET,
@@ -25,13 +26,13 @@ export async function GET() {
     version: TRAKR_SERVICE_VERSION,
     type: "A2MCP",
     description:
-      "One server-authoritative conversational A2MCP endpoint exposing five goal-directed actions: opportunity discovery, resume benchmarking, resume optimization, resume generation, and application-readiness guidance.",
+      "Three independently selectable Trakr marketplace services share one server-authoritative conversational A2MCP route: Opportunity Discovery, Resume Benchmarking & Optimization, and Resume Generation.",
     endpoints: {
       recommend: {
         method: "POST",
         path: "/api/a2mcp/recommend",
         description:
-          "Accepts an empty bootstrap body, operation start, explicit service operations, structured profile data, supported resume representations, natural-language requests, or an opaque caller-carried continuation reference. Existing legacy structured recommendation requests remain supported.",
+          "The bare route is the Opportunity Discovery entry. Resume services use the documented service query selector, body service field, or X-Trakr-Service header. Explicit operations, supported resume representations, natural-language requests, and opaque caller-carried continuations remain supported.",
       },
       health: {
         method: "GET",
@@ -81,33 +82,45 @@ export async function GET() {
     ),
     actions: ["Apply Now", "Prepare First", "Skip"],
     aiStatus: ["enhanced", "retrying", "degraded", "fallback"],
+    marketplaceServices: TRAKR_MARKETPLACE_SERVICES.map((service) => ({
+      ...service,
+      method: "POST",
+      price: `${X402_PRICE_USD} ${X402_TOKEN_NAME} per valid API call`,
+    })),
     services: [
       {
         id: "opportunity_finding",
-        label: "Opportunity Finding",
+        label: "Opportunity Discovery",
         operation: "discover",
+        endpoint: "/api/a2mcp/recommend",
         status: "available",
         firstStage: "choose_opportunity_categories",
         resumeOptional: true,
         categories: discoveryCategoryDefinitions.map(({ id }) => id),
+        includes: [
+          "opportunity matching",
+          "recommendation explanation",
+          "skill-gap analysis",
+          "application readiness",
+          "action planning",
+        ],
       },
       {
-        id: "resume_benchmarking",
-        label: "Resume Benchmarking and Analysis",
+        id: "resume_benchmarking_optimization",
+        label: "Resume Benchmarking & Optimization",
         operation: "benchmark",
-        status: "available",
-      },
-      {
-        id: "resume_optimization",
-        label: "Target-Specific Resume Optimization",
-        operation: "optimize",
-        prerequisite: "compatible target-specific benchmark",
+        endpoint:
+          "/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+        operations: ["benchmark", "optimize"],
+        prerequisite:
+          "Optimization follows a compatible target-specific benchmark and user confirmation.",
         status: "available",
       },
       {
         id: "resume_generation",
         label: "Resume Generation",
         operation: "generate_resume",
+        endpoint: "/api/a2mcp/recommend?service=resume-generation",
         status: "available",
         documentTypes: [
           "private_sector_resume",
@@ -125,48 +138,36 @@ export async function GET() {
           "general_professional_profile",
         ],
       },
-      {
-        id: "application_readiness",
-        label: "Application and Readiness Guidance",
-        operation: "readiness",
-        routes: [
-          "assess a known Trakr opportunity",
-          "benchmark a resume against a target",
-          "find a suitable opportunity first",
-        ],
-        status: "available",
-      },
     ],
     bootstrap: {
-      operation: "start",
-      accepts: [{}, { operation: "start" }, { message: "" }],
-      stage: "choose_service",
+      defaultService: "opportunity_finding",
+      accepts: [{}, { message: "" }],
+      stage: "choose_opportunity_categories",
       status: "needs_input",
+      options: discoveryCategoryDefinitions.map(
+        ({ id, number, label }) => ({ value: id, number, label }),
+      ),
+      rule:
+        "Marketplace service selection determines the workflow before the paid call. The service does not ask the user to choose among Trakr services again.",
+    },
+    legacyBootstrap: {
+      operation: "start",
+      stage: "choose_service",
       options: [
-        { value: "discover", number: 1, label: "Find opportunities" },
+        { value: "discover", number: 1, label: "Find an Opportunity" },
         {
           value: "benchmark",
           number: 2,
-          label: "Benchmark or analyze my resume",
-        },
-        {
-          value: "optimize",
-          number: 3,
-          label: "Optimize my resume for a target",
+          label: "Resume Benchmarking & Optimization",
         },
         {
           value: "generate_resume",
-          number: 4,
-          label: "Generate a resume",
-        },
-        {
-          value: "readiness",
-          number: 5,
-          label: "Help me with my application or readiness",
+          number: 3,
+          label: "Resume Generation",
         },
       ],
-      rule:
-        "A service declaration or legacy display title alone is ambiguous and must not route to Opportunity Finding.",
+      purpose:
+        "Backward-compatible explicit bootstrap only; marketplace entry points should not use it.",
     },
     operations: [
       "start",
@@ -241,6 +242,7 @@ export async function GET() {
       },
       priority: [
         "valid continuation and current stage",
+        "selected marketplace service",
         "explicit operation",
         "clear natural-language intent",
         "legacy structured discovery request",

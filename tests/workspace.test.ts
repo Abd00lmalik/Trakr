@@ -290,33 +290,54 @@ test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async (
       "application/json"
     ].schema;
 
+  const opportunityService = metadata.services.find(
+    (item: { id: string }) =>
+      item.id === "opportunity_finding",
+  );
+  assert.equal(opportunityService.status, "available");
+  assert.equal(opportunityService.operation, "discover");
+  assert.equal(
+    opportunityService.firstStage,
+    "choose_opportunity_categories",
+  );
+  assert.ok(opportunityService.includes.includes("application readiness"));
+
   const benchmarkService = metadata.services.find(
     (item: { id: string }) =>
-      item.id === "resume_benchmarking",
+      item.id === "resume_benchmarking_optimization",
   );
   assert.equal(benchmarkService.status, "available");
   assert.equal(benchmarkService.operation, "benchmark");
-  const optimizationService = metadata.services.find(
-    (item: { id: string }) => item.id === "resume_optimization",
-  );
-  assert.equal(optimizationService.status, "available");
-  assert.equal(optimizationService.operation, "optimize");
-  assert.match(optimizationService.prerequisite, /benchmark/i);
-  assert.equal(metadata.submission.pricing, "free");
-  assert.equal(metadata.submission.paymentRequired, false);
+  assert.deepEqual(benchmarkService.operations, ["benchmark", "optimize"]);
+  assert.match(benchmarkService.prerequisite, /benchmark/i);
+
   const generationService = metadata.services.find(
     (item: { id: string }) => item.id === "resume_generation",
   );
   assert.equal(generationService.status, "available");
   assert.equal(generationService.operation, "generate_resume");
   assert.ok(generationService.documentTypes.includes("biosketch"));
-  const readinessService = metadata.services.find(
-    (item: { id: string }) => item.id === "application_readiness",
+
+  assert.equal(metadata.marketplaceServices.length, 3);
+  assert.deepEqual(
+    metadata.marketplaceServices.map((item: { service: string }) => item.service),
+    [
+      "opportunity_finding",
+      "resume_benchmarking_optimization",
+      "resume_generation",
+    ],
   );
-  assert.equal(readinessService.status, "available");
-  assert.equal(readinessService.operation, "readiness");
-  assert.equal(metadata.bootstrap.options.length, 5);
-  assert.equal(document.info.version, "0.9.4");
+  assert.equal(metadata.bootstrap.options.length, 10);
+  assert.equal(metadata.legacyBootstrap.options.length, 3);
+  assert.equal(document.info.version, "0.9.5");
+  assert.equal(
+    document.paths["/api/a2mcp/recommend"].post.parameters[0].name,
+    "service",
+  );
+  assert.equal(
+    document["x-trakr-orchestration"].marketplaceServices.length,
+    3,
+  );
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);

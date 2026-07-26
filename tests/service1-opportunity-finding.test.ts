@@ -126,22 +126,14 @@ function scored(
   };
 }
 
-test("empty auto request exposes the five goal-directed actions", async () => {
+test("empty auto request enters the Opportunity Discovery category flow", async () => {
   const response = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({}),
   );
 
-  assert.equal(response.conversation?.state, "choose_service");
-  assert.deepEqual(
-    response.conversation?.choices?.map((choice) => choice.id),
-    [
-      "opportunity_finding",
-      "resume_benchmarking_optimization",
-      "resume_optimization",
-      "resume_generation",
-      "application_readiness",
-    ],
-  );
+  assert.equal(response.conversation?.state, "choose_opportunity_categories");
+  assert.equal(response.conversation?.service, "opportunity_finding");
+  assert.equal(response.conversation?.choices?.length, 10);
 });
 
 test("explicit discovery begins with the ten-category menu", async () => {

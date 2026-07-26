@@ -341,8 +341,52 @@ test("402 body advertises the paid POST request parameters for OKX replay", asyn
     required: false,
     type: "string",
   });
+  assert.deepEqual(TRAKR_X402_OUTPUT_SCHEMA.input.service, {
+    carrier: "query",
+    required: false,
+    type: "string",
+  });
   assert.equal(TRAKR_X402_OUTPUT_SCHEMA.method, "POST");
   resetX402ServerForTests();
+});
+
+test("all three marketplace service entries receive the same compliant x402 challenge", async () => {
+  process.env.TRAKR_X402_ENFORCEMENT = "enforce";
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new FakeFacilitator();
+  setX402ServerForTests(await createX402Server(facilitator));
+
+  const urls = [
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-generation",
+  ];
+  for (const [index, url] of urls.entries()) {
+    const response = await POST(
+      new Request(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-for": `198.51.100.${100 + index}`,
+        },
+        body: "{}",
+      }),
+    );
+    assert.equal(response.status, 402, url);
+    const challenge = decodeHeader<{
+      x402Version: number;
+      accepts: PaymentRequirements[];
+    }>(response.headers.get("PAYMENT-REQUIRED") ?? "");
+    assert.equal(challenge.x402Version, X402_VERSION);
+    assert.equal(challenge.accepts[0].scheme, X402_SCHEME);
+    assert.equal(challenge.accepts[0].network, X402_NETWORK);
+    assert.equal(challenge.accepts[0].asset, X402_ASSET);
+    assert.equal(challenge.accepts[0].amount, X402_ATOMIC_AMOUNT);
+    assert.equal(challenge.accepts[0].payTo, payTo);
+  }
+
+  resetX402ServerForTests();
+  process.env.TRAKR_X402_ENFORCEMENT = "off";
 });
 
 test("valid proof verifies and settles synchronously with PAYMENT-RESPONSE", async () => {
@@ -819,7 +863,8 @@ test("paid route completes 402, settlement, business logic, and durable replay",
   setX402ServerForTests(await createX402Server(facilitator));
   const paidBusinessPayload = {
     message:
-      "Find remote Web3 hackathons for a frontend developer in Lagos",
+      "I am an early-career frontend developer in Lagos with React and TypeScript skills. Find remote Web3 hackathons and jobs open globally.",
+    selectedDiscoveryCategories: ["jobs", "hackathons"],
   };
 
   const unpaidResponse = await POST(
@@ -1060,7 +1105,7 @@ test("paid route requires fresh proof after failed settlement and replays succes
     retryBody.allowedResponses.map(
       (choice: { value: string }) => choice.value,
     ),
-    ["discover", "benchmark", "optimize", "generate_resume", "readiness"],
+    ["discover", "benchmark", "generate_resume"],
   );
   assert.ok(retryResponse.headers.get("PAYMENT-RESPONSE"));
   const verifyCallsAfterSuccess = facilitator.verifyCalls;

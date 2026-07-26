@@ -2,7 +2,7 @@
 
 ![Trakr logo](public/trakr-logo.png)
 
-Trakr is an outcome-first AI Opportunity Companion exposed as an A2MCP-style API service. The product presents three visible services: Opportunity Finding, Resume Benchmarking & Optimization, and Resume Generation. They share one capability layer and the stable public endpoint, `POST /api/a2mcp/recommend`.
+Trakr is an outcome-first AI Opportunity Companion exposed through three independently selectable A2MCP services: Opportunity Discovery, Resume Benchmarking & Optimization, and Resume Generation. They share one capability layer and one stable route, with service-specific query selectors for the resume workflows.
 
 Service 1, Opportunity Finding, and Service 2, Resume Benchmarking & Optimization, are production-ready in this repository. Service 2 has also passed a 153-case independently AI-reviewed and adjudicated synthetic calibration gate. Service 3, Resume Generation, is implemented behind the same additive endpoint and generates target-specific documents only from confirmed, claim-linked evidence.
 
@@ -82,13 +82,24 @@ npm run verify
 }
 ```
 
-## Outcome-First Conversation
+## Marketplace Service Entry
 
-An empty conversational request returns the three service choices. An external agent can make the selection explicitly:
+Marketplace selection determines the workflow before the request reaches Trakr:
+
+```text
+POST /api/a2mcp/recommend
+POST /api/a2mcp/recommend?service=resume-benchmarking-optimization
+POST /api/a2mcp/recommend?service=resume-generation
+```
+
+An empty request to the bare route immediately begins Opportunity Discovery and
+returns the ten opportunity categories. The resume URLs immediately begin their
+corresponding target-first workflows. The legacy chooser remains available only
+when requested explicitly:
 
 ```json
 {
-  "operation": "discover"
+  "operation": "start"
 }
 ```
 

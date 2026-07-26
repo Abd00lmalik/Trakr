@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 import { discoveryCategoryDefinitions } from "@/lib/opportunities/discovery-categories";
+import { TRAKR_MARKETPLACE_SERVICES } from "@/lib/companion/marketplace-services";
 import {
   isX402Enforced,
   X402_ASSET,
@@ -15,30 +16,18 @@ import {
 export const runtime = "nodejs";
 
 const serviceChoices = [
-  { id: "opportunity_finding", value: "discover", number: 1, label: "Find opportunities" },
+  { id: "opportunity_finding", value: "discover", number: 1, label: "Find an Opportunity" },
   {
-    id: "resume_benchmarking",
+    id: "resume_benchmarking_optimization",
     value: "benchmark",
     number: 2,
-    label: "Benchmark or analyze my resume",
-  },
-  {
-    id: "resume_optimization",
-    value: "optimize",
-    number: 3,
-    label: "Optimize my resume for a target",
+    label: "Resume Benchmarking & Optimization",
   },
   {
     id: "resume_generation",
     value: "generate_resume",
-    number: 4,
-    label: "Generate a resume",
-  },
-  {
-    id: "application_readiness",
-    value: "readiness",
-    number: 5,
-    label: "Help me with my application or readiness",
+    number: 3,
+    label: "Resume Generation",
   },
 ];
 
@@ -296,7 +285,7 @@ export async function GET() {
       title: "Trakr Opportunity & Resume Services",
       version: TRAKR_SERVICE_VERSION,
       description:
-        `One server-authoritative, conversation-first, evidence-first A2MCP endpoint exposing opportunity discovery, resume benchmarking, resume optimization, resume generation, and application-readiness guidance. Routing priority is: valid continuation and stage, explicit operation, clear natural-language intent, legacy structured discovery, then an ambiguous cold start. An empty or service-declaration-only request ${paymentRequired ? "first returns an HTTP 402 x402 challenge; after payment, the replay returns HTTP 200 with" : "returns HTTP 200 with"} a machine-readable five-action chooser and never assumes Opportunity Finding. Existing valid legacy recommendation payloads and three-choice continuations remain compatible.`,
+        `Three independently selectable, conversation-first Trakr marketplace services share one A2MCP route: Opportunity Discovery, Resume Benchmarking & Optimization, and Resume Generation. The bare route enters Opportunity Discovery; the two resume services use explicit service selectors. A valid request ${paymentRequired ? "first returns an HTTP 402 x402 challenge; after payment, the replay enters" : "enters"} the selected workflow directly. Explicit operation=start remains a backward-compatible three-service chooser.`,
     },
     servers: [
       {
@@ -309,7 +298,7 @@ export async function GET() {
     paths: {
       "/api/a2mcp": {
         get: {
-          summary: "Discover Trakr's five goal-directed actions and orchestration rules",
+          summary: "Discover Trakr's three marketplace services and orchestration rules",
           responses: { "200": { description: "A2MCP service metadata" } },
         },
       },
@@ -317,11 +306,28 @@ export async function GET() {
         post: {
           summary: "Start or continue a Trakr opportunity or resume workflow",
           description:
-            `The same endpoint supports start, discover, benchmark, optimize, generate_resume, and readiness. Bootstrap requests may have an empty body, {}, operation=start, an empty message, or a service declaration. Optimization requires a compatible benchmark and explicit approval. Readiness can assess a known Trakr opportunity, route to target benchmarking, or begin with opportunity discovery. ${
+            `The bare endpoint starts Opportunity Discovery. Use service=resume-benchmarking-optimization or service=resume-generation to enter the corresponding marketplace workflow. The same endpoint supports explicit operations and caller-carried continuations. Optimization requires a compatible benchmark and explicit approval. ${
               paymentRequired
                 ? `Every valid call requires ${X402_PRICE_USD} ${X402_TOKEN_NAME} through x402 v2 exact payment on ${X402_NETWORK}.`
                 : "Payment enforcement is currently disabled."
             }`,
+          parameters: [
+            {
+              name: "service",
+              in: "query",
+              required: false,
+              description:
+                "Marketplace service selector. Omit for Opportunity Discovery.",
+              schema: {
+                type: "string",
+                enum: [
+                  "opportunity-discovery",
+                  "resume-benchmarking-optimization",
+                  "resume-generation",
+                ],
+              },
+            },
+          ],
           requestBody: {
             required: false,
             content: {
@@ -329,8 +335,16 @@ export async function GET() {
                 schema: {
                   type: "object",
                   description:
-                    "An empty object opens the service chooser. Explicit operations and legacy structured discovery payloads remain valid. Documents may be supplied as extracted text or canonical base64 PDF, DOCX, or TXT content up to 2.5 MB.",
+                    "An empty object enters Opportunity Discovery. The selected marketplace service may also be supplied canonically in the body. Explicit operations and legacy structured discovery payloads remain valid.",
                   properties: {
+                    service: {
+                      type: "string",
+                      enum: [
+                        "opportunity_finding",
+                        "resume_benchmarking_optimization",
+                        "resume_generation",
+                      ],
+                    },
                     operation: {
                       type: "string",
                       enum: ["start", "auto", "discover", "benchmark", "optimize", "generate_resume", "readiness"],
@@ -558,7 +572,7 @@ export async function GET() {
           responses: {
             "200": {
               description:
-                "Conversational state or a completed service result. Bootstrap returns choose_service, status needs_input, all five goal-directed actions, and an opaque continuation. Legacy recommendation fields remain present for compatible clients.",
+                "Conversational state or a completed service result. Marketplace entries begin the selected workflow directly and return an opaque continuation. Explicit operation=start retains the legacy three-service chooser.",
               headers: {
                 "X-Trakr-Version": {
                   required: true,
@@ -820,7 +834,7 @@ export async function GET() {
                         stage: "choose_service",
                         status: "needs_input",
                         message:
-                          "What would you like Trakr to help you with?\n1. Find opportunities\n2. Benchmark or analyze my resume\n3. Optimize my resume for a target\n4. Generate a resume\n5. Help me with my application or readiness",
+                          "Choose a Trakr service:\n1. Find an Opportunity\n2. Resume Benchmarking & Optimization\n3. Resume Generation",
                         selectedService: null,
                         requiredInputs: [
                           { id: "service", type: "enum", required: true, prompt: "Choose a service", options: serviceChoices },
@@ -829,7 +843,7 @@ export async function GET() {
                         allowedResponses: serviceChoices,
                         attachmentsAccepted: [],
                         callerAction: "show_selection_menu",
-                        nextActions: ["discover", "benchmark", "optimize", "generate_resume", "readiness"],
+                        nextActions: ["discover", "benchmark", "generate_resume"],
                         continuation: { token: "opaque-encrypted-token-at-least-forty-characters", expiresAt: "2026-07-21T12:30:00.000Z", sessionVersion: "2" },
                       },
                     },
@@ -963,6 +977,7 @@ export async function GET() {
     "x-trakr-orchestration": {
       routingPriority: [
         "valid continuation and current stage",
+        "selected marketplace service",
         "explicit operation",
         "clear natural-language intent",
         "legacy structured discovery request",
@@ -970,6 +985,13 @@ export async function GET() {
       ],
       bootstrap: {
         status: 200,
+        defaultService: "opportunity_finding",
+        stage: "choose_opportunity_categories",
+        options: discoveryCategoryChoices,
+      },
+      marketplaceServices: TRAKR_MARKETPLACE_SERVICES,
+      legacyBootstrap: {
+        operation: "start",
         stage: "choose_service",
         options: serviceChoices,
       },

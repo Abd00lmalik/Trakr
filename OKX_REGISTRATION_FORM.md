@@ -2,15 +2,10 @@
 
 Use these values when registering Trakr in OKX.AI / Onchain OS.
 
-## Service Details
+## Agent Details
 
-- Service name: Trakr
 - OKX Agent ID: #5198
-- Service type: A2MCP
 - Category: Lifestyle Companion
-- Pricing: Free
-- Method: POST
-- Endpoint: https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend
 - Health URL: https://trakr-production-c70e.up.railway.app/api/health
 - Metadata URL: https://trakr-production-c70e.up.railway.app/api/a2mcp
 - OpenAPI URL: https://trakr-production-c70e.up.railway.app/api/a2mcp/openapi
@@ -18,13 +13,19 @@ Use these values when registering Trakr in OKX.AI / Onchain OS.
 - Avatar URL: https://trakr-production-c70e.up.railway.app/trakr-avatar.png
 - OKX avatar URL: https://static.okx.com/cdn/web3/wallet/marketplace/headimages/agent/avatar/8281fbc1-189e-4ab4-8efa-ca726d5e273e.png
 
-## Short Description
+## Marketplace Services
 
-Trakr is an AI-powered Opportunity Companion that returns ranked, explainable opportunity recommendations for students, developers, freelancers, creators, and builders.
+All services are A2MCP, use `POST`, and cost `0.005 USDT` per valid API call.
 
-## Full Description
+1. Opportunity Discovery
+   - Endpoint: https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend
+2. Resume Benchmarking & Optimization
+   - Endpoint: https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-benchmarking-optimization
+3. Resume Generation
+   - Endpoint: https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-generation
 
-Trakr accepts a structured user profile or resume text and matches the user against hackathons, grants, scholarships, fellowships, internships, remote jobs, and Web3 bounties. It returns ranked recommendations with match scores, AI reasoning, missing requirements, recommended action, next steps, a personalized action plan, and a learning roadmap.
+Each marketplace service enters only its corresponding Trakr workflow. The
+backend rejects conflicting operations and continuations from another service.
 
 ## Input Summary
 
@@ -70,18 +71,11 @@ The endpoint returns JSON containing:
 
 ## Verification
 
-Latest verification on 2026-07-12:
+Latest local verification on 2026-07-26:
 
 - OKX ASP identity: Registered
-- OKX marketplace listing: Under review
-- OKX review note: AI quality review suggested pass
+- OKX marketplace listing: Requires resubmission after deployment verification
 - OKX avatar: Updated to official Trakr logo
-- Health endpoint: OK
-- Railway deployment: Online
-- PostgreSQL: Connected
-- pgvector: Installed
-- Schema: Ready
-- AI provider: Gemini Flash
-- Recommendation endpoint: OK
-- OpenAPI endpoint: OK
-- PDF and DOCX resume parsing: OK
+- Three independent service entries: Locally verified
+- x402 payment challenge and durable replay: Locally verified
+- Production deployment and external service-entry verification: Pending

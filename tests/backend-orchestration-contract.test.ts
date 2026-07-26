@@ -30,13 +30,7 @@ async function bootstrap() {
 }
 
 async function startOpportunityFinding() {
-  const cold = await bootstrap();
-  return handleOpportunityCompanionRequest(
-    opportunityCompanionRequestSchema.parse({
-      message: "1",
-      continuation: cold.continuation,
-    }),
-  );
+  return bootstrap();
 }
 
 test("every Service 1 category is server-issued and persists in continuation", async () => {
@@ -136,9 +130,9 @@ test("the incomplete-response contract explicitly tells callers what to do", asy
   assert.equal(cold.apiVersion, cold.version);
   assert.equal(cold.callerAction, "show_selection_menu");
   assert.equal(cold.status, "needs_input");
-  assert.equal(cold.requiredInputs?.[0]?.id, "service");
+  assert.equal(cold.requiredInputs?.[0]?.id, "opportunity_categories");
   assert.deepEqual(cold.optionalInputs, []);
-  assert.equal(cold.allowedResponses?.length, 5);
+  assert.equal(cold.allowedResponses?.length, 10);
   assert.deepEqual(cold.attachmentsAccepted, []);
   assert.equal(cold.callerInstructions?.relayMessage, true);
   assert.equal(cold.callerInstructions?.doNotSelectService, true);
@@ -150,11 +144,9 @@ test("the incomplete-response contract explicitly tells callers what to do", asy
 });
 
 test("Service 3 requests the target before applicant evidence", async () => {
-  const cold = await bootstrap();
   const generation = await handleOpportunityCompanionRequest(
     opportunityCompanionRequestSchema.parse({
-      message: "Resume Generation",
-      continuation: cold.continuation,
+      service: "resume_generation",
     }),
   );
   assert.equal(generation.stage, "generate_awaiting_target");

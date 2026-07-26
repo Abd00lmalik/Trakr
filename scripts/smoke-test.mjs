@@ -141,13 +141,48 @@ try {
   });
   if (
     !emptyBootstrap.response.ok ||
-    emptyBootstrap.body?.stage !== "choose_service" ||
+    emptyBootstrap.body?.stage !== "choose_opportunity_categories" ||
     emptyBootstrap.body?.status !== "needs_input" ||
-    emptyBootstrap.body?.requiredInputs?.[0]?.options?.length !== 3
+    emptyBootstrap.body?.selectedService !== "opportunity_finding" ||
+    emptyBootstrap.body?.requiredInputs?.[0]?.options?.length !== 10
   ) {
     throw new Error(
-      `Empty bootstrap did not expose the three-service chooser: ${JSON.stringify(
+      `Empty bootstrap did not enter Opportunity Discovery: ${JSON.stringify(
         emptyBootstrap.body,
+      )}`,
+    );
+  }
+
+  const benchmarkBootstrap = await requestJson(
+    "/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+    { method: "POST" },
+  );
+  if (
+    !benchmarkBootstrap.response.ok ||
+    benchmarkBootstrap.body?.stage !==
+      "benchmark_awaiting_resume_and_target" ||
+    benchmarkBootstrap.body?.selectedService !==
+      "resume_benchmarking_optimization"
+  ) {
+    throw new Error(
+      `Benchmark marketplace entry did not start its workflow: ${JSON.stringify(
+        benchmarkBootstrap.body,
+      )}`,
+    );
+  }
+
+  const generationBootstrap = await requestJson(
+    "/api/a2mcp/recommend?service=resume-generation",
+    { method: "POST" },
+  );
+  if (
+    !generationBootstrap.response.ok ||
+    generationBootstrap.body?.stage !== "generate_awaiting_target" ||
+    generationBootstrap.body?.selectedService !== "resume_generation"
+  ) {
+    throw new Error(
+      `Generation marketplace entry did not start its workflow: ${JSON.stringify(
+        generationBootstrap.body,
       )}`,
     );
   }

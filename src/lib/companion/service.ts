@@ -77,7 +77,7 @@ type ServiceMenuSelection = {
 
 function serviceMenuSelection(
   value: string | undefined,
-  menuVersion: CompanionContext["menuVersion"] = "2",
+  menuVersion: CompanionContext["menuVersion"] = "1",
 ): ServiceMenuSelection | undefined {
   const normalized = value?.trim().toLowerCase() ?? "";
   if (/^(1|discover|opportunity finding|find opportunities?)$/.test(normalized)) {
@@ -148,39 +148,23 @@ function serviceChoices(): CompanionChoice[] {
       id: "opportunity_finding",
       value: "discover",
       number: 1,
-      label: "Find opportunities",
+      label: "Find an Opportunity",
       description: "Find current opportunities that fit your goals and constraints.",
     },
     {
       id: "resume_benchmarking_optimization",
       value: "benchmark",
       number: 2,
-      label: "Benchmark or analyze my resume",
+      label: "Resume Benchmarking & Optimization",
       description:
-        "Compare your evidence with a target and identify strengths, gaps, and readiness issues.",
-    },
-    {
-      id: "resume_optimization",
-      value: "optimize",
-      number: 3,
-      label: "Optimize my resume for a target",
-      description:
-        "Benchmark first, then improve the resume using only confirmed evidence.",
+        "Benchmark against a target, identify gaps, then optimize using confirmed evidence.",
     },
     {
       id: "resume_generation",
       value: "generate_resume",
-      number: 4,
-      label: "Generate a resume",
+      number: 3,
+      label: "Resume Generation",
       description: "Create a truthful, target-specific document from verified facts.",
-    },
-    {
-      id: "application_readiness",
-      value: "readiness",
-      number: 5,
-      label: "Help me with my application or readiness",
-      description:
-        "Assess a known opportunity, benchmark against a target, or find a suitable opportunity first.",
     },
   ];
 }
@@ -433,6 +417,7 @@ function serviceSelectionFromRequest(request: OpportunityCompanionRequest) {
   const context = activeContext(request);
   const contextService = context?.service;
   if (contextService) return contextService;
+  if (request.service) return request.service;
   if (request.operation === "start") return undefined;
   if (request.operation !== "auto") return serviceForOperation(request.operation);
   return serviceMenuSelectionForRequest(request)?.service;
@@ -553,6 +538,14 @@ function operationForRequest(
     /^(yes|y|1|optimize|continue|proceed)\b/i.test(request.message?.trim() ?? "")
   ) {
     return "optimize";
+  }
+  if (context?.operation && context.operation !== "start") {
+    return context.operation;
+  }
+  if (request.service === "opportunity_finding") return "discover";
+  if (request.service === "resume_generation") return "generate_resume";
+  if (request.service === "resume_benchmarking_optimization") {
+    return intent === "resume_optimization" ? "optimize" : "benchmark";
   }
   if (intent === "resume_benchmark") return "benchmark";
   if (intent === "resume_optimization") return "optimize";
@@ -1370,7 +1363,13 @@ function hasUsableTarget(
 export async function handleOpportunityCompanionRequest(
   rawRequest: OpportunityCompanionRequest,
 ): Promise<OpportunityCompanionResponse> {
-  const normalized = normalizedRequest(rawRequest);
+  const supplied = normalizedRequest(rawRequest);
+  const normalized =
+    supplied.operation !== "start" &&
+    !supplied.service &&
+    isColdStartRequest(supplied)
+      ? { ...supplied, service: "opportunity_finding" as const }
+      : supplied;
   const menuSelection =
     activeContext(normalized)?.stage === "choose_service"
       ? serviceMenuSelectionForRequest(normalized)
@@ -1571,13 +1570,15 @@ export async function handleOpportunityCompanionRequest(
       Boolean(serviceMenuSelectionForRequest(request))) ||
     (!activeContext(request) &&
       Boolean(serviceMenuSelectionForRequest(request)) &&
-      !/^\s*[1-5]\s*$/.test(request.message ?? ""));
+      !/^\s*[1-3]\s*$/.test(request.message ?? ""));
+  const enteredMarketplaceService =
+    !activeContext(request) && Boolean(request.service);
   const sourceChoice = selectedFromServiceMenu
     ? undefined
     : request.intakeRoute;
 
   if (
-    isColdStartRequest(request) ||
+    request.operation === "start" ||
     (activeContext(request)?.stage === "choose_service" &&
       operation === "start")
   ) {
@@ -1589,8 +1590,8 @@ export async function handleOpportunityCompanionRequest(
       "start",
       null,
       "choose_service",
-      menuMessage("What would you like Trakr to help you with?", choices),
-      ["discover", "benchmark", "optimize", "generate_resume", "readiness"],
+      menuMessage("Choose a Trakr service:", choices),
+      ["discover", "benchmark", "generate_resume"],
       undefined,
       {
         requiredAction: "select_service",
@@ -1608,7 +1609,7 @@ export async function handleOpportunityCompanionRequest(
         missingInformation: [],
         unknownFields: [],
         unansweredQuestions: [],
-        menuVersion: "2",
+        menuVersion: "1",
         hideProfile: true,
         clearProfileFromSession: true,
       },
@@ -1818,7 +1819,7 @@ export async function handleOpportunityCompanionRequest(
   }
 
   if (
-    selectedFromServiceMenu &&
+    (selectedFromServiceMenu || enteredMarketplaceService) &&
     service === "opportunity_finding" &&
     operation === "discover"
   ) {
@@ -1921,7 +1922,7 @@ export async function handleOpportunityCompanionRequest(
   }
 
   if (
-    selectedFromServiceMenu &&
+    (selectedFromServiceMenu || enteredMarketplaceService) &&
     service === "resume_benchmarking_optimization"
   ) {
     const prompt =
@@ -1983,7 +1984,10 @@ export async function handleOpportunityCompanionRequest(
     return emptyResponse(request, conversation, undefined, built.filters);
   }
 
-  if (selectedFromServiceMenu && service === "resume_generation") {
+  if (
+    (selectedFromServiceMenu || enteredMarketplaceService) &&
+    service === "resume_generation"
+  ) {
     const prompt =
       "What job, internship, scholarship, fellowship, grant, academic program, or other opportunity are you applying for? Paste the description, share the official URL, upload the requirements, or explain the target naturally.";
     const conversation = conversationFor(
@@ -2148,7 +2152,7 @@ export async function handleOpportunityCompanionRequest(
     return emptyResponse(request, conversation, undefined, built.filters);
   }
 
-  if (service === "opportunity_finding") {
+  if (service === "opportunity_finding" && operation === "discover") {
     const intake = discoveryIntake(
       built.profile,
       built.filters,

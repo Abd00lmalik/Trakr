@@ -85,7 +85,7 @@ The bootstrap response presents:
 6. Done: Register as A2MCP in OKX.AI/Onchain OS with the endpoint above.
 7. Done: Submit as free for first review.
 8. Done: Listed publicly on OKX.AI.
-9. Current phase: Keep the service free and preserve the registered endpoint and identity.
+9. Current phase: Deploy and verify three paid service entries, then update and resubmit Agent #5198 in place.
 
 ## OKX Registration Result
 
@@ -94,12 +94,13 @@ The bootstrap response presents:
 - Official avatar update transaction: `0x80a0843597fcdd25b7925bdbf36e47bb3c1134492781bdcfb4986866d093180d`
 - Owner X Layer address: `0xbe116468bb544723141647608fe98c1bc0471291`
 - Public display title proposed: Trakr Opportunity & Resume Services
-- Legacy service title: Opportunity Matching API
+- Existing service ID `32470`: Opportunity Discovery
+- Additional services proposed: Resume Benchmarking & Optimization; Resume Generation
 - Service type: A2MCP
-- Fee: `0 USDT`
-- Endpoint: `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`
-- Current status: Listed and active
-- Pricing remains: `0 USDT`
+- Fee: `0.005 USDT` per valid API call for each service
+- Route: `https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend`
+- Resume service selectors: `service=resume-benchmarking-optimization`; `service=resume-generation`
+- Current status: Requires resubmission after deployment verification
 
 ## Manual/User-Gated Steps
 

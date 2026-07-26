@@ -94,17 +94,27 @@ directories remain discoverable but are limited to `Prepare First` or `Skip`.
 
 ## OKX.AI A2MCP Registration
 
-Trakr remains one existing A2MCP service on Agent `#5198`:
+Agent `#5198` exposes three independently selectable A2MCP services through one
+server-authoritative route:
 
-- Service name: Trakr
-- Service type: A2MCP
-- Interface URL: `https://your-railway-domain/api/a2mcp/recommend`
+1. Opportunity Discovery
+   - Interface URL: `https://your-railway-domain/api/a2mcp/recommend`
+2. Resume Benchmarking & Optimization
+   - Interface URL: `https://your-railway-domain/api/a2mcp/recommend?service=resume-benchmarking-optimization`
+3. Resume Generation
+   - Interface URL: `https://your-railway-domain/api/a2mcp/recommend?service=resume-generation`
+
+All three services use:
+
 - Method: `POST`
-- Marketplace pricing: `0.005 USDT` per API call after coordinated cutover
-- Protocol payment: `0.005 USD?0` (`5000` atomic units) on
+- Marketplace pricing: `0.005 USDT` per valid API call
+- Protocol payment: `0.005 USD₮0` (`5000` atomic units) on
   `eip155:196`, x402 v2 `exact`
-- Input: empty bootstrap, explicit service operation, structured profile, resume text, canonical base64 PDF/DOCX/TXT, natural-language request, or caller-scoped continuation
-- Output: server-authoritative conversational state, five-action goal chooser, ranked opportunities, evidence-linked resume diagnostics, application-readiness guidance, and short-lived DOCX/PDF artifacts
+
+Marketplace selection determines the workflow before the paid request. The bare
+route enters Opportunity Discovery, while the two resume service URLs enter
+their corresponding workflows directly. Explicit `operation: "start"` remains
+available only as a backward-compatible three-service chooser.
 
 Deploy payment-capable code with `TRAKR_X402_ENFORCEMENT=off` first. Apply the
 database migration and verify payment readiness before coordinating the listing
