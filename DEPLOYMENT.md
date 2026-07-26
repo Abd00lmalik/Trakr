@@ -28,6 +28,16 @@ TRAKR_X402_OKX_API_KEY=your_okx_seller_api_key
 TRAKR_X402_OKX_SECRET_KEY=your_okx_seller_api_secret
 TRAKR_X402_OKX_PASSPHRASE=your_okx_seller_api_passphrase
 TRAKR_X402_OKX_BASE_URL=https://web3.okx.com
+TRAKR_REQUEST_BODY_TIMEOUT_MS=5000
+TRAKR_DOCUMENT_PROCESSING_TIMEOUT_MS=8000
+TRAKR_BUSINESS_TIMEOUT_MS=25000
+TRAKR_AI_ENHANCEMENT_BUDGET_MS=7000
+TRAKR_X402_VERIFY_TIMEOUT_MS=8000
+TRAKR_X402_SETTLE_TIMEOUT_MS=20000
+TRAKR_X402_STATUS_TIMEOUT_MS=5000
+TRAKR_DB_CONNECT_TIMEOUT_MS=3000
+TRAKR_DB_QUERY_TIMEOUT_MS=5000
+TRAKR_DB_STATEMENT_TIMEOUT_MS=5000
 INGEST_API_KEY=generate_a_long_random_value
 TRAKR_ADMIN_API_KEY=generate_a_long_random_value
 ```
@@ -124,6 +134,15 @@ unchanged.
 - `TRAKR_ARTIFACT_TTL_MINUTES` is bounded between 5 and 120 minutes and defaults to 30. Download URLs are bearer credentials and must not be logged or forwarded.
 - `TRAKR_X402_RESULT_SECRET` encrypts paid-response replay data and must be
   separate from `TRAKR_SESSION_SECRET`.
+- The unpaid x402 challenge is generated locally from the fixed, reviewed X
+  Layer payment configuration. Payment verification and settlement still use
+  the official OKX facilitator and have bounded response deadlines.
+- Database, request-body, document-processing, AI enhancement, verification,
+  settlement, and total business-response deadlines prevent an external
+  dependency from leaving an A2MCP request open indefinitely.
+- Production responses include `X-Request-Id`, `X-Trakr-Duration-Ms`, and
+  `Server-Timing`. Railway logs contain privacy-safe stage and duration events
+  keyed by the request ID.
 - `TRAKR_X402_ENFORCEMENT` must remain `off` until the marketplace fee and
   endpoint enforcement can be switched together.
 - Set `RECOMMENDATION_LOG_RETENTION_DAYS` between 1 and 365. Expired recommendation analytics are pruned during normal recommendation traffic.

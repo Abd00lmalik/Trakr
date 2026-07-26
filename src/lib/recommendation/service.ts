@@ -29,6 +29,10 @@ import {
   discoveryCategoryLabel,
   discoveryCategoryMatchesOpportunity,
 } from "@/lib/opportunities/discovery-categories";
+import {
+  timeoutFromEnv,
+  withTimeout,
+} from "@/lib/runtime/timeout";
 
 const SERVICE_VERSION = TRAKR_SERVICE_VERSION;
 const supportingCategories = new Set<OpportunityCategory>([
@@ -673,12 +677,21 @@ export async function generateRecommendations(
   let response = draftResponse;
   if (recommendations.length) {
     try {
-      response = await aiProvider.enhanceRecommendations({
-        request: groundedRequest,
-        profileText: buildProfileText(groundedRequest),
-        scoredOpportunities: ranked,
-        draftResponse,
-      });
+      response = await withTimeout(
+        aiProvider.enhanceRecommendations({
+          request: groundedRequest,
+          profileText: buildProfileText(groundedRequest),
+          scoredOpportunities: ranked,
+          draftResponse,
+        }),
+        timeoutFromEnv(
+          "TRAKR_AI_ENHANCEMENT_BUDGET_MS",
+          7_000,
+          2_000,
+          15_000,
+        ),
+        "ai_enhancement_timeout",
+      );
     } catch (error) {
       response = {
         ...draftResponse,

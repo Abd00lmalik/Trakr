@@ -1,4 +1,5 @@
 import { Pool } from "pg";
+import { timeoutFromEnv } from "@/lib/runtime/timeout";
 
 let pool: Pool | undefined;
 
@@ -11,6 +12,26 @@ export function getPool() {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 5,
+      connectionTimeoutMillis: timeoutFromEnv(
+        "TRAKR_DB_CONNECT_TIMEOUT_MS",
+        3_000,
+        500,
+        10_000,
+      ),
+      query_timeout: timeoutFromEnv(
+        "TRAKR_DB_QUERY_TIMEOUT_MS",
+        5_000,
+        1_000,
+        15_000,
+      ),
+      statement_timeout: timeoutFromEnv(
+        "TRAKR_DB_STATEMENT_TIMEOUT_MS",
+        5_000,
+        1_000,
+        15_000,
+      ),
+      idle_in_transaction_session_timeout: 10_000,
+      keepAlive: true,
     });
   }
 

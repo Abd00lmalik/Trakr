@@ -10,6 +10,10 @@ import {
 import type {
   PaymentPayload,
   PaymentRequirements,
+  SettleResponse,
+  SettleStatusResponse,
+  SupportedResponse,
+  VerifyResponse,
 } from "@okxweb3/x402-core/types";
 import { ExactEvmScheme } from "@okxweb3/x402-evm/exact/server";
 import {
@@ -28,6 +32,10 @@ import {
   X402_TOKEN_VERSION,
   X402_VERSION,
 } from "@/lib/payments/config";
+import {
+  timeoutFromEnv,
+  withTimeout,
+} from "@/lib/runtime/timeout";
 
 class WebRequestAdapter implements HTTPAdapter {
   constructor(
@@ -131,6 +139,79 @@ export const TRAKR_X402_OUTPUT_SCHEMA = {
 
 let serverPromise: Promise<x402HTTPResourceServer> | undefined;
 
+class ProductionFacilitatorClient implements FacilitatorClient {
+  constructor(
+    private readonly delegate: FacilitatorClient,
+    private readonly payTo: string,
+  ) {}
+
+  async getSupported(): Promise<SupportedResponse> {
+    // The protected route is fixed to the officially supported X Layer exact
+    // configuration. Avoid making the first unpaid 402 depend on a live
+    // facilitator capability lookup.
+    return {
+      kinds: [
+        {
+          x402Version: X402_VERSION,
+          scheme: X402_SCHEME,
+          network: X402_NETWORK,
+          extra: {},
+        },
+      ],
+      extensions: [],
+      signers: { "eip155:*": [this.payTo] },
+    };
+  }
+
+  verify(
+    paymentPayload: PaymentPayload,
+    paymentRequirements: PaymentRequirements,
+  ): Promise<VerifyResponse> {
+    return withTimeout(
+      this.delegate.verify(paymentPayload, paymentRequirements),
+      timeoutFromEnv("TRAKR_X402_VERIFY_TIMEOUT_MS", 8_000, 1_000, 15_000),
+      "payment_verification_timeout",
+    );
+  }
+
+  settle(
+    paymentPayload: PaymentPayload,
+    paymentRequirements: PaymentRequirements,
+  ): Promise<SettleResponse> {
+    return withTimeout(
+      this.delegate.settle(paymentPayload, paymentRequirements),
+      timeoutFromEnv("TRAKR_X402_SETTLE_TIMEOUT_MS", 20_000, 5_000, 30_000),
+      "payment_settlement_timeout",
+    );
+  }
+
+  getSettleStatus(txHash: string): Promise<SettleStatusResponse> {
+    if (!this.delegate.getSettleStatus) {
+      return Promise.resolve({
+        success: false,
+        status: "failed",
+        errorReason: "settlement_status_unavailable",
+      });
+    }
+    return withTimeout(
+      this.delegate.getSettleStatus(txHash),
+      timeoutFromEnv(
+        "TRAKR_X402_STATUS_TIMEOUT_MS",
+        5_000,
+        1_000,
+        10_000,
+      ),
+      "payment_status_timeout",
+    );
+  }
+}
+
+export function createProductionFacilitatorClient(
+  facilitator: FacilitatorClient,
+) {
+  return new ProductionFacilitatorClient(facilitator, getX402PayTo());
+}
+
 export async function createX402Server(facilitator: FacilitatorClient) {
   const resourceServer = new x402ResourceServer(facilitator).register(
     X402_NETWORK,
@@ -189,13 +270,14 @@ export async function createX402Server(facilitator: FacilitatorClient) {
 
 async function createServer() {
   const credentials = getX402OkxCredentials();
-  const facilitator = new OKXFacilitatorClient({
+  const okxFacilitator = new OKXFacilitatorClient({
     ...credentials,
     baseUrl:
       process.env.TRAKR_X402_OKX_BASE_URL?.trim() ||
       X402_DEFAULT_FACILITATOR_BASE_URL,
     syncSettle: true,
   });
+  const facilitator = createProductionFacilitatorClient(okxFacilitator);
   return createX402Server(facilitator);
 }
 

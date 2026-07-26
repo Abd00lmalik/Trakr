@@ -213,7 +213,7 @@ test("empty and minimal cold starts return the three-service chooser with HTTP 2
   for (const input of cases) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.2");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.3");
     assertChooser(result.body);
   }
 });

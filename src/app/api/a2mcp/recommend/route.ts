@@ -30,6 +30,12 @@ import {
   recommendationRequestSchema,
 } from "@/lib/types/opportunities";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
+import { RequestTiming } from "@/lib/observability/request-timing";
+import {
+  OperationTimeoutError,
+  timeoutFromEnv,
+  withTimeout,
+} from "@/lib/runtime/timeout";
 
 export const runtime = "nodejs";
 
@@ -39,7 +45,7 @@ const responseHeaders = {
   "Access-Control-Allow-Headers":
     "Content-Type, Authorization, X-Trakr-Api-Key, Idempotency-Key, X-Request-Id, PAYMENT-SIGNATURE",
   "Access-Control-Expose-Headers":
-    "X-Request-Id, X-Idempotency-Status, X-Trakr-Version, PAYMENT-REQUIRED, PAYMENT-RESPONSE",
+    "X-Request-Id, X-Idempotency-Status, X-Trakr-Version, X-Trakr-Duration-Ms, Server-Timing, PAYMENT-REQUIRED, PAYMENT-RESPONSE",
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
   "X-Trakr-Version": TRAKR_SERVICE_VERSION,
@@ -240,14 +246,22 @@ function exposeConversationContract<T extends Record<string, unknown>>(
 async function readRequestPayload(request: Request) {
   const contentType = request.headers.get("content-type") ?? "";
   if (!contentType.toLowerCase().startsWith("multipart/form-data")) {
-    const rawBody = await request.text();
+    const rawBody = await withTimeout(
+      request.text(),
+      timeoutFromEnv("TRAKR_REQUEST_BODY_TIMEOUT_MS", 5_000, 1_000, 10_000),
+      "request_body_timeout",
+    );
     return {
       rawBody,
       payload: rawBody.trim() ? JSON.parse(rawBody) : {},
     };
   }
 
-  const formData = await request.formData();
+  const formData = await withTimeout(
+    request.formData(),
+    timeoutFromEnv("TRAKR_REQUEST_BODY_TIMEOUT_MS", 5_000, 1_000, 10_000),
+    "request_body_timeout",
+  );
   const file = formData.get("resume");
   if (!(file instanceof File)) {
     throw new Error("Multipart requests must include a resume file.");
@@ -405,14 +419,37 @@ async function executeBusinessRequest(
     const legacyRequest = hasConversationalFields(normalizedPayload)
       ? null
       : recommendationRequestSchema.safeParse(normalizedPayload);
-    const response = legacyRequest?.success
-      ? await generateRecommendations(legacyRequest.data)
-      : await handleOpportunityCompanionRequest(parsedPayload);
+    const businessPromise = legacyRequest?.success
+      ? generateRecommendations(legacyRequest.data)
+      : handleOpportunityCompanionRequest(parsedPayload);
+    const response = await withTimeout(
+      businessPromise,
+      timeoutFromEnv(
+        "TRAKR_BUSINESS_TIMEOUT_MS",
+        25_000,
+        5_000,
+        45_000,
+      ),
+      "business_response_timeout",
+    );
     return {
       body: exposeConversationContract({ ...response, requestId }),
       status: 200,
     };
   } catch (error) {
+    if (error instanceof OperationTimeoutError) {
+      return {
+        body: {
+          error: "service_timeout",
+          code: error.code,
+          message:
+            "Trakr could not complete this call within the response deadline. Retry the identical paid request with the same payment proof.",
+          requestId,
+          retryable: true,
+        },
+        status: 504,
+      };
+    }
     if (error instanceof CompanionSessionError) {
       return {
         body: {
@@ -509,9 +546,31 @@ export async function POST(request: Request) {
     "X-Request-Id": requestId,
     "X-Trakr-Version": TRAKR_SERVICE_VERSION,
   };
+  const timing = new RequestTiming(requestId);
+  timing.mark("request", "started", {
+    method: request.method,
+    hasPayment: request.headers.has("payment-signature"),
+  });
+  const respond = (
+    body: unknown,
+    status = 200,
+    extraHeaders: Record<string, string> = {},
+    stage = "response",
+  ) => {
+    timing.mark(
+      stage,
+      status >= 500 ? "failed" : status >= 400 ? "rejected" : "completed",
+      { status },
+    );
+    return json(body, status, {
+      ...requestHeaders,
+      ...timing.headers(),
+      ...extraHeaders,
+    });
+  };
 
   if (!isAuthorized(request)) {
-    return json(
+    return respond(
       {
         error: "unauthorized",
         code: "unauthorized",
@@ -520,7 +579,8 @@ export async function POST(request: Request) {
         retryable: false,
       },
       401,
-      requestHeaders,
+      {},
+      "authorization",
     );
   }
 
@@ -534,12 +594,23 @@ export async function POST(request: Request) {
     payload = parsedRequest.payload;
   } catch (error) {
     const invalidJson = error instanceof SyntaxError;
-    return json(
+    const timedOut = error instanceof OperationTimeoutError;
+    return respond(
       {
-        error: invalidJson ? "invalid_json" : "invalid_request_body",
-        code: invalidJson ? "invalid_json" : "invalid_request_body",
+        error: timedOut
+          ? "request_timeout"
+          : invalidJson
+            ? "invalid_json"
+            : "invalid_request_body",
+        code: timedOut
+          ? error.code
+          : invalidJson
+            ? "invalid_json"
+            : "invalid_request_body",
         message:
-          error instanceof SyntaxError
+          timedOut
+            ? "The request body was not received within the allowed time."
+            : error instanceof SyntaxError
             ? "Request body must be valid JSON."
             : error instanceof Error
               ? error.message
@@ -547,8 +618,9 @@ export async function POST(request: Request) {
         requestId,
         retryable: false,
       },
-      400,
-      requestHeaders,
+      timedOut ? 408 : 400,
+      {},
+      "request_body",
     );
   }
 
@@ -558,7 +630,7 @@ export async function POST(request: Request) {
     rawBody,
   );
   if (idempotency.status === "invalid") {
-    return json(
+    return respond(
       {
         error: "invalid_idempotency_key",
         code: "invalid_idempotency_key",
@@ -568,11 +640,12 @@ export async function POST(request: Request) {
         retryable: false,
       },
       400,
-      requestHeaders,
+      {},
+      "idempotency",
     );
   }
   if (idempotency.status === "conflict") {
-    return json(
+    return respond(
       {
         error: "idempotency_conflict",
         code: "idempotency_conflict",
@@ -583,21 +656,20 @@ export async function POST(request: Request) {
         requiredAction: "Use a new Idempotency-Key for a different request.",
       },
       409,
-      requestHeaders,
+      {},
+      "idempotency",
     );
   }
   if (idempotency.status === "replay") {
-    return json(idempotency.result.body, idempotency.result.status, {
-      ...requestHeaders,
+    return respond(idempotency.result.body, idempotency.result.status, {
       "X-Idempotency-Status": "replayed",
-    });
+    }, "idempotency_replay");
   }
   if (idempotency.status === "pending") {
     const result = await idempotency.pending;
-    return json(result.body, result.status, {
-      ...requestHeaders,
+    return respond(result.body, result.status, {
       "X-Idempotency-Status": "replayed",
-    });
+    }, "idempotency_pending_replay");
   }
 
   function complete(
@@ -608,13 +680,12 @@ export async function POST(request: Request) {
     if (idempotency.status === "owner") {
       idempotency.complete({ body, status });
     }
-    return json(body, status, {
-      ...requestHeaders,
+    return respond(body, status, {
       ...(idempotency.status === "owner"
         ? { "X-Idempotency-Status": "stored" }
         : {}),
       ...extraHeaders,
-    });
+    }, "business_response");
   }
 
   const rateLimit = checkRateLimit(clientKey);
@@ -635,14 +706,25 @@ export async function POST(request: Request) {
 
   let normalizedPayload: unknown;
   try {
-    normalizedPayload = await prepareDocumentPayload(normalizePayload(payload));
+    normalizedPayload = await withTimeout(
+      prepareDocumentPayload(normalizePayload(payload)),
+      timeoutFromEnv(
+        "TRAKR_DOCUMENT_PROCESSING_TIMEOUT_MS",
+        8_000,
+        2_000,
+        20_000,
+      ),
+      "document_processing_timeout",
+    );
   } catch (error) {
     return complete(
       {
         error: "invalid_document",
         code: "invalid_document",
         message:
-          error instanceof Error
+          error instanceof OperationTimeoutError
+            ? "The supplied document could not be processed within the allowed time."
+            : error instanceof Error
             ? error.message
             : "The supplied document could not be processed.",
         requestId,
@@ -684,13 +766,28 @@ export async function POST(request: Request) {
 
   if (paymentHeader) {
     fingerprint = paymentFingerprint(paymentHeader);
-    const existing = await inspectPaymentCall(fingerprint, paidRequestHash);
+    let existing;
+    try {
+      existing = await inspectPaymentCall(fingerprint, paidRequestHash);
+    } catch {
+      return respond(
+        {
+          error: "payment_persistence_unavailable",
+          code: "payment_persistence_unavailable",
+          message: "Durable payment replay protection is unavailable.",
+          requestId,
+          retryable: true,
+        },
+        503,
+        {},
+        "payment_ledger",
+      );
+    }
     if (existing?.status === "replay") {
-      return json(existing.response.body, existing.response.status, {
-        ...requestHeaders,
+      return respond(existing.response.body, existing.response.status, {
         "PAYMENT-RESPONSE": existing.settlementHeader,
         "X-Idempotency-Status": "replayed",
-      });
+      }, "payment_replay");
     }
     if (
       existing &&
@@ -698,16 +795,31 @@ export async function POST(request: Request) {
       existing.status !== "verification_required"
     ) {
       const error = claimErrorResponse(existing, requestId);
-      return json(error.body, error.status, requestHeaders);
+      return respond(error.body, error.status, {}, "payment_claim");
     }
     if (existing?.status === "resumable") {
-      claim = await claimPaymentCall({
-        paymentFingerprint: fingerprint,
-        requestHash: paidRequestHash,
-        idempotencyKey: request.headers.get("idempotency-key"),
-        requestId,
-        alreadyVerified: false,
-      });
+      try {
+        claim = await claimPaymentCall({
+          paymentFingerprint: fingerprint,
+          requestHash: paidRequestHash,
+          idempotencyKey: request.headers.get("idempotency-key"),
+          requestId,
+          alreadyVerified: false,
+        });
+      } catch {
+        return respond(
+          {
+            error: "payment_persistence_unavailable",
+            code: "payment_persistence_unavailable",
+            message: "Durable payment replay protection is unavailable.",
+            requestId,
+            retryable: true,
+          },
+          503,
+          {},
+          "payment_ledger",
+        );
+      }
     }
   }
 
@@ -716,7 +828,7 @@ export async function POST(request: Request) {
     try {
       paymentResult = await processX402Request(request, normalizedPayload);
     } catch (error) {
-      return json(
+      return respond(
         {
           error: "payment_service_unavailable",
           code: "payment_service_unavailable",
@@ -730,19 +842,23 @@ export async function POST(request: Request) {
               : undefined,
         },
         503,
-        requestHeaders,
+        {},
+        "payment_initialization",
       );
     }
     if (paymentResult.type === "response") {
+      timing.mark("payment_challenge", "completed", {
+        status: paymentResult.response.status,
+      });
       return paymentInstructionResponse(
         paymentResult.response,
-        requestHeaders,
+        { ...requestHeaders, ...timing.headers() },
       );
     }
     verifiedPayment = paymentResult.payment;
     const verifiedHeader = paymentHeader ?? request.headers.get("payment-signature");
     if (!verifiedHeader) {
-      return json(
+      return respond(
         {
           error: "payment_proof_missing",
           code: "payment_proof_missing",
@@ -751,32 +867,47 @@ export async function POST(request: Request) {
           retryable: true,
         },
         402,
-        requestHeaders,
+        {},
+        "payment_verification",
       );
     }
     fingerprint = paymentFingerprint(verifiedHeader);
-    claim = await claimPaymentCall({
-      paymentFingerprint: fingerprint,
-      requestHash: paidRequestHash,
-      idempotencyKey: request.headers.get("idempotency-key"),
-      requestId,
-      alreadyVerified: true,
-    });
+    try {
+      claim = await claimPaymentCall({
+        paymentFingerprint: fingerprint,
+        requestHash: paidRequestHash,
+        idempotencyKey: request.headers.get("idempotency-key"),
+        requestId,
+        alreadyVerified: true,
+      });
+    } catch {
+      return respond(
+        {
+          error: "payment_persistence_unavailable",
+          code: "payment_persistence_unavailable",
+          message: "Durable payment replay protection is unavailable.",
+          requestId,
+          retryable: true,
+        },
+        503,
+        {},
+        "payment_ledger",
+      );
+    }
   }
 
   if (claim.status === "replay") {
-    return json(claim.response.body, claim.response.status, {
-      ...requestHeaders,
+    return respond(claim.response.body, claim.response.status, {
       "PAYMENT-RESPONSE": claim.settlementHeader,
       "X-Idempotency-Status": "replayed",
-    });
+    }, "payment_replay");
   }
   if (claim.status !== "owner") {
     const error = claimErrorResponse(claim, requestId);
-    return json(error.body, error.status, requestHeaders);
+    return respond(error.body, error.status, {}, "payment_claim");
   }
   if (!fingerprint) {
-    return json(
+    return respond(
       {
         error: "payment_verification_state_lost",
         code: "payment_verification_state_lost",
@@ -785,14 +916,15 @@ export async function POST(request: Request) {
         retryable: true,
       },
       503,
-      requestHeaders,
+      {},
+      "payment_state",
     );
   }
 
   let settlementHeader = claim.settlementHeader;
   if (claim.needsSettlement) {
     if (!verifiedPayment) {
-      return json(
+      return respond(
         {
           error: "payment_verification_state_lost",
           code: "payment_verification_state_lost",
@@ -801,7 +933,8 @@ export async function POST(request: Request) {
           retryable: true,
         },
         503,
-        requestHeaders,
+        {},
+        "payment_state",
       );
     }
     try {
@@ -835,12 +968,15 @@ export async function POST(request: Request) {
           });
         }
         if ("response" in settlement) {
+          timing.mark("payment_settlement", "rejected", {
+            status: settlement.response.status,
+          });
           return paymentInstructionResponse(
             settlement.response,
-            requestHeaders,
+            { ...requestHeaders, ...timing.headers() },
           );
         }
-        return json(
+        return respond(
           {
             error: "payment_settlement_failed",
             code:
@@ -852,7 +988,8 @@ export async function POST(request: Request) {
             retryable: true,
           },
           402,
-          { ...requestHeaders, ...settlement.headers },
+          settlement.headers,
+          "payment_settlement",
         );
       }
       settlementHeader = settlement.headers["PAYMENT-RESPONSE"];
@@ -869,6 +1006,9 @@ export async function POST(request: Request) {
         network: settlement.network,
         payer: settlement.payer,
       });
+      timing.mark("payment_settlement", "completed", {
+        status: settlement.status ?? "success",
+      });
     } catch (error) {
       await markSettlementUncertain({
         paymentFingerprint: fingerprint,
@@ -876,7 +1016,7 @@ export async function POST(request: Request) {
         errorCode:
           error instanceof Error ? error.message : "payment_settlement_failed",
       });
-      return json(
+      return respond(
         {
           error: "payment_settlement_failed",
           code: "payment_settlement_failed",
@@ -886,7 +1026,8 @@ export async function POST(request: Request) {
           retryable: true,
         },
         402,
-        requestHeaders,
+        {},
+        "payment_settlement",
       );
     }
   }
@@ -896,13 +1037,18 @@ export async function POST(request: Request) {
       { status: "settlement_uncertain" },
       requestId,
     );
-    return json(error.body, error.status, requestHeaders);
+    return respond(error.body, error.status, {}, "payment_state");
   }
 
   const result = await executeBusinessRequest(
     normalizedPayload,
     parsed.data,
     requestId,
+  );
+  timing.mark(
+    "business_logic",
+    result.status >= 500 ? "failed" : "completed",
+    { status: result.status },
   );
   if (result.status >= 500) {
     await markPaymentCallRetryable({
@@ -915,11 +1061,10 @@ export async function POST(request: Request) {
           ? String((result.body as { code: unknown }).code)
           : "paid_call_failed",
     });
-    return json(result.body, result.status, {
-      ...requestHeaders,
+    return respond(result.body, result.status, {
       "PAYMENT-RESPONSE": settlementHeader,
       "X-Idempotency-Status": "retryable",
-    });
+    }, "business_response");
   }
 
   try {
@@ -934,7 +1079,7 @@ export async function POST(request: Request) {
       leaseToken: claim.leaseToken,
       errorCode: "paid_response_persistence_failed",
     });
-    return json(
+    return respond(
       {
         error: "paid_response_persistence_failed",
         code: "paid_response_persistence_failed",
@@ -944,16 +1089,13 @@ export async function POST(request: Request) {
         retryable: true,
       },
       503,
-      {
-        ...requestHeaders,
-        "PAYMENT-RESPONSE": settlementHeader,
-      },
+      { "PAYMENT-RESPONSE": settlementHeader },
+      "payment_ledger",
     );
   }
 
-  return json(result.body, result.status, {
-    ...requestHeaders,
+  return respond(result.body, result.status, {
     "PAYMENT-RESPONSE": settlementHeader,
     "X-Idempotency-Status": "stored",
-  });
+  }, "business_response");
 }

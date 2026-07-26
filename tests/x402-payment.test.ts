@@ -22,6 +22,7 @@ import {
 } from "../src/lib/payments/config";
 import {
   createX402Server,
+  createProductionFacilitatorClient,
   processX402Request,
   resetX402ServerForTests,
   setX402ServerForTests,
@@ -111,6 +112,22 @@ class FailOnceFacilitator extends FakeFacilitator {
       network: paymentRequirements.network,
       amount: paymentRequirements.amount,
     };
+  }
+}
+
+class HangingCapabilityFacilitator extends FakeFacilitator {
+  supportedCalls = 0;
+
+  override async getSupported(): Promise<SupportedResponse> {
+    this.supportedCalls += 1;
+    return new Promise<SupportedResponse>(() => undefined);
+  }
+}
+
+class HangingVerificationFacilitator extends FakeFacilitator {
+  override async verify(): Promise<VerifyResponse> {
+    this.verifyCalls += 1;
+    return new Promise<VerifyResponse>(() => undefined);
   }
 }
 
@@ -204,6 +221,87 @@ test("official OKX server emits a compliant x402 v2 exact challenge", async () =
     },
   });
   assert.equal(facilitator.verifyCalls, 0);
+  resetX402ServerForTests();
+});
+
+test("production cold challenge does not wait on facilitator capability discovery", async () => {
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new HangingCapabilityFacilitator();
+  const server = await createX402Server(
+    createProductionFacilitatorClient(facilitator),
+  );
+  setX402ServerForTests(server);
+
+  const startedAt = performance.now();
+  const result = await processX402Request(request(), { operation: "start" });
+  const durationMs = performance.now() - startedAt;
+
+  assert.equal(result.type, "response");
+  if (result.type === "response") {
+    assert.equal(result.response.status, 402);
+  }
+  assert.equal(facilitator.supportedCalls, 0);
+  assert.ok(
+    durationMs < 500,
+    `Cold challenge should be local and fast, received ${durationMs}ms`,
+  );
+  resetX402ServerForTests();
+});
+
+test("production payment verification returns a 402 when the facilitator stalls", async () => {
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  process.env.TRAKR_X402_VERIFY_TIMEOUT_MS = "1000";
+  const facilitator = new HangingVerificationFacilitator();
+  const server = await createX402Server(
+    createProductionFacilitatorClient(facilitator),
+  );
+  setX402ServerForTests(server);
+
+  const unpaid = await processX402Request(request(), { operation: "start" });
+  assert.equal(unpaid.type, "response");
+  if (unpaid.type !== "response") return;
+  const challenge = decodeHeader<{
+    x402Version: number;
+    resource: { url: string };
+    accepts: PaymentRequirements[];
+  }>(unpaid.response.headers["PAYMENT-REQUIRED"]);
+  const payload: PaymentPayload = {
+    x402Version: X402_VERSION,
+    resource: challenge.resource,
+    accepted: challenge.accepts[0],
+    payload: {
+      authorization: {
+        from: "0x1111111111111111111111111111111111111111",
+        to: payTo,
+        value: X402_ATOMIC_AMOUNT,
+        validAfter: "0",
+        validBefore: "9999999999",
+        nonce:
+          "0x4545454545454545454545454545454545454545454545454545454545454545",
+      },
+      signature: "0x01",
+    },
+  };
+
+  const startedAt = performance.now();
+  const result = await processX402Request(
+    request(encodeHeader(payload)),
+    { operation: "start" },
+  );
+  const durationMs = performance.now() - startedAt;
+
+  assert.equal(result.type, "response");
+  if (result.type === "response") {
+    assert.equal(result.response.status, 402);
+    const failure = decodeHeader<{ error?: string }>(
+      result.response.headers["PAYMENT-REQUIRED"],
+    );
+    assert.match(failure.error ?? "", /payment_verification_timeout/i);
+  }
+  assert.equal(facilitator.verifyCalls, 1);
+  assert.ok(durationMs >= 900 && durationMs < 1_500);
+
+  delete process.env.TRAKR_X402_VERIFY_TIMEOUT_MS;
   resetX402ServerForTests();
 });
 
@@ -365,6 +463,29 @@ test("route payment failures preserve a machine-readable rejection body", async 
   assert.ok(rejected.headers.get("PAYMENT-REQUIRED"));
 
   resetX402ServerForTests();
+  process.env.TRAKR_X402_ENFORCEMENT = "off";
+});
+
+test("a payment-ledger outage returns promptly instead of hanging the route", async () => {
+  process.env.TRAKR_X402_ENFORCEMENT = "enforce";
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  setPaymentPoolForTests({
+    query: async () => {
+      throw new Error("database unavailable");
+    },
+  });
+
+  const startedAt = performance.now();
+  const response = await POST(request("bm90LWEtdmFsaWQtcHJvb2Y="));
+  const durationMs = performance.now() - startedAt;
+  const body = await response.json();
+
+  assert.equal(response.status, 503);
+  assert.equal(body.code, "payment_persistence_unavailable");
+  assert.equal(body.retryable, true);
+  assert.ok(durationMs < 500);
+
+  setPaymentPoolForTests(undefined);
   process.env.TRAKR_X402_ENFORCEMENT = "off";
 });
 

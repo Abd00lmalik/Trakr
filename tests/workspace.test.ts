@@ -304,7 +304,7 @@ test("A2MCP metadata and OpenAPI expose Services 2 and 3 as additive available c
   assert.equal(generationService.status, "available");
   assert.equal(generationService.operation, "generate_resume");
   assert.ok(generationService.documentTypes.includes("biosketch"));
-  assert.equal(document.info.version, "0.9.2");
+  assert.equal(document.info.version, "0.9.3");
   assert.ok(requestSchema.properties.target.properties.description);
   assert.ok(requestSchema.properties.target.properties.requirements);
   assert.ok(requestSchema.properties.target.properties.url);
