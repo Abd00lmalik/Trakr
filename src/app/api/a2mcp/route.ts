@@ -2,10 +2,22 @@ import { NextResponse } from "next/server";
 import { opportunitySourceRegistry } from "@/lib/opportunities/source-registry";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 import { discoveryCategoryDefinitions } from "@/lib/opportunities/discovery-categories";
+import {
+  isX402Enforced,
+  X402_ASSET,
+  X402_ATOMIC_AMOUNT,
+  X402_NETWORK,
+  X402_PRICE_USD,
+  X402_SCHEME,
+  X402_TOKEN_DECIMALS,
+  X402_TOKEN_NAME,
+  X402_VERSION,
+} from "@/lib/payments/config";
 
 export const runtime = "nodejs";
 
 export async function GET() {
+  const paymentRequired = isX402Enforced();
   return NextResponse.json({
     service: "trakr",
     displayTitle: "Trakr Opportunity & Resume Services",
@@ -214,14 +226,27 @@ export async function GET() {
       "real short-lived DOCX and PDF artifacts for successful optimization and generation",
       "artifact selection across professional resumes, internship resumes, academic and research CVs, biosketches, scholarship and fellowship profiles, grant profiles, hackathon profiles, and portfolio-oriented resumes",
     ],
-    futureBilling: {
-      compatibleWith: "x402",
-      status: "not_enabled_in_phase_1",
+    payment: {
+      protocol: "x402",
+      x402Version: X402_VERSION,
+      scheme: X402_SCHEME,
+      network: X402_NETWORK,
+      asset: X402_ASSET,
+      token: X402_TOKEN_NAME,
+      tokenDecimals: X402_TOKEN_DECIMALS,
+      price: X402_PRICE_USD,
+      amount: X402_ATOMIC_AMOUNT,
+      unit: "per_valid_api_call",
+      enforcement: paymentRequired ? "enabled" : "disabled",
     },
     submission: {
-      pricing: "free",
-      responseMode: "HTTP 200 JSON for Phase 1",
-      paymentRequired: false,
+      pricing: paymentRequired
+        ? `${X402_PRICE_USD} ${X402_TOKEN_NAME} per valid API call`
+        : "free",
+      responseMode: paymentRequired
+        ? "HTTP 402 x402 v2 challenge, then paid HTTP response"
+        : "HTTP 200 JSON",
+      paymentRequired,
     },
     dataSources: opportunitySourceRegistry,
     qualityControls: [
@@ -246,6 +271,8 @@ export async function GET() {
         "Optional caller key for replay-safe requests within the deployment window.",
       "X-Request-Id":
         "Optional caller correlation value; response always includes X-Request-Id.",
+      "PAYMENT-SIGNATURE":
+        "Required x402 v2 payment proof when payment enforcement is enabled.",
     },
   });
 }

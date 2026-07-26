@@ -1,6 +1,16 @@
 import { NextResponse } from "next/server";
 import { TRAKR_SERVICE_VERSION } from "@/lib/version";
 import { discoveryCategoryDefinitions } from "@/lib/opportunities/discovery-categories";
+import {
+  isX402Enforced,
+  X402_ASSET,
+  X402_ATOMIC_AMOUNT,
+  X402_NETWORK,
+  X402_PRICE_USD,
+  X402_SCHEME,
+  X402_TOKEN_NAME,
+  X402_VERSION,
+} from "@/lib/payments/config";
 
 export const runtime = "nodejs";
 
@@ -262,6 +272,7 @@ const structuredProfileSchema = {
 };
 
 export async function GET() {
+  const paymentRequired = isX402Enforced();
   return NextResponse.json({
     openapi: "3.1.0",
     info: {
@@ -289,7 +300,11 @@ export async function GET() {
         post: {
           summary: "Start or continue a Trakr opportunity or resume workflow",
           description:
-            "The same endpoint supports start, discover, benchmark, optimize, and generate_resume. Bootstrap requests may have an empty body, {}, operation=start, an empty message, or a service declaration. Optimization requires a compatible benchmark and explicit approval. The service is free and returns no payment challenge.",
+            `The same endpoint supports start, discover, benchmark, optimize, and generate_resume. Bootstrap requests may have an empty body, {}, operation=start, an empty message, or a service declaration. Optimization requires a compatible benchmark and explicit approval. ${
+              paymentRequired
+                ? `Every valid call requires ${X402_PRICE_USD} ${X402_TOKEN_NAME} through x402 v2 exact payment on ${X402_NETWORK}.`
+                : "Payment enforcement is currently disabled."
+            }`,
           requestBody: {
             required: false,
             content: {
@@ -681,7 +696,9 @@ export async function GET() {
                           askUserForRequiredInputs: { const: true },
                           doNotReplaceTrakrMatching: { const: true },
                           treatHttp200AsBusinessResponse: { const: true },
-                          doNotExposeProtocolWorkWhenFree: { const: true },
+                          doNotExposeProtocolWorkWhenFree: {
+                            type: "boolean",
+                          },
                         },
                       },
                       profileOrigin: {
@@ -812,6 +829,22 @@ export async function GET() {
             "409": { description: "Idempotency key reused with different request content" },
             "410": { description: "Expired continuation; start a fresh session" },
             "429": { description: "Rate limit exceeded" },
+            "402": {
+              description:
+                "x402 v2 payment required, invalid payment proof, or settlement failure",
+              headers: {
+                "PAYMENT-REQUIRED": {
+                  description:
+                    "Base64-encoded x402 v2 payment requirements.",
+                  schema: { type: "string" },
+                },
+                "PAYMENT-RESPONSE": {
+                  description:
+                    "Base64-encoded settlement result when settlement was attempted.",
+                  schema: { type: "string" },
+                },
+              },
+            },
             "503": { description: "Required session or artifact persistence is unavailable" },
           },
         },
@@ -907,10 +940,21 @@ export async function GET() {
         options: serviceChoices,
       },
       payment: {
-        pricing: "free",
-        paymentRequired: false,
-        needsConfirm: false,
-        behavior: "HTTP 200 without PAYMENT-REQUIRED, WWW-Authenticate: Payment, or payment attempt",
+        pricing: paymentRequired
+          ? `${X402_PRICE_USD} ${X402_TOKEN_NAME} per valid API call`
+          : "free",
+        paymentRequired,
+        x402Version: X402_VERSION,
+        scheme: X402_SCHEME,
+        network: X402_NETWORK,
+        asset: X402_ASSET,
+        amount: X402_ATOMIC_AMOUNT,
+        requestHeader: "PAYMENT-SIGNATURE",
+        challengeHeader: "PAYMENT-REQUIRED",
+        settlementHeader: "PAYMENT-RESPONSE",
+        behavior: paymentRequired
+          ? "Validate request, return HTTP 402 when proof is absent, synchronously settle a valid proof, then execute or resume the API call."
+          : "HTTP 200 without a payment attempt.",
       },
     },
   });

@@ -1,6 +1,7 @@
 # Deploying Trakr
 
-This guide covers the first public deployment path for Trakr as a free A2MCP endpoint on Railway. x402 payment gating can be added after the free endpoint is stable and accepted by OKX.AI.
+This guide covers Trakr's Railway deployment and the staged conversion of its
+existing A2MCP endpoint to x402 v2 pay-per-call access.
 
 ## Railway
 
@@ -20,6 +21,13 @@ RECOMMENDATION_LOG_HASH_KEY=generate_a_long_random_value
 TRAKR_SESSION_SECRET=generate_a_different_long_random_value
 TRAKR_SESSION_TTL_MINUTES=30
 TRAKR_ARTIFACT_TTL_MINUTES=30
+TRAKR_X402_ENFORCEMENT=off
+TRAKR_X402_PAY_TO=0xbe116468bb544723141647608fe98c1bc0471291
+TRAKR_X402_RESULT_SECRET=generate_a_third_long_random_value
+TRAKR_X402_OKX_API_KEY=your_okx_seller_api_key
+TRAKR_X402_OKX_SECRET_KEY=your_okx_seller_api_secret
+TRAKR_X402_OKX_PASSPHRASE=your_okx_seller_api_passphrase
+TRAKR_X402_OKX_BASE_URL=https://web3.okx.com
 INGEST_API_KEY=generate_a_long_random_value
 TRAKR_ADMIN_API_KEY=generate_a_long_random_value
 ```
@@ -76,19 +84,22 @@ directories remain discoverable but are limited to `Prepare First` or `Skip`.
 
 ## OKX.AI A2MCP Registration
 
-For the first submission, register Trakr as a free A2MCP service:
+Trakr remains one existing A2MCP service on Agent `#5198`:
 
 - Service name: Trakr
 - Service type: A2MCP
 - Interface URL: `https://your-railway-domain/api/a2mcp/recommend`
 - Method: `POST`
-- Pricing: free for Phase 1 validation
+- Marketplace pricing: `0.005 USDT` per API call after coordinated cutover
+- Protocol payment: `0.005 USD?0` (`5000` atomic units) on
+  `eip155:196`, x402 v2 `exact`
 - Input: empty bootstrap, explicit service operation, structured profile, resume text, canonical base64 PDF/DOCX/TXT, natural-language request, or caller-scoped continuation
 - Output: server-authoritative conversational state, three-service chooser, ranked opportunities, evidence-linked resume diagnostics, and short-lived DOCX/PDF artifacts
 
-The current service remains free. This capability phase does not add payment requirements or change the registered endpoint.
-
-After the free endpoint passes review and has stable behavior, add x402 payment middleware around `POST /api/a2mcp/recommend` and resubmit/update the listing as pay-per-call.
+Deploy payment-capable code with `TRAKR_X402_ENFORCEMENT=off` first. Apply the
+database migration and verify payment readiness before coordinating the listing
+fee update and enforcement switch. The endpoint and Agent identity remain
+unchanged.
 
 ## Production Readiness Checks
 
@@ -97,13 +108,24 @@ After the free endpoint passes review and has stable behavior, add x402 payment 
 - `database.connected`, `database.pgvector`, and `database.schemaReady` should be `true` once Railway Postgres is configured and migrated.
 - `database.sourceVerificationReady` should be `true` after the source verification migration.
 - `database.artifactStorageReady` should be `true` after the resume artifact migration.
-- `POST /api/a2mcp/recommend` should return `HTTP 200` for the free OKX submission path.
-- Leave `TRAKR_API_KEY` unset for public free OKX review unless OKX gives a shared secret or gateway header to enforce.
+- With payment enforcement off, `POST /api/a2mcp/recommend` should preserve the
+  current `HTTP 200` contract.
+- With payment enforcement enabled, malformed and schema-invalid requests should
+  remain `4xx` without a charge; valid unpaid requests should return `HTTP 402`
+  with `PAYMENT-REQUIRED`.
+- Paid retries use PostgreSQL-backed replay protection and encrypted short-lived
+  response caching. Raw resumes and profiles are not stored in payment records.
+- Leave `TRAKR_API_KEY` unset for public OKX access unless OKX gives a shared
+  secret or gateway header to enforce.
 - Set `INGEST_API_KEY` before enabling scheduled ingestion.
 - Set `RECOMMENDATION_LOG_HASH_KEY` to enable keyed request correlation without storing raw identifiers or resume content.
 - Set `TRAKR_SESSION_SECRET` to a separate long random value. It encrypts opaque, short-lived caller-carried session references; do not rotate it while active sessions must remain resumable.
 - `TRAKR_SESSION_TTL_MINUTES` is bounded between 5 and 120 minutes and defaults to 30.
 - `TRAKR_ARTIFACT_TTL_MINUTES` is bounded between 5 and 120 minutes and defaults to 30. Download URLs are bearer credentials and must not be logged or forwarded.
+- `TRAKR_X402_RESULT_SECRET` encrypts paid-response replay data and must be
+  separate from `TRAKR_SESSION_SECRET`.
+- `TRAKR_X402_ENFORCEMENT` must remain `off` until the marketplace fee and
+  endpoint enforcement can be switched together.
 - Set `RECOMMENDATION_LOG_RETENTION_DAYS` between 1 and 365. Expired recommendation analytics are pruned during normal recommendation traffic.
 
 ## Current Railway Deployment

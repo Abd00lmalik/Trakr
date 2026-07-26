@@ -240,3 +240,44 @@ create table if not exists resume_artifacts (
 
 create index if not exists resume_artifacts_expires_at_idx
   on resume_artifacts (expires_at);
+
+create table if not exists x402_payment_calls (
+  payment_fingerprint text primary key,
+  request_hash text not null,
+  idempotency_key_hash text,
+  request_id_hash text,
+  state text not null check (
+    state in (
+      'verified',
+      'settling',
+      'settlement_uncertain',
+      'settled',
+      'processing',
+      'retryable',
+      'completed',
+      'settlement_failed'
+    )
+  ),
+  lease_token text,
+  lease_expires_at timestamptz,
+  settlement_transaction text,
+  settlement_status text,
+  settlement_amount text,
+  settlement_network text,
+  settlement_payer_hash text,
+  settlement_header_ciphertext text,
+  response_ciphertext text,
+  response_status integer check (
+    response_status is null or response_status between 100 and 599
+  ),
+  last_error_code text,
+  expires_at timestamptz not null default (now() + interval '1 day'),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists x402_payment_calls_expires_at_idx
+  on x402_payment_calls (expires_at);
+
+create index if not exists x402_payment_calls_state_idx
+  on x402_payment_calls (state, lease_expires_at);

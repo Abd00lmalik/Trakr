@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 import { nanoid } from "nanoid";
 import { CompanionSessionError } from "@/lib/companion/session";
 import { handleOpportunityCompanionRequest } from "@/lib/companion/service";
@@ -6,6 +7,24 @@ import { generateRecommendations } from "@/lib/recommendation/service";
 import { parseResumeBuffer } from "@/lib/resume/parser";
 import { beginIdempotentRequest } from "@/lib/security/idempotency";
 import { checkRateLimit, getClientKey } from "@/lib/security/rate-limit";
+import {
+  claimPaymentCall,
+  completePaymentCall,
+  inspectPaymentCall,
+  markPaymentCallRetryable,
+  markPaymentSettled,
+  markPaymentSettling,
+  markSettlementFailed,
+  markSettlementUncertain,
+  type PaymentCallClaim,
+} from "@/lib/payments/ledger";
+import { isX402Enforced } from "@/lib/payments/config";
+import {
+  paymentFingerprint,
+  processX402Request,
+  settleX402Payment,
+  type VerifiedX402Payment,
+} from "@/lib/payments/x402";
 import {
   opportunityCompanionRequestSchema,
   recommendationRequestSchema,
@@ -18,9 +37,9 @@ const responseHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, X-Trakr-Api-Key, Idempotency-Key, X-Request-Id",
+    "Content-Type, Authorization, X-Trakr-Api-Key, Idempotency-Key, X-Request-Id, PAYMENT-SIGNATURE",
   "Access-Control-Expose-Headers":
-    "X-Request-Id, X-Idempotency-Status, X-Trakr-Version",
+    "X-Request-Id, X-Idempotency-Status, X-Trakr-Version, PAYMENT-REQUIRED, PAYMENT-RESPONSE",
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
   "X-Trakr-Version": TRAKR_SERVICE_VERSION,
@@ -204,7 +223,7 @@ function exposeConversationContract<T extends Record<string, unknown>>(
       askUserForRequiredInputs: true,
       doNotReplaceTrakrMatching: true,
       treatHttp200AsBusinessResponse: true,
-      doNotExposeProtocolWorkWhenFree: true,
+      doNotExposeProtocolWorkWhenFree: !isX402Enforced(),
     },
     profileOrigin,
     profileConfirmed: profile?.confirmed === true,
@@ -294,6 +313,159 @@ async function readRequestPayload(request: Request) {
   };
 }
 
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(canonicalize);
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, item]) => item !== undefined)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, item]) => [key, canonicalize(item)]),
+    );
+  }
+  return value;
+}
+
+function requestHash(payload: unknown) {
+  return createHash("sha256")
+    .update(JSON.stringify(canonicalize(payload)))
+    .digest("hex");
+}
+
+function paymentInstructionResponse(
+  instructions: {
+    status: number;
+    headers: Record<string, string>;
+    body?: unknown;
+  },
+  requestHeaders: Record<string, string>,
+) {
+  const body =
+    instructions.body &&
+    typeof instructions.body === "object" &&
+    !Array.isArray(instructions.body)
+      ? { ...(instructions.body as Record<string, unknown>), requestId: requestHeaders["X-Request-Id"] }
+      : {
+          error: "payment_required",
+          code: "payment_required",
+          message: "Payment is required for this Trakr API call.",
+          requestId: requestHeaders["X-Request-Id"],
+          retryable: true,
+        };
+  return json(body, instructions.status, {
+    ...requestHeaders,
+    ...instructions.headers,
+  });
+}
+
+async function executeBusinessRequest(
+  normalizedPayload: unknown,
+  parsedPayload: Parameters<typeof handleOpportunityCompanionRequest>[0],
+  requestId: string,
+) {
+  try {
+    const legacyRequest = hasConversationalFields(normalizedPayload)
+      ? null
+      : recommendationRequestSchema.safeParse(normalizedPayload);
+    const response = legacyRequest?.success
+      ? await generateRecommendations(legacyRequest.data)
+      : await handleOpportunityCompanionRequest(parsedPayload);
+    return {
+      body: exposeConversationContract({ ...response, requestId }),
+      status: 200,
+    };
+  } catch (error) {
+    if (error instanceof CompanionSessionError) {
+      return {
+        body: {
+          error: error.code,
+          code: error.code,
+          message: error.message,
+          requestId,
+          retryable: error.code === "session_unavailable",
+          requiredAction:
+            error.code === "expired_session"
+              ? "Start a fresh Trakr session with current profile information."
+              : "Send a valid continuation reference or start a fresh session.",
+        },
+        status:
+          error.code === "expired_session"
+            ? 410
+            : error.code === "session_unavailable"
+              ? 503
+              : 400,
+      };
+    }
+    return {
+      body: {
+        error: "recommendation_failed",
+        code: "recommendation_failed",
+        message: "Trakr could not generate recommendations for this request.",
+        requestId,
+        retryable: true,
+        detail:
+          process.env.NODE_ENV === "development" && error instanceof Error
+            ? error.message
+            : undefined,
+      },
+      status: 500,
+    };
+  }
+}
+
+function claimErrorResponse(
+  claim: Exclude<PaymentCallClaim, { status: "owner" | "replay" }>,
+  requestId: string,
+) {
+  if (claim.status === "conflict") {
+    return {
+      status: 409,
+      body: {
+        error: "payment_proof_conflict",
+        code: "payment_proof_conflict",
+        message:
+          "This payment proof is already bound to a different Trakr request.",
+        requestId,
+        retryable: false,
+      },
+    };
+  }
+  if (claim.status === "settlement_uncertain") {
+    return {
+      status: 503,
+      body: {
+        error: "payment_settlement_uncertain",
+        code: "payment_settlement_uncertain",
+        message:
+          "Settlement may still be completing. Retry this identical request shortly with the same payment proof.",
+        requestId,
+        retryable: true,
+      },
+    };
+  }
+  return {
+    status: claim.status === "unavailable" ? 503 : 409,
+    body: {
+      error:
+        claim.status === "unavailable"
+          ? "payment_persistence_unavailable"
+          : "payment_request_in_progress",
+      code:
+        claim.status === "unavailable"
+          ? "payment_persistence_unavailable"
+          : "payment_request_in_progress",
+      message:
+        claim.status === "unavailable"
+          ? "Durable payment replay protection is unavailable."
+          : "This paid request is already being processed. Retry the identical request shortly.",
+      requestId,
+      retryable: true,
+    },
+  };
+}
+
 export async function POST(request: Request) {
   const requestId =
     request.headers.get("x-request-id")?.slice(0, 160) || nanoid();
@@ -317,6 +489,7 @@ export async function POST(request: Request) {
   }
 
   const clientKey = getClientKey(request);
+  const paymentEnforced = isX402Enforced();
   let rawBody: string;
   let payload: unknown;
   try {
@@ -345,7 +518,7 @@ export async function POST(request: Request) {
 
   const idempotency = beginIdempotentRequest(
     clientKey,
-    request.headers.get("idempotency-key"),
+    paymentEnforced ? null : request.headers.get("idempotency-key"),
     rawBody,
   );
   if (idempotency.status === "invalid") {
@@ -458,48 +631,293 @@ export async function POST(request: Request) {
     );
   }
 
-  try {
-    const legacyRequest = hasConversationalFields(normalizedPayload)
-      ? null
-      : recommendationRequestSchema.safeParse(normalizedPayload);
-    const response = legacyRequest?.success
-      ? await generateRecommendations(legacyRequest.data)
-      : await handleOpportunityCompanionRequest(parsed.data);
-    return complete(exposeConversationContract({ ...response, requestId }));
-  } catch (error) {
-    if (error instanceof CompanionSessionError) {
-      return complete(
+  if (!paymentEnforced) {
+    const result = await executeBusinessRequest(
+      normalizedPayload,
+      parsed.data,
+      requestId,
+    );
+    return complete(result.body, result.status);
+  }
+
+  const paidRequestHash = requestHash(normalizedPayload);
+  const paymentHeader = request.headers.get("payment-signature");
+  let claim: PaymentCallClaim | undefined;
+  let verifiedPayment: VerifiedX402Payment | undefined;
+  let fingerprint: string | undefined;
+
+  if (paymentHeader) {
+    fingerprint = paymentFingerprint(paymentHeader);
+    const existing = await inspectPaymentCall(fingerprint, paidRequestHash);
+    if (existing?.status === "replay") {
+      return json(existing.response.body, existing.response.status, {
+        ...requestHeaders,
+        "PAYMENT-RESPONSE": existing.settlementHeader,
+        "X-Idempotency-Status": "replayed",
+      });
+    }
+    if (
+      existing &&
+      existing.status !== "resumable" &&
+      existing.status !== "verification_required"
+    ) {
+      const error = claimErrorResponse(existing, requestId);
+      return json(error.body, error.status, requestHeaders);
+    }
+    if (existing?.status === "resumable") {
+      claim = await claimPaymentCall({
+        paymentFingerprint: fingerprint,
+        requestHash: paidRequestHash,
+        idempotencyKey: request.headers.get("idempotency-key"),
+        requestId,
+        alreadyVerified: false,
+      });
+    }
+  }
+
+  if (!claim) {
+    let paymentResult;
+    try {
+      paymentResult = await processX402Request(request, normalizedPayload);
+    } catch (error) {
+      return json(
         {
-          error: error.code,
-          code: error.code,
-          message: error.message,
+          error: "payment_service_unavailable",
+          code: "payment_service_unavailable",
+          message:
+            "Trakr could not initialize the payment service for this request.",
           requestId,
-          retryable: error.code === "session_unavailable",
-          requiredAction:
-            error.code === "expired_session"
-              ? "Start a fresh Trakr session with current profile information."
-              : "Send a valid continuation reference or start a fresh session.",
+          retryable: true,
+          detail:
+            process.env.NODE_ENV === "development" && error instanceof Error
+              ? error.message
+              : undefined,
         },
-        error.code === "expired_session"
-          ? 410
-          : error.code === "session_unavailable"
-            ? 503
-            : 400,
+        503,
+        requestHeaders,
       );
     }
-    return complete(
+    if (paymentResult.type === "response") {
+      return paymentInstructionResponse(
+        paymentResult.response,
+        requestHeaders,
+      );
+    }
+    verifiedPayment = paymentResult.payment;
+    const verifiedHeader = paymentHeader ?? request.headers.get("payment-signature");
+    if (!verifiedHeader) {
+      return json(
+        {
+          error: "payment_proof_missing",
+          code: "payment_proof_missing",
+          message: "A verified payment proof was not present.",
+          requestId,
+          retryable: true,
+        },
+        402,
+        requestHeaders,
+      );
+    }
+    fingerprint = paymentFingerprint(verifiedHeader);
+    claim = await claimPaymentCall({
+      paymentFingerprint: fingerprint,
+      requestHash: paidRequestHash,
+      idempotencyKey: request.headers.get("idempotency-key"),
+      requestId,
+      alreadyVerified: true,
+    });
+  }
+
+  if (claim.status === "replay") {
+    return json(claim.response.body, claim.response.status, {
+      ...requestHeaders,
+      "PAYMENT-RESPONSE": claim.settlementHeader,
+      "X-Idempotency-Status": "replayed",
+    });
+  }
+  if (claim.status !== "owner") {
+    const error = claimErrorResponse(claim, requestId);
+    return json(error.body, error.status, requestHeaders);
+  }
+  if (!fingerprint) {
+    return json(
       {
-        error: "recommendation_failed",
-        code: "recommendation_failed",
-        message: "Trakr could not generate recommendations for this request.",
+        error: "payment_verification_state_lost",
+        code: "payment_verification_state_lost",
+        message: "Obtain a fresh payment requirement and retry.",
         requestId,
         retryable: true,
-        detail:
-          process.env.NODE_ENV === "development" && error instanceof Error
-            ? error.message
-            : undefined,
       },
-      500,
+      503,
+      requestHeaders,
     );
   }
+
+  let settlementHeader = claim.settlementHeader;
+  if (claim.needsSettlement) {
+    if (!verifiedPayment) {
+      return json(
+        {
+          error: "payment_verification_state_lost",
+          code: "payment_verification_state_lost",
+          message: "Obtain a fresh payment requirement and retry.",
+          requestId,
+          retryable: true,
+        },
+        503,
+        requestHeaders,
+      );
+    }
+    try {
+      await markPaymentSettling(fingerprint, claim.leaseToken);
+      const settlement = await settleX402Payment(verifiedPayment, {
+        requestId,
+        requestHash: paidRequestHash,
+      });
+      if (!settlement.success || settlement.status === "pending") {
+        const settlementCode =
+          settlement.errorReason ??
+          (settlement.status === "pending"
+            ? "asynchronous_settlement_not_accepted"
+            : "payment_settlement_failed");
+        if (
+          settlement.status === "pending" ||
+          settlement.status === "timeout" ||
+          settlement.transaction
+        ) {
+          await markSettlementUncertain({
+            paymentFingerprint: fingerprint,
+            leaseToken: claim.leaseToken,
+            transaction: settlement.transaction,
+            errorCode: settlementCode,
+          });
+        } else {
+          await markSettlementFailed({
+            paymentFingerprint: fingerprint,
+            leaseToken: claim.leaseToken,
+            errorCode: settlementCode,
+          });
+        }
+        if ("response" in settlement) {
+          return paymentInstructionResponse(
+            settlement.response,
+            requestHeaders,
+          );
+        }
+        return json(
+          {
+            error: "payment_settlement_failed",
+            code:
+              settlement.errorReason ?? "payment_settlement_failed",
+            message:
+              settlement.errorMessage ??
+              "The payment could not be settled synchronously.",
+            requestId,
+            retryable: true,
+          },
+          402,
+          { ...requestHeaders, ...settlement.headers },
+        );
+      }
+      settlementHeader = settlement.headers["PAYMENT-RESPONSE"];
+      if (!settlementHeader) {
+        throw new Error("The facilitator omitted PAYMENT-RESPONSE.");
+      }
+      await markPaymentSettled({
+        paymentFingerprint: fingerprint,
+        leaseToken: claim.leaseToken,
+        settlementHeader,
+        transaction: settlement.transaction,
+        status: settlement.status,
+        amount: settlement.amount,
+        network: settlement.network,
+        payer: settlement.payer,
+      });
+    } catch (error) {
+      await markSettlementUncertain({
+        paymentFingerprint: fingerprint,
+        leaseToken: claim.leaseToken,
+        errorCode:
+          error instanceof Error ? error.message : "payment_settlement_failed",
+      });
+      return json(
+        {
+          error: "payment_settlement_failed",
+          code: "payment_settlement_failed",
+          message:
+            "The payment could not be settled synchronously. Obtain a fresh payment requirement before retrying.",
+          requestId,
+          retryable: true,
+        },
+        402,
+        requestHeaders,
+      );
+    }
+  }
+
+  if (!settlementHeader) {
+    const error = claimErrorResponse(
+      { status: "settlement_uncertain" },
+      requestId,
+    );
+    return json(error.body, error.status, requestHeaders);
+  }
+
+  const result = await executeBusinessRequest(
+    normalizedPayload,
+    parsed.data,
+    requestId,
+  );
+  if (result.status >= 500) {
+    await markPaymentCallRetryable({
+      paymentFingerprint: fingerprint,
+      leaseToken: claim.leaseToken,
+      errorCode:
+        typeof result.body === "object" &&
+        result.body &&
+        "code" in result.body
+          ? String((result.body as { code: unknown }).code)
+          : "paid_call_failed",
+    });
+    return json(result.body, result.status, {
+      ...requestHeaders,
+      "PAYMENT-RESPONSE": settlementHeader,
+      "X-Idempotency-Status": "retryable",
+    });
+  }
+
+  try {
+    await completePaymentCall({
+      paymentFingerprint: fingerprint,
+      leaseToken: claim.leaseToken,
+      response: result,
+    });
+  } catch {
+    await markPaymentCallRetryable({
+      paymentFingerprint: fingerprint,
+      leaseToken: claim.leaseToken,
+      errorCode: "paid_response_persistence_failed",
+    });
+    return json(
+      {
+        error: "paid_response_persistence_failed",
+        code: "paid_response_persistence_failed",
+        message:
+          "Payment settled, but Trakr could not persist replay protection. Retry the identical request with the same payment proof.",
+        requestId,
+        retryable: true,
+      },
+      503,
+      {
+        ...requestHeaders,
+        "PAYMENT-RESPONSE": settlementHeader,
+      },
+    );
+  }
+
+  return json(result.body, result.status, {
+    ...requestHeaders,
+    "PAYMENT-RESPONSE": settlementHeader,
+    "X-Idempotency-Status": "stored",
+  });
 }

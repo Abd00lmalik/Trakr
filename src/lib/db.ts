@@ -29,6 +29,7 @@ export async function checkDatabase() {
       sourceVerificationReady: false,
       inventoryMetadataReady: false,
       artifactStorageReady: false,
+      paymentPersistenceReady: false,
     };
   }
 
@@ -95,6 +96,14 @@ export async function checkDatabase() {
           and table_name = 'resume_artifacts'
       ) as ready`,
     );
+    const paymentPersistence = await db.query<{ ready: boolean }>(
+      `select exists(
+        select 1
+        from information_schema.tables
+        where table_schema = 'public'
+          and table_name = 'x402_payment_calls'
+      ) as ready`,
+    );
 
     return {
       configured: true,
@@ -105,6 +114,8 @@ export async function checkDatabase() {
       sourceVerificationReady: sourceVerification.rows[0]?.ready ?? false,
       inventoryMetadataReady: inventoryMetadata.rows[0]?.ready ?? false,
       artifactStorageReady: artifactStorage.rows[0]?.ready ?? false,
+      paymentPersistenceReady:
+        paymentPersistence.rows[0]?.ready ?? false,
     };
   } catch (error) {
     return {
@@ -116,6 +127,7 @@ export async function checkDatabase() {
       sourceVerificationReady: false,
       inventoryMetadataReady: false,
       artifactStorageReady: false,
+      paymentPersistenceReady: false,
       error: error instanceof Error ? error.message : "Unknown database error",
     };
   }
