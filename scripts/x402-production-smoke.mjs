@@ -7,6 +7,9 @@ const baseUrl =
 const servicePath =
   process.env.TRAKR_SMOKE_SERVICE_PATH ?? "/api/a2mcp/recommend";
 const endpoint = new URL(servicePath, baseUrl).toString();
+const trailingSlashEndpoint = endpoint.endsWith("/")
+  ? endpoint
+  : `${endpoint}/`;
 const expectedVersion = (
   await readFile(new URL("../src/lib/version.ts", import.meta.url), "utf8")
 ).match(/TRAKR_SERVICE_VERSION\s*=\s*"([^"]+)"/)?.[1];
@@ -131,6 +134,31 @@ assert.match(
   /PAYMENT-RESPONSE/i,
 );
 
+const optionsResponse = await fetchBounded(endpoint, {
+  method: "OPTIONS",
+  headers: {
+    Origin: "https://www.okx.com",
+    "Access-Control-Request-Method": "HEAD",
+  },
+});
+assert.equal(optionsResponse.status, 204);
+assert.match(
+  optionsResponse.headers.get("access-control-allow-methods") ?? "",
+  /\bHEAD\b/i,
+);
+
+const trailingSlashResponse = await fetchBounded(trailingSlashEndpoint, {
+  method: "GET",
+  redirect: "manual",
+});
+const trailingSlashChallenge = decodePaymentHeader(
+  trailingSlashResponse.headers.get("payment-required"),
+);
+assert.equal(trailingSlashResponse.status, 402);
+assert.equal(trailingSlashResponse.headers.get("location"), null);
+assert.equal(trailingSlashChallenge.x402Version, 2);
+assert.equal(trailingSlashChallenge.accepts?.[0]?.amount, "5000");
+
 console.log(
   JSON.stringify(
     {
@@ -151,6 +179,10 @@ console.log(
         asset: accepted?.asset,
         amount: accepted?.amount,
         payTo: accepted?.payTo,
+      },
+      compatibility: {
+        headCorsAllowed: true,
+        trailingSlashStatus: trailingSlashResponse.status,
       },
     },
     null,

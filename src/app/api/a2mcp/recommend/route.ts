@@ -46,7 +46,7 @@ export const runtime = "nodejs";
 
 const responseHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, HEAD, POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "Content-Type, Authorization, X-Trakr-Api-Key, X-Trakr-Service, Idempotency-Key, X-Request-Id, PAYMENT-SIGNATURE",
   "Access-Control-Expose-Headers":

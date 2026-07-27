@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  skipTrailingSlashRedirect: true,
   serverExternalPackages: ["pdfkit"],
   outputFileTracingIncludes: {
     "/api/profile/parse-resume": [

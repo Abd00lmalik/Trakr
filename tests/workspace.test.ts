@@ -329,7 +329,7 @@ test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async (
   );
   assert.equal(metadata.bootstrap.options.length, 10);
   assert.equal(metadata.legacyBootstrap.options.length, 3);
-  assert.equal(document.info.version, "0.9.10");
+  assert.equal(document.info.version, "0.9.11");
   assert.equal(
     document.paths["/api/a2mcp/recommend"].post.parameters[0].name,
     "service",
@@ -354,7 +354,7 @@ test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async (
 });
 
 test("production ingestion migrates and checks inventory metadata readiness", async () => {
-  const [workflow, database, health, nextConfig] = await Promise.all([
+  const [workflow, database, health, nextConfig, middleware] = await Promise.all([
     readFile(
       new URL("../.github/workflows/ingest.yml", import.meta.url),
       "utf8",
@@ -365,6 +365,7 @@ test("production ingestion migrates and checks inventory metadata readiness", as
       "utf8",
     ),
     readFile(new URL("../next.config.ts", import.meta.url), "utf8"),
+    readFile(new URL("../src/middleware.ts", import.meta.url), "utf8"),
   ]);
 
   const migrationIndex = workflow.indexOf("/api/admin/database");
@@ -384,6 +385,9 @@ test("production ingestion migrates and checks inventory metadata readiness", as
   assert.match(adminRoute, /database\.artifactStorageReady/);
   assert.match(nextConfig, /serverExternalPackages:\s*\["pdfkit"\]/);
   assert.match(nextConfig, /pdfkit\/js\/data/);
+  assert.match(nextConfig, /skipTrailingSlashRedirect:\s*true/);
+  assert.match(middleware, /\/api\/a2mcp\/recommend\//);
+  assert.match(middleware, /NextResponse\.rewrite/);
 });
 
 test("database migration accepts either configured operator key", async () => {
