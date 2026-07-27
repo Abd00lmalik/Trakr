@@ -238,10 +238,16 @@ function discoveryCategoriesForRequest(
   service: UserFacingService | null,
 ) {
   if (service !== "opportunity_finding") return [];
+  const context = activeContext(request);
+  const messageCategories =
+    /^\s*\d+\s*$/.test(request.message ?? "") &&
+    context?.stage !== "choose_opportunity_categories"
+      ? []
+      : parseDiscoveryCategories(request.message);
   return uniqueDiscoveryCategories([
-    ...(activeContext(request)?.selectedDiscoveryCategories ?? []),
+    ...(context?.selectedDiscoveryCategories ?? []),
     ...(request.selectedDiscoveryCategories ?? []),
-    ...parseDiscoveryCategories(request.message),
+    ...messageCategories,
   ]);
 }
 
@@ -1360,6 +1366,17 @@ function hasUsableTarget(
   );
 }
 
+function hasRequestedTarget(target: CompanionTarget | undefined) {
+  return Boolean(
+    target?.opportunityId ||
+      target?.opportunityTitle ||
+      target?.url ||
+      target?.description ||
+      target?.requirements?.length ||
+      target?.role,
+  );
+}
+
 export async function handleOpportunityCompanionRequest(
   rawRequest: OpportunityCompanionRequest,
 ): Promise<OpportunityCompanionResponse> {
@@ -1493,13 +1510,21 @@ export async function handleOpportunityCompanionRequest(
       consentSafeProfile.filters,
     );
   }
+  const enteredMarketplaceService =
+    !activeContext(request) && Boolean(request.service);
   const built = buildConversationalProfile(
     isStageControlMessage(request)
       ? { ...request, message: undefined }
       : request,
   );
   const profileConfirmedNow = confirmedProfile(request);
-  if (profileConfirmedNow) {
+  const directResumeExecutionAuthorized =
+    enteredMarketplaceService &&
+    resumeConsentGranted &&
+    Boolean(request.resumeText) &&
+    (service === "resume_benchmarking_optimization" ||
+      service === "resume_generation");
+  if (profileConfirmedNow || directResumeExecutionAuthorized) {
     built.evidence = confirmProfileEvidence(built.evidence);
   }
   if (
@@ -1571,8 +1596,6 @@ export async function handleOpportunityCompanionRequest(
     (!activeContext(request) &&
       Boolean(serviceMenuSelectionForRequest(request)) &&
       !/^\s*[1-3]\s*$/.test(request.message ?? ""));
-  const enteredMarketplaceService =
-    !activeContext(request) && Boolean(request.service);
   const sourceChoice = selectedFromServiceMenu
     ? undefined
     : request.intakeRoute;
@@ -1819,41 +1842,6 @@ export async function handleOpportunityCompanionRequest(
   }
 
   if (
-    (selectedFromServiceMenu || enteredMarketplaceService) &&
-    service === "opportunity_finding" &&
-    operation === "discover"
-  ) {
-    const choices = discoveryCategoryChoices();
-    const conversation = conversationFor(
-      request,
-      built,
-      "opportunity_matching",
-      "discover",
-      service,
-      "choose_opportunity_categories",
-      discoveryCategoryMenuMessage(),
-      choices.map((choice) => choice.value),
-      undefined,
-      {
-        requiredAction: "select_opportunity_categories",
-        choices,
-        requiredInputs: [
-          requiredInput({
-            id: "opportunity_categories",
-            type: "enum",
-            prompt:
-              "Choose one or more categories by number, category name, or a natural-language goal.",
-            options: choices,
-          }),
-        ],
-        selectedDiscoveryCategories: [],
-        stage: "choose_opportunity_categories",
-      },
-    );
-    return emptyResponse(request, conversation, undefined, built.filters);
-  }
-
-  if (
     service === "opportunity_finding" &&
     operation === "discover" &&
     selectedDiscoveryCategories.length === 0
@@ -1923,7 +1911,9 @@ export async function handleOpportunityCompanionRequest(
 
   if (
     (selectedFromServiceMenu || enteredMarketplaceService) &&
-    service === "resume_benchmarking_optimization"
+    service === "resume_benchmarking_optimization" &&
+    (!hasResumeEvidence(built.profile, request.resumeText) ||
+      !hasRequestedTarget(request.target))
   ) {
     const prompt =
       operation === "optimize"
@@ -1986,7 +1976,9 @@ export async function handleOpportunityCompanionRequest(
 
   if (
     (selectedFromServiceMenu || enteredMarketplaceService) &&
-    service === "resume_generation"
+    service === "resume_generation" &&
+    (!hasGenerationEvidence(built.evidence) ||
+      !hasRequestedTarget(request.target))
   ) {
     const prompt =
       "What job, internship, scholarship, fellowship, grant, academic program, or other opportunity are you applying for? Paste the description, share the official URL, upload the requirements, or explain the target naturally.";
@@ -2044,6 +2036,7 @@ export async function handleOpportunityCompanionRequest(
   );
   const requiresProfileConfirmation =
     !profileConfirmedNow &&
+    !directResumeExecutionAuthorized &&
     (!activeContext(request)?.profileConfirmed ||
       hasNewConfirmableProfileInput) &&
     (built.evidence.some(

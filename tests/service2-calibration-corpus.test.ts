@@ -35,7 +35,9 @@ test("calibration corpus is versioned, synthetic, hash-locked, and reviewer-blin
   for (const entry of Object.values(manifest.files)) {
     const text = await readFile(path.join(root, entry.path), "utf8");
     assert.equal(
-      createHash("sha256").update(text).digest("hex"),
+      createHash("sha256")
+        .update(text.replace(/\r\n/g, "\n"))
+        .digest("hex"),
       entry.sha256,
       entry.path,
     );

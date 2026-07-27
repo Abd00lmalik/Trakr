@@ -996,6 +996,149 @@ test("paid route completes 402, settlement, business logic, and durable replay",
   process.env.TRAKR_X402_ENFORCEMENT = "off";
 });
 
+test("paid marketplace calls execute the selected service-specific capability", async () => {
+  process.env.TRAKR_X402_ENFORCEMENT = "enforce";
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  process.env.TRAKR_X402_RESULT_SECRET =
+    "service-capability-payment-secret-with-more-than-thirty-two-characters";
+
+  const pool = createPaymentTestPool();
+  setPaymentPoolForTests(pool);
+  const facilitator = new FakeFacilitator();
+  const resumeText = `AMINA TESTER
+Lagos, Nigeria
+Frontend Developer
+SKILLS
+React, TypeScript, JavaScript, HTML, CSS, Git.
+EXPERIENCE
+Built and maintained a fictional React dashboard used by 2,500 students.
+PROJECTS
+Created an accessible TypeScript study planner and documented component tests.
+EDUCATION
+BSc Computer Science student at Fictional University.`;
+  const target = {
+    role: "Frontend Engineer Intern",
+    organization: "Fictional Labs",
+    opportunityType: "internship",
+    description:
+      "Fictional Labs seeks a frontend engineering intern to build accessible interfaces. React and TypeScript are required. Students enrolled in a degree program are eligible.",
+    requirements: [
+      "React and TypeScript are required.",
+      "Applicants must be enrolled in a degree program.",
+    ],
+    locale: "Nigeria",
+  };
+  const consent = {
+    processPersonalData: true,
+    retention: "session_only",
+    source: "explicit",
+  };
+  const entries = [
+    {
+      url: "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+      body: {
+        message:
+          "Find remote AI and frontend internships for a computer science student in Lagos, Nigeria. I use React, TypeScript, and Python.",
+      },
+      expectedService: "opportunity_finding",
+      expectedStage: "discover_completed",
+      capability: "discovery",
+    },
+    {
+      url: "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+      body: { resumeText, target, consent },
+      expectedService: "resume_benchmarking_optimization",
+      expectedStage: "optimize_confirmation",
+      capability: "benchmark",
+    },
+    {
+      url: "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-generation",
+      body: { resumeText, target, consent },
+      expectedService: "resume_generation",
+      expectedStage: "generate_completed",
+      capability: "generation",
+    },
+  ] as const;
+
+  for (const [index, entry] of entries.entries()) {
+    setX402ServerForTests(
+      await createX402Server(facilitator, entry.url),
+    );
+    const unpaid = await POST(
+      new Request(entry.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-forwarded-for": `198.51.100.${150 + index * 2}`,
+        },
+        body: JSON.stringify(entry.body),
+      }),
+    );
+    assert.equal(unpaid.status, 402, entry.url);
+    const challenge = decodeHeader<{
+      x402Version: number;
+      resource: { url: string };
+      accepts: PaymentRequirements[];
+    }>(unpaid.headers.get("PAYMENT-REQUIRED") ?? "");
+    const payload: PaymentPayload = {
+      x402Version: X402_VERSION,
+      resource: challenge.resource,
+      accepted: challenge.accepts[0],
+      payload: {
+        authorization: {
+          from: "0x1111111111111111111111111111111111111111",
+          to: payTo,
+          value: X402_ATOMIC_AMOUNT,
+          validAfter: "0",
+          validBefore: "9999999999",
+          nonce: `0x${String(index + 31).padStart(64, "0")}`,
+        },
+        signature: `0x0${index + 1}`,
+      },
+    };
+    const paid = await POST(
+      new Request(entry.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "PAYMENT-SIGNATURE": encodeHeader(payload),
+          "Idempotency-Key": `service-capability-${index}`,
+          "x-forwarded-for": `198.51.100.${151 + index * 2}`,
+        },
+        body: JSON.stringify(entry.body),
+      }),
+    );
+    const body = await paid.json();
+
+    assert.equal(paid.status, 200, entry.url);
+    assert.equal(body.selectedService, entry.expectedService);
+    assert.equal(body.stage, entry.expectedStage);
+    assert.ok(paid.headers.get("PAYMENT-RESPONSE"));
+    if (entry.capability === "discovery") {
+      assert.ok(body.categoryCoverage.length > 0);
+      assert.equal(body.capabilityResult?.resumeBenchmark, undefined);
+      assert.equal(body.capabilityResult?.resumeGeneration, undefined);
+    } else if (entry.capability === "benchmark") {
+      assert.ok(body.capabilityResult?.resumeBenchmark);
+      assert.equal(body.capabilityResult?.resumeGeneration, undefined);
+    } else {
+      assert.ok(body.capabilityResult?.resumeGeneration);
+      assert.equal(body.capabilityResult?.resumeBenchmark, undefined);
+      assert.deepEqual(
+        body.artifacts.map((artifact: { format: string }) => artifact.format).sort(),
+        ["docx", "pdf"],
+      );
+    }
+  }
+
+  assert.equal(facilitator.verifyCalls, 3);
+  assert.equal(facilitator.settleCalls, 3);
+  await pool.end();
+  setPaymentPoolForTests(undefined);
+  resetX402ServerForTests();
+  process.env.TRAKR_X402_ENFORCEMENT = "off";
+});
+
 test("paid route requires fresh proof after failed settlement and replays success safely", async () => {
   process.env.TRAKR_X402_ENFORCEMENT = "enforce";
   process.env.TRAKR_X402_PAY_TO = payTo;

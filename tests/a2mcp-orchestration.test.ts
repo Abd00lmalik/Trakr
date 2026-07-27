@@ -223,7 +223,7 @@ test("bare marketplace entry starts Opportunity Discovery and explicit bootstrap
   for (const input of [undefined, {}, { message: "" }]) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.6");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.7");
     assertOpportunityEntry(result.body);
   }
   for (const input of [
@@ -745,6 +745,70 @@ test("the three marketplace service entry points start their own workflows direc
   assert.equal(generation.body.operation, "generate_resume");
   assert.equal(generation.body.stage, "generate_awaiting_target");
   assert.equal(generation.body.requiredInputs[0].id, "generation_target");
+});
+
+test("complete marketplace Opportunity Discovery requests execute instead of restarting category intake", async () => {
+  const result = await callRoute({
+    message:
+      "Find remote AI and frontend internships for a computer science student in Lagos, Nigeria. I use React, TypeScript, and Python.",
+  });
+
+  assert.equal(result.response.status, 200);
+  assert.equal(result.body.selectedService, "opportunity_finding");
+  assert.equal(result.body.stage, "discover_completed");
+  assert.ok(result.body.categoryCoverage.length > 0);
+  assert.notEqual(
+    result.body.conversation?.requiredAction,
+    "select_opportunity_categories",
+  );
+});
+
+test("complete marketplace Resume Benchmark requests return the benchmark in the paid call", async () => {
+  const result = await callRoute(
+    {
+      resumeText,
+      target,
+      consent,
+    },
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+  );
+
+  assert.equal(result.response.status, 200);
+  assert.equal(
+    result.body.selectedService,
+    "resume_benchmarking_optimization",
+  );
+  assert.equal(result.body.stage, "optimize_confirmation");
+  assert.ok(result.body.capabilityResult?.resumeBenchmark);
+  assert.notEqual(result.body.stage, "profile_confirmation");
+  assert.notEqual(result.body.stage, "benchmark_awaiting_resume_and_target");
+});
+
+test("complete marketplace Resume Generation requests return generated artifacts in the paid call", async () => {
+  clearLocalArtifactsForTests();
+  const result = await callRoute(
+    {
+      resumeText,
+      target,
+      consent,
+    },
+    {},
+    "http://localhost/api/a2mcp/recommend?service=resume-generation",
+  );
+
+  assert.equal(result.response.status, 200);
+  assert.equal(result.body.selectedService, "resume_generation");
+  assert.equal(result.body.stage, "generate_completed");
+  assert.ok(result.body.capabilityResult?.resumeGeneration);
+  assert.deepEqual(
+    result.body.artifacts
+      .map((artifact: DownloadableArtifact) => artifact.format)
+      .sort(),
+    ["docx", "pdf"],
+  );
+  assert.notEqual(result.body.stage, "profile_confirmation");
+  assert.notEqual(result.body.stage, "generate_awaiting_target");
 });
 
 test("marketplace service selectors reject cross-service operations and continuations before business execution", async () => {
