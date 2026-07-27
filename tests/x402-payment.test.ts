@@ -40,7 +40,7 @@ import {
   setPaymentPoolForTests,
   markSettlementUncertain,
 } from "../src/lib/payments/ledger";
-import { POST } from "../src/app/api/a2mcp/recommend/route";
+import { GET, POST } from "../src/app/api/a2mcp/recommend/route";
 
 const payTo = "0xbe116468bb544723141647608fe98c1bc0471291";
 
@@ -399,6 +399,65 @@ test("all three marketplace service entries receive the same compliant x402 chal
     resetX402ServerForTests();
   }
 
+  process.env.TRAKR_X402_ENFORCEMENT = "off";
+});
+
+test("OKX GET probes receive a compliant challenge that declares POST replay", async () => {
+  process.env.TRAKR_X402_ENFORCEMENT = "enforce";
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new FakeFacilitator();
+  const entries = [
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend",
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-benchmarking-optimization",
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend?service=resume-generation",
+  ];
+
+  for (const entry of entries) {
+    setX402ServerForTests(await createX402Server(facilitator, entry));
+    const response = await GET(new Request(entry));
+    assert.equal(response.status, 402, entry);
+    assert.match(
+      response.headers.get("Access-Control-Allow-Methods") ?? "",
+      /\bGET\b/,
+    );
+    const challenge = decodeHeader<{
+      x402Version: number;
+      resource: { url: string };
+      accepts: PaymentRequirements[];
+    }>(response.headers.get("PAYMENT-REQUIRED") ?? "");
+    assert.equal(challenge.resource.url, entry);
+    assert.equal(challenge.accepts[0].network, X402_NETWORK);
+    assert.equal(challenge.accepts[0].amount, X402_ATOMIC_AMOUNT);
+    const body = await response.json();
+    assert.equal(body.outputSchema.method, "POST");
+  }
+
+  assert.equal(facilitator.verifyCalls, 0);
+  assert.equal(facilitator.settleCalls, 0);
+  resetX402ServerForTests();
+  process.env.TRAKR_X402_ENFORCEMENT = "off";
+});
+
+test("payment proofs are never settled through the GET negotiation path", async () => {
+  process.env.TRAKR_X402_ENFORCEMENT = "enforce";
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new FakeFacilitator();
+  const entry =
+    "https://trakr-production-c70e.up.railway.app/api/a2mcp/recommend";
+  setX402ServerForTests(await createX402Server(facilitator, entry));
+
+  const response = await GET(
+    new Request(entry, {
+      headers: { "PAYMENT-SIGNATURE": "test-proof" },
+    }),
+  );
+  const body = await response.json();
+  assert.equal(response.status, 405);
+  assert.equal(body.code, "paid_replay_requires_post");
+  assert.equal(facilitator.verifyCalls, 0);
+  assert.equal(facilitator.settleCalls, 0);
+
+  resetX402ServerForTests();
   process.env.TRAKR_X402_ENFORCEMENT = "off";
 });
 

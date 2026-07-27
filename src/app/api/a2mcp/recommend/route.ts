@@ -46,7 +46,7 @@ export const runtime = "nodejs";
 
 const responseHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "Content-Type, Authorization, X-Trakr-Api-Key, X-Trakr-Service, Idempotency-Key, X-Request-Id, PAYMENT-SIGNATURE",
   "Access-Control-Expose-Headers":
@@ -528,6 +528,154 @@ function paymentInstructionResponse(
     ...requestHeaders,
     ...instructions.headers,
   });
+}
+
+export async function GET(request: Request) {
+  const requestId =
+    request.headers.get("x-request-id")?.slice(0, 160) || nanoid();
+  const requestHeaders = {
+    "X-Request-Id": requestId,
+    "X-Trakr-Version": TRAKR_SERVICE_VERSION,
+  };
+
+  if (!isAuthorized(request)) {
+    return json(
+      {
+        error: "unauthorized",
+        code: "unauthorized",
+        message: "A valid Trakr API key is required for this deployment.",
+        requestId,
+        retryable: false,
+      },
+      401,
+      requestHeaders,
+    );
+  }
+
+  if (!isX402Enforced()) {
+    return json(
+      {
+        error: "method_not_allowed",
+        code: "method_not_allowed",
+        message: "Use POST for Trakr business requests.",
+        requestId,
+        retryable: false,
+      },
+      405,
+      {
+        ...requestHeaders,
+        Allow: "POST, OPTIONS",
+      },
+    );
+  }
+
+  if (request.headers.has("payment-signature")) {
+    return json(
+      {
+        error: "paid_replay_requires_post",
+        code: "paid_replay_requires_post",
+        message:
+          "The payment challenge declares a POST business request. Replay the paid request with POST and the required body.",
+        requestId,
+        retryable: true,
+      },
+      405,
+      {
+        ...requestHeaders,
+        Allow: "POST, OPTIONS",
+      },
+    );
+  }
+
+  let normalizedPayload: unknown;
+  try {
+    normalizedPayload = normalizeMarketplaceServiceRequest(request, {});
+  } catch (error) {
+    return json(
+      {
+        error: "service_boundary_conflict",
+        code: "service_boundary_conflict",
+        message:
+          error instanceof Error
+            ? error.message
+            : "The request conflicts with the selected Trakr marketplace service.",
+        requestId,
+        retryable: false,
+      },
+      409,
+      requestHeaders,
+    );
+  }
+
+  const parsed = opportunityCompanionRequestSchema.safeParse(
+    normalizedPayload,
+  );
+  if (!parsed.success) {
+    return json(
+      {
+        error: "validation_error",
+        code: "validation_error",
+        message:
+          "Request does not match the Trakr opportunity companion schema.",
+        requestId,
+        retryable: false,
+        issues: parsed.error.issues,
+      },
+      400,
+      requestHeaders,
+    );
+  }
+
+  try {
+    const negotiationRequest = new Request(request.url, {
+      method: "POST",
+      headers: request.headers,
+    });
+    const paymentResult = await processX402Request(
+      negotiationRequest,
+      parsed.data,
+    );
+    if (paymentResult.type === "response") {
+      return paymentInstructionResponse(
+        paymentResult.response,
+        requestHeaders,
+      );
+    }
+  } catch (error) {
+    return json(
+      {
+        error: "payment_service_unavailable",
+        code: "payment_service_unavailable",
+        message:
+          "Trakr could not initialize the payment service for this request.",
+        requestId,
+        retryable: true,
+        detail:
+          process.env.NODE_ENV === "development" &&
+          error instanceof Error
+            ? error.message
+            : undefined,
+      },
+      503,
+      requestHeaders,
+    );
+  }
+
+  return json(
+    {
+      error: "paid_replay_requires_post",
+      code: "paid_replay_requires_post",
+      message:
+        "The payment challenge declares a POST business request. Replay the paid request with POST and the required body.",
+      requestId,
+      retryable: true,
+    },
+    405,
+    {
+      ...requestHeaders,
+      Allow: "POST, OPTIONS",
+    },
+  );
 }
 
 async function executeBusinessRequest(
