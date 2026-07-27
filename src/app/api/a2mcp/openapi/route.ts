@@ -10,6 +10,7 @@ import {
   X402_PRICE_USD,
   X402_SCHEME,
   X402_TOKEN_NAME,
+  X402_TOKEN_SYMBOL,
   X402_VERSION,
 } from "@/lib/payments/config";
 
@@ -308,7 +309,7 @@ export async function GET() {
           description:
             `The bare endpoint starts Opportunity Discovery. Use service=resume-benchmarking-optimization or service=resume-generation to enter the corresponding marketplace workflow. The same endpoint supports explicit operations and caller-carried continuations. Optimization requires a compatible benchmark and explicit approval. ${
               paymentRequired
-                ? `Every valid call requires ${X402_PRICE_USD} ${X402_TOKEN_NAME} through x402 v2 exact payment on ${X402_NETWORK}.`
+                ? `Every valid call requires ${X402_PRICE_USD} ${X402_TOKEN_SYMBOL} through x402 v2 exact payment on ${X402_NETWORK}.`
                 : "Payment enforcement is currently disabled."
             }`,
           parameters: [
@@ -997,13 +998,15 @@ export async function GET() {
       },
       payment: {
         pricing: paymentRequired
-          ? `${X402_PRICE_USD} ${X402_TOKEN_NAME} per valid API call`
+          ? `${X402_PRICE_USD} ${X402_TOKEN_SYMBOL} per valid API call`
           : "free",
         paymentRequired,
         x402Version: X402_VERSION,
         scheme: X402_SCHEME,
         network: X402_NETWORK,
         asset: X402_ASSET,
+        token: X402_TOKEN_SYMBOL,
+        tokenName: X402_TOKEN_NAME,
         amount: X402_ATOMIC_AMOUNT,
         requestHeader: "PAYMENT-SIGNATURE",
         challengeHeader: "PAYMENT-REQUIRED",

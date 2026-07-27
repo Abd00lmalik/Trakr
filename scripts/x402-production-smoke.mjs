@@ -83,6 +83,14 @@ assert.equal(openApiResponse.status, 200);
 assert.equal(metadata.version, expectedVersion);
 assert.equal(openApi.info?.version, expectedVersion);
 assert.equal(metadata.marketplaceServices?.length, 3);
+assert.equal(metadata.payment?.token, "USDT");
+assert.equal(metadata.payment?.tokenName, "USD₮0");
+assert.ok(
+  metadata.marketplaceServices.every(
+    (service) => service.price === "0.005 USDT per valid API call",
+  ),
+);
+assert.equal(openApi["x-trakr-orchestration"]?.payment?.token, "USDT");
 
 const invalidStartedAt = Date.now();
 const invalidResponse = await fetchBounded(endpoint, {

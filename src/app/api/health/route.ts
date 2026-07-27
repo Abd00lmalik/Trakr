@@ -10,6 +10,7 @@ import {
   X402_PRICE_USD,
   X402_SCHEME,
   X402_TOKEN_NAME,
+  X402_TOKEN_SYMBOL,
   X402_VERSION,
 } from "@/lib/payments/config";
 
@@ -63,7 +64,8 @@ export async function GET() {
       scheme: X402_SCHEME,
       network: X402_NETWORK,
       asset: X402_ASSET,
-      token: X402_TOKEN_NAME,
+      token: X402_TOKEN_SYMBOL,
+      tokenName: X402_TOKEN_NAME,
       price: X402_PRICE_USD,
       amount: X402_ATOMIC_AMOUNT,
       settlement: "synchronous",

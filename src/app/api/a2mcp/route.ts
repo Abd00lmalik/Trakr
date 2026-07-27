@@ -12,6 +12,7 @@ import {
   X402_SCHEME,
   X402_TOKEN_DECIMALS,
   X402_TOKEN_NAME,
+  X402_TOKEN_SYMBOL,
   X402_VERSION,
 } from "@/lib/payments/config";
 
@@ -85,7 +86,7 @@ export async function GET() {
     marketplaceServices: TRAKR_MARKETPLACE_SERVICES.map((service) => ({
       ...service,
       method: "POST",
-      price: `${X402_PRICE_USD} ${X402_TOKEN_NAME} per valid API call`,
+      price: `${X402_PRICE_USD} ${X402_TOKEN_SYMBOL} per valid API call`,
     })),
     services: [
       {
@@ -268,7 +269,8 @@ export async function GET() {
       scheme: X402_SCHEME,
       network: X402_NETWORK,
       asset: X402_ASSET,
-      token: X402_TOKEN_NAME,
+      token: X402_TOKEN_SYMBOL,
+      tokenName: X402_TOKEN_NAME,
       tokenDecimals: X402_TOKEN_DECIMALS,
       price: X402_PRICE_USD,
       amount: X402_ATOMIC_AMOUNT,
@@ -277,7 +279,7 @@ export async function GET() {
     },
     submission: {
       pricing: paymentRequired
-        ? `${X402_PRICE_USD} ${X402_TOKEN_NAME} per valid API call`
+        ? `${X402_PRICE_USD} ${X402_TOKEN_SYMBOL} per valid API call`
         : "free",
       responseMode: paymentRequired
         ? "HTTP 402 x402 v2 challenge, then paid HTTP response"

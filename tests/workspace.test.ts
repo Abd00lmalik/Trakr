@@ -319,6 +319,13 @@ test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async (
   assert.ok(generationService.documentTypes.includes("biosketch"));
 
   assert.equal(metadata.marketplaceServices.length, 3);
+  assert.ok(
+    metadata.marketplaceServices.every(
+      (item: { price: string }) => item.price === "0.005 USDT per valid API call",
+    ),
+  );
+  assert.equal(metadata.payment.token, "USDT");
+  assert.equal(metadata.payment.tokenName, "USD₮0");
   assert.deepEqual(
     metadata.marketplaceServices.map((item: { service: string }) => item.service),
     [
@@ -329,7 +336,9 @@ test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async (
   );
   assert.equal(metadata.bootstrap.options.length, 10);
   assert.equal(metadata.legacyBootstrap.options.length, 3);
-  assert.equal(document.info.version, "0.9.11");
+  assert.equal(document.info.version, "0.9.12");
+  assert.equal(document["x-trakr-orchestration"].payment.token, "USDT");
+  assert.equal(document["x-trakr-orchestration"].payment.tokenName, "USD₮0");
   assert.equal(
     document.paths["/api/a2mcp/recommend"].post.parameters[0].name,
     "service",
