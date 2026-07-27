@@ -329,7 +329,7 @@ test("A2MCP metadata and OpenAPI expose all goal-directed capabilities", async (
   );
   assert.equal(metadata.bootstrap.options.length, 10);
   assert.equal(metadata.legacyBootstrap.options.length, 3);
-  assert.equal(document.info.version, "0.9.9");
+  assert.equal(document.info.version, "0.9.10");
   assert.equal(
     document.paths["/api/a2mcp/recommend"].post.parameters[0].name,
     "service",

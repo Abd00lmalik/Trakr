@@ -29,6 +29,8 @@ import {
   X402_SCHEME,
   X402_TOKEN_DECIMALS,
   X402_TOKEN_NAME,
+  X402_TOKEN_SYMBOL,
+  X402_TOKEN_TRANSFER_METHOD,
   X402_TOKEN_VERSION,
   X402_VERSION,
 } from "@/lib/payments/config";
@@ -171,6 +173,8 @@ class TrakrExactEvmScheme extends ExactEvmScheme {
       extra: {
         ...enhanced.extra,
         decimals: X402_TOKEN_DECIMALS,
+        symbol: X402_TOKEN_SYMBOL,
+        transferMethod: X402_TOKEN_TRANSFER_METHOD,
       },
     };
   }
@@ -321,6 +325,8 @@ export async function createX402Server(
         maxTimeoutSeconds: 120,
         extra: {
           decimals: X402_TOKEN_DECIMALS,
+          symbol: X402_TOKEN_SYMBOL,
+          transferMethod: X402_TOKEN_TRANSFER_METHOD,
         },
       },
       resource: resourceUrl,
@@ -332,7 +338,7 @@ export async function createX402Server(
         body: {
           error: "payment_required",
           code: "payment_required",
-          message: `This valid Trakr API call requires ${X402_PRICE_USD} ${X402_TOKEN_NAME} on X Layer.`,
+          message: `This valid Trakr API call requires ${X402_PRICE_USD} ${X402_TOKEN_SYMBOL} on X Layer.`,
           retryable: true,
           outputSchema: TRAKR_X402_OUTPUT_SCHEMA,
           payment: {
@@ -341,9 +347,11 @@ export async function createX402Server(
             network: X402_NETWORK,
             asset: X402_ASSET,
             amount: X402_ATOMIC_AMOUNT,
-            token: X402_TOKEN_NAME,
+            token: X402_TOKEN_SYMBOL,
+            tokenName: X402_TOKEN_NAME,
             tokenVersion: X402_TOKEN_VERSION,
             tokenDecimals: X402_TOKEN_DECIMALS,
+            transferMethod: X402_TOKEN_TRANSFER_METHOD,
           },
         },
       }),

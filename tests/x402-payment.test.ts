@@ -18,6 +18,8 @@ import {
   X402_SCHEME,
   X402_TOKEN_DECIMALS,
   X402_TOKEN_NAME,
+  X402_TOKEN_SYMBOL,
+  X402_TOKEN_TRANSFER_METHOD,
   X402_TOKEN_VERSION,
   X402_VERSION,
 } from "../src/lib/payments/config";
@@ -221,6 +223,8 @@ test("official OKX server emits a compliant x402 v2 exact challenge", async () =
       name: X402_TOKEN_NAME,
       version: X402_TOKEN_VERSION,
       decimals: X402_TOKEN_DECIMALS,
+      symbol: X402_TOKEN_SYMBOL,
+      transferMethod: X402_TOKEN_TRANSFER_METHOD,
     },
   });
   assert.equal(facilitator.verifyCalls, 0);
