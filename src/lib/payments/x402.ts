@@ -44,7 +44,11 @@ class WebRequestAdapter implements HTTPAdapter {
   ) {}
 
   getHeader(name: string) {
-    return this.request.headers.get(name) ?? undefined;
+    const value = this.request.headers.get(name) ?? undefined;
+    if (name.toLowerCase() !== "payment-signature" || !value) {
+      return value;
+    }
+    return normalizePaymentSignatureDecimals(value);
   }
 
   getMethod() {
@@ -146,6 +150,86 @@ export const TRAKR_X402_OUTPUT_SCHEMA = {
 const serverPromises = new Map<string, Promise<x402HTTPResourceServer>>();
 let testServer: x402HTTPResourceServer | undefined;
 
+class TrakrExactEvmScheme extends ExactEvmScheme {
+  override async enhancePaymentRequirements(
+    paymentRequirements: PaymentRequirements,
+    supportedKind: {
+      x402Version: number;
+      scheme: string;
+      network: PaymentRequirements["network"];
+      extra?: Record<string, unknown>;
+    },
+    extensionKeys: string[],
+  ): Promise<PaymentRequirements> {
+    const enhanced = await super.enhancePaymentRequirements(
+      paymentRequirements,
+      supportedKind,
+      extensionKeys,
+    );
+    return {
+      ...enhanced,
+      extra: {
+        ...enhanced.extra,
+        decimals: X402_TOKEN_DECIMALS,
+      },
+    };
+  }
+}
+
+function normalizePaymentSignatureDecimals(value: string) {
+  try {
+    const payload = JSON.parse(
+      Buffer.from(value, "base64").toString("utf8"),
+    ) as {
+      accepted?: PaymentRequirements & { decimals?: unknown };
+    };
+    if (!payload.accepted || payload.accepted.decimals === undefined) {
+      return value;
+    }
+    const { decimals: _decimals, ...accepted } = payload.accepted;
+    return Buffer.from(
+      JSON.stringify({ ...payload, accepted }),
+    ).toString("base64");
+  } catch {
+    return value;
+  }
+}
+
+function addPaymentRequirementDecimals(
+  response: Extract<HTTPProcessResult, { type: "payment-error" }>["response"],
+) {
+  const header =
+    response.headers["PAYMENT-REQUIRED"] ??
+    response.headers["payment-required"];
+  if (!header) return response;
+  try {
+    const challenge = JSON.parse(
+      Buffer.from(header, "base64").toString("utf8"),
+    ) as {
+      accepts?: Array<PaymentRequirements & { decimals?: number }>;
+    };
+    if (!Array.isArray(challenge.accepts)) return response;
+    const encoded = Buffer.from(
+      JSON.stringify({
+        ...challenge,
+        accepts: challenge.accepts.map((requirement) => ({
+          ...requirement,
+          decimals: X402_TOKEN_DECIMALS,
+        })),
+      }),
+    ).toString("base64");
+    return {
+      ...response,
+      headers: {
+        ...response.headers,
+        "PAYMENT-REQUIRED": encoded,
+      },
+    };
+  } catch {
+    return response;
+  }
+}
+
 class ProductionFacilitatorClient implements FacilitatorClient {
   constructor(
     private readonly delegate: FacilitatorClient,
@@ -225,7 +309,7 @@ export async function createX402Server(
 ) {
   const resourceServer = new x402ResourceServer(facilitator).register(
     X402_NETWORK,
-    new ExactEvmScheme(),
+    new TrakrExactEvmScheme(),
   );
   const httpServer = new x402HTTPResourceServer(resourceServer, {
     [X402_ROUTE]: {
@@ -235,6 +319,9 @@ export async function createX402Server(
         payTo: getX402PayTo(),
         price: `$${X402_PRICE_USD}`,
         maxTimeoutSeconds: 120,
+        extra: {
+          decimals: X402_TOKEN_DECIMALS,
+        },
       },
       resource: resourceUrl,
       description:
@@ -354,7 +441,10 @@ export async function processX402Request(
   };
   const result = await server.processHTTPRequest(context);
   if (result.type === "payment-error") {
-    return { type: "response", response: result.response };
+    return {
+      type: "response",
+      response: addPaymentRequirementDecimals(result.response),
+    };
   }
   if (result.type !== "payment-verified") {
     throw new Error("The paid Trakr route was not recognized by x402.");

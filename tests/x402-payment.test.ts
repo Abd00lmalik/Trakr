@@ -16,6 +16,7 @@ import {
   X402_ATOMIC_AMOUNT,
   X402_NETWORK,
   X402_SCHEME,
+  X402_TOKEN_DECIMALS,
   X402_TOKEN_NAME,
   X402_TOKEN_VERSION,
   X402_VERSION,
@@ -215,9 +216,11 @@ test("official OKX server emits a compliant x402 v2 exact challenge", async () =
     amount: X402_ATOMIC_AMOUNT,
     payTo,
     maxTimeoutSeconds: 120,
+    decimals: X402_TOKEN_DECIMALS,
     extra: {
       name: X402_TOKEN_NAME,
       version: X402_TOKEN_VERSION,
+      decimals: X402_TOKEN_DECIMALS,
     },
   });
   assert.equal(facilitator.verifyCalls, 0);
@@ -544,6 +547,45 @@ test("a proof for the wrong network is rejected before settlement", async () => 
   assert.equal(result.response.status, 402);
   assert.equal(facilitator.verifyCalls, 0);
   assert.equal(facilitator.settleCalls, 0);
+  resetX402ServerForTests();
+});
+
+test("buyer-echoed top-level decimals metadata is normalized before verification", async () => {
+  process.env.TRAKR_X402_PAY_TO = payTo;
+  const facilitator = new FakeFacilitator();
+  setX402ServerForTests(await createX402Server(facilitator));
+
+  const unpaid = await processX402Request(request(), { operation: "start" });
+  assert.equal(unpaid.type, "response");
+  if (unpaid.type !== "response") return;
+  const challenge = decodeHeader<{
+    x402Version: number;
+    resource: { url: string };
+    accepts: Array<PaymentRequirements & { decimals: number }>;
+  }>(unpaid.response.headers["PAYMENT-REQUIRED"]);
+  const payload: PaymentPayload = {
+    x402Version: challenge.x402Version,
+    resource: challenge.resource,
+    accepted: challenge.accepts[0],
+    payload: {
+      authorization: {
+        from: "0x1111111111111111111111111111111111111111",
+        to: payTo,
+        value: X402_ATOMIC_AMOUNT,
+        validAfter: "0",
+        validBefore: "9999999999",
+        nonce:
+          "0x4545454545454545454545454545454545454545454545454545454545454545",
+      },
+      signature: "0x01",
+    },
+  };
+  const paid = await processX402Request(
+    request(encodeHeader(payload)),
+    { operation: "start" },
+  );
+  assert.equal(paid.type, "verified");
+  assert.equal(facilitator.verifyCalls, 1);
   resetX402ServerForTests();
 });
 

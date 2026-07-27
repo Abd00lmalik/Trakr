@@ -223,7 +223,7 @@ test("bare marketplace entry starts Opportunity Discovery and explicit bootstrap
   for (const input of [undefined, {}, { message: "" }]) {
     const result = await callRoute(input);
     assert.equal(result.response.status, 200);
-    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.8");
+    assert.equal(result.response.headers.get("x-trakr-version"), "0.9.9");
     assertOpportunityEntry(result.body);
   }
   for (const input of [
